@@ -34,9 +34,9 @@
     </style>
     <div class="launchpad-brand">
       <div class="launchpad-logos">
-        <img src="${url.resourcesPath}/img/redhat.svg" alt="Red Hat" class="launchpad-logo-redhat" />
+        <img src="${url.resourcesPath}/img/redhat.svg?v=20260902-2" alt="Red Hat" class="launchpad-logo-redhat" />
         <span aria-hidden="true" class="launchpad-divider"></span>
-        <img src="${url.resourcesPath}/img/intel.svg" alt="Intel" class="launchpad-logo-intel" />
+        <img src="${url.resourcesPath}/img/intel.svg?v=20260902-2" alt="Intel" class="launchpad-logo-intel" />
       </div>
       <div class="launchpad-title">Intel × Red Hat AI Launchpad</div>
       <div class="launchpad-subtitle">Secure access to your lab environment</div>
