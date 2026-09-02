@@ -208,8 +208,14 @@ async def showroom_assets(request: Request, path: str):
     return await _showroom_alias(request, f"www/assets/{path}")
 
 
+@app.api_route("/token", methods=["GET", "POST"])
+async def showroom_terminal_token(request: Request):
+    return await _showroom_alias(request, "token")
+
+
+@app.websocket("/ws")
 @app.websocket("/terminal/{path:path}")
-async def showroom_terminal_socket(client: WebSocket, path: str):
+async def showroom_terminal_socket(client: WebSocket, path: str = ""):
     try:
         target = await _resolve(client)
     except HTTPException:
@@ -220,7 +226,8 @@ async def showroom_terminal_socket(client: WebSocket, path: str):
         await client.close(code=4404)
         return
     scheme = "wss" if base.startswith("https://") else "ws"
-    upstream_url = f"{scheme}://{base.split('://', 1)[-1].rstrip('/')}/terminal/{path}"
+    upstream_path = "ws" if client.url.path == "/ws" else f"terminal/{path}"
+    upstream_url = f"{scheme}://{base.split('://', 1)[-1].rstrip('/')}/{upstream_path}"
     if client.url.query:
         upstream_url += "?" + client.url.query
     tls = None

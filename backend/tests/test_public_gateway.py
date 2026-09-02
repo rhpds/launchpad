@@ -37,6 +37,8 @@ def test_gateway_exposes_participant_home_and_add_lab_routes():
     assert "/instructions/{path:path}" in paths
     assert "/terminal/{path:path}" in paths
     assert "/assets/{path:path}" in paths
+    assert "/token" in paths
+    assert "/ws" in paths
 
 
 def test_participant_shell_uses_launchpad_navigation_and_switch_identity():
