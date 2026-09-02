@@ -18,6 +18,12 @@ class ClaimRequest(BaseModel):
     code: str
 
 
+class IdentityClaimRequest(BaseModel):
+    host: str
+    username: str
+    code: str
+
+
 def _require_broker(key: str) -> None:
     expected = os.getenv("ACCESS_BROKER_KEY", "")
     if not expected or not __import__("secrets").compare_digest(expected, key):
@@ -221,3 +227,53 @@ def resolve_oidc_identity(host: str, username: str, x_access_broker_key: str = H
         console_url = cluster.public_console_url or cluster.console_url
     public_access_service._audit("authorize", policy.order_id, "granted", identity.participant_id)
     return {"order_id": policy.order_id, "seat_ref": entitlement.seat_ref, "expires_at": entitlement.expires_at, "showroom_url": showroom_url, "workspace_url": workspace_url, "console_url": console_url}
+
+
+@router.get("/private/identity-entitlements")
+def identity_entitlements(username: str, x_access_broker_key: str = Header(default="")):
+    """Return every currently usable lab for one trusted OIDC identity."""
+    _require_broker(x_access_broker_key)
+    identity = next(
+        (item for item in public_access_service._identities.values() if item.keycloak_username == username),
+        None,
+    )
+    if not identity or identity.disabled_at:
+        raise HTTPException(403, "Access denied")
+    labs = []
+    for entitlement in public_access_service.entitlements_for(identity.participant_id):
+        policy = public_access_service.get_policy(entitlement.order_id)
+        if not policy or not policy.enabled:
+            continue
+        try:
+            target = resolve_oidc_identity(
+                host=policy.public_url.split("//", 1)[-1].split("/", 1)[0],
+                username=username,
+                x_access_broker_key=x_access_broker_key,
+            )
+        except HTTPException:
+            continue
+        labs.append({**target, "public_url": policy.public_url, "catalog_slug": policy.catalog_slug})
+    return {"username": username, "labs": sorted(labs, key=lambda item: str(item["expires_at"]))}
+
+
+@router.post("/private/claim-identity")
+def claim_oidc_identity(body: IdentityClaimRequest, x_access_broker_key: str = Header(default="")):
+    """Add the lab addressed by host to an existing signed-in participant."""
+    _require_broker(x_access_broker_key)
+    policy = public_access_service.get_policy_by_host(body.host)
+    identity = next(
+        (item for item in public_access_service._identities.values() if item.keycloak_username == body.username),
+        None,
+    )
+    if not policy or not policy.enabled or not identity or identity.disabled_at:
+        raise HTTPException(403, "Access request cannot be completed")
+    try:
+        result = public_access_service.claim(
+            policy.order_id, identity.normalized_email, body.code, "oidc-gateway"
+        )
+        provisioning_service.bind_public_participant(
+            policy.order_id, result.entitlement.seat_ref, identity.keycloak_username
+        )
+    except ValueError:
+        raise HTTPException(403, "Access request cannot be completed")
+    return {"order_id": policy.order_id, "seat_ref": result.entitlement.seat_ref}

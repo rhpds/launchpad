@@ -1,0 +1,20 @@
+version: 2
+required_score: 100
+categories:
+  identity_and_claims: {points: 20, earned: 20}
+  authorization_and_isolation: {points: 20, earned: 18}
+  public_ingress_dns_tls: {points: 15, earned: 3}
+  keycloak_openshift_sso: {points: 15, earned: 8}
+  rotation_expiry_cleanup: {points: 15, earned: 8}
+  participant_instructor_usability: {points: 5, earned: 3}
+  audit_and_evidence_integrity: {points: 5, earned: 4}
+  repeatability_and_recovery: {points: 5, earned: 4}
+current_score: 68
+release_ready: false
+blocking_gates:
+  - stable public wildcard DNS and trusted TLS
+  - production entitlement-aware gateway
+  - OpenShift Console OIDC SSO
+  - deletion of operational entitlement and ephemeral identity residue
+  - participant home with add-lab and resume journeys
+  - three consecutive complete certification runs

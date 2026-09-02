@@ -44,6 +44,30 @@ def _page(body: str) -> HTMLResponse:
     return HTMLResponse(f"""<!doctype html><html><head><meta name=viewport content='width=device-width,initial-scale=1'><title>Join your lab</title><style>body{{font:16px system-ui;background:#151515;color:#fff;margin:0}}main{{max-width:560px;margin:8vh auto;padding:32px;background:#212121;border:1px solid #444;border-radius:10px}}input,button,a{{box-sizing:border-box;width:100%;padding:13px;margin-top:10px;border-radius:5px}}input{{background:#151515;color:#fff;border:1px solid #888}}button,a{{background:#e00;color:#fff;border:0;font-weight:700;text-decoration:none;display:block;text-align:center}}small{{color:#bbb}}</style></head><body><main>{body}</main></body></html>""")
 
 
+async def _labs_for(username: str) -> list[dict]:
+    async with httpx.AsyncClient(timeout=10) as client:
+        response = await client.get(
+            f"{BACKEND}/public-access/private/identity-entitlements",
+            params={"username": username},
+            headers={"X-Access-Broker-Key": BROKER_KEY},
+        )
+    if response.status_code != 200:
+        return []
+    return response.json().get("labs", [])
+
+
+def _lab_cards(labs: list[dict]) -> str:
+    if not labs:
+        return "<p>No active labs are associated with this account.</p>"
+    cards = []
+    for lab in labs:
+        label = html.escape(lab.get("catalog_slug") or "Lab environment")
+        url = html.escape(lab["public_url"], quote=True)
+        expiry = html.escape(str(lab["expires_at"]))
+        cards.append(f"<section><h2>{label}</h2><p>Available until {expiry}</p><a href='{url}'>Resume lab</a></section>")
+    return "".join(cards)
+
+
 @app.get("/health")
 def health():
     return {"status": "ok", "service": "public-access-gateway"}
@@ -51,16 +75,51 @@ def health():
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
+    username = request.headers.get("x-forwarded-user", "")
     try:
         target = await _resolve(request)
     except HTTPException:
+        if username:
+            return _page(
+                "<h1>Add this lab</h1><p>You are already signed in. Enter only this lab's instructor code.</p>"
+                "<form method=post action=/add-lab><input name=code required autocomplete=one-time-code "
+                "placeholder='Instructor code'><button>Add lab</button></form><a href='/my-labs'>My Lab Access</a>"
+            )
         return _page("<h1>Join your lab</h1><p>Enter the email label and code supplied by your instructor.</p><small>Email ownership is not verified. The instructor code is the sole secret.</small><form method=post action=/claim><input name=email type=email required placeholder='Email'><input name=code required autocomplete=one-time-code placeholder='Instructor code'><button>Join lab</button></form>")
     links = []
     for key, label in (("showroom_url", "Open visual guide"), ("workspace_url", "Open workspace"), ("console_url", "Open OpenShift Console")):
         if target.get(key):
             path = "/proxy/" + key.removesuffix("_url") + "/"
             links.append(f"<a href='{path}'>{html.escape(label)}</a>")
-    return _page(f"<h1>Your lab is ready</h1><p>Seat <strong>{html.escape(target['seat_ref'])}</strong></p>{''.join(links)}<small>Access ends at {html.escape(str(target['expires_at']))}.</small>")
+    return _page(f"<h1>Your lab is ready</h1><p>Seat <strong>{html.escape(target['seat_ref'])}</strong></p>{''.join(links)}<a href='/my-labs'>My Lab Access</a><small>Access ends at {html.escape(str(target['expires_at']))}.</small>")
+
+
+@app.get("/my-labs", response_class=HTMLResponse)
+async def my_labs(request: Request):
+    username = request.headers.get("x-forwarded-user", "")
+    if not username:
+        return RedirectResponse("/", status_code=302)
+    return _page(
+        "<h1>My Lab Access</h1><p>Resume any active environment associated with your participant identity.</p>"
+        + _lab_cards(await _labs_for(username))
+        + "<small>To add another lab, open its instructor-provided link and enter that lab's code.</small>"
+    )
+
+
+@app.post("/add-lab")
+async def add_lab(request: Request, code: str = Form()):
+    username = request.headers.get("x-forwarded-user", "")
+    if not username:
+        return RedirectResponse("/", status_code=303)
+    async with httpx.AsyncClient(timeout=15) as client:
+        result = await client.post(
+            f"{BACKEND}/public-access/private/claim-identity",
+            json={"host": _host(request), "username": username, "code": code},
+            headers={"X-Access-Broker-Key": BROKER_KEY},
+        )
+    if result.status_code != 200:
+        return _page("<h1>Access denied</h1><p>Access request cannot be completed. Check the instructor code.</p><a href='/my-labs'>My Lab Access</a>")
+    return RedirectResponse("/", status_code=303)
 
 
 @app.post("/claim")

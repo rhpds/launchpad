@@ -1,0 +1,40 @@
+{
+  "evidence_id": "PA-ARENA-CF-20260902-01",
+  "feature": "public-passwordless-lab-access",
+  "cluster": "arena",
+  "source_commit": "bde5b6ff5fe1bce993c47056b5a4ead9091b1dc6",
+  "backend_image_digest": "sha256:153df7118df520ddfc3d161e780b7cbe63bda6ada59ca6c84c176b691123b822",
+  "keycloak_image_digest": "sha256:a915649e4f588c7af5bb86b9d1eaa42d4934ae5695d9c879fcafda6fa7fcba49",
+  "workshop_id": "8f10fd1e-06c2-4508-bd04-488fcaa4297a",
+  "transport": {
+    "kind": "cloudflare_quick_tunnel",
+    "purpose": "temporary external functional certification only",
+    "production_dns_tls_certified": false,
+    "wildcard_order_hosts_supported": false
+  },
+  "results": {
+    "local_component_contract_tests": {"passed": 19, "failed": 0},
+    "keycloak_restart_recovery": {"passed": true},
+    "backend_restart_recovery": {"passed": true},
+    "single_external_oidc_claim": {"passed": true, "seconds": 3.203, "profile_prompt_seen": false},
+    "simultaneous_external_oidc_claims": {"requested": 25, "passed": 25, "failed": 0, "wall_seconds": 4.151, "p95_seconds": 3.963, "duplicate_seats": 0},
+    "namespace_rbac": {"unique_bindings": 25, "own_namespace_edit": true, "cross_seat_edit": false, "cluster_admin": false},
+    "rotation": {"old_code_rejected": true, "bindings_removed": 25, "new_code_restored_original_seat": true},
+    "rate_limit": {"failed_attempt_limit": 5, "uniform_error": true},
+    "bulk_reclaim": {"seats_reclaimed": 25, "namespaces_remaining": 0, "argocd_applications_remaining": 0, "rolebindings_remaining": 0},
+    "operational_access_cleanup": {"policy_enabled": false, "active_entitlements": 0, "active_sessions": 0, "historical_entitlement_rows_remaining": 27, "passed": false}
+  },
+  "defects": [
+    {"id": "PA-UX-PROFILE", "status": "fixed", "regression_test": "backend/tests/test_keycloak_authenticator_contract.py"},
+    {"id": "PA-COUNT-REVOKED", "status": "fixed", "regression_test": "backend/tests/test_public_access.py::test_owner_summary_counts_only_active_claims"},
+    {"id": "PA-CLEANUP-RECORDS", "status": "open", "description": "Reclaim leaves revoked entitlement history in operational tables; GA rubric requires removal."}
+  ],
+  "safety": {
+    "temporary_routes_and_tunnels_removed": true,
+    "arena_gitops_restored": true,
+    "arena_public_gateway_replicas": 0,
+    "arena_public_access_enabled": false,
+    "oberon_temporary_keycloak_change_detected_and_fully_restored": true
+  },
+  "conclusion": "Functional identity, claim, concurrency, RBAC, rotation, rate-limit, restart, and bulk resource cleanup paths passed on Arena. Production public ingress, entitlement-record deletion, participant home, gateway authorization, and OpenShift Console SSO remain release blockers."
+}
