@@ -78,7 +78,10 @@ def build_showroom_application(
         "showroom_journey": seat.journey,
     }
     tabs = [
-        {"name": "Instructions", "path": "/instructions", "port": 443},
+        # Use the generated Antora page directly.  Routing through the
+        # /instructions redirect can make Showroom persist the outer frame URL
+        # as the tab URL and recursively embed the lab shell.
+        {"name": "Instructions", "path": "/www/modules/index.html", "port": 443},
         {"name": "Terminal", "path": "/terminal", "port": 443},
     ]
     if seat.workspace_url:
@@ -88,7 +91,10 @@ def build_showroom_application(
     ui_config = {
         "type": "showroom",
         "default_width": 40,
-        "persist_url_state": True,
+        # Public labs are reverse-proxied beneath a participant gateway.  URL
+        # state persistence is unsafe there because an outer Showroom URL can
+        # be restored inside one of its own frames.
+        "persist_url_state": False,
         "tabs": tabs,
     }
     values = {

@@ -55,6 +55,8 @@ def test_operator_workshop_places_namespace_console_inside_showroom():
     assert [tab["name"] for tab in ui["tabs"]] == [
         "Instructions", "Terminal", "OpenShift Console",
     ]
+    assert ui["tabs"][0]["path"] == "/www/modules/index.html"
+    assert ui["persist_url_state"] is False
     assert ui["tabs"][-1]["url"] == "https://console.example.com"
     user_data = yaml.safe_load(values["content"]["user_data"])
     assert user_data["openshift_console_url"] == "https://console.example.com"
