@@ -48,6 +48,23 @@ def _make_service(catalog_item=None, preflight=None, max_workshop=50):
 # ── Task 8: Session limits for workshops ─────────────────────────────
 
 class TestWorkshopSessionLimits:
+    def test_ready_workshop_has_validated_ready_sessions(self):
+        """A workshop must not report ready while its sessions are validating."""
+        svc = _make_service()
+        workshop = Workshop(
+            tenant_id="test-tenant",
+            catalog_item_id="demo-a",
+            num_users=2,
+            ttl="4h",
+        )
+
+        result = svc.provision_workshop(workshop)
+
+        assert result.status == "ready"
+        sessions = [svc.get_session(session_id) for session_id in result.session_ids]
+        assert all(session.status == "ready" for session in sessions)
+        assert all(session.validation_results for session in sessions)
+
     def test_workshop_bypasses_per_user_limit(self):
         """Each workshop user is unique, so per-user limit shouldn't block."""
         svc = _make_service()

@@ -1472,6 +1472,17 @@ class ProvisioningService:
             session = self.provision(
                 accepted.request_id, workshop_id=workshop.workshop_id
             )
+            session = self.validate_session(session.session_id)
+            if session.status != SessionStatus.READY:
+                return seat.model_copy(update={
+                    "status": WorkshopSeatStatus.FAILED,
+                    "session_id": session.session_id,
+                    "request_id": accepted.request_id,
+                    "lab_url": session.lab_url,
+                    "showroom_url": session.metadata.get("showroom_url") or session.lab_url,
+                    "error": "seat validation failed",
+                    "updated_at": datetime.utcnow(),
+                }), None
             session = session.model_copy(update={
                 "metadata": {
                     **session.metadata,
