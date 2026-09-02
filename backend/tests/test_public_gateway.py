@@ -35,6 +35,7 @@ def test_gateway_exposes_participant_home_and_add_lab_routes():
     assert "/my-labs" in paths
     assert "/add-lab" in paths
     assert "/instructions/{path:path}" in paths
+    assert "/www/{path:path}" in paths
     assert "/terminal/{path:path}" in paths
     assert "/assets/{path:path}" in paths
     assert "/token" in paths

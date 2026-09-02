@@ -194,6 +194,13 @@ async def _showroom_alias(request: Request, path: str) -> Response:
 @app.api_route("/instructions", methods=["GET", "HEAD"])
 @app.api_route("/instructions/{path:path}", methods=["GET", "HEAD"])
 async def showroom_instructions(request: Request, path: str = ""):
+    if not path:
+        return RedirectResponse("/www/modules/index.html", status_code=302)
+    return await _showroom_alias(request, f"www/modules/{path}")
+
+
+@app.api_route("/www/{path:path}", methods=["GET", "HEAD"])
+async def showroom_generated_site(request: Request, path: str):
     return await _showroom_alias(request, f"www/{path}")
 
 
@@ -235,9 +242,15 @@ async def showroom_terminal_socket(client: WebSocket, path: str = ""):
         tls = ssl.create_default_context()
         tls.check_hostname = False
         tls.verify_mode = ssl.CERT_NONE
-    await client.accept()
+    requested_protocols = [value.strip() for value in client.headers.get("sec-websocket-protocol", "").split(",")]
+    selected_protocol = "tty" if "tty" in requested_protocols else None
+    await client.accept(subprotocol=selected_protocol)
     try:
-        async with websockets.connect(upstream_url, ssl=tls) as upstream:
+        async with websockets.connect(
+            upstream_url,
+            ssl=tls,
+            subprotocols=[selected_protocol] if selected_protocol else None,
+        ) as upstream:
             async def to_upstream():
                 while True:
                     message = await client.receive()
