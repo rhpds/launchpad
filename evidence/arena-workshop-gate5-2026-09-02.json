@@ -1,0 +1,47 @@
+{
+  "evidence_id": "ARENA-WORKSHOP-GATE5-2026-09-02",
+  "cluster": "arena",
+  "workshop_id": "825d7196-9fea-4fe9-90b9-0d5691cd99df",
+  "catalog_item_id": "openshift-operators-workshop",
+  "seats_requested": 5,
+  "started_at": "2026-09-02T11:23:51Z",
+  "placement": {
+    "selected_cluster": "arena",
+    "whole_workshop_affinity": true,
+    "capacity_preview": "pass",
+    "estimated_fleet_capacity_with_20_percent_headroom": 649
+  },
+  "red": [
+    {
+      "check": "dynamic_namespace_gitops_permissions",
+      "result": "fail",
+      "remediation": "Bound the Arena Argo controller to the existing restricted launchpad-argocd-manager role"
+    },
+    {
+      "check": "five_seat_concurrent_gitops_memory",
+      "result": "fail",
+      "remediation": "Raised the Arena Argo application-controller limit from 2 GiB to 4 GiB"
+    },
+    {
+      "check": "participant_console_namespace_access",
+      "result": "fail",
+      "remediation": "Added one edit RoleBinding for each participant identity in only its assigned seat namespace"
+    }
+  ],
+  "green": [
+    {"check": "five_seats_ready", "result": "pass", "count": 5},
+    {"check": "five_showroom_applications_synced", "result": "pass", "count": 5},
+    {"check": "five_showroom_pods_ready", "result": "pass", "count": 5},
+    {"check": "five_showroom_routes_http_200", "result": "pass", "count": 5},
+    {"check": "correct_antora_operator_content", "result": "pass", "page_title": "OpenShift AI Operator Workshop"},
+    {"check": "session_validation", "result": "pass", "checks_per_seat": 2},
+    {"check": "participant_own_namespace_edit", "result": "pass", "count": 5},
+    {"check": "participant_cross_seat_denial", "result": "pass", "count": 5},
+    {"check": "bulk_reclaim", "result": "pass"},
+    {"check": "remaining_namespaces", "result": "pass", "count": 0},
+    {"check": "remaining_argocd_applications", "result": "pass", "count": 0},
+    {"check": "openshift_authentication_operator", "result": "pass", "status": "Available/NotDegraded"}
+  ],
+  "result": "GREEN-live after remediation",
+  "next_gate": "Repeat five-seat run from a clean state, then certify 25 concurrent seats"
+}

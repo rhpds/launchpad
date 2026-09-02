@@ -131,6 +131,20 @@ def test_showroom_namespace_is_labeled_for_namespaced_argocd():
     assert body.metadata.labels["argocd.argoproj.io/managed-by"] == "argocd"
 
 
+def test_workshop_participant_gets_edit_only_in_seat_namespace():
+    adapter = OpenShiftProvisioningAdapter.__new__(OpenShiftProvisioningAdapter)
+    adapter._rbac_v1 = MagicMock()
+
+    adapter._grant_participant_access("seat-namespace", "workshop-user-1")
+
+    call = adapter._rbac_v1.create_namespaced_role_binding.call_args
+    assert call.kwargs["namespace"] == "seat-namespace"
+    binding = call.kwargs["body"]
+    assert binding.role_ref.name == "edit"
+    assert binding.subjects[0].kind == "User"
+    assert binding.subjects[0].name == "workshop-user-1"
+
+
 def test_guided_lab_namespace_keeps_generated_showroom_host_label_valid():
     namespace = OpenShiftProvisioningAdapter._demo_namespace(
         "smoke-test-tenant",

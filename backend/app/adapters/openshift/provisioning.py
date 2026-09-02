@@ -69,10 +69,12 @@ class OpenShiftProvisioningAdapter:
             self._core_v1 = client.CoreV1Api()
             self._apps_v1 = client.AppsV1Api()
             self._custom_objects = client.CustomObjectsApi()
+            self._rbac_v1 = client.RbacAuthorizationV1Api()
         else:
             self._core_v1 = clients.core
             self._apps_v1 = clients.apps
             self._custom_objects = clients.custom
+            self._rbac_v1 = clients.rbac
         self._showroom_gitops = ShowroomGitOpsAdapter(
             argocd_custom_objects or self._custom_objects,
             os.environ.get("SHOWROOM_ARGOCD_NAMESPACE", "argocd")
@@ -119,7 +121,7 @@ class OpenShiftProvisioningAdapter:
                 "participant_id": request.metadata.get("participant_id", request.requester_id),
                 "showroom_content_repo_url": meta.get(
                     "showroom_content_repo_url",
-                    os.environ.get("SHOWROOM_CONTENT_REPO_URL", "https://github.com/jkershawrh/launchpad.git"),
+                    os.environ.get("SHOWROOM_CONTENT_REPO_URL", "https://github.com/rhpds/launchpad.git"),
                 ),
                 "showroom_content_ref": meta.get(
                     "showroom_content_ref", os.environ.get("SHOWROOM_CONTENT_REF", "main")
@@ -176,6 +178,9 @@ class OpenShiftProvisioningAdapter:
             },
         )
         self._grant_image_pull(demo_namespace)
+        self._grant_participant_access(
+            demo_namespace, str(res.get("participant_id", ""))
+        )
         # The official Showroom chart clones Git content and builds Antora at
         # startup. Keep the restricted egress policy for ordinary demos, but
         # do not attach it to guided Showroom namespaces.
@@ -450,13 +455,42 @@ http {{
             ],
         )
         try:
-            self._rbac_v1 = client.RbacAuthorizationV1Api()
             self._rbac_v1.create_namespaced_role_binding(
                 namespace="partner-ai-launchpad", body=body
             )
         except ApiException as exc:
             if exc.status != 409:
                 pass
+
+    def _grant_participant_access(self, namespace: str, participant_id: str) -> None:
+        if not participant_id:
+            return
+        body = client.V1RoleBinding(
+            metadata=client.V1ObjectMeta(
+                name="launchpad-participant", namespace=namespace
+            ),
+            role_ref=client.V1RoleRef(
+                api_group="rbac.authorization.k8s.io",
+                kind="ClusterRole",
+                name="edit",
+            ),
+            subjects=[
+                client.RbacV1Subject(
+                    api_group="rbac.authorization.k8s.io",
+                    kind="User",
+                    name=participant_id,
+                )
+            ],
+        )
+        try:
+            self._rbac_v1.create_namespaced_role_binding(
+                namespace=namespace, body=body
+            )
+        except ApiException as exc:
+            if exc.status != 409:
+                raise ValueError(
+                    f"Failed to grant workshop access to {participant_id}: {exc.reason}"
+                ) from exc
 
     def _create_demo_secrets(self, namespace: str, session_maas_key: str = "") -> None:
         import os
