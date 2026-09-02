@@ -2,14 +2,23 @@ from __future__ import annotations
 
 import html
 import os
+import asyncio
+import ssl
 from datetime import datetime
+from pathlib import Path
 from urllib.parse import urljoin
 
 import httpx
-from fastapi import FastAPI, Form, HTTPException, Request, Response
+import websockets
+from fastapi import FastAPI, Form, HTTPException, Request, Response, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI(title="Launchpad Public Access Gateway", docs_url=None, redoc_url=None, openapi_url=None)
+_logo_dir = Path("/opt/app-root/src/public/logos")
+if not _logo_dir.exists():
+    _logo_dir = Path(__file__).resolve().parents[2] / "frontend/public/logos"
+app.mount("/brand", StaticFiles(directory=_logo_dir), name="participant-brand")
 BACKEND = os.getenv("LAUNCHPAD_INTERNAL_API", "http://backend:8000/api/v1").rstrip("/")
 BROKER_KEY = os.getenv("ACCESS_BROKER_KEY", "")
 UPSTREAM_TLS_VERIFY = os.getenv("PUBLIC_UPSTREAM_TLS_VERIFY", "true").casefold() not in {"0", "false", "no"}
@@ -50,7 +59,8 @@ async def _resolve(request: Request) -> dict:
 def _page(body: str) -> HTMLResponse:
     return HTMLResponse(f"""<!doctype html><html><head><meta name=viewport content='width=device-width,initial-scale=1'><title>Intel × Red Hat AI Launchpad</title><style>
     :root{{--red:#ee0000;--blue:#0071c5;--panel:#212121;--muted:#b8bbbe}}*{{box-sizing:border-box}}body{{font:16px 'Red Hat Text',system-ui,sans-serif;background:radial-gradient(circle at 15% 0,#3b1717 0,transparent 34%),radial-gradient(circle at 90% 20%,#102c43 0,transparent 30%),#151515;color:#fff;margin:0;min-height:100vh}}header{{height:68px;border-bottom:1px solid #353535;background:rgba(21,21,21,.94);display:flex;align-items:center;justify-content:space-between;padding:0 max(24px,calc((100vw - 1120px)/2))}}.brand{{display:flex;align-items:center;gap:12px;font-weight:750;letter-spacing:.01em}}.brand-red{{color:var(--red)}}.brand-intel{{color:#59b8ee}}nav{{display:flex;align-items:center;gap:8px}}nav a{{color:var(--muted);padding:9px 12px;text-decoration:none;border-radius:6px}}nav a:hover{{color:#fff;background:#ffffff12}}main{{max-width:1040px;margin:0 auto;padding:64px 24px 80px}}.panel,section{{background:rgba(33,33,33,.96);border:1px solid #3c3c3c;border-radius:12px;padding:28px;margin-top:20px;box-shadow:0 18px 50px #0005}}h1{{font-size:clamp(30px,5vw,46px);line-height:1.08;margin:0 0 12px}}h2{{margin:0 0 8px}}p{{color:var(--muted);line-height:1.55}}.actions{{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-top:24px}}a.button,button{{display:block;background:var(--red);color:#fff;border:0;border-radius:6px;padding:13px 18px;font-weight:700;text-align:center;text-decoration:none;cursor:pointer}}a.secondary{{background:#2b2b2b;border:1px solid #555}}input{{width:100%;background:#151515;color:#fff;border:1px solid #777;border-radius:6px;padding:13px;margin:7px 0 12px}}small{{display:block;color:#8d9092;margin-top:20px}}.eyebrow{{color:#59b8ee;text-transform:uppercase;font-size:12px;font-weight:800;letter-spacing:.12em}}@media(max-width:700px){{header{{height:auto;padding:18px 22px;align-items:flex-start;gap:15px;flex-direction:column}}main{{padding-top:40px}}}}
-    </style></head><body><header><div class='brand'><span class='brand-red'>Red Hat</span><span>×</span><span class='brand-intel'>intel</span><span>AI Launchpad</span></div><nav><a href='/'>Current lab</a><a href='/my-labs'>My Lab Access</a><a href='/oauth2/sign_out?rd=%2Frealms%2Flaunchpad-public%2Fprotocol%2Fopenid-connect%2Flogout'>Switch participant</a></nav></header><main><div class='eyebrow'>Participant workspace</div><div class='panel'>{body}</div></main></body></html>""")
+    .brand img{{display:block;object-fit:contain}}.brand .redhat{{height:25px;width:auto}}.brand .intel{{height:19px;width:auto}}
+    </style></head><body><header><div class='brand'><img class='redhat' src='/brand/redhat.png' alt='Red Hat'><span>×</span><img class='intel' src='/brand/intel.png' alt='Intel'><span>AI Launchpad</span></div><nav><a href='/'>Current lab</a><a href='/my-labs'>My Lab Access</a><a href='/oauth2/sign_out?rd=%2Frealms%2Flaunchpad-public%2Fprotocol%2Fopenid-connect%2Flogout'>Switch participant</a></nav></header><main><div class='eyebrow'>Participant workspace</div><div class='panel'>{body}</div></main></body></html>""")
 
 
 async def _labs_for(username: str) -> list[dict]:
@@ -167,3 +177,78 @@ async def proxy(kind: str, path: str, request: Request):
         upstream = await client.request(request.method, url, params=request.query_params, headers={"accept": request.headers.get("accept", "*/*")})
     excluded = {"content-length", "connection", "transfer-encoding", "set-cookie"}
     return Response(upstream.content, status_code=upstream.status_code, headers={k: v for k, v in upstream.headers.items() if k.casefold() not in excluded})
+
+
+async def _showroom_alias(request: Request, path: str) -> Response:
+    target = await _resolve(request)
+    base = target.get("showroom_url")
+    if not base:
+        raise HTTPException(404)
+    url = urljoin(base.rstrip("/") + "/", path.lstrip("/"))
+    async with httpx.AsyncClient(timeout=30, follow_redirects=False, verify=UPSTREAM_TLS_VERIFY) as client:
+        upstream = await client.request(request.method, url, params=request.query_params, headers={"accept": request.headers.get("accept", "*/*")})
+    excluded = {"content-length", "connection", "transfer-encoding", "set-cookie"}
+    return Response(upstream.content, status_code=upstream.status_code, headers={k: v for k, v in upstream.headers.items() if k.casefold() not in excluded})
+
+
+@app.api_route("/instructions", methods=["GET", "HEAD"])
+@app.api_route("/instructions/{path:path}", methods=["GET", "HEAD"])
+async def showroom_instructions(request: Request, path: str = ""):
+    return await _showroom_alias(request, f"instructions/{path}")
+
+
+@app.api_route("/terminal", methods=["GET", "HEAD"])
+@app.api_route("/terminal/{path:path}", methods=["GET", "HEAD"])
+async def showroom_terminal(request: Request, path: str = ""):
+    return await _showroom_alias(request, f"terminal/{path}")
+
+
+@app.api_route("/assets/{path:path}", methods=["GET", "HEAD"])
+async def showroom_assets(request: Request, path: str):
+    return await _showroom_alias(request, f"assets/{path}")
+
+
+@app.websocket("/terminal/{path:path}")
+async def showroom_terminal_socket(client: WebSocket, path: str):
+    try:
+        target = await _resolve(client)
+    except HTTPException:
+        await client.close(code=4403)
+        return
+    base = target.get("showroom_url")
+    if not base:
+        await client.close(code=4404)
+        return
+    scheme = "wss" if base.startswith("https://") else "ws"
+    upstream_url = f"{scheme}://{base.split('://', 1)[-1].rstrip('/')}/terminal/{path}"
+    if client.url.query:
+        upstream_url += "?" + client.url.query
+    tls = None
+    if scheme == "wss" and not UPSTREAM_TLS_VERIFY:
+        tls = ssl.create_default_context()
+        tls.check_hostname = False
+        tls.verify_mode = ssl.CERT_NONE
+    await client.accept()
+    try:
+        async with websockets.connect(upstream_url, ssl=tls) as upstream:
+            async def to_upstream():
+                while True:
+                    message = await client.receive()
+                    if message.get("bytes") is not None:
+                        await upstream.send(message["bytes"])
+                    elif message.get("text") is not None:
+                        await upstream.send(message["text"])
+                    else:
+                        break
+            async def to_client():
+                async for message in upstream:
+                    if isinstance(message, bytes):
+                        await client.send_bytes(message)
+                    else:
+                        await client.send_text(message)
+            tasks = [asyncio.create_task(to_upstream()), asyncio.create_task(to_client())]
+            done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
+            for task in pending:
+                task.cancel()
+    except (WebSocketDisconnect, websockets.WebSocketException):
+        pass

@@ -174,14 +174,14 @@ def resolve_gateway_target(
         lab_session = next((item for item in provisioning_service._sessions.values() if item.request_id == policy.order_id), None)
         if lab_session:
             showroom_url = lab_session.lab_url
-            workspace_url = lab_session.dashboard_url or lab_session.lab_url
+            workspace_url = lab_session.metadata.get("workspace_url") or lab_session.dashboard_url
     if lab_session and lab_session.cluster_ref and provisioning_service.cluster_registry:
         target = provisioning_service.cluster_registry.get(lab_session.cluster_ref)
         console_url = target.public_console_url or target.console_url
         if console_url and lab_session.namespace:
             console_url = f"{console_url.rstrip('/')}/topology/ns/{lab_session.namespace}"
-        if not workspace_url or "example.com" in workspace_url:
-            workspace_url = console_url or showroom_url
+        if workspace_url and ("example.com" in workspace_url or ".apps.cluster.local" in workspace_url):
+            workspace_url = None
     return {
         "order_id": policy.order_id,
         "seat_ref": entitlement.seat_ref,
@@ -225,14 +225,15 @@ def resolve_oidc_identity(host: str, username: str, x_access_broker_key: str = H
         if seat:
             showroom_url, workspace_url = seat.showroom_url, seat.lab_url
     elif lab_session:
-        showroom_url, workspace_url = lab_session.lab_url, lab_session.dashboard_url or lab_session.lab_url
+        showroom_url = lab_session.metadata.get("showroom_url") or lab_session.lab_url
+        workspace_url = lab_session.metadata.get("workspace_url") or lab_session.dashboard_url
     if lab_session and lab_session.cluster_ref and provisioning_service.cluster_registry:
         cluster = provisioning_service.cluster_registry.get(lab_session.cluster_ref)
         console_url = cluster.public_console_url or cluster.console_url
         if console_url and lab_session.namespace:
             console_url = f"{console_url.rstrip('/')}/topology/ns/{lab_session.namespace}"
-        if not workspace_url or "example.com" in workspace_url:
-            workspace_url = console_url or showroom_url
+        if workspace_url and ("example.com" in workspace_url or ".apps.cluster.local" in workspace_url):
+            workspace_url = None
     public_access_service._audit("authorize", policy.order_id, "granted", identity.participant_id)
     return {"order_id": policy.order_id, "seat_ref": entitlement.seat_ref, "expires_at": entitlement.expires_at, "showroom_url": showroom_url, "workspace_url": workspace_url, "console_url": console_url}
 

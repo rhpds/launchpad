@@ -34,6 +34,9 @@ def test_gateway_exposes_participant_home_and_add_lab_routes():
     paths = {route.path for route in app.routes}
     assert "/my-labs" in paths
     assert "/add-lab" in paths
+    assert "/instructions/{path:path}" in paths
+    assert "/terminal/{path:path}" in paths
+    assert "/assets/{path:path}" in paths
 
 
 def test_participant_shell_uses_launchpad_navigation_and_switch_identity():
@@ -45,6 +48,8 @@ def test_participant_shell_uses_launchpad_navigation_and_switch_identity():
     assert "My Lab Access" in body
     assert "Switch participant" in body
     assert "/oauth2/sign_out" in body
+    assert "/brand/redhat.png" in body
+    assert "/brand/intel.png" in body
 
 
 def test_gateway_prefers_stable_oidc_username_claim():

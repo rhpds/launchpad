@@ -183,6 +183,7 @@ def test_public_access_never_uses_placeholder_workspace_url():
         / "app/api/routers/public_access.py"
     ).read_text()
     assert '"example.com" in workspace_url' in source
+    assert '".apps.cluster.local" in workspace_url' in source
     assert "/topology/ns/" in source
 
 
