@@ -1,5 +1,6 @@
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
+from types import SimpleNamespace
 
 import pytest
 
@@ -7,6 +8,7 @@ from app.domain.access import EntitlementStatus, ExposurePolicy
 from app.domain.clusters import ClusterTarget
 from app.services.cluster_registry import ClusterRegistry
 from app.services.public_access import PublicAccessService
+from app.api.routers import public_access as public_access_router
 
 
 def service():
@@ -140,6 +142,23 @@ def test_participant_removal_reopens_the_seat():
     first = access.claim("order-remove", "first@example.com", code, "192.0.2.11")
     access.remove_participant("order-remove", first.identity.participant_id)
     assert access.claim("order-remove", "second@example.com", code, "192.0.2.12").entitlement.seat_ref == "seat"
+
+
+def test_owner_summary_counts_only_active_claims(monkeypatch):
+    policy = SimpleNamespace(
+        order_id="order-summary", public_url="https://lab.example.io", enabled=True,
+        expires_at=datetime.utcnow() + timedelta(hours=1), seat_limit=2, code_version=1,
+    )
+    fake_service = SimpleNamespace(
+        get_policy=lambda order_id: policy,
+        _entitlements={
+            "active": SimpleNamespace(order_id="order-summary", status=EntitlementStatus.ACTIVE),
+            "revoked": SimpleNamespace(order_id="order-summary", status=EntitlementStatus.REVOKED),
+        },
+    )
+    monkeypatch.setattr(public_access_router, "public_access_service", fake_service)
+
+    assert public_access_router._owner_summary("order-summary")["claim_count"] == 1
 
 
 def test_backend_restart_recovers_policy_identity_entitlement_and_session():

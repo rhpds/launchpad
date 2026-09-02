@@ -28,7 +28,11 @@ def _owner_summary(order_id: str) -> dict:
     policy = public_access_service.get_policy(order_id)
     if not policy:
         raise HTTPException(404, "Public access policy not found")
-    entitlements = [e for e in public_access_service._entitlements.values() if e.order_id == order_id]
+    entitlements = [
+        entitlement
+        for entitlement in public_access_service._entitlements.values()
+        if entitlement.order_id == order_id and entitlement.status.value == "active"
+    ]
     return {
         "order_id": order_id,
         "public_url": policy.public_url,
