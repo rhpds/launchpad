@@ -175,7 +175,7 @@ async def proxy(kind: str, path: str, request: Request):
     url = urljoin(base.rstrip("/") + "/", path)
     async with httpx.AsyncClient(timeout=30, follow_redirects=False, verify=UPSTREAM_TLS_VERIFY) as client:
         upstream = await client.request(request.method, url, params=request.query_params, headers={"accept": request.headers.get("accept", "*/*")})
-    excluded = {"content-length", "connection", "transfer-encoding", "set-cookie"}
+    excluded = {"content-length", "content-encoding", "connection", "transfer-encoding", "set-cookie"}
     return Response(upstream.content, status_code=upstream.status_code, headers={k: v for k, v in upstream.headers.items() if k.casefold() not in excluded})
 
 
@@ -187,7 +187,7 @@ async def _showroom_alias(request: Request, path: str) -> Response:
     url = urljoin(base.rstrip("/") + "/", path.lstrip("/"))
     async with httpx.AsyncClient(timeout=30, follow_redirects=False, verify=UPSTREAM_TLS_VERIFY) as client:
         upstream = await client.request(request.method, url, params=request.query_params, headers={"accept": request.headers.get("accept", "*/*")})
-    excluded = {"content-length", "connection", "transfer-encoding", "set-cookie"}
+    excluded = {"content-length", "content-encoding", "connection", "transfer-encoding", "set-cookie"}
     return Response(upstream.content, status_code=upstream.status_code, headers={k: v for k, v in upstream.headers.items() if k.casefold() not in excluded})
 
 
