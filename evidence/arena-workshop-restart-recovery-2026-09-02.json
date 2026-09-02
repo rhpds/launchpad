@@ -1,0 +1,68 @@
+{
+  "evidence_id": "ARENA-WORKSHOP-RESTART-RECOVERY-2026-09-02",
+  "result": "GREEN-live-after-red-green-remediation",
+  "cluster": "arena",
+  "catalog_item": "openshift-operators-workshop",
+  "implementation_commit": "d274ce0ae88992c4716fa6ef0bc55b8b22f3c650",
+  "red_evidence": {
+    "workshop_id": "50e0805b-82cb-4004-9e27-8ba59ddf0161",
+    "injected_fault": "backend deployment restarted with 5 ready and 20 provisioning seats",
+    "observed_failure": "persisted workshop remained indefinitely at 5 ready and 20 provisioning",
+    "secondary_failure": "Argo CD application controller was OOMKilled at its 4Gi memory limit",
+    "remediation": [
+      "automatically resume queued or provisioning workshops during backend startup",
+      "preserve ready seats while resetting only incomplete seats",
+      "rely on startup resource reconciliation before replacing unlinked partial sessions",
+      "increase Argo CD controller memory request to 4Gi and limit to 8Gi"
+    ]
+  },
+  "tdd": {
+    "regression_test": "test_interrupted_workshop_is_automatically_recovered",
+    "tests_passed": 50
+  },
+  "first_recovery_proof": {
+    "workshop_id": "50e0805b-82cb-4004-9e27-8ba59ddf0161",
+    "starting_state": "5 ready, 20 provisioning",
+    "operator_retry_required": false,
+    "seats_ready": 25,
+    "seat_failures": 0,
+    "unique_sessions": 25,
+    "unique_namespaces": 25,
+    "validation_checks_passed": 50,
+    "showroom_http_200": 25,
+    "remaining_namespaces_after_reclaim": 0,
+    "remaining_argocd_applications_after_reclaim": 0
+  },
+  "clean_confirmation": {
+    "workshop_id": "fa04be68-7cbf-49f3-995f-79f0a006e31b",
+    "starting_state": "5 ready, 20 provisioning",
+    "injected_fault": "backend deployment restart",
+    "operator_retry_required": false,
+    "seats_ready": 25,
+    "seat_failures": 0,
+    "unique_sessions": 25,
+    "unique_namespaces": 25,
+    "validation_checks_passed": 50,
+    "validation_checks_failed": 0,
+    "showroom_http_200": 25,
+    "argocd_controller_ready": true,
+    "argocd_controller_restarts": 0,
+    "argocd_controller_memory_limit": "8Gi",
+    "remaining_namespaces_after_reclaim": 0,
+    "remaining_argocd_applications_after_reclaim": 0
+  },
+  "certified": [
+    "backend restart during a 25-seat Arena workshop",
+    "automatic recovery without operator retry",
+    "completed-seat preservation",
+    "no duplicate active session or namespace assignment",
+    "validated participant routes after recovery",
+    "bulk reclaim with zero workshop residue"
+  ],
+  "not_yet_certified": [
+    "database restart during active workshop provisioning",
+    "OpenShift API outage during provisioning",
+    "GitOps controller restart during provisioning at the new 8Gi limit",
+    "public passwordless access and OpenShift Console SSO"
+  ]
+}
