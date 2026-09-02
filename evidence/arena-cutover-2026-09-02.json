@@ -1,0 +1,46 @@
+{
+  "evidence_id": "ARENA-CUTOVER-2026-09-02",
+  "cluster": "arena",
+  "source_revision": "6f0874fa5475dfbe8db03369d7917875183e038a",
+  "request_id": "c9c32728-340d-4f3e-bfd3-50ec69ed27f2",
+  "session_id": "916eea07-8642-47d5-ae2b-6934d1b00500",
+  "namespace": "launchpad-sandbox-smoke-test-tenant-1f531fbb",
+  "red": [
+    {
+      "check": "model_preflight",
+      "result": "fail",
+      "reason": "Arena OVMS was blocked by fleet ingress policy and the sandbox catalog requested Oberon-only models"
+    },
+    {
+      "check": "reclaim_targeting",
+      "result": "fail",
+      "reason": "cleanup resolved a hard-coded Oberon control cluster in an Arena-only registry"
+    },
+    {
+      "check": "gitops_sync",
+      "result": "fail",
+      "reason": "the Arena Argo CD controller initially lacked namespace-scoped deployment permissions"
+    }
+  ],
+  "green": [
+    {"check": "arena_api_ready", "result": "pass"},
+    {"check": "sandbox_pod_ready", "result": "pass"},
+    {"check": "sandbox_pvc_bound_20_gib", "result": "pass"},
+    {"check": "granite_model_inventory", "result": "pass", "model": "granite-2b-cpu"},
+    {"check": "granite_chat_completion", "result": "pass", "response": "ARENA-READY"},
+    {"check": "assigned_namespace_edit", "result": "pass"},
+    {"check": "cross_namespace_edit_denied", "result": "pass"},
+    {"check": "cluster_scope_access_denied", "result": "pass"},
+    {"check": "repeatability_report", "result": "pass", "score": 100},
+    {"check": "arena_targeted_reclaim", "result": "pass"},
+    {"check": "namespace_removed", "result": "pass"},
+    {"check": "argocd_sync", "result": "pass", "status": "Synced/Healthy"}
+  ],
+  "release_scope": "Arena internal OpenShift sandbox control-plane cutover",
+  "not_certified": [
+    "stable public lab ingress",
+    "25-seat workshop load",
+    "Arena public OpenShift Console SSO",
+    "restoration of historical Oberon sessions"
+  ]
+}
