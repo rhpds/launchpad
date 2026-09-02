@@ -56,6 +56,12 @@ public final class LaunchpadCodeAuthenticator implements Authenticator {
             if (user == null) user = context.getSession().users().addUser(realm, username);
             user.setEnabled(true);
             user.setEmail(email.strip().toLowerCase());
+            // Keycloak's default user profile requires first and last name.
+            // Populate stable non-authoritative display values so a newly
+            // created passwordless participant is not diverted into the
+            // generic Verify Profile required action before reaching the lab.
+            user.setFirstName("Launchpad");
+            user.setLastName("Participant");
             user.setSingleAttribute("launchpad_participant_id", subject);
             user.setSingleAttribute("launchpad_order_id", order);
             context.setUser(user);
