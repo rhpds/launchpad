@@ -77,13 +77,10 @@ def build_showroom_application(
         "content_revision": seat.content_ref,
         "showroom_journey": seat.journey,
     }
-    tabs = [
-        # Use the generated Antora page directly.  Routing through the
-        # /instructions redirect can make Showroom persist the outer frame URL
-        # as the tab URL and recursively embed the lab shell.
-        {"name": "Instructions", "path": "/www/modules/index.html", "port": 443},
-        {"name": "Terminal", "path": "/terminal", "port": 443},
-    ]
+    # Antora content is Showroom's primary guide pane, so it must not also be
+    # configured as a tool tab. Doing so duplicates (and through a public
+    # reverse proxy can recursively embed) the Showroom shell.
+    tabs = [{"name": "Terminal", "path": "/terminal", "port": 443}]
     if seat.workspace_url:
         tabs.insert(1, {"name": "RAG Workspace", "url": seat.workspace_url})
     if seat.console_url:
@@ -127,14 +124,9 @@ def build_showroom_application(
             "requests": {"cpu": "100m", "memory": "256Mi"},
             "limits": {"cpu": "500m", "memory": "512Mi"},
         }
-        values["wetty"] = {
-            "setup": "true",
-            "image": "quay.io/rhpds/wetty:v3.2.1",
-            "resources": {
-                "requests": {"cpu": "50m", "memory": "128Mi"},
-                "limits": {"cpu": "250m", "memory": "256Mi"},
-            },
-        }
+        # The chart otherwise enables its separate wetty container by default.
+        # The supported /terminal service already supplies this seat's shell.
+        values["wetty"] = {"setup": "false"}
     return {
         "apiVersion": f"{ARGO_GROUP}/{ARGO_VERSION}",
         "kind": "Application",

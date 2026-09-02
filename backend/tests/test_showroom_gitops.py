@@ -53,9 +53,8 @@ def test_operator_workshop_places_namespace_console_inside_showroom():
     values = yaml.safe_load(app["spec"]["source"]["helm"]["values"])
     ui = yaml.safe_load(values["content"]["uiConfig"])
     assert [tab["name"] for tab in ui["tabs"]] == [
-        "Instructions", "Terminal", "OpenShift Console",
+        "Terminal", "OpenShift Console",
     ]
-    assert ui["tabs"][0]["path"] == "/www/modules/index.html"
     assert ui["persist_url_state"] is False
     assert ui["tabs"][-1]["url"] == "https://console.example.com"
     user_data = yaml.safe_load(values["content"]["user_data"])
@@ -63,7 +62,7 @@ def test_operator_workshop_places_namespace_console_inside_showroom():
     assert user_data["cluster_display_name"] == "Arena CPU Execution"
     assert values["terminal"]["storage"]["setup"] == "false"
     assert values["terminal"]["resources"]["requests"]["cpu"] == "100m"
-    assert values["wetty"]["resources"]["requests"]["cpu"] == "50m"
+    assert values["wetty"]["setup"] == "false"
 
 
 def test_application_name_is_stable_dns_safe_and_bounded():
