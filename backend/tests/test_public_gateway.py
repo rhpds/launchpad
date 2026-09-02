@@ -49,7 +49,7 @@ def test_participant_shell_uses_launchpad_navigation_and_switch_identity():
     body = _page("<h1>My labs</h1>").body.decode()
     assert "AI Launchpad" in body
     assert "My Lab Access" in body
-    assert "Switch participant" in body
+    assert "Log out of lab" in body
     assert "/oauth2/sign_out" in body
     assert "/brand/redhat.png" in body
     assert "/brand/intel.png" in body
