@@ -59,6 +59,7 @@ def test_participant_shell_uses_launchpad_navigation_and_switch_identity():
 def test_participant_home_does_not_duplicate_console_outside_showroom():
     source = Path(__file__).resolve().parents[1].joinpath("app/public_gateway.py").read_text()
     assert 'key == "console_url" and target.get("showroom_url")' in source
+    assert '("showroom_url", "Open Lab")' in source
 
 
 def test_gateway_prefers_stable_oidc_username_claim():

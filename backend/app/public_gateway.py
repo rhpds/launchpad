@@ -111,7 +111,7 @@ async def home(request: Request):
             )
         return _page("<h1>Join your lab</h1><p>Enter the email label and code supplied by your instructor.</p><small>Email ownership is not verified. The instructor code is the sole secret.</small><form method=post action=/claim><input name=email type=email required placeholder='Email'><input name=code required autocomplete=one-time-code placeholder='Instructor code'><button>Join lab</button></form>")
     links = []
-    for key, label in (("showroom_url", "Open visual guide"), ("workspace_url", "Open workspace"), ("console_url", "Open OpenShift Console")):
+    for key, label in (("showroom_url", "Open Lab"), ("workspace_url", "Open workspace"), ("console_url", "Open OpenShift Console")):
         if key == "console_url" and target.get("showroom_url"):
             continue
         if target.get(key):

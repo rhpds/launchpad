@@ -237,7 +237,7 @@ export default function SessionDetail() {
           <p className="text-sm text-[#c7c7c7] mt-2">Follow the Showroom journey while working in the provisioned environment.</p>
           <div className="flex flex-wrap gap-3 mt-5">
             <a href={guidedLinks.showroomUrl} target="_blank" rel="noopener noreferrer" className="px-4 py-2 bg-[#EE0000] text-white rounded text-sm font-semibold hover:bg-[#b50000]">
-              Open Visual Guide
+              Open Lab
             </a>
             {guidedLinks.workspaceUrl && (
               <a href={guidedLinks.workspaceUrl} target="_blank" rel="noopener noreferrer" className="px-4 py-2 bg-[#0068B5] text-white rounded text-sm font-semibold hover:bg-[#00518d]">
