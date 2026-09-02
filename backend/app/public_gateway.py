@@ -128,8 +128,26 @@ async def my_labs(request: Request):
     return _page(
         "<h1>My Lab Access</h1><p>Resume any active environment associated with your participant identity.</p>"
         + _lab_cards(await _labs_for(username))
-        + "<small>To add another lab, open its instructor-provided link and enter that lab's code.</small>"
+        + "<section><h2>Add another lab</h2><p>Enter the instructor code for another active lab.</p>"
+          "<form method=post action=/add-lab-by-code><input name=code required autocomplete=one-time-code "
+          "placeholder='Instructor code'><button>Add lab</button></form></section>"
     )
+
+
+@app.post("/add-lab-by-code")
+async def add_lab_by_code(request: Request, code: str = Form()):
+    username = _username(request)
+    if not username:
+        return RedirectResponse("/", status_code=303)
+    async with httpx.AsyncClient(timeout=15) as client:
+        result = await client.post(
+            f"{BACKEND}/public-access/private/claim-identity-by-code",
+            json={"username": username, "code": code},
+            headers={"X-Access-Broker-Key": BROKER_KEY},
+        )
+    if result.status_code != 200:
+        return _page("<h1>Access denied</h1><p>That code is invalid, expired, or has no available seats.</p><a href='/my-labs'>My Lab Access</a>")
+    return RedirectResponse(result.json()["public_url"], status_code=303)
 
 
 @app.post("/add-lab")

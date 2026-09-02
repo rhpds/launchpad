@@ -34,6 +34,7 @@ def test_gateway_exposes_participant_home_and_add_lab_routes():
     paths = {route.path for route in app.routes}
     assert "/my-labs" in paths
     assert "/add-lab" in paths
+    assert "/add-lab-by-code" in paths
     assert "/instructions/{path:path}" in paths
     assert "/www/{path:path}" in paths
     assert "/ui-config.yml" in paths
@@ -65,6 +66,12 @@ def test_participant_home_does_not_duplicate_console_outside_showroom():
     source = Path(__file__).resolve().parents[1].joinpath("app/public_gateway.py").read_text()
     assert 'key == "console_url" and target.get("showroom_url")' in source
     assert '("showroom_url", "Open Lab")' in source
+
+
+def test_my_labs_supports_claiming_another_lab_by_code():
+    source = Path(__file__).resolve().parents[1].joinpath("app/public_gateway.py").read_text()
+    assert 'action=/add-lab-by-code' in source
+    assert '/private/claim-identity-by-code' in source
 
 
 def test_gateway_prefers_stable_oidc_username_claim():

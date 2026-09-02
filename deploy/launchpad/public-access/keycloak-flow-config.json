@@ -2,7 +2,10 @@
   "realm": "launchpad-public",
   "flowAlias": "Launchpad public passwordless browser",
   "providerId": "launchpad-order-code",
-  "requirement": "REQUIRED",
+  "executions": [
+    {"providerId": "auth-cookie", "requirement": "ALTERNATIVE"},
+    {"providerId": "launchpad-order-code", "requirement": "ALTERNATIVE"}
+  ],
   "clients": [
     {
       "clientId": "openshift-launchpad-public",
@@ -19,5 +22,5 @@
       "redirectUris": ["https://*.labs.example.invalid/oauth2/callback"]
     }
   ],
-  "notes": "Create the client secret at deployment time; it is intentionally absent from Git. Configure the realm browser flow with the compiled provider through the Keycloak Admin API."
+  "notes": "Create client secrets at deployment time; they are intentionally absent from Git. The cookie execution must precede the order-code execution so an existing participant session silently completes the OpenShift Console OIDC flow. A new browser without that session falls through to the email and instructor-code claim form."
 }

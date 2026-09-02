@@ -24,6 +24,11 @@ class IdentityClaimRequest(BaseModel):
     code: str
 
 
+class IdentityCodeClaimRequest(BaseModel):
+    username: str
+    code: str
+
+
 def _require_broker(key: str) -> None:
     expected = os.getenv("ACCESS_BROKER_KEY", "")
     if not expected or not __import__("secrets").compare_digest(expected, key):
@@ -286,3 +291,40 @@ def claim_oidc_identity(body: IdentityClaimRequest, x_access_broker_key: str = H
     except ValueError:
         raise HTTPException(403, "Access request cannot be completed")
     return {"order_id": policy.order_id, "seat_ref": result.entitlement.seat_ref}
+
+
+@router.post("/private/claim-identity-by-code")
+def claim_oidc_identity_by_code(
+    body: IdentityCodeClaimRequest,
+    x_access_broker_key: str = Header(default=""),
+):
+    """Add an active lab by its instructor code from the participant hub."""
+    _require_broker(x_access_broker_key)
+    identity = next(
+        (item for item in public_access_service._identities.values() if item.keycloak_username == body.username),
+        None,
+    )
+    if not identity or identity.disabled_at:
+        raise HTTPException(403, "Access request cannot be completed")
+    now = datetime.utcnow()
+    matches = [
+        policy for policy in public_access_service._policies.values()
+        if policy.enabled and policy.expires_at > now and public_access_service._verify(policy, body.code)
+    ]
+    if len(matches) != 1:
+        raise HTTPException(403, "Access request cannot be completed")
+    policy = matches[0]
+    try:
+        result = public_access_service.claim(
+            policy.order_id, identity.normalized_email, body.code, "participant-hub"
+        )
+        provisioning_service.bind_public_participant(
+            policy.order_id, result.entitlement.seat_ref, identity.keycloak_username
+        )
+    except ValueError:
+        raise HTTPException(403, "Access request cannot be completed")
+    return {
+        "order_id": policy.order_id,
+        "seat_ref": result.entitlement.seat_ref,
+        "public_url": policy.public_url,
+    }
