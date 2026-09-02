@@ -28,7 +28,9 @@ def test_operator_workshop_playbook_starts_on_operator_journey():
     operator_index = ROOT / "content-operators/modules/ROOT/pages/index.adoc"
     assert "OpenShift AI Operator Workshop" in operator_index.read_text()
     assert "Inference Overdrive" not in operator_index.read_text()
-    assert "link:{openshift_console_url}" in operator_index.read_text()
+    assert "*OpenShift Console* operator tab" in operator_index.read_text()
+    assert "*launchpad-public*" in operator_index.read_text()
+    assert "no separate OpenShift username" in operator_index.read_text()
     assert "{cluster_display_name}" in operator_index.read_text()
     assert "Oberon" not in operator_index.read_text()
 
