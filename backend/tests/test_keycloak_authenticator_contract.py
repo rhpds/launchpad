@@ -11,10 +11,11 @@ def test_passwordless_authenticator_populates_required_profile_fields():
     assert 'user.setLastName("Participant")' in source
 
 
-def test_login_brand_assets_have_cache_busting_versions():
+def test_login_brand_marks_are_inline_and_do_not_depend_on_external_images():
     template = (
         Path(__file__).resolve().parents[2]
         / "keycloak-authenticator/src/main/resources/theme-resources/templates/launchpad-code.ftl"
     ).read_text()
-    assert "redhat.svg?v=" in template
-    assert "intel.svg?v=" in template
+    assert 'class="launchpad-brand-mark launchpad-brand-mark-redhat"' in template
+    assert 'class="launchpad-brand-mark launchpad-brand-mark-intel"' in template
+    assert "${url.resourcesPath}/img/" not in template

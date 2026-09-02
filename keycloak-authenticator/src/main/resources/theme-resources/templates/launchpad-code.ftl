@@ -11,8 +11,10 @@
       #kc-page-title { width: 100%; margin: 0; text-align: center !important; }
       .launchpad-brand { text-align: center; }
       .launchpad-logos { display: flex; align-items: center; justify-content: center; gap: 26px; min-height: 60px; margin-bottom: 18px; }
-      .launchpad-logo-redhat { display: block; width: 74px; height: 54px; object-fit: contain; }
-      .launchpad-logo-intel { display: block; width: 124px; height: 50px; object-fit: contain; }
+      .launchpad-brand-mark { display: inline-flex; align-items: center; justify-content: center; height: 54px; font-weight: 700; line-height: 1; }
+      .launchpad-brand-mark-redhat { gap: 8px; color: #f5f5f5; font-size: 21px; }
+      .launchpad-brand-mark-redhat::before { content: ""; width: 34px; height: 22px; background: #ee0000; border-radius: 55% 55% 38% 38%; box-shadow: inset 0 -6px 0 #b80000; transform: skew(-8deg); }
+      .launchpad-brand-mark-intel { color: #00c7fd; font-size: 30px; font-style: italic; letter-spacing: -1.5px; text-transform: lowercase; }
       .launchpad-divider { width: 1px; height: 42px; background: #6a6e73; opacity: .55; }
       .launchpad-title { width: 100%; color: #f0f0f0; font-size: 28px; font-weight: 700; line-height: 1.2; letter-spacing: -.02em; text-align: center; white-space: nowrap; }
       .launchpad-subtitle { width: 100%; color: #c7c7c7; font-size: 15px; font-weight: 400; line-height: 1.5; margin-top: 8px; text-align: center; }
@@ -34,9 +36,9 @@
     </style>
     <div class="launchpad-brand">
       <div class="launchpad-logos">
-        <img src="${url.resourcesPath}/img/redhat.svg?v=20260902-2" alt="Red Hat" class="launchpad-logo-redhat" />
+        <span class="launchpad-brand-mark launchpad-brand-mark-redhat" aria-label="Red Hat">Red Hat</span>
         <span aria-hidden="true" class="launchpad-divider"></span>
-        <img src="${url.resourcesPath}/img/intel.svg?v=20260902-2" alt="Intel" class="launchpad-logo-intel" />
+        <span class="launchpad-brand-mark launchpad-brand-mark-intel" aria-label="Intel">intel</span>
       </div>
       <div class="launchpad-title">Intel × Red Hat AI Launchpad</div>
       <div class="launchpad-subtitle">Secure access to your lab environment</div>
