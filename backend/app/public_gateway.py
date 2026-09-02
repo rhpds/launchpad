@@ -179,6 +179,8 @@ async def proxy(kind: str, path: str, request: Request):
         raise HTTPException(404)
     if kind == "console":
         return RedirectResponse(base, status_code=302)
+    if kind == "showroom" and path == "ui-config.yml":
+        path = "www/ui-config.yml"
     url = urljoin(base.rstrip("/") + "/", path)
     async with httpx.AsyncClient(timeout=30, follow_redirects=False, verify=UPSTREAM_TLS_VERIFY) as client:
         upstream = await client.request(request.method, url, params=request.query_params, headers={"accept": request.headers.get("accept", "*/*")})
@@ -214,7 +216,10 @@ async def showroom_generated_site(request: Request, path: str):
 @app.api_route("/ui-config.yml", methods=["GET", "HEAD"])
 @app.api_route("/zero-touch-config.yml", methods=["GET", "HEAD"])
 async def showroom_root_config(request: Request):
-    return await _showroom_alias(request, request.url.path.lstrip("/"))
+    path = request.url.path.lstrip("/")
+    if path == "ui-config.yml":
+        path = "www/ui-config.yml"
+    return await _showroom_alias(request, path)
 
 
 @app.api_route("/terminal", methods=["GET", "HEAD"])

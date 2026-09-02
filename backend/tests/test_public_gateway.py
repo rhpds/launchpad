@@ -43,6 +43,11 @@ def test_gateway_exposes_participant_home_and_add_lab_routes():
     assert "/ws" in paths
 
 
+def test_gateway_uses_generated_per_lab_showroom_config():
+    source = Path(__file__).resolve().parents[1].joinpath("app/public_gateway.py").read_text()
+    assert source.count('path = "www/ui-config.yml"') == 2
+
+
 def test_participant_shell_uses_launchpad_navigation_and_switch_identity():
     response = TestClient(app).get("/health")
     assert response.status_code == 200
