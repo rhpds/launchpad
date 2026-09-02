@@ -1,0 +1,35 @@
+---
+- name: Configure OpenShift Console embedding for Showroom
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    ACTION: provision
+    ocp_console_embed_domain: apps.arena.fm2aihpcsed.com
+    public_lab_frame_origins: []
+  roles:
+    - agnosticd.showroom.ocp4_workload_ocp_console_embed
+  post_tasks:
+    - name: Allow Arena Showrooms and approved public lab origins to frame Console
+      kubernetes.core.k8s:
+        api_version: operator.openshift.io/v1
+        kind: IngressController
+        name: default
+        namespace: openshift-ingress-operator
+        state: present
+        definition:
+          spec:
+            httpHeaders:
+              actions:
+                response:
+                  - name: X-Frame-Options
+                    action:
+                      type: Delete
+                  - name: Content-Security-Policy
+                    action:
+                      type: Set
+                      set:
+                        value: >-
+                          frame-ancestors 'self'
+                          https://*.{{ ocp_console_embed_domain }}
+                          {{ public_lab_frame_origins | join(' ') }}

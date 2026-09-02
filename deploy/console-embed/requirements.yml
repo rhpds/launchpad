@@ -1,0 +1,7 @@
+---
+collections:
+  - name: kubernetes.core
+    version: 6.5.0
+  - name: https://github.com/rhpds/showroom.git
+    type: git
+    version: 6db547899f38b928b3c7ea941afc01fc748971d9
