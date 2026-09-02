@@ -36,6 +36,17 @@ def test_gateway_exposes_participant_home_and_add_lab_routes():
     assert "/add-lab" in paths
 
 
+def test_participant_shell_uses_launchpad_navigation_and_switch_identity():
+    response = TestClient(app).get("/health")
+    assert response.status_code == 200
+    from app.public_gateway import _page
+    body = _page("<h1>My labs</h1>").body.decode()
+    assert "AI Launchpad" in body
+    assert "My Lab Access" in body
+    assert "Switch participant" in body
+    assert "/oauth2/sign_out" in body
+
+
 def test_gateway_prefers_stable_oidc_username_claim():
     request = type("Request", (), {"headers": {
         "x-forwarded-user": "40982c65-d541-4fca-a92c-44d38885cd45",
