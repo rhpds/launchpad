@@ -1,0 +1,78 @@
+{
+  "evidence_id": "ARENA-WORKSHOP-GATE25-2026-09-02",
+  "result": "GREEN-live",
+  "cluster": "arena",
+  "catalog_item": "openshift-operators-workshop",
+  "commit": "f38e706dcf04732087b807cb9b5779f384145b7d",
+  "test_driven_fix": {
+    "red_workshop_id": "d8696a91-bed9-40bf-b309-1f32f8060ddb",
+    "failure": "workshop reported ready while all five sessions remained validating with zero validation results",
+    "regression_test": "TestWorkshopSessionLimits.test_ready_workshop_has_validated_ready_sessions",
+    "green_local": "49 passed",
+    "remediation": "validate every session before marking its workshop seat ready"
+  },
+  "clean_five_seat_gate": {
+    "workshop_id": "bb5a8c50-01a8-406f-8989-99efa6a5ead8",
+    "placement": "arena",
+    "seats_ready": 5,
+    "validation_checks_passed": 10,
+    "showroom_http_200": 5,
+    "correct_showroom_content": 5,
+    "own_namespace_edit_passes": 5,
+    "cross_seat_denials": 5,
+    "remaining_namespaces": 0,
+    "remaining_argocd_applications": 0
+  },
+  "twenty_five_seat_gate": {
+    "workshop_id": "9d7eab9f-9c3e-4889-a61e-74c252069a45",
+    "placement": "arena",
+    "placement_policy": "all seats on one cluster",
+    "capacity_preview": {
+      "can_provision": true,
+      "headroom_percent": 20,
+      "estimated_cpu_millicores": 4125,
+      "estimated_memory_mib": 11600,
+      "estimated_pods": 25
+    },
+    "provisioning_started_utc": "2026-09-02T12:13:26Z",
+    "workshop_ready_utc": "2026-09-02T12:17:00Z",
+    "provisioning_seconds": 214,
+    "seats_ready": 25,
+    "seat_failures": 0,
+    "validation_checks_passed": 50,
+    "validation_checks_failed": 0,
+    "showroom_http_200": 25,
+    "correct_showroom_content": 25,
+    "own_namespace_edit_passes": 25,
+    "cross_seat_denials": 25,
+    "reclaim_started_utc": "2026-09-02T12:19:34Z",
+    "zero_residue_utc": "2026-09-02T12:21:36Z",
+    "reclaim_seconds": 122,
+    "remaining_namespaces": 0,
+    "remaining_argocd_applications": 0
+  },
+  "platform_after_test": {
+    "authentication_available": true,
+    "authentication_degraded": false,
+    "argocd_controller_ready": true,
+    "argocd_controller_restarts": 0,
+    "argocd_controller_memory_limit": "4Gi"
+  },
+  "certification_boundary": {
+    "certified": [
+      "one internal 25-seat OpenShift Operator workshop on Arena",
+      "validated Showroom routes and content",
+      "namespace-scoped participant edit access",
+      "adjacent-seat access denial",
+      "bulk reclaim with zero workshop residue"
+    ],
+    "not_yet_certified": [
+      "three consecutive 25-seat runs",
+      "simultaneous 25-seat workshops on Oberon and Arena",
+      "three 25-seat workshops across the fleet",
+      "50-seat or 75-seat Arena workshops",
+      "public passwordless workshop access and OpenShift Console SSO",
+      "fault injection and restart recovery during a 25-seat workshop"
+    ]
+  }
+}
