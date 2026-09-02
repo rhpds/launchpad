@@ -2,12 +2,12 @@
 <@layout.registrationLayout displayMessage=true; section>
   <#if section = "header">
     <style>
-      .pf-v5-c-login { position: relative; display: flex; min-height: 100vh; align-items: center; justify-content: center; overflow: hidden; background: radial-gradient(circle at 16% 18%, rgba(238, 0, 0, .3), transparent 31%), radial-gradient(circle at 84% 22%, rgba(0, 199, 253, .28), transparent 32%), radial-gradient(circle at 52% 105%, rgba(90, 44, 170, .26), transparent 42%), linear-gradient(135deg, #07090d 0%, #101824 48%, #080a0f 100%); }
-      .pf-v5-c-login::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .3; background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px); background-size: 44px 44px; mask-image: linear-gradient(to bottom, rgba(0,0,0,.8), transparent 82%); }
+      body, .pf-v5-c-login { font-family: "Red Hat Text", "Red Hat Display", Helvetica, Arial, sans-serif; }
+      body { background: url("${url.resourcesPath}/img/keycloak-bg-darken.svg") no-repeat center center fixed; background-size: cover; }
+      .pf-v5-c-login { display: flex; min-height: 100vh; align-items: center; justify-content: center; background: transparent; }
       .pf-v5-c-login__container { display: block; width: 520px !important; max-width: calc(100vw - 32px) !important; padding: 28px 0; }
       #kc-header { display: none; }
-      .pf-v5-c-login__main { position: relative; border: 1px solid rgba(255,255,255,.12); border-radius: 18px; background: rgba(12, 15, 21, .88); box-shadow: 0 28px 80px rgba(0, 0, 0, .55), 0 0 80px rgba(0, 113, 197, .1); overflow: hidden; backdrop-filter: blur(18px); }
-      .pf-v5-c-login__main::before { content: ""; position: absolute; inset: 0 0 auto; height: 3px; background: linear-gradient(90deg, #ee0000, #7d3cff 50%, #00c7fd); }
+      .pf-v5-c-login__main { border-radius: 16px; box-shadow: 0 18px 48px rgba(0, 0, 0, .34); overflow: hidden; }
       .pf-v5-c-login__main-header { display: block; padding: 32px 40px 16px; }
       .pf-v5-c-login__main-body { padding: 6px 40px 34px; }
       #kc-page-title { width: 100%; margin: 0; text-align: center !important; }
@@ -17,7 +17,7 @@
       .launchpad-logo-redhat { width: 156px; }
       .launchpad-logo-intel { width: 112px; }
       .launchpad-divider { width: 1px; height: 42px; background: #6a6e73; opacity: .55; }
-      .launchpad-title { width: 100%; color: #f0f0f0; font-size: 28px; font-weight: 700; line-height: 1.2; letter-spacing: -.02em; text-align: center; white-space: nowrap; }
+      .launchpad-title { width: 100%; color: #f0f0f0; font-family: "Red Hat Display", "Red Hat Text", Helvetica, Arial, sans-serif; font-size: 28px; font-weight: 700; line-height: 1.2; letter-spacing: -.02em; text-align: center; white-space: nowrap; }
       .launchpad-subtitle { width: 100%; color: #c7c7c7; font-size: 15px; font-weight: 400; line-height: 1.5; margin-top: 8px; text-align: center; }
       .launchpad-form { display: grid; gap: 16px; margin-top: 6px; }
       .launchpad-field { display: grid; gap: 8px; }
