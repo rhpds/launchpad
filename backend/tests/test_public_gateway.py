@@ -2,7 +2,7 @@ from pathlib import Path
 
 from fastapi.testclient import TestClient
 
-from app.public_gateway import _lab_cards, _username, app
+from app.public_gateway import _lab_cards, _public_showroom_config, _username, app
 
 
 def test_gateway_exposes_only_public_health_identity():
@@ -41,11 +41,25 @@ def test_gateway_exposes_participant_home_and_add_lab_routes():
     assert "/assets/{path:path}" in paths
     assert "/token" in paths
     assert "/ws" in paths
+    assert "/console-launcher" in paths
 
 
 def test_gateway_uses_generated_per_lab_showroom_config():
     source = Path(__file__).resolve().parents[1].joinpath("app/public_gateway.py").read_text()
     assert source.count('path = "www/ui-config.yml"') == 2
+
+
+def test_public_showroom_console_uses_non_recursive_top_level_launcher():
+    config = _public_showroom_config(b"""type: showroom
+tabs:
+  - name: Instructions
+    path: /instructions
+  - name: OpenShift Console
+    url: https://console.example.test/topology/ns/seat-1
+""")
+    assert b"url: https://console.example.test" not in config
+    assert b"path: /console-launcher" in config
+    assert b"port: 443" in config
 
 
 def test_participant_shell_uses_launchpad_navigation_and_switch_identity():
