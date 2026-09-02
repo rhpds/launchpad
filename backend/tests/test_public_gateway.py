@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from fastapi.testclient import TestClient
 
 from app.public_gateway import _lab_cards, app
@@ -32,3 +34,11 @@ def test_gateway_exposes_participant_home_and_add_lab_routes():
     paths = {route.path for route in app.routes}
     assert "/my-labs" in paths
     assert "/add-lab" in paths
+
+
+def test_oauth_proxy_accepts_unverified_participant_identity_labels():
+    manifest = (
+        Path(__file__).resolve().parents[2]
+        / "deploy/launchpad/base/public-access-gateway.yaml"
+    ).read_text()
+    assert "--insecure-oidc-allow-unverified-email=true" in manifest

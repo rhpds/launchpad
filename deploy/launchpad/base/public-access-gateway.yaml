@@ -47,6 +47,7 @@ spec:
             - --http-address=0.0.0.0:8443
             - --upstream=http://127.0.0.1:8080
             - --email-domain=*
+            - --insecure-oidc-allow-unverified-email=true
             - --pass-user-headers=true
             - --set-xauthrequest=true
             - --cookie-secure=true
