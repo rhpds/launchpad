@@ -12,6 +12,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 app = FastAPI(title="Launchpad Public Access Gateway", docs_url=None, redoc_url=None, openapi_url=None)
 BACKEND = os.getenv("LAUNCHPAD_INTERNAL_API", "http://backend:8000/api/v1").rstrip("/")
 BROKER_KEY = os.getenv("ACCESS_BROKER_KEY", "")
+UPSTREAM_TLS_VERIFY = os.getenv("PUBLIC_UPSTREAM_TLS_VERIFY", "true").casefold() not in {"0", "false", "no"}
 
 
 def _host(request: Request) -> str:
@@ -160,7 +161,7 @@ async def proxy(kind: str, path: str, request: Request):
     if kind == "console":
         return RedirectResponse(base, status_code=302)
     url = urljoin(base.rstrip("/") + "/", path)
-    async with httpx.AsyncClient(timeout=30, follow_redirects=False) as client:
+    async with httpx.AsyncClient(timeout=30, follow_redirects=False, verify=UPSTREAM_TLS_VERIFY) as client:
         upstream = await client.request(request.method, url, params=request.query_params, headers={"accept": request.headers.get("accept", "*/*")})
     excluded = {"content-length", "connection", "transfer-encoding", "set-cookie"}
     return Response(upstream.content, status_code=upstream.status_code, headers={k: v for k, v in upstream.headers.items() if k.casefold() not in excluded})

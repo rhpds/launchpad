@@ -29,6 +29,9 @@ spec:
             - {name: http, containerPort: 8080}
           env:
             - {name: LAUNCHPAD_INTERNAL_API, value: "http://backend:8000/api/v1"}
+            # Keep TLS verification enabled. A cluster certification overlay may
+            # temporarily disable it until that cluster's ingress CA is mounted.
+            - {name: PUBLIC_UPSTREAM_TLS_VERIFY, value: "true"}
             - name: ACCESS_BROKER_KEY
               valueFrom:
                 secretKeyRef: {name: launchpad-public-access, key: ACCESS_BROKER_KEY, optional: true}

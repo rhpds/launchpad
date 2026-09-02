@@ -51,3 +51,4 @@ def test_oauth_proxy_accepts_unverified_participant_identity_labels():
     ).read_text()
     assert "--insecure-oidc-allow-unverified-email=true" in manifest
     assert "--oidc-email-claim=preferred_username" in manifest
+    assert 'name: PUBLIC_UPSTREAM_TLS_VERIFY, value: "true"' in manifest
