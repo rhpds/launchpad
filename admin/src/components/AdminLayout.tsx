@@ -15,16 +15,20 @@ export default function AdminLayout() {
   const location = useLocation();
 
   return (
-    <div className="min-h-screen bg-[#F0F0F0] flex flex-col">
-      <header className="bg-[#151515] text-white">
+    <div className="min-h-screen bg-[#151515] flex flex-col">
+      <header className="border-b border-[#333] bg-[#151515] text-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <Link to="/" className="flex items-center gap-5">
-              <RedHatLogo height={28} />
-              <span className="text-white text-xl font-bold mx-2">X</span>
-              <IntelLogo height={22} />
-              <span className="text-xs font-medium bg-white/15 px-2 py-0.5 rounded ml-2">ADMIN</span>
-            </Link>
+            <div className="flex items-center gap-4">
+              <Link to="/" className="flex items-center gap-3">
+                <RedHatLogo height={24} />
+                <span className="text-white text-lg font-bold">X</span>
+                <IntelLogo height={18} />
+              </Link>
+              <span className="text-[#333] mx-2">|</span>
+              <span className="text-white text-sm font-semibold" style={{ fontFamily: 'Red Hat Display' }}>Partner AI Launchpad</span>
+              <span className="text-[11px] font-medium bg-white/15 px-2 py-1 rounded">ADMIN</span>
+            </div>
             <nav className="flex gap-1">
               {NAV_ITEMS.map((item) => (
                 <Link
@@ -33,7 +37,7 @@ export default function AdminLayout() {
                   className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
                     location.pathname === item.path
                       ? 'bg-white/15 text-white'
-                      : 'text-gray-300 hover:text-white hover:bg-white/10'
+                      : 'text-[#6A6E73] hover:text-white hover:bg-white/10'
                   }`}
                 >
                   {item.label}
@@ -44,20 +48,20 @@ export default function AdminLayout() {
         </div>
       </header>
 
-      <div className="bg-[#EE0000] h-0.5" />
+      <div className="h-0.5 flex"><div className="flex-1 bg-[#EE0000]" /><div className="flex-1 bg-[#0071C5]" /><div className="flex-1 bg-[#3E8635]" /></div>
 
       <main className="flex-1">
         <Outlet />
       </main>
 
-      <footer className="bg-[#151515] text-gray-400 text-sm py-6">
+      <footer className="border-t border-[#333] bg-[#151515] text-[#6A6E73] text-sm py-6">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <RedHatLogo height={18} />
             <span className="text-white text-sm font-bold mx-1">X</span>
             <IntelLogo height={14} />
           </div>
-          <span>Partner AI Launchpad — Administration</span>
+          <span>Internal operations and administration</span>
         </div>
       </footer>
     </div>
