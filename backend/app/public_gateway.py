@@ -18,8 +18,14 @@ def _host(request: Request) -> str:
     return request.headers.get("host", "").split(":", 1)[0].casefold()
 
 
+def _username(request: Request) -> str:
+    # oauth2-proxy always uses the OIDC subject for X-Forwarded-User.  The
+    # configured email claim carries Launchpad's stable preferred_username.
+    return request.headers.get("x-forwarded-email", "") or request.headers.get("x-forwarded-user", "")
+
+
 async def _resolve(request: Request) -> dict:
-    username = request.headers.get("x-forwarded-user", "")
+    username = _username(request)
     cookie = request.cookies.get("launchpad_access", "")
     async with httpx.AsyncClient(timeout=10) as client:
         if username:
@@ -75,7 +81,7 @@ def health():
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
-    username = request.headers.get("x-forwarded-user", "")
+    username = _username(request)
     try:
         target = await _resolve(request)
     except HTTPException:
@@ -96,7 +102,7 @@ async def home(request: Request):
 
 @app.get("/my-labs", response_class=HTMLResponse)
 async def my_labs(request: Request):
-    username = request.headers.get("x-forwarded-user", "")
+    username = _username(request)
     if not username:
         return RedirectResponse("/", status_code=302)
     return _page(
@@ -108,7 +114,7 @@ async def my_labs(request: Request):
 
 @app.post("/add-lab")
 async def add_lab(request: Request, code: str = Form()):
-    username = request.headers.get("x-forwarded-user", "")
+    username = _username(request)
     if not username:
         return RedirectResponse("/", status_code=303)
     async with httpx.AsyncClient(timeout=15) as client:

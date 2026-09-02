@@ -55,7 +55,12 @@ public final class LaunchpadCodeAuthenticator implements Authenticator {
             UserModel user = context.getSession().users().getUserByUsername(realm, username);
             if (user == null) user = context.getSession().users().addUser(realm, username);
             user.setEnabled(true);
-            user.setEmail(email.strip().toLowerCase());
+            // Participant email is an unverified label, not a unique account
+            // identifier. Keycloak enforces unique emails per realm, so use
+            // the opaque stable username for that field and retain the label
+            // separately for audit/display.
+            user.setEmail(username + "@participants.invalid");
+            user.setSingleAttribute("launchpad_email_label", email.strip().toLowerCase());
             // Keycloak's default user profile requires first and last name.
             // Populate stable non-authoritative display values so a newly
             // created passwordless participant is not diverted into the

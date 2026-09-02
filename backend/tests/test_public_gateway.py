@@ -2,7 +2,7 @@ from pathlib import Path
 
 from fastapi.testclient import TestClient
 
-from app.public_gateway import _lab_cards, app
+from app.public_gateway import _lab_cards, _username, app
 
 
 def test_gateway_exposes_only_public_health_identity():
@@ -36,9 +36,18 @@ def test_gateway_exposes_participant_home_and_add_lab_routes():
     assert "/add-lab" in paths
 
 
+def test_gateway_prefers_stable_oidc_username_claim():
+    request = type("Request", (), {"headers": {
+        "x-forwarded-user": "40982c65-d541-4fca-a92c-44d38885cd45",
+        "x-forwarded-email": "lp-87bd01a6f6c73d54ece70b489ceb3957",
+    }})()
+    assert _username(request) == "lp-87bd01a6f6c73d54ece70b489ceb3957"
+
+
 def test_oauth_proxy_accepts_unverified_participant_identity_labels():
     manifest = (
         Path(__file__).resolve().parents[2]
         / "deploy/launchpad/base/public-access-gateway.yaml"
     ).read_text()
     assert "--insecure-oidc-allow-unverified-email=true" in manifest
+    assert "--oidc-email-claim=preferred_username" in manifest
