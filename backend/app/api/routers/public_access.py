@@ -178,6 +178,10 @@ def resolve_gateway_target(
     if lab_session and lab_session.cluster_ref and provisioning_service.cluster_registry:
         target = provisioning_service.cluster_registry.get(lab_session.cluster_ref)
         console_url = target.public_console_url or target.console_url
+        if console_url and lab_session.namespace:
+            console_url = f"{console_url.rstrip('/')}/topology/ns/{lab_session.namespace}"
+        if not workspace_url or "example.com" in workspace_url:
+            workspace_url = console_url or showroom_url
     return {
         "order_id": policy.order_id,
         "seat_ref": entitlement.seat_ref,
@@ -225,6 +229,10 @@ def resolve_oidc_identity(host: str, username: str, x_access_broker_key: str = H
     if lab_session and lab_session.cluster_ref and provisioning_service.cluster_registry:
         cluster = provisioning_service.cluster_registry.get(lab_session.cluster_ref)
         console_url = cluster.public_console_url or cluster.console_url
+        if console_url and lab_session.namespace:
+            console_url = f"{console_url.rstrip('/')}/topology/ns/{lab_session.namespace}"
+        if not workspace_url or "example.com" in workspace_url:
+            workspace_url = console_url or showroom_url
     public_access_service._audit("authorize", policy.order_id, "granted", identity.participant_id)
     return {"order_id": policy.order_id, "seat_ref": entitlement.seat_ref, "expires_at": entitlement.expires_at, "showroom_url": showroom_url, "workspace_url": workspace_url, "console_url": console_url}
 

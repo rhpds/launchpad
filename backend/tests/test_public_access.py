@@ -161,6 +161,15 @@ def test_owner_summary_counts_only_active_claims(monkeypatch):
     assert public_access_router._owner_summary("order-summary")["claim_count"] == 1
 
 
+def test_public_access_never_uses_placeholder_workspace_url():
+    source = (
+        __import__("pathlib").Path(__file__).resolve().parents[1]
+        / "app/api/routers/public_access.py"
+    ).read_text()
+    assert '"example.com" in workspace_url' in source
+    assert "/topology/ns/" in source
+
+
 def test_backend_restart_recovers_policy_identity_entitlement_and_session():
     class Store:
         def __init__(self):
