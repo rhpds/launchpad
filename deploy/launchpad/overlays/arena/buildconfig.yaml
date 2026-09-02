@@ -9,7 +9,7 @@ spec:
   runPolicy: SerialLatestOnly
   source:
     type: Git
-    git: {uri: "https://github.com/jkershawrh/launchpad.git", ref: main}
+    git: {uri: "https://github.com/rhpds/launchpad.git", ref: main}
   strategy:
     type: Docker
     dockerStrategy: {dockerfilePath: backend/Containerfile}
@@ -29,7 +29,7 @@ spec:
   runPolicy: SerialLatestOnly
   source:
     type: Git
-    git: {uri: "https://github.com/jkershawrh/launchpad.git", ref: main}
+    git: {uri: "https://github.com/rhpds/launchpad.git", ref: main}
     contextDir: frontend
   strategy:
     type: Docker
@@ -50,7 +50,7 @@ spec:
   runPolicy: SerialLatestOnly
   source:
     type: Git
-    git: {uri: "https://github.com/jkershawrh/launchpad.git", ref: main}
+    git: {uri: "https://github.com/rhpds/launchpad.git", ref: main}
     contextDir: admin
   strategy:
     type: Docker
@@ -71,7 +71,7 @@ spec:
   runPolicy: SerialLatestOnly
   source:
     type: Git
-    git: {uri: "https://github.com/jkershawrh/launchpad.git", ref: main}
+    git: {uri: "https://github.com/rhpds/launchpad.git", ref: main}
     contextDir: demos/containers/sandbox
   strategy:
     type: Docker
@@ -80,4 +80,3 @@ spec:
   resources:
     requests: {cpu: "500m", memory: 1Gi, ephemeral-storage: 2Gi}
     limits: {cpu: "2", memory: 2Gi, ephemeral-storage: 8Gi}
-

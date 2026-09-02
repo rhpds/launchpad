@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/jkershawrh/launchpad.git
+    repoURL: https://github.com/rhpds/launchpad.git
     targetRevision: main
     path: deploy/launchpad/overlays/arena-argocd
   destination:
@@ -18,4 +18,3 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-
