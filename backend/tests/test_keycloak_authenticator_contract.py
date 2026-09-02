@@ -18,9 +18,10 @@ def test_login_brand_marks_are_inline_and_do_not_depend_on_external_images():
     ).read_text()
     assert '<svg class="launchpad-logo launchpad-logo-redhat"' in template
     assert '<svg class="launchpad-logo launchpad-logo-intel"' in template
+    assert 'viewBox="0 0 192.3 146"' in template
+    assert '>Red</text>' not in template
     assert "redhat.svg" not in template
     assert "intel.svg" not in template
     assert 'font-family: "Red Hat Text"' in template
-    assert "background: transparent" in template
-    assert "keycloak-bg-darken.svg" in template
-    assert "radial-gradient" not in template
+    assert "radial-gradient" in template
+    assert "keycloak-bg-darken.svg" not in template

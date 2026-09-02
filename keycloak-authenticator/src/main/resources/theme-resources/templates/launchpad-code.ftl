@@ -3,8 +3,8 @@
   <#if section = "header">
     <style>
       body, .pf-v5-c-login { font-family: "Red Hat Text", "Red Hat Display", Helvetica, Arial, sans-serif; }
-      body { background: url("${url.resourcesPath}/img/keycloak-bg-darken.svg") no-repeat center center fixed; background-size: cover; }
-      .pf-v5-c-login { display: flex; min-height: 100vh; align-items: center; justify-content: center; background: transparent; }
+      .pf-v5-c-login { position: relative; display: flex; min-height: 100vh; align-items: center; justify-content: center; overflow: hidden; background: radial-gradient(circle at 16% 18%, rgba(238, 0, 0, .3), transparent 31%), radial-gradient(circle at 84% 22%, rgba(0, 199, 253, .28), transparent 32%), radial-gradient(circle at 52% 105%, rgba(90, 44, 170, .26), transparent 42%), linear-gradient(135deg, #07090d 0%, #101824 48%, #080a0f 100%); }
+      .pf-v5-c-login::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .3; background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px); background-size: 44px 44px; mask-image: linear-gradient(to bottom, rgba(0,0,0,.8), transparent 82%); }
       .pf-v5-c-login__container { display: block; width: 520px !important; max-width: calc(100vw - 32px) !important; padding: 28px 0; }
       #kc-header { display: none; }
       .pf-v5-c-login__main { border-radius: 16px; box-shadow: 0 18px 48px rgba(0, 0, 0, .34); overflow: hidden; }
@@ -14,7 +14,7 @@
       .launchpad-brand { text-align: center; }
       .launchpad-logos { display: flex; align-items: center; justify-content: center; gap: 26px; min-height: 60px; margin-bottom: 18px; }
       .launchpad-logo { display: block; height: auto; overflow: visible; }
-      .launchpad-logo-redhat { width: 156px; }
+      .launchpad-logo-redhat { width: 74px; }
       .launchpad-logo-intel { width: 112px; }
       .launchpad-divider { width: 1px; height: 42px; background: #6a6e73; opacity: .55; }
       .launchpad-title { width: 100%; color: #f0f0f0; font-family: "Red Hat Display", "Red Hat Text", Helvetica, Arial, sans-serif; font-size: 28px; font-weight: 700; line-height: 1.2; letter-spacing: -.02em; text-align: center; white-space: nowrap; }
@@ -37,11 +37,9 @@
     </style>
     <div class="launchpad-brand">
       <div class="launchpad-logos">
-        <svg class="launchpad-logo launchpad-logo-redhat" role="img" aria-label="Red Hat" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 613 145">
+        <svg class="launchpad-logo launchpad-logo-redhat" role="img" aria-label="Red Hat" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192.3 146">
           <path d="M127.47 83.49c12.51 0 30.61-2.58 30.61-17.46a14 14 0 0 0-.31-3.42l-7.45-32.36c-1.72-7.12-3.23-10.35-15.73-16.6C124.89 8.69 103.76.5 97.51.5 91.69.5 90 8 83.06 8c-6.68 0-11.64-5.6-17.89-5.6-6 0-9.91 4.09-12.93 12.5 0 0-8.41 23.72-9.49 27.16A6.43 6.43 0 0 0 42.53 44c0 9.22 36.3 39.45 84.94 39.45M160 72.07c1.73 8.19 1.73 9.05 1.73 10.13 0 14-15.74 21.77-36.43 21.77C78.54 104 37.58 76.6 37.58 58.49a18.45 18.45 0 0 1 1.51-7.33C22.27 52 .5 55 .5 74.22c0 31.48 74.59 70.28 133.65 70.28 45.28 0 56.7-20.48 56.7-36.65 0-12.72-11-27.16-30.83-35.78" fill="#ee0000"/>
-          <path d="M160 72.07c1.73 8.19 1.73 9.05 1.73 10.13 0 14-15.74 21.77-36.43 21.77C78.54 104 37.58 76.6 37.58 58.49a18.45 18.45 0 0 1 1.51-7.33l3.66-9.06A6.43 6.43 0 0 0 42.53 44c0 9.22 36.3 39.45 84.94 39.45 12.51 0 30.61-2.58 30.61-17.46a14 14 0 0 0-.31-3.42" fill="#f5f5f5"/>
-          <text x="200" y="95" font-family="Red Hat Display, Arial, sans-serif" font-size="72" font-weight="600" fill="#ee0000">Red</text>
-          <text x="340" y="95" font-family="Red Hat Display, Arial, sans-serif" font-size="72" font-weight="600" fill="#f5f5f5">Hat</text>
+          <path d="M160 72.07c1.73 8.19 1.73 9.05 1.73 10.13 0 14-15.74 21.77-36.43 21.77C78.54 104 37.58 76.6 37.58 58.49a18.45 18.45 0 0 1 1.51-7.33l3.66-9.06A6.43 6.43 0 0 0 42.53 44c0 9.22 36.3 39.45 84.94 39.45 12.51 0 30.61-2.58 30.61-17.46a14 14 0 0 0-.31-3.42" fill="#000000"/>
         </svg>
         <span aria-hidden="true" class="launchpad-divider"></span>
         <svg class="launchpad-logo launchpad-logo-intel" role="img" aria-label="Intel" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 388.2 150.6">
