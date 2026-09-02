@@ -16,6 +16,7 @@ def test_login_brand_marks_are_inline_and_do_not_depend_on_external_images():
         Path(__file__).resolve().parents[2]
         / "keycloak-authenticator/src/main/resources/theme-resources/templates/launchpad-code.ftl"
     ).read_text()
-    assert 'class="launchpad-brand-mark launchpad-brand-mark-redhat"' in template
-    assert 'class="launchpad-brand-mark launchpad-brand-mark-intel"' in template
+    assert '<svg class="launchpad-logo launchpad-logo-redhat"' in template
+    assert '<svg class="launchpad-logo launchpad-logo-intel"' in template
     assert "${url.resourcesPath}/img/" not in template
+    assert "radial-gradient" in template
