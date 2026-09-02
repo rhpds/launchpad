@@ -340,7 +340,10 @@ class PublicAccessService:
 
     def get_policy_by_host(self, host: str) -> AccessPolicy | None:
         normalized = host.split(":", 1)[0].casefold()
-        return next(
-            (policy for policy in self._policies.values() if policy.public_url.removeprefix("https://").casefold() == normalized),
-            None,
-        )
+        matches = [
+            policy for policy in self._policies.values()
+            if policy.enabled
+            and policy.expires_at > datetime.utcnow()
+            and policy.public_url.removeprefix("https://").rstrip("/").casefold() == normalized
+        ]
+        return max(matches, key=lambda policy: policy.created_at, default=None)

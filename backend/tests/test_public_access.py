@@ -115,6 +115,22 @@ def test_expired_policy_denies_claim_and_session():
         access.validate_session(claim.session_token, "expired")
 
 
+def test_shared_pilot_host_selects_only_current_active_policy():
+    access = service()
+    old, _ = access.create_policy(
+        order_id="old", order_type="individual", catalog_slug="lab",
+        seat_refs=["old-seat"], expires_at=datetime.utcnow() + timedelta(hours=1),
+    )
+    access._policies["old"] = old.model_copy(update={"public_url": "https://pilot.example.io"})
+    access.expire_order("old")
+    current, _ = access.create_policy(
+        order_id="current", order_type="individual", catalog_slug="lab",
+        seat_refs=["current-seat"], expires_at=datetime.utcnow() + timedelta(hours=2),
+    )
+    access._policies["current"] = current.model_copy(update={"public_url": "https://pilot.example.io"})
+    assert access.get_policy_by_host("pilot.example.io").order_id == "current"
+
+
 def test_public_placement_requires_public_enabled_cluster():
     registry = ClusterRegistry([
         ClusterTarget(cluster_id="private", display_name="Private", ingress_domain="apps.private", capabilities=["openshift"]),
