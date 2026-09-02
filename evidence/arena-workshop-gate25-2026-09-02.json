@@ -1,6 +1,6 @@
 {
   "evidence_id": "ARENA-WORKSHOP-GATE25-2026-09-02",
-  "result": "GREEN-live",
+  "result": "GREEN-live-three-consecutive-runs",
   "cluster": "arena",
   "catalog_item": "openshift-operators-workshop",
   "commit": "f38e706dcf04732087b807cb9b5779f384145b7d",
@@ -51,6 +51,59 @@
     "remaining_namespaces": 0,
     "remaining_argocd_applications": 0
   },
+  "twenty_five_seat_repeat_runs": [
+    {
+      "run": 2,
+      "workshop_id": "59877d17-f15e-4f66-b3d8-31e4121b82cf",
+      "provisioning_started_utc": "2026-09-02T12:23:53Z",
+      "workshop_ready_utc": "2026-09-02T12:27:25Z",
+      "provisioning_seconds": 212,
+      "seats_ready": 25,
+      "seat_failures": 0,
+      "validation_checks_passed": 50,
+      "validation_checks_failed": 0,
+      "showroom_http_200": 25,
+      "correct_showroom_content": 25,
+      "participant_edit_bindings": 25,
+      "isolation_samples_passed": 5,
+      "reclaim_started_utc": "2026-09-02T12:29:01Z",
+      "zero_residue_utc": "2026-09-02T12:30:57Z",
+      "reclaim_seconds": 116,
+      "remaining_namespaces": 0,
+      "remaining_argocd_applications": 0
+    },
+    {
+      "run": 3,
+      "workshop_id": "654a8752-dc2e-4f7d-a14b-ee9e8387d782",
+      "provisioning_started_utc": "2026-09-02T12:31:19Z",
+      "workshop_ready_utc": "2026-09-02T12:34:53Z",
+      "provisioning_seconds": 214,
+      "seats_ready": 25,
+      "seat_failures": 0,
+      "validation_checks_passed": 50,
+      "validation_checks_failed": 0,
+      "showroom_http_200": 25,
+      "correct_showroom_content": 25,
+      "participant_edit_bindings": 25,
+      "isolation_samples_passed": 5,
+      "reclaim_started_utc": "2026-09-02T12:36:15Z",
+      "zero_residue_utc": "2026-09-02T12:38:17Z",
+      "reclaim_seconds": 122,
+      "remaining_namespaces": 0,
+      "remaining_argocd_applications": 0
+    }
+  ],
+  "repeatability_summary": {
+    "consecutive_successes": 3,
+    "total_seats_ready": 75,
+    "total_seat_failures": 0,
+    "total_validation_checks_passed": 150,
+    "total_showroom_http_200": 75,
+    "provisioning_seconds": [214, 212, 214],
+    "average_provisioning_seconds": 213.3,
+    "reclaim_seconds": [122, 116, 122],
+    "average_reclaim_seconds": 120
+  },
   "platform_after_test": {
     "authentication_available": true,
     "authentication_degraded": false,
@@ -60,14 +113,13 @@
   },
   "certification_boundary": {
     "certified": [
-      "one internal 25-seat OpenShift Operator workshop on Arena",
+      "three consecutive internal 25-seat OpenShift Operator workshops on Arena",
       "validated Showroom routes and content",
       "namespace-scoped participant edit access",
       "adjacent-seat access denial",
       "bulk reclaim with zero workshop residue"
     ],
     "not_yet_certified": [
-      "three consecutive 25-seat runs",
       "simultaneous 25-seat workshops on Oberon and Arena",
       "three 25-seat workshops across the fleet",
       "50-seat or 75-seat Arena workshops",
