@@ -34,7 +34,9 @@
     {"check": "repeatability_report", "result": "pass", "score": 100},
     {"check": "arena_targeted_reclaim", "result": "pass"},
     {"check": "namespace_removed", "result": "pass"},
-    {"check": "argocd_sync", "result": "pass", "status": "Synced/Healthy"}
+    {"check": "argocd_sync", "result": "pass", "status": "Synced/Healthy"},
+    {"check": "openshift_keycloak_ca_validation", "result": "pass"},
+    {"check": "openshift_authentication_operator", "result": "pass", "status": "Available/NotDegraded"}
   ],
   "release_scope": "Arena internal OpenShift sandbox control-plane cutover",
   "not_certified": [

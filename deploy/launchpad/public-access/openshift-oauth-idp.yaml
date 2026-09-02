@@ -12,9 +12,9 @@ spec:
       openID:
         clientID: openshift-launchpad-public
         clientSecret: {name: launchpad-keycloak-client}
+        ca: {name: launchpad-keycloak-ca}
         issuer: https://keycloak.example.invalid/realms/launchpad-public
         claims:
           preferredUsername: [preferred_username]
           name: [name]
           email: [email]
-

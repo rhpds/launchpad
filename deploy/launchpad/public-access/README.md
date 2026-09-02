@@ -15,7 +15,10 @@ Activation order:
    Operator to report `Succeeded` in its dedicated `keycloak` namespace.
 4. Apply `oberon-ingresscontroller.yaml` with the real values and wait for
    Available.
-5. Configure Keycloak and OpenShift OIDC.
+5. Configure Keycloak and OpenShift OIDC. When the Keycloak route uses the
+   OpenShift ingress CA, copy only that public CA certificate into an
+   `openshift-config/launchpad-keycloak-ca` ConfigMap and reference it from the
+   OpenID provider. Do not set an insecure TLS bypass.
 6. Render and review `overlays/oberon-public`; then deploy it.
 7. Run DNS, TLS, isolation, browser, authorization and cleanup certification.
 
