@@ -17,6 +17,7 @@ MODEL_HEALTH_INTERVAL = int(os.environ.get("MODEL_HEALTH_INTERVAL", "120"))
 _ttl_task = None
 _catalog_sync_task = None
 _model_health_task = None
+_workshop_recovery_task = None
 
 
 REQUIRED_ENV_VARS = {
@@ -78,17 +79,39 @@ async def _model_health_loop():
             logger.debug("Model health check error (non-critical): %s", e)
 
 
+async def _recover_interrupted_workshops():
+    """Resume persisted workshop jobs after the API is ready to serve."""
+    if os.environ.get("WORKSHOP_AUTO_RECOVERY", "true").lower() != "true":
+        return
+    try:
+        from app.api.deps import provisioning_service
+
+        recovered = await asyncio.to_thread(
+            provisioning_service.recover_interrupted_workshops
+        )
+        if recovered:
+            logger.info("Recovered interrupted workshops: %s", recovered)
+    except Exception as exc:
+        logger.exception("Interrupted workshop recovery failed: %s", exc)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    global _ttl_task, _catalog_sync_task, _model_health_task
+    global _ttl_task, _catalog_sync_task, _model_health_task, _workshop_recovery_task
     _validate_config()
     if get_database_url():
         await init_db()
     _ttl_task = asyncio.create_task(_ttl_enforcement_loop())
     _catalog_sync_task = asyncio.create_task(_catalog_sync_loop())
     _model_health_task = asyncio.create_task(_model_health_loop())
+    _workshop_recovery_task = asyncio.create_task(_recover_interrupted_workshops())
     yield
-    for task in (_ttl_task, _catalog_sync_task, _model_health_task):
+    for task in (
+        _ttl_task,
+        _catalog_sync_task,
+        _model_health_task,
+        _workshop_recovery_task,
+    ):
         if task:
             task.cancel()
     await close_db()

@@ -336,6 +336,34 @@ def test_interrupted_workshop_seats_can_be_requeued_without_resetting_ready_seat
     assert queued.seats[2].status == WorkshopSeatStatus.PENDING
 
 
+def test_interrupted_workshop_is_automatically_recovered():
+    service = ProvisioningService()
+    order = service.create_workshop_order(
+        Workshop(
+            tenant_id="automatic-recovery-tenant",
+            catalog_item_id="inference-overdrive-quickstart",
+            num_users=3,
+        )
+    )
+    seats = [
+        order.seats[0].model_copy(update={"status": WorkshopSeatStatus.READY}),
+        order.seats[1].model_copy(update={"status": WorkshopSeatStatus.PROVISIONING}),
+        order.seats[2].model_copy(update={"status": WorkshopSeatStatus.PENDING}),
+    ]
+    service._save_workshop(order.model_copy(update={
+        "status": WorkshopStatus.PROVISIONING,
+        "seats": seats,
+    }))
+
+    recovered = service.recover_interrupted_workshops()
+    completed = service.get_workshop(order.workshop_id)
+
+    assert recovered == [order.workshop_id]
+    assert completed.status == WorkshopStatus.READY
+    assert len(completed.session_ids) == 3
+    assert all(seat.status == WorkshopSeatStatus.READY for seat in completed.seats)
+
+
 def test_workshop_order_rejects_more_than_supported_seat_limit():
     service = ProvisioningService()
     with patch.dict(os.environ, {"MAX_ACTIVE_SESSIONS_PER_WORKSHOP": "20"}):

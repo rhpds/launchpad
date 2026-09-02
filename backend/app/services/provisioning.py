@@ -1216,6 +1216,37 @@ class ProvisioningService:
         self._save_workshop(queued)
         return queued
 
+    def recover_interrupted_workshops(self) -> list[str]:
+        """Resume workshop jobs whose in-process worker was interrupted.
+
+        Workshop and seat state is persisted, but the worker thread is not. On
+        process startup, reset only incomplete seats and reuse every completed
+        seat/session. Resource reconciliation runs while the service loads and
+        removes any unlinked partial session before this method creates a
+        replacement, preventing duplicate live namespaces for one seat.
+        """
+        interrupted = [
+            workshop.workshop_id
+            for workshop in list(self._workshops.values())
+            if workshop.status in {
+                WorkshopStatus.QUEUED,
+                WorkshopStatus.PROVISIONING,
+            }
+        ]
+        recovered: list[str] = []
+        for workshop_id in interrupted:
+            try:
+                workshop = self._workshops[workshop_id]
+                if workshop.status == WorkshopStatus.PROVISIONING:
+                    self.queue_failed_workshop_seats(workshop_id)
+                self.run_queued_workshop(workshop_id)
+                recovered.append(workshop_id)
+            except Exception:
+                logger.exception(
+                    "Automatic recovery failed for workshop %s", workshop_id
+                )
+        return recovered
+
     def provision_workshop(
         self, workshop: Workshop, idempotency_key: str = None
     ) -> Workshop:
