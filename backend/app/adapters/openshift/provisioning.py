@@ -212,7 +212,11 @@ class OpenShiftProvisioningAdapter:
                     content_repo_url=str(res["showroom_content_repo_url"]),
                     content_ref=str(res["showroom_content_ref"]),
                     apps_domain=apps_domain,
-                    console_url=self._target.console_url if self._target else os.environ.get("OPENSHIFT_CONSOLE_URL", ""),
+                    console_url=(
+                        f"{self._target.console_url.rstrip('/')}/topology/ns/{demo_namespace}"
+                        if self._target and self._target.console_url
+                        else os.environ.get("OPENSHIFT_CONSOLE_URL", "")
+                    ),
                     destination_server=self._target.api_url if self._target else "https://kubernetes.default.svc",
                     storage_class=self._target.storage_class if self._target else "nfs-storage",
                     cluster_id=self._target.cluster_id if self._target else "oberon",
