@@ -36,6 +36,7 @@ def test_gateway_exposes_participant_home_and_add_lab_routes():
     assert "/add-lab" in paths
     assert "/instructions/{path:path}" in paths
     assert "/www/{path:path}" in paths
+    assert "/ui-config.yml" in paths
     assert "/terminal/{path:path}" in paths
     assert "/assets/{path:path}" in paths
     assert "/token" in paths
@@ -59,6 +60,14 @@ def test_gateway_prefers_stable_oidc_username_claim():
     request = type("Request", (), {"headers": {
         "x-forwarded-user": "40982c65-d541-4fca-a92c-44d38885cd45",
         "x-forwarded-email": "lp-87bd01a6f6c73d54ece70b489ceb3957",
+    }})()
+    assert _username(request) == "lp-87bd01a6f6c73d54ece70b489ceb3957"
+
+
+def test_gateway_accepts_oauth_proxy_websocket_identity_headers():
+    request = type("Request", (), {"headers": {
+        "x-auth-request-user": "40982c65-d541-4fca-a92c-44d38885cd45",
+        "x-auth-request-email": "lp-87bd01a6f6c73d54ece70b489ceb3957",
     }})()
     assert _username(request) == "lp-87bd01a6f6c73d54ece70b489ceb3957"
 

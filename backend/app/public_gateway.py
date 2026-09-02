@@ -31,7 +31,12 @@ def _host(request: Request) -> str:
 def _username(request: Request) -> str:
     # oauth2-proxy always uses the OIDC subject for X-Forwarded-User.  The
     # configured email claim carries Launchpad's stable preferred_username.
-    return request.headers.get("x-forwarded-email", "") or request.headers.get("x-forwarded-user", "")
+    return (
+        request.headers.get("x-forwarded-email", "")
+        or request.headers.get("x-auth-request-email", "")
+        or request.headers.get("x-forwarded-user", "")
+        or request.headers.get("x-auth-request-user", "")
+    )
 
 
 async def _resolve(request: Request) -> dict:
@@ -202,6 +207,12 @@ async def showroom_instructions(request: Request, path: str = ""):
 @app.api_route("/www/{path:path}", methods=["GET", "HEAD"])
 async def showroom_generated_site(request: Request, path: str):
     return await _showroom_alias(request, f"www/{path}")
+
+
+@app.api_route("/ui-config.yml", methods=["GET", "HEAD"])
+@app.api_route("/zero-touch-config.yml", methods=["GET", "HEAD"])
+async def showroom_root_config(request: Request):
+    return await _showroom_alias(request, request.url.path.lstrip("/"))
 
 
 @app.api_route("/terminal", methods=["GET", "HEAD"])
