@@ -10,7 +10,6 @@ from urllib.parse import urljoin
 
 import httpx
 import websockets
-import yaml
 from fastapi import FastAPI, Form, HTTPException, Request, Response, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -91,19 +90,6 @@ def _lab_cards(labs: list[dict]) -> str:
         expiry = html.escape(str(lab["expires_at"]))
         cards.append(f"<section><h2>{label}</h2><p>Available until {expiry}</p><div class='actions'><a class='button' href='{url}'>Resume lab</a></div></section>")
     return "".join(cards)
-
-
-def _public_showroom_config(content: bytes) -> bytes:
-    """Replace iframe-blocked Console URLs with a top-level launcher tab."""
-    try:
-        config = yaml.safe_load(content) or {}
-        for tab in config.get("tabs", []):
-            if tab.get("name") == "OpenShift Console":
-                tab.pop("url", None)
-                tab.update({"path": "/console-launcher", "port": 443})
-        return yaml.safe_dump(config, sort_keys=False).encode()
-    except (TypeError, yaml.YAMLError):
-        return content
 
 
 @app.get("/health")
@@ -198,9 +184,8 @@ async def proxy(kind: str, path: str, request: Request):
     url = urljoin(base.rstrip("/") + "/", path)
     async with httpx.AsyncClient(timeout=30, follow_redirects=False, verify=UPSTREAM_TLS_VERIFY) as client:
         upstream = await client.request(request.method, url, params=request.query_params, headers={"accept": request.headers.get("accept", "*/*")})
-    content = _public_showroom_config(upstream.content) if kind == "showroom" and path == "www/ui-config.yml" else upstream.content
     excluded = {"content-length", "content-encoding", "connection", "transfer-encoding", "set-cookie"}
-    return Response(content, status_code=upstream.status_code, headers={k: v for k, v in upstream.headers.items() if k.casefold() not in excluded})
+    return Response(upstream.content, status_code=upstream.status_code, headers={k: v for k, v in upstream.headers.items() if k.casefold() not in excluded})
 
 
 async def _showroom_alias(request: Request, path: str) -> Response:
@@ -234,30 +219,7 @@ async def showroom_root_config(request: Request):
     path = request.url.path.lstrip("/")
     if path == "ui-config.yml":
         path = "www/ui-config.yml"
-    response = await _showroom_alias(request, path)
-    if path == "www/ui-config.yml":
-        response.body = _public_showroom_config(response.body)
-        response.headers["content-length"] = str(len(response.body))
-    return response
-
-
-@app.get("/console-launcher")
-async def console_launcher(request: Request):
-    target = await _resolve(request)
-    console_url = target.get("console_url")
-    if not console_url:
-        raise HTTPException(404)
-    safe_url = html.escape(console_url, quote=True)
-    return HTMLResponse(
-        "<!doctype html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'>"
-        "<style>body{margin:0;background:#151515;color:#f5f5f5;font:16px system-ui;display:grid;place-items:center;min-height:100vh}"
-        ".card{max-width:560px;padding:40px;text-align:center;background:#212121;border:1px solid #3c3f42;border-radius:14px}"
-        "a{display:inline-block;margin-top:18px;padding:13px 24px;background:#ee0000;color:white;text-decoration:none;border-radius:6px;font-weight:700}"
-        "p{color:#c7c7c7;line-height:1.55}</style></head><body><main class='card'>"
-        "<h1>OpenShift Console</h1><p>The Console opens in a full browser page for secure sign-in and starts in this seat's assigned namespace.</p>"
-        f"<a href='{safe_url}' target='_blank' rel='noopener noreferrer'>Open OpenShift Console</a>"
-        "</main></body></html>"
-    )
+    return await _showroom_alias(request, path)
 
 
 @app.api_route("/terminal", methods=["GET", "HEAD"])
