@@ -184,6 +184,11 @@ class PublicAccessService:
                 self._identities[normalized] = identity
                 if self.store:
                     self.store.save_identity(identity)
+            elif identity.disabled_at is not None:
+                identity = identity.model_copy(update={"disabled_at": None})
+                self._identities[normalized] = identity
+                if self.store:
+                    self.store.save_identity(identity)
 
             key = (order_id, identity.participant_id)
             entitlement = self._entitlements.get(key)

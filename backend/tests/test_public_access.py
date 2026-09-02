@@ -221,3 +221,21 @@ def test_final_entitlement_expiry_disables_identity_and_revokes_session():
     identity = access._identities["person@example.com"]
     assert identity.disabled_at is not None
     assert access._sessions[access._token_hash(claim.session_token)].revoked_at is not None
+
+
+def test_claiming_a_later_lab_reactivates_the_ephemeral_identity():
+    access = service()
+    _, first_code = access.create_policy(
+        order_id="first", order_type="individual", catalog_slug="sandbox",
+        seat_refs=["first-seat"], expires_at=datetime.utcnow() + timedelta(hours=1),
+    )
+    first = access.claim("first", "person@example.com", first_code, "192.0.2.30")
+    access.expire_order("first")
+    assert access._identities["person@example.com"].disabled_at is not None
+    _, next_code = access.create_policy(
+        order_id="next", order_type="individual", catalog_slug="operators",
+        seat_refs=["next-seat"], expires_at=datetime.utcnow() + timedelta(hours=2),
+    )
+    resumed = access.claim("next", "person@example.com", next_code, "192.0.2.30")
+    assert resumed.identity.participant_id == first.identity.participant_id
+    assert resumed.identity.disabled_at is None
