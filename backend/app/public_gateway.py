@@ -205,7 +205,7 @@ async def showroom_terminal(request: Request, path: str = ""):
 
 @app.api_route("/assets/{path:path}", methods=["GET", "HEAD"])
 async def showroom_assets(request: Request, path: str):
-    return await _showroom_alias(request, f"assets/{path}")
+    return await _showroom_alias(request, f"www/assets/{path}")
 
 
 @app.websocket("/terminal/{path:path}")
