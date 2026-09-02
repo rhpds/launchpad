@@ -25,7 +25,10 @@ oc get pods -n {namespace}
 ----
 . Confirm the authorization result is `yes` and the active project is your assigned namespace.
 
-The *OpenShift Console* tab opens the {cluster_display_name} console. Select your assigned namespace before changing any resource.
+The *OpenShift Console* tab opens the {cluster_display_name} console. If
+OpenShift asks for an identity provider, choose *launchpad-public*. Your current
+participant session signs you in without another username or password, and
+Launchpad limits access to `{namespace}`.
 
 [.next-nav]
 xref:02-operator-discovery.adoc[Next: Discover platform operators →]
