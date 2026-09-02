@@ -1,0 +1,83 @@
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata: {name: launchpad-backend}
+---
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata: {name: launchpad-backend}
+spec:
+  runPolicy: SerialLatestOnly
+  source:
+    type: Git
+    git: {uri: "https://github.com/jkershawrh/launchpad.git", ref: main}
+  strategy:
+    type: Docker
+    dockerStrategy: {dockerfilePath: backend/Containerfile}
+  output: {to: {kind: ImageStreamTag, name: "launchpad-backend:latest"}}
+  resources:
+    requests: {cpu: "1", memory: 2Gi, ephemeral-storage: 4Gi}
+    limits: {cpu: "4", memory: 4Gi, ephemeral-storage: 12Gi}
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata: {name: launchpad-portal}
+---
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata: {name: launchpad-portal}
+spec:
+  runPolicy: SerialLatestOnly
+  source:
+    type: Git
+    git: {uri: "https://github.com/jkershawrh/launchpad.git", ref: main}
+    contextDir: frontend
+  strategy:
+    type: Docker
+    dockerStrategy: {dockerfilePath: Containerfile}
+  output: {to: {kind: ImageStreamTag, name: "launchpad-portal:latest"}}
+  resources:
+    requests: {cpu: "1", memory: 2Gi, ephemeral-storage: 4Gi}
+    limits: {cpu: "4", memory: 4Gi, ephemeral-storage: 12Gi}
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata: {name: launchpad-admin}
+---
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata: {name: launchpad-admin}
+spec:
+  runPolicy: SerialLatestOnly
+  source:
+    type: Git
+    git: {uri: "https://github.com/jkershawrh/launchpad.git", ref: main}
+    contextDir: admin
+  strategy:
+    type: Docker
+    dockerStrategy: {dockerfilePath: Containerfile}
+  output: {to: {kind: ImageStreamTag, name: "launchpad-admin:latest"}}
+  resources:
+    requests: {cpu: "1", memory: 2Gi, ephemeral-storage: 4Gi}
+    limits: {cpu: "4", memory: 4Gi, ephemeral-storage: 12Gi}
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata: {name: launchpad-sandbox}
+---
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata: {name: launchpad-sandbox}
+spec:
+  runPolicy: SerialLatestOnly
+  source:
+    type: Git
+    git: {uri: "https://github.com/jkershawrh/launchpad.git", ref: main}
+    contextDir: demos/containers/sandbox
+  strategy:
+    type: Docker
+    dockerStrategy: {dockerfilePath: Containerfile}
+  output: {to: {kind: ImageStreamTag, name: "launchpad-sandbox:latest"}}
+  resources:
+    requests: {cpu: "500m", memory: 1Gi, ephemeral-storage: 2Gi}
+    limits: {cpu: "2", memory: 2Gi, ephemeral-storage: 8Gi}
+

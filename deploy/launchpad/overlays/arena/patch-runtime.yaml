@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  template:
+    spec:
+      containers:
+        - name: backend
+          volumeMounts:
+            - name: cluster-targets
+              mountPath: /etc/launchpad
+              readOnly: true
+      volumes:
+        - name: cluster-targets
+          configMap:
+            name: launchpad-cluster-targets
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: partner-portal
+spec:
+  replicas: 1
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: admin
+spec:
+  replicas: 1
+

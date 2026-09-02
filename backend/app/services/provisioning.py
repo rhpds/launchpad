@@ -219,7 +219,7 @@ class ProvisioningService:
             from app.adapters.openshift.provisioning import OpenShiftProvisioningAdapter
             target = self.cluster_registry.get(cluster_ref)
             clients = self._target_clients(cluster_ref)
-            control_clients = self._target_clients("oberon")
+            control_clients = self._target_clients(self._control_cluster_ref(cluster_ref))
             return OpenShiftProvisioningAdapter(
                 clients=clients,
                 target=target,
@@ -242,12 +242,25 @@ class ProvisioningService:
     def _get_cleanup(self, cluster_ref: Optional[str]):
         if os.environ.get("LAUNCHPAD_MODE") == "openshift" and cluster_ref and self.cluster_client_factory:
             from app.adapters.openshift.cleanup import OpenShiftCleanupAdapter
-            control_clients = self._target_clients("oberon")
+            control_clients = self._target_clients(self._control_cluster_ref(cluster_ref))
             return OpenShiftCleanupAdapter(
                 clients=self._target_clients(cluster_ref),
                 argocd_custom_objects=control_clients.custom if control_clients else None,
             )
         return self.cleanup
+
+    def _control_cluster_ref(self, target_cluster_ref: Optional[str]) -> str:
+        """Resolve the cluster hosting Launchpad and its central Argo CD instance."""
+        configured = os.environ.get("LAUNCHPAD_CONTROL_CLUSTER_REF", "").strip()
+        if configured:
+            return configured
+        if self.cluster_registry:
+            for target in self.cluster_registry.list_enabled():
+                if target.local or "control-plane" in target.capabilities:
+                    return target.cluster_id
+        if target_cluster_ref:
+            return target_cluster_ref
+        return "oberon"
 
     def _select_target_cluster(self, request: LabRequest, catalog_item) -> Optional[str]:
         override = request.metadata.get("target_cluster")

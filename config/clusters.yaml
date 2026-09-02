@@ -5,12 +5,12 @@ clusters:
     ingress_domain: apps.arena.fm2aihpcsed.com
     console_url: https://console-openshift-console.apps.arena.fm2aihpcsed.com
     storage_class: nfs-storage
-    credential_secret: partner-ai-launchpad/launchpad-arena-kubeconfig
+    local: true
     priority: 10
     public_access_enabled: false
-    capabilities: [cpu, openshift, operators, openshift-ai, showroom, model_endpoint]
+    capabilities: [cpu, openshift, operators, openshift-ai, showroom, model_endpoint, control-plane]
     model_endpoints:
-      granite-2b: https://ovms-granite-2b-fleet-llm-d.apps.arena.fm2aihpcsed.com
+      granite-2b-cpu: https://ovms-granite-2b-fleet-llm-d.apps.arena.fm2aihpcsed.com/v1
   - cluster_id: oberon
     display_name: Oberon Primary
     api_url: https://kubernetes.default.svc
@@ -19,6 +19,7 @@ clusters:
     storage_class: nfs-storage
     local: true
     priority: 50
+    enabled: false
     # Certification gate: enable only after wildcard DNS/TLS, dedicated public
     # ingress, Keycloak and Console/OAuth external probes are all GREEN-live.
     public_access_enabled: false

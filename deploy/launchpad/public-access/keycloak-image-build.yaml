@@ -1,0 +1,32 @@
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: launchpad-keycloak
+  namespace: keycloak
+---
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: launchpad-keycloak
+  namespace: keycloak
+spec:
+  runPolicy: SerialLatestOnly
+  resources:
+    requests:
+      cpu: "1"
+      memory: 2Gi
+      ephemeral-storage: 4Gi
+    limits:
+      cpu: "4"
+      memory: 4Gi
+      ephemeral-storage: 12Gi
+  source:
+    type: Binary
+  strategy:
+    type: Docker
+    dockerStrategy:
+      dockerfilePath: Containerfile
+  output:
+    to:
+      kind: ImageStreamTag
+      name: launchpad-keycloak:26.4.2

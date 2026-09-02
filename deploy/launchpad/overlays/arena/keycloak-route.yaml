@@ -1,0 +1,19 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: launchpad-keycloak
+  namespace: keycloak
+  labels:
+    app.kubernetes.io/part-of: partner-ai-launchpad
+spec:
+  host: keycloak.apps.arena.fm2aihpcsed.com
+  to:
+    kind: Service
+    name: keycloak-service
+    weight: 100
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+

@@ -1,12 +1,26 @@
-# Template only. Replace the image with the signed image built from
-# keycloak-authenticator/Containerfile and merge these values into Oberon's
-# operator-managed Keycloak CR after backing up the existing CR.
+# The referenced Secrets are generated directly in the cluster and are never
+# stored in Git. Build the image with keycloak-image-build.yaml before applying
+# this resource.
 apiVersion: k8s.keycloak.org/v2alpha1
 kind: Keycloak
 metadata: {name: keycloak, namespace: keycloak}
 spec:
-  instances: 2
-  image: registry.example.invalid/launchpad-keycloak:26.4.2
+  instances: 1
+  image: image-registry.openshift-image-registry.svc:5000/keycloak/launchpad-keycloak:26.4.2
+  startOptimized: true
+  ingress: {enabled: false}
+  http: {httpEnabled: true}
+  proxy: {headers: xforwarded}
+  hostname:
+    strict: false
+  db:
+    vendor: postgres
+    host: keycloak-postgres
+    database: keycloak
+    usernameSecret: {name: keycloak-db, key: username}
+    passwordSecret: {name: keycloak-db, key: password}
+  bootstrapAdmin:
+    user: {secret: keycloak-bootstrap-admin}
   additionalOptions:
     - {name: spi-login-protocol-openid-connect-legacy-logout-redirect-uri, value: "true"}
   unsupported:

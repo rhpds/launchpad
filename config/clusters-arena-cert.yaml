@@ -1,0 +1,12 @@
+clusters:
+  - cluster_id: arena
+    display_name: Arena CPU Execution
+    api_url: https://kubernetes.default.svc
+    ingress_domain: apps.arena.fm2aihpcsed.com
+    console_url: https://console-openshift-console.apps.arena.fm2aihpcsed.com
+    storage_class: nfs-storage
+    local: true
+    priority: 10
+    public_access_enabled: true
+    public_ingress_domain: trycloudflare.com
+    capabilities: [cpu, openshift, operators, openshift-ai, showroom]

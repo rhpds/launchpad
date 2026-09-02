@@ -11,11 +11,13 @@ Activation order:
 1. Provision a public load balancer/WAF and wildcard DNS.
 2. Install the browser-trusted wildcard certificate Secret in
    `openshift-ingress`.
-3. Apply `oberon-ingresscontroller.yaml` with the real values and wait for
+3. Install `rhbk-operator.yaml` and wait for the Red Hat Build of Keycloak
+   Operator to report `Succeeded` in its dedicated `keycloak` namespace.
+4. Apply `oberon-ingresscontroller.yaml` with the real values and wait for
    Available.
-4. Configure Keycloak and OpenShift OIDC.
-5. Render and review `overlays/oberon-public`; then deploy it.
-6. Run DNS, TLS, isolation, browser, authorization and cleanup certification.
+5. Configure Keycloak and OpenShift OIDC.
+6. Render and review `overlays/oberon-public`; then deploy it.
+7. Run DNS, TLS, isolation, browser, authorization and cleanup certification.
 
 Do not set `public_access_enabled: true` for Oberon until all steps pass.
 

@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: launchpad-config
+data:
+  LAUNCHPAD_MODE: "openshift"
+  CATALOG_DIR: "/opt/catalog"
+  CLUSTER_TARGETS_FILE: "/etc/launchpad/clusters.yaml"
+  LAUNCHPAD_CONTROL_CLUSTER_REF: "arena"
+  SHOWROOM_ARGOCD_NAMESPACE: "openshift-gitops"
+  LITELLM_API_BASE: "http://ovms-granite-2b.fleet-llm-d.svc:8080/v1"
+  SANDBOX_IMAGE: "image-registry.openshift-image-registry.svc:5000/partner-ai-launchpad/launchpad-sandbox:latest"
+  SANDBOX_STORAGE_CLASS: "nfs-storage"
+  CORS_ORIGINS: "https://launchpad.apps.arena.fm2aihpcsed.com,https://launchpad-admin.apps.arena.fm2aihpcsed.com,https://launchpad-api.apps.arena.fm2aihpcsed.com"
+  TRUSTED_OAUTH_HOSTS: "launchpad.apps.arena.fm2aihpcsed.com,launchpad-admin.apps.arena.fm2aihpcsed.com"
+  TENANT_USER_MAP: '{"api-user":["smoke-test-tenant"],"partner-smoke":["smoke-test-tenant"]}'
+  OPENSHIFT_INGRESS_DOMAIN: "apps.arena.fm2aihpcsed.com"
+  OPENSHIFT_CONSOLE_URL: "https://console-openshift-console.apps.arena.fm2aihpcsed.com"
+  SMART_PLACEMENT_ENABLED: "false"
+  ORCHESTRATION_BRAIN_ENABLED: "false"
+  PUBLIC_ACCESS_ENABLED: "false"
+  PUBLIC_LABS_DOMAIN: ""

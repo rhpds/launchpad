@@ -1,0 +1,45 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: launchpad-resource-reconciler
+spec:
+  schedule: "*/15 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/part-of: partner-ai-launchpad
+            app.kubernetes.io/name: launchpad-resource-reconciler
+        spec:
+          serviceAccountName: launchpad-backend
+          restartPolicy: Never
+          containers:
+            - name: reconcile
+              image: backend:latest
+              imagePullPolicy: Always
+              command: [python, -c]
+              args:
+                - |
+                  from app.api.deps import provisioning_service
+                  from app.services.resource_reconciliation import reconcile_resources
+                  print(reconcile_resources(provisioning_service))
+              envFrom:
+                - configMapRef: {name: launchpad-config}
+                - secretRef: {name: launchpad-litellm, optional: true}
+              env:
+                - name: DATABASE_URL
+                  valueFrom:
+                    secretKeyRef: {name: launchpad-db-secret, key: DATABASE_URL}
+              volumeMounts:
+                - name: cluster-targets
+                  mountPath: /etc/launchpad
+                  readOnly: true
+          volumes:
+            - name: cluster-targets
+              configMap: {name: launchpad-cluster-targets}
+

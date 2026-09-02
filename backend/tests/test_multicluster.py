@@ -66,7 +66,7 @@ def test_showroom_application_targets_selected_remote_cluster():
 def test_repository_cluster_config_has_oberon_and_arena():
     path = Path(__file__).resolve().parents[2] / "config" / "clusters.yaml"
     registry = ClusterRegistry.from_file(str(path))
-    assert {c.cluster_id for c in registry.list_enabled()} == {"oberon", "arena"}
+    assert {c.cluster_id for c in registry.list_enabled()} == {"arena"}
 
 
 def test_active_ai_sandbox_has_an_eligible_cluster():
@@ -81,11 +81,11 @@ def test_active_ai_sandbox_has_an_eligible_cluster():
         required_models=catalog_item["metadata"]["required_models"],
     )
 
-    assert selected.cluster_id == "oberon"
+    assert selected.cluster_id == "arena"
     assert set(catalog_item["metadata"]["required_models"]).issubset(
         selected.model_endpoints
     )
-    assert len(registry.get("oberon").model_endpoints) == 10
+    assert len(registry.get("arena").model_endpoints) == 1
 
 
 def test_sandbox_model_selection_controls_cluster_placement():
@@ -108,6 +108,27 @@ def test_sandbox_model_selection_controls_cluster_placement():
     )
 
     assert service._select_target_cluster(request, catalog_item) == "oberon"
+
+
+def test_arena_only_registry_uses_arena_as_control_cluster(monkeypatch):
+    monkeypatch.delenv("LAUNCHPAD_CONTROL_CLUSTER_REF", raising=False)
+    service = ProvisioningService.__new__(ProvisioningService)
+    service.cluster_registry = ClusterRegistry([
+        target("arena", 10, ["cpu", "openshift", "control-plane"]),
+    ])
+
+    assert service._control_cluster_ref("arena") == "arena"
+
+
+def test_explicit_control_cluster_overrides_registry(monkeypatch):
+    monkeypatch.setenv("LAUNCHPAD_CONTROL_CLUSTER_REF", "arena")
+    service = ProvisioningService.__new__(ProvisioningService)
+    service.cluster_registry = ClusterRegistry([
+        target("oberon", 50, ["openshift", "control-plane"]),
+        target("arena", 10, ["openshift"]),
+    ])
+
+    assert service._control_cluster_ref("oberon") == "arena"
 
 
 def test_remote_argocd_role_can_bind_only_edit():
