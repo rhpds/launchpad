@@ -32,7 +32,7 @@ INTEL_GUIDED_LABS = [
         "playbook": "site-intel-llm-tool-calling.yml",
         "content_path": "content-intel-llm-tool-calling",
         "title": "Enable AI Tool Calling on OpenShift",
-        "model": "granite-2b-cpu",
+        "model": "granite-3.2-8b-tools",
         "workspace_route": "",
     },
 ]
@@ -117,6 +117,8 @@ def test_intel_guided_lab_is_native_launchpad_content(lab):
     assert metadata["showroom"] is True
     assert metadata["operator_workshop"] is True
     assert metadata["content_only"] is True
+    assert metadata["max_workshop_seats"] == 1
+    assert metadata["certification_stage"] == "single-seat"
     assert metadata["required_models"] == [lab["model"]]
     assert metadata["showroom_content_repo_url"] == (
         "https://github.com/rhpds/launchpad.git"

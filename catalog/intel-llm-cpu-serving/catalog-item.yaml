@@ -25,6 +25,8 @@ metadata:
   showroom: true
   operator_workshop: true
   content_only: true
+  certification_stage: single-seat
+  max_workshop_seats: 1
   showroom_journey: intel-llm-cpu-serving
   showroom_title: "Serve LLMs on Intel Xeon CPUs"
   workspace_route_name: rag

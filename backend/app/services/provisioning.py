@@ -11,8 +11,6 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta
 from typing import Optional
 
-from app.integrations.event_publisher import publish_event as notify_stargate
-
 from app.adapters.interfaces import ConstraintResult
 from app.adapters.mock.branding import FileBrandingAdapter
 from app.adapters.mock.catalog import MockCatalogAdapter
@@ -22,6 +20,7 @@ from app.adapters.mock.pool import MockPoolAdapter
 from app.adapters.mock.provisioning import MockProvisioningAdapter
 from app.adapters.mock.showback import MockShowbackAdapter
 from app.adapters.mock.validation import MockValidationAdapter
+from app.domain.access import ExposurePolicy
 from app.domain.enums import (
     CatalogCategory,
     LabRequestStatus,
@@ -40,8 +39,8 @@ from app.domain.models import (
     Workshop,
     WorkshopSeat,
 )
-from app.domain.access import ExposurePolicy
 from app.domain.reports import HandoffPackage, RepeatabilityReport, SecurityPlan
+from app.integrations.event_publisher import publish_event as notify_stargate
 
 logger = __import__("logging").getLogger("launchpad.provisioning")
 
@@ -978,8 +977,61 @@ class ProvisioningService:
             for index in range(1, workshop.num_users + 1)
         ]
 
+    def _validate_workshop_seat_limit(self, workshop: Workshop) -> int | None:
+        """Enforce the smaller of the platform and catalog certification limits."""
+        platform_limit = int(
+            os.environ.get(
+                "MAX_ACTIVE_SESSIONS_PER_WORKSHOP",
+                str(self.MAX_ACTIVE_PER_WORKSHOP),
+            )
+        )
+        if workshop.num_users > platform_limit:
+            raise ValueError(
+                f"Workshop seat count exceeds the supported limit of {platform_limit}"
+            )
+
+        catalog_item = self.catalog.get_item(workshop.catalog_item_id)
+        raw_catalog_limit = (
+            (catalog_item.metadata or {}).get("max_workshop_seats")
+            if catalog_item
+            else None
+        )
+        if raw_catalog_limit is None:
+            return None
+        catalog_limit = int(raw_catalog_limit)
+        if catalog_limit < 1:
+            raise ValueError(
+                f"{workshop.catalog_item_id} has an invalid workshop seat limit"
+            )
+        if workshop.num_users > catalog_limit:
+            raise ValueError(
+                f"{workshop.catalog_item_id} is certified for a maximum of "
+                f"{catalog_limit} workshop seat(s)"
+            )
+        return catalog_limit
+
     def preview_workshop_capacity(self, workshop: Workshop) -> dict:
         catalog_item = self.catalog.get_item(workshop.catalog_item_id)
+        catalog_limit = None
+        try:
+            catalog_limit = self._validate_workshop_seat_limit(workshop)
+        except ValueError as exc:
+            metadata = catalog_item.metadata if catalog_item else {}
+            return {
+                "can_provision": False,
+                "reason": str(exc),
+                "selected_cluster": workshop.cluster_ref or workshop.target_cluster,
+                "placement_reason": "catalog certification limit",
+                "catalog_seat_limit": int(
+                    metadata.get("max_workshop_seats", self.MAX_ACTIVE_PER_WORKSHOP)
+                ),
+                "seats_requested": workshop.num_users,
+                "estimated_resources": {
+                    "cpu_millicores": 0,
+                    "memory_mib": 0,
+                    "pods": 0,
+                },
+            }
         selected_cluster = workshop.cluster_ref or workshop.target_cluster
         if self.cluster_registry and catalog_item:
             try:
@@ -1019,6 +1071,7 @@ class ProvisioningService:
                 if selected_cluster else "single-cluster placement"
             ),
             "seats_requested": workshop.num_users,
+            "catalog_seat_limit": catalog_limit,
             "estimated_resources": {
                 "cpu_millicores": cpu_per_seat * workshop.num_users,
                 "memory_mib": memory_per_seat * workshop.num_users,
@@ -1098,13 +1151,7 @@ class ProvisioningService:
     def create_workshop_order(
         self, workshop: Workshop, idempotency_key: str = None
     ) -> Workshop:
-        workshop_limit = int(os.environ.get(
-            "MAX_ACTIVE_SESSIONS_PER_WORKSHOP", str(self.MAX_ACTIVE_PER_WORKSHOP)
-        ))
-        if workshop.num_users > workshop_limit:
-            raise ValueError(
-                f"Workshop seat count exceeds the supported limit of {workshop_limit}"
-            )
+        self._validate_workshop_seat_limit(workshop)
         fingerprint = self._workshop_order_fingerprint(workshop)
         if idempotency_key:
             lookup_key = (workshop.tenant_id, idempotency_key)
@@ -1254,6 +1301,11 @@ class ProvisioningService:
             workshop.workshop_id, threading.Event()
         )
         provision_event.clear()
+        try:
+            self._validate_workshop_seat_limit(workshop)
+        except ValueError:
+            provision_event.set()
+            raise
         if idempotency_key:
             lookup_key = (workshop.tenant_id, idempotency_key)
             fingerprint = self._workshop_order_fingerprint(workshop)

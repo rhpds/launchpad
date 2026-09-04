@@ -1,9 +1,9 @@
 export const MAX_WORKSHOP_SEATS = 25;
 
-export function validateSeatCount(value: number): string | null {
+export function validateSeatCount(value: number, maximum = MAX_WORKSHOP_SEATS): string | null {
   if (!Number.isInteger(value)) return 'Seat count must be a whole number.';
-  if (value < 1 || value > MAX_WORKSHOP_SEATS) {
-    return `Seat count must be between 1 and ${MAX_WORKSHOP_SEATS}.`;
+  if (value < 1 || value > maximum) {
+    return `Seat count must be between 1 and ${maximum}.`;
   }
   return null;
 }

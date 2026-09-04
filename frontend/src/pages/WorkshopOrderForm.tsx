@@ -24,7 +24,16 @@ export default function WorkshopOrderForm({ embedded = false }: { embedded?: boo
     });
   }, []);
 
-  const seatError = validateSeatCount(form.num_users);
+  const selectedCatalogItem = catalog.find(
+    (item) => item.catalog_item_id === form.catalog_item_id,
+  );
+  const configuredCatalogLimit = Number(
+    selectedCatalogItem?.metadata?.max_workshop_seats ?? MAX_WORKSHOP_SEATS,
+  );
+  const catalogSeatLimit = Number.isInteger(configuredCatalogLimit)
+    ? Math.min(MAX_WORKSHOP_SEATS, Math.max(1, configuredCatalogLimit))
+    : MAX_WORKSHOP_SEATS;
+  const seatError = validateSeatCount(form.num_users, catalogSeatLimit);
   const checkCapacity = async () => {
     if (seatError) return setError(seatError);
     setBusy(true); setError(''); setWorkshop(null);
@@ -62,9 +71,9 @@ export default function WorkshopOrderForm({ embedded = false }: { embedded?: boo
       <label className={label}>Workshop name<input className={field} value={form.name} onChange={(e) => setForm({...form, name:e.target.value})} placeholder="e.g., Intel partner enablement" /></label>
       <label className={label}>Instructor ID<input required className={field} value={form.owner_id} onChange={(e) => setForm({...form, owner_id:e.target.value})} placeholder="e.g., instructor-1" /></label>
       <label className={label}>Tenant<select required className={field} value={form.tenant_id} onChange={(e) => setForm({...form, tenant_id:e.target.value})}><option value="">Select a tenant...</option>{tenants.map((t)=><option key={t.tenant_id} value={t.tenant_id}>{t.display_name}</option>)}</select></label>
-      <label className={label}>Lab<select className={field} value={form.catalog_item_id} onChange={(e) => setForm({...form, catalog_item_id:e.target.value})}>{catalog.map((c)=><option key={c.catalog_item_id} value={c.catalog_item_id}>{c.display_name}</option>)}</select></label>
+      <label className={label}>Lab<select className={field} value={form.catalog_item_id} onChange={(e) => { const catalog_item_id = e.target.value; const item = catalog.find((candidate) => candidate.catalog_item_id === catalog_item_id); const configured = Number(item?.metadata?.max_workshop_seats ?? MAX_WORKSHOP_SEATS); const maximum = Number.isInteger(configured) ? Math.min(MAX_WORKSHOP_SEATS, Math.max(1, configured)) : MAX_WORKSHOP_SEATS; setForm({...form, catalog_item_id, num_users: Math.min(form.num_users, maximum)}); setPreview(null); }}>{catalog.map((c)=><option key={c.catalog_item_id} value={c.catalog_item_id}>{c.display_name}</option>)}</select></label>
       <div className="grid gap-4 sm:grid-cols-2">
-        <label className={label}>Participant seats<input type="number" min="1" max={MAX_WORKSHOP_SEATS} className={field} value={form.num_users} onChange={(e) => setForm({...form, num_users:Number(e.target.value)})} /><span className="mt-1 block text-xs font-normal text-[#6A6E73]">Maximum {MAX_WORKSHOP_SEATS} seats in one workshop.</span></label>
+        <label className={label}>Participant seats<input type="number" min="1" max={catalogSeatLimit} className={field} value={form.num_users} onChange={(e) => setForm({...form, num_users:Number(e.target.value)})} /><span className="mt-1 block text-xs font-normal text-[#6A6E73]">Maximum {catalogSeatLimit} seat{catalogSeatLimit === 1 ? '' : 's'} for this lab's current certification stage.</span></label>
         <label className={label}>Duration<select className={field} value={form.ttl} onChange={(e) => setForm({...form, ttl:e.target.value})}><option value="4h">4 hours</option><option value="8h">8 hours</option><option value="1d">1 day</option></select></label>
       </div>
       <label className={label}>Access<select className={field} value={form.exposure_policy} onChange={(e) => setForm({...form, exposure_policy:e.target.value})}><option value="internal">Internal access</option><option value="public_code">Public link + instructor code</option></select><span className="mt-1 block text-xs font-normal text-[#6A6E73]">Email is an unverified label. The shared instructor code is the only secret, and access ends at the workshop TTL.</span></label>

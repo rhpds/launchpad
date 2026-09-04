@@ -2,19 +2,27 @@
 import os
 import threading
 import time
+from types import SimpleNamespace
 from unittest.mock import patch
 
-from fastapi.testclient import TestClient
-from pydantic import ValidationError
 import pytest
-
+from app.domain.clusters import ClusterTarget
 from app.domain.enums import WorkshopSeatStatus, WorkshopStatus
 from app.domain.models import Workshop, WorkshopSeat
-from app.domain.clusters import ClusterTarget
 from app.main import app
 from app.services.cluster_registry import ClusterRegistry
 from app.services.provisioning import ProvisioningService
-from types import SimpleNamespace
+from fastapi.testclient import TestClient
+from pydantic import ValidationError
+
+
+def _catalog_with_workshop_limit(limit: int):
+    catalog = SimpleNamespace()
+    catalog.get_item = lambda _item_id: SimpleNamespace(
+        metadata={"max_workshop_seats": limit},
+        required_capabilities=[],
+    )
+    return catalog
 
 
 client = TestClient(app)
@@ -375,6 +383,47 @@ def test_workshop_order_rejects_more_than_supported_seat_limit():
                     num_users=21,
                 )
             )
+
+
+def test_capacity_preview_rejects_catalog_certification_seat_limit():
+    service = ProvisioningService(catalog=_catalog_with_workshop_limit(1))
+    preview = service.preview_workshop_capacity(
+        Workshop(
+            tenant_id="pilot-tenant",
+            catalog_item_id="pilot-lab",
+            num_users=2,
+        )
+    )
+
+    assert preview["can_provision"] is False
+    assert preview["catalog_seat_limit"] == 1
+    assert preview["reason"] == (
+        "pilot-lab is certified for a maximum of 1 workshop seat(s)"
+    )
+
+
+def test_workshop_order_rejects_catalog_certification_seat_limit():
+    service = ProvisioningService(catalog=_catalog_with_workshop_limit(1))
+    with pytest.raises(ValueError, match="certified for a maximum of 1"):
+        service.create_workshop_order(
+            Workshop(
+                tenant_id="pilot-tenant",
+                catalog_item_id="pilot-lab",
+                num_users=2,
+            )
+        )
+
+
+def test_direct_workshop_provision_rejects_catalog_certification_seat_limit():
+    service = ProvisioningService(catalog=_catalog_with_workshop_limit(1))
+    with pytest.raises(ValueError, match="certified for a maximum of 1"):
+        service.provision_workshop(
+            Workshop(
+                tenant_id="pilot-tenant",
+                catalog_item_id="pilot-lab",
+                num_users=2,
+            )
+        )
 
 
 def test_workshop_provisioning_respects_bounded_concurrency():

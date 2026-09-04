@@ -25,13 +25,15 @@ metadata:
   showroom: true
   operator_workshop: true
   content_only: true
+  certification_stage: single-seat
+  max_workshop_seats: 1
   showroom_journey: intel-llm-tool-calling
   showroom_title: "LLM Tool Calling on Intel"
   showroom_content_repo_url: "https://github.com/rhpds/launchpad.git"
   showroom_content_ref: "intel-guided-content-v1.0.1"
   showroom_content_playbook: "site-intel-llm-tool-calling.yml"
   required_models:
-    - granite-2b-cpu
+    - granite-3.2-8b-tools
   inference_endpoint: litellm
   maas_rpm_limit: 60
   seat_cpu_millicores: 165

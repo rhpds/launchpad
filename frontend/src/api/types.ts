@@ -179,6 +179,7 @@ export interface WorkshopCapacityPreview {
   seats_requested: number;
   selected_cluster?: string;
   placement_reason?: string;
+  catalog_seat_limit?: number | null;
   estimated_resources: {
     cpu_millicores: number;
     memory_mib: number;

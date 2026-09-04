@@ -21,6 +21,11 @@ describe('workshop order contract', () => {
     expect(validateSeatCount(2.5)).toMatch(/whole number/);
   });
 
+  it('enforces a catalog certification seat ceiling', () => {
+    expect(validateSeatCount(1, 1)).toBeNull();
+    expect(validateSeatCount(2, 1)).toMatch(/between 1 and 1/);
+  });
+
   it('calculates instructor readiness', () => {
     expect(workshopReadiness(18, 20)).toBe(90);
   });

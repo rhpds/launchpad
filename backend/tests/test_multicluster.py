@@ -84,7 +84,10 @@ def test_active_ai_sandbox_has_an_eligible_cluster():
     assert set(catalog_item["metadata"]["required_models"]).issubset(
         selected.model_endpoints
     )
-    assert len(registry.get("arena").model_endpoints) == 1
+    assert set(registry.get("arena").model_endpoints) == {
+        "granite-2b-cpu",
+        "granite-3.2-8b-tools",
+    }
 
 
 def test_arena_public_cert_registry_retains_model_routing():
