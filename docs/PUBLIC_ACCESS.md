@@ -21,10 +21,17 @@ identity label.
 
 ## Fail-closed activation
 
-Both `PUBLIC_ACCESS_ENABLED=true` and a non-empty `PUBLIC_LABS_DOMAIN` are
-required. The selected cluster must also set `public_access_enabled: true` and
-provide public ingress, Console, OAuth and TLS configuration. Oberon is the
-first target; Arena must be certified separately.
+Production activation requires `PUBLIC_ACCESS_ENABLED=true` and a non-empty
+`PUBLIC_LABS_DOMAIN`. The selected cluster must also set
+`public_access_enabled: true` and provide public ingress, Console, OAuth and TLS
+configuration. Arena is the current execution target; Oberon remains disabled.
+
+For a disposable Arena browser pilot only, `PUBLIC_LABS_SHARED_ORIGIN` can hold
+one Cloudflare Quick Tunnel origin and `PUBLIC_ACCESS_PILOT_CLUSTER=arena` can
+enable placement without marking the cluster production-certified. The shared
+origin supports exactly one active public order. `scripts/start-tunnel.sh` and
+`scripts/stop-tunnel.sh` apply and remove those runtime overrides while pinning
+every cluster command to the Arena kubeconfig.
 
 Only the entitlement-aware gateway, Keycloak, Console and OAuth routes may use
 the public ingress. The normal backend, seat routes, Argo CD, databases, model
@@ -34,8 +41,9 @@ endpoints, admin APIs and internal service routes remain private.
 
 - Contract: `contracts/public-access-v1.yaml`
 - Behavior: `features/public_lab_access.feature`
-- RED/GREEN record: `evidence/public-access/`
-- Component suite: `backend/tests/test_public_access.py`
+- RED/GREEN record: `evidence/public-access/validation-matrix-v5.yaml`
+- Component suites: `backend/tests/test_public_access.py` and
+  `backend/tests/test_public_tunnel_contract.py`
 
 General availability requires every critical matrix row at `GREEN-live`, a
 100/100 rubric, zero high/critical findings, three consecutive 25-seat browser

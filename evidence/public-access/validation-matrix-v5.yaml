@@ -1,0 +1,26 @@
+version: 5
+supersedes: validation-matrix-v4.yaml
+feature: public-passwordless-lab-access
+stages: [RED, GREEN-local, GREEN-integration, GREEN-live]
+columns: [unit, contract, component, bdd, integration, security, external_browser, fault_injection, cleanup, performance]
+live_evidence: evidence/public-access/arena-cloudflare-functional-2026-09-02.json
+local_evidence: evidence/public-access/green-local-arena-console-fix-2026-09-04.json
+rows:
+  - {id: PA-DNS-001, requirement: Production public DNS and trusted TLS, critical: true, stage: RED}
+  - {id: PA-ISO-002, requirement: Production public route isolation, critical: true, stage: RED}
+  - {id: PA-CODE-003, requirement: Order and one-time code creation, critical: true, stage: GREEN-live}
+  - {id: PA-CLAIM-004, requirement: Workshop claims, critical: true, stage: GREEN-live}
+  - {id: PA-CONC-005, requirement: Twenty-five concurrent unique claims, critical: true, stage: GREEN-live}
+  - {id: PA-IDENT-006, requirement: Seat recovery and stable identity, critical: true, stage: GREEN-live}
+  - {id: PA-GATE-007, requirement: Production Showroom and workspace gateway authorization, critical: true, stage: GREEN-local}
+  - {id: PA-OIDC-008, requirement: Keycloak OIDC application login, critical: true, stage: GREEN-live}
+  - {id: PA-CONSOLE-009, requirement: OpenShift Console SSO, critical: true, stage: GREEN-local, evidence: [evidence/public-access/green-local-arena-console-fix-2026-09-04.json]}
+  - {id: PA-DENY-010, requirement: Cross-seat and cluster-scope denial, critical: true, stage: GREEN-live}
+  - {id: PA-ROT-011, requirement: Rotation and reauthentication, critical: true, stage: GREEN-live}
+  - {id: PA-RATE-012, requirement: Rate limiting and uniform denial, critical: true, stage: GREEN-live}
+  - {id: PA-TTL-013, requirement: TTL denial, critical: true, stage: GREEN-local}
+  - {id: PA-CLEAN-014, requirement: Complete operational access-record cleanup, critical: true, stage: RED}
+  - {id: PA-RECOV-015, requirement: Backend and Keycloak restart recovery, critical: true, stage: GREEN-live}
+  - {id: PA-LIVE25-016, requirement: Twenty-five-seat external functional journey, critical: true, stage: GREEN-live}
+  - {id: PA-HOME-017, requirement: Participant home and add-lab/resume experience, critical: true, stage: GREEN-local, evidence: [backend/app/public_gateway.py, backend/tests/test_public_gateway.py]}
+release_rule: No critical RED row may be counted as release-ready. Quick Tunnel evidence does not certify production DNS or ingress. Console SSO remains uncertified until the Arena deployment and an external browser journey pass.

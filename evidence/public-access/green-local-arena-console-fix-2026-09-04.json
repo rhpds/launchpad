@@ -1,0 +1,40 @@
+{
+  "evidence_id": "PA-ARENA-CONSOLE-GREEN-LOCAL-20260904-01",
+  "feature": "public-passwordless-lab-access",
+  "cluster_scope": "arena-only",
+  "source_commit": "ee5afa4e128741d68ae9f4ab7a7f578a987af08e",
+  "recorded_at": "2026-09-04T14:42:57Z",
+  "results": {
+    "python_public_access_contract_matrix": {
+      "passed": 101,
+      "failed": 0
+    },
+    "keycloak_authenticator_build_tests": {
+      "passed": true,
+      "command": "mvn -q -f keycloak-authenticator/pom.xml test"
+    },
+    "shell_syntax": {"passed": true},
+    "python_compile": {"passed": true},
+    "secret_scan": {"passed": true, "runner": "pre-commit gitleaks"},
+    "red_green_regressions": [
+      "claim is revoked when namespace RoleBinding creation fails",
+      "OpenShift Console OIDC can recover the unique order from its instructor code",
+      "temporary public origins require a bare HTTPS origin",
+      "a shared Quick Tunnel origin permits only one active public order",
+      "public pilot placement can enable Arena without enabling another cluster",
+      "pilot startup and shutdown fail public ordering closed"
+    ]
+  },
+  "artifact_sha256": {
+    "backend/tests/test_public_access.py": "242e1782ca0acf1bf9c5cd1769285a4ab87845fc7e36a2084af84d8cda642ca6",
+    "backend/tests/test_public_tunnel_contract.py": "14c07d99bcbd931f6796f8a3fc59ae0f126abebd39b8d28529a2da22de59c38f",
+    "contracts/public-access-v1.yaml": "c8435d3b66e9b2b34c29f029f1d388a0f5e80cb67931212d4e61efeeb872e215"
+  },
+  "live_status": {
+    "attempted": true,
+    "passed": false,
+    "reason": "Arena API 192.168.1.105:6443 was unreachable from the operator workstation (host is down).",
+    "oberon_contacted": false
+  },
+  "release_effect": "PA-CONSOLE-009 advances to GREEN-local only. GREEN-integration and GREEN-live remain required."
+}
