@@ -14,7 +14,7 @@ INTEL_GUIDED_LABS = [
         "playbook": "site-intel-xeon6-agent-201.yml",
         "content_path": "content-intel-xeon6-agent-201",
         "title": "Intel Xeon 6 201 — Building an AI Agent",
-        "model": "granite-2b-cpu",
+        "model": "granite-3.2-8b-tools",
         "workspace_route": "app",
         "content_ref": "intel-guided-content-v1.0.7",
         "max_workshop_seats": 5,
@@ -229,6 +229,16 @@ def test_agent_content_uses_launchpad_safe_workload_manifests():
     assert ui_deployment["spec"]["template"]["spec"]["containers"][0][
         "resources"
     ]["limits"]["memory"] == "512Mi"
+
+
+def test_agent_201_uses_the_workshop_certified_tool_model():
+    catalog = yaml.safe_load(
+        (ROOT / "catalog/intel-xeon6-agent-201/catalog-item.yaml").read_text()
+    )
+
+    assert catalog["metadata"]["required_models"] == [
+        "granite-3.2-8b-tools"
+    ]
 
 
 def test_cpu_serving_content_uses_route_name_that_fits_launchpad_namespace():

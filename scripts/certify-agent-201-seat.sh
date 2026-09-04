@@ -18,6 +18,9 @@ curl_options=(-fsSk)
 if [[ -n "${ARENA_CURL_INTERFACE:-}" ]]; then
   curl_options+=(--interface "$ARENA_CURL_INTERFACE")
 fi
+if [[ -n "${ARENA_INGRESS_IP:-}" ]]; then
+  curl_options+=(--resolve "${host}:443:${ARENA_INGRESS_IP}")
+fi
 page="$(curl "${curl_options[@]}" "https://${host}/www/modules/03-wire-agent.html")"
 endpoint="$(printf '%s' "$page" | sed -n "s/.*--from-literal=api-base='\([^']*\)'.*/\1/p" | head -1)"
 api_key="$(printf '%s' "$page" | sed -n "s/.*--from-literal=api-key='\([^']*\)'.*/\1/p" | head -1)"

@@ -19,12 +19,20 @@ curl_options=(-fsSk)
 if [[ -n "${ARENA_CURL_INTERFACE:-}" ]]; then
   curl_options+=(--interface "$ARENA_CURL_INTERFACE")
 fi
+tools_curl_options=("${curl_options[@]}")
+agent_curl_options=("${curl_options[@]}")
+app_curl_options=("${curl_options[@]}")
+if [[ -n "${ARENA_INGRESS_IP:-}" ]]; then
+  tools_curl_options+=(--resolve "${tools_host}:443:${ARENA_INGRESS_IP}")
+  agent_curl_options+=(--resolve "${agent_host}:443:${ARENA_INGRESS_IP}")
+  app_curl_options+=(--resolve "${app_host}:443:${ARENA_INGRESS_IP}")
+fi
 
-[[ "$(curl "${curl_options[@]}" -o /dev/null -w '%{http_code}' "https://${tools_host}/health")" == "200" ]]
-[[ "$(curl "${curl_options[@]}" -o /dev/null -w '%{http_code}' "https://${agent_host}/health")" == "200" ]]
-[[ "$(curl "${curl_options[@]}" -o /dev/null -w '%{http_code}' "https://${app_host}/")" == "200" ]]
+[[ "$(curl "${tools_curl_options[@]}" -o /dev/null -w '%{http_code}' "https://${tools_host}/health")" == "200" ]]
+[[ "$(curl "${agent_curl_options[@]}" -o /dev/null -w '%{http_code}' "https://${agent_host}/health")" == "200" ]]
+[[ "$(curl "${app_curl_options[@]}" -o /dev/null -w '%{http_code}' "https://${app_host}/")" == "200" ]]
 
-curl "${curl_options[@]}" \
+curl "${tools_curl_options[@]}" \
   -X POST "https://${tools_host}/mcp" \
   -H 'Content-Type: application/json' \
   --data '{"jsonrpc":"2.0","id":"1","method":"tools/list","params":{}}' \
@@ -38,7 +46,7 @@ curl "${curl_options[@]}" \
       ]))
     ' >/dev/null
 
-result="$(curl "${curl_options[@]}" \
+result="$(curl "${agent_curl_options[@]}" \
   -w $'\n%{http_code}\t%{time_total}\n' \
   -X POST "https://${agent_host}/api/v1/advise" \
   -H 'Content-Type: application/json' \
