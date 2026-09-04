@@ -25,7 +25,7 @@ metadata:
   showroom: true
   operator_workshop: true
   content_only: true
-  certification_stage: five-seat-candidate
+  certification_stage: five-seat
   max_workshop_seats: 5
   showroom_journey: intel-xeon6-agent-201
   showroom_title: "Intel Xeon 6 201: Building an AI Agent"

@@ -1,0 +1,215 @@
+{
+  "schema_version": "1.0",
+  "evidence_id": "EDD-INTEL-AGENT-201-ARENA-5-20260904",
+  "generated_at": "2026-09-04T22:26:05Z",
+  "outcome": "pass",
+  "scope": "internal-five-seat-workshop",
+  "cluster": "arena",
+  "catalog_item_id": "intel-xeon6-agent-201",
+  "catalog_version": "1.0.0",
+  "content_ref": "intel-guided-content-v1.0.7",
+  "source_commit": "ce3176474c40c09536451abd9b53c412584acbe1",
+  "model": "granite-3.2-8b-tools",
+  "seat_count": 5,
+  "public_access_certified": false,
+  "twenty_five_seat_certified": false,
+  "certification_boundary": "This evidence promotes one internal five-seat Agent 201 workshop on Arena. It does not certify public-code access, external DNS/TLS, or 25-seat Agent 201 performance.",
+  "images": {
+    "backend": "sha256:6d65c928d4f02d2468da5151ef3513fd0d44c78e514cfdffd2df46274dc946d9",
+    "showroom_terminal": "sha256:01e4ca6097f07e5011581e44862194944e08cccdbdef241dcce6701243c13a2a",
+    "solution_tools": "sha256:856874dc984eeb05ec0aeadb6f49265a58687eed17e5a92bc769875d3df44850",
+    "solution_agent": "sha256:60897d598014f040c9f515312233b5a22df80c93ba3342c16f681be027933d03",
+    "solution_ui": "sha256:9388d91c19e845b8dcee12ef9037e4b93afadea4df5e7912dbe0a6151b8605fb",
+    "vllm_tool_model": "sha256:cf6577f6d526561651df5390aad916c53820a18a1659e3fb39c1c5a62aef0e3c"
+  },
+  "artifact_hashes": {
+    "catalog/intel-xeon6-agent-201/catalog-item.yaml": "b5ca234668782dad4675f684070f50f287f24943b52729761d928a0354a1210a",
+    "content-intel-xeon6-agent-201/antora.yml": "66926849d4866a96b4099e28ef18d036675605cc5d92c6501a24d57bfe1b6d98",
+    "content-intel-xeon6-agent-201/manifests/solution-tools.yaml": "cbb1ea2cda1f312647094340d070479054fec505c5034897d11159f3c5afba30",
+    "content-intel-xeon6-agent-201/manifests/solution-agent.yaml": "ff30fd23267cd6c804aea4da554f93ff4a938e53628965b62c28a37603cde742",
+    "content-intel-xeon6-agent-201/manifests/solution-ui.yaml": "ca0c273c95287186be55cc854b1baebae39d68004726a6691237119e79c80f2d",
+    "scripts/certify-agent-201-seat.sh": "797b23f69733d3e17d68111554936ebd4289b227b4b3a08b9a7d5f6842e0fc51",
+    "scripts/certify-agent-201-journey.sh": "a4d5ba9392c08027cbebcea5be9d4a3e5aca25a7828467665d5b3a353bacd3dc"
+  },
+  "test_runs": {
+    "catalog_workshop_showroom_placement_security_and_evidence_suite": "195 passed",
+    "live_arena_workshop": "5 seats ready; each completed an error-free model and three-tool agent journey",
+    "live_arena_cleanup": "zero namespaces, Routes, Applications, and RoleBindings"
+  },
+  "tdd": {
+    "red": [
+      "The catalog contract rejected max_workshop_seats=1 when the five-seat gate was opened.",
+      "The first candidate rendered literal %maas_url% and %litellm_api_key% values; model calls returned masked connection-error fallbacks.",
+      "A chained Antora alias attempt remained literal because the Showroom userdata replacement is single pass.",
+      "The ownership contract showed provisioning plans lacked the persisted session UUID and namespaces mislabeled request UUIDs as session IDs.",
+      "Five simultaneous Agent journeys on granite-2b-cpu all exceeded the 300-second Route timeout.",
+      "The model-selection contract rejected granite-2b-cpu before the catalog moved to the workshop-certified tool model.",
+      "The evidence contract failed with FileNotFoundError before this manifest existed."
+    ],
+    "green": [
+      "Direct maas_endpoint and maas_api_key attributes render into all five guides from content v1.0.7.",
+      "Every new namespace carries distinct session-id and request-id labels with the persisted session UUID.",
+      "The catalog selects granite-3.2-8b-tools for Agent 201.",
+      "Five concurrent journeys completed with structured briefs, all three MCP tools, and no inference errors.",
+      "Bulk reclaim removed every workshop artifact."
+    ]
+  },
+  "cdd": {
+    "contracts": [
+      "five-seat workshop capacity, order, confirmation, and status",
+      "persisted whole-workshop Arena affinity",
+      "session-id and request-id namespace ownership",
+      "direct Showroom runtime attribute rendering",
+      "participant-scoped OpenShift edit access",
+      "pinned tools, agent, and UI manifests",
+      "OpenAI-compatible tool-model endpoint",
+      "structured advise response with an error-free inference log",
+      "idempotent workshop reclaim"
+    ],
+    "status": "pass"
+  },
+  "bdd": {
+    "scenario": "Given one five-seat Agent 201 order targeted to Arena, when each participant follows the rendered guide, then every isolated seat deploys the tools, agent, and UI, receives a structured solution brief using all three MCP tools and real model inference, and one bulk reclaim removes the workshop.",
+    "status": "pass"
+  },
+  "cbt": {
+    "components": {
+      "placement_and_capacity": "pass",
+      "workshop_orchestration": "pass",
+      "showroom_and_antora": "pass",
+      "terminal_identity": "pass",
+      "namespace_ownership_labels": "pass",
+      "openshift_rbac": "pass",
+      "mcp_tools": "pass",
+      "solution_agent": "pass",
+      "solution_ui": "pass",
+      "vllm_tool_model": "pass",
+      "cleanup_controller": "pass"
+    }
+  },
+  "discarded_candidate_runs": [
+    {
+      "workshop_id": "486fe42f-9d26-49fa-b061-ffd86a99dadc",
+      "result": "red-regression-added",
+      "reason": "The guide rendered literal MaaS values and the agent returned connection-error fallback output. It also exposed the request/session ownership-label defect. Reclaimed with zero namespaces."
+    },
+    {
+      "workshop_id": "0814d3d9-bca3-4ac0-9275-6e34a5959f78",
+      "result": "red-regression-added",
+      "reason": "Content v1.0.6 proved chained Antora placeholders are not recursively substituted. Reclaimed with zero namespaces."
+    },
+    {
+      "workshop_id": "191fad1a-9df5-4d49-afde-2b1196972af9",
+      "result": "red-performance-gate",
+      "reason": "Direct runtime values and namespace ownership passed, but all five OVMS-backed Agent journeys returned Route HTTP 504 after 300 seconds. The run was reclaimed after rhgnr1 recovered from a transient PLEG incident; zero namespaces remained."
+    }
+  ],
+  "workshop": {
+    "workshop_id": "20bb0aa9-507f-459b-88b1-c68fb568ead7",
+    "idempotency_key": "arena-agent-201-tool-five-final-20260904",
+    "placement": "arena",
+    "placement_reason": "Entire workshop assigned to arena; seats were not split",
+    "requested_at": "2026-09-04T22:16:27.130732Z",
+    "last_seat_ready_at": "2026-09-04T22:17:26.442508Z",
+    "status_after_reclaim": "completed",
+    "session_ids": [
+      "27b117a2-c8dd-434a-a63c-1e2ed08437ee",
+      "8744f3b7-509c-4fe7-91f2-51b90b78a1d7",
+      "c62e86c2-a332-4c4f-9cc7-f5ef894b8d63",
+      "a7a1ade7-721b-4687-9d61-dc9c3acde902",
+      "c700f6f2-81e6-4057-83e5-af47930eff79"
+    ],
+    "namespaces": [
+      "launchpad-smoke-test-tenant-intel-xeon6-agent-2066bb",
+      "launchpad-smoke-test-tenant-intel-xeon6-agent-4f0c07",
+      "launchpad-smoke-test-tenant-intel-xeon6-agent-e2b323",
+      "launchpad-smoke-test-tenant-intel-xeon6-agent-93e648",
+      "launchpad-smoke-test-tenant-intel-xeon6-agent-f54195"
+    ]
+  },
+  "capacity_preview": {
+    "can_provision": true,
+    "selected_cluster": "arena",
+    "seats_requested": 5,
+    "catalog_seat_limit": 5,
+    "estimated_resources": {
+      "cpu_millicores": 2075,
+      "memory_mib": 4560,
+      "pods": 20
+    },
+    "fleet_headroom_reason": "Cluster can support 159 seats before catalog and certification limits; 20 percent headroom retained"
+  },
+  "provisioning": {
+    "all_seats_ready": true,
+    "collective_ready_seconds": 59.313,
+    "unique_session_count": 5,
+    "unique_namespace_count": 5,
+    "session_labels_match": 5,
+    "request_labels_present": 5,
+    "showroom_pods_ready": 5,
+    "healthy_synced_argocd_applications": 5
+  },
+  "participant_validation": {
+    "showroom_http_200": 5,
+    "guide_http_200": 5,
+    "model_connection_values_rendered": 5,
+    "selected_model_rendered": 5,
+    "default_project_matches_seat": 5,
+    "own_namespace_edit_allowed": 5,
+    "cross_seat_read_denied": 5,
+    "mcp_tool_catalog_count_per_seat": 3,
+    "participant_deployments_ready": 15,
+    "participant_routes_http_200": 15,
+    "participant_pods_zero_restarts": 15
+  },
+  "concurrent_agent_journeys": {
+    "successful_journeys": 5,
+    "fallback_free_journeys": 5,
+    "structured_briefs": 5,
+    "all_three_mcp_tools_used": 5,
+    "http_statuses": [200, 200, 200, 200, 200],
+    "latency_seconds": [167.385233, 181.347371, 181.502789, 182.631219, 187.111692],
+    "mean_seconds": 179.995661,
+    "p95_seconds": 187.111692
+  },
+  "cleanup": {
+    "started_at": "2026-09-04T22:24:40Z",
+    "completed_at": "2026-09-04T22:26:05Z",
+    "completed_seconds": 85,
+    "all_seats_reclaimed": true,
+    "remaining_namespaces": 0,
+    "remaining_routes": 0,
+    "remaining_applications": 0,
+    "remaining_rolebindings": 0
+  },
+  "red_green_matrix": [
+    {"requirement": "whole-workshop Arena placement", "critical": true, "status": "GREEN-live"},
+    {"requirement": "five unique sessions and namespaces", "critical": true, "status": "GREEN-live"},
+    {"requirement": "persisted session ownership labels", "critical": true, "status": "GREEN-live"},
+    {"requirement": "Showroom content and direct runtime values", "critical": true, "status": "GREEN-live"},
+    {"requirement": "participant namespace isolation", "critical": true, "status": "GREEN-live"},
+    {"requirement": "fifteen participant-owned components", "critical": true, "status": "GREEN-live"},
+    {"requirement": "five concurrent error-free model journeys", "critical": true, "status": "GREEN-live"},
+    {"requirement": "all three MCP tools used by every journey", "critical": true, "status": "GREEN-live"},
+    {"requirement": "bulk reclaim with zero residue", "critical": true, "status": "GREEN-live"}
+  ],
+  "gate_rubric": {
+    "workshop_order_and_placement": 15,
+    "seat_and_namespace_isolation": 15,
+    "showroom_and_runtime_attributes": 15,
+    "participant_component_deployment": 15,
+    "functional_agent_and_mcp": 20,
+    "reclaim_and_cleanup": 10,
+    "evidence_integrity": 5,
+    "repeatability_and_regression_recovery": 5,
+    "score": 100,
+    "required": 100
+  },
+  "known_limits": [
+    "Public-code participant access was not exercised.",
+    "A 25-seat Agent 201 workshop has not been certified.",
+    "Five simultaneous end-to-end journeys have p95 latency of 187.1 seconds because each journey performs two model generations and the final brief permits up to 2048 tokens.",
+    "Shorten the final generation before opening a 25-seat certification gate.",
+    "A transient rhgnr1 PLEG outage interrupted cleanup of a discarded run; the node recovered, stale pods were force-deleted, and zero namespaces remained before the final run."
+  ]
+}
