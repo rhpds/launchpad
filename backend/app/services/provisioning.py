@@ -289,6 +289,18 @@ class ProvisioningService:
             model_endpoints=model_endpoints,
         )
 
+    def _selected_model_endpoint(
+        self, cluster_ref: Optional[str], selected_models: list[str]
+    ) -> str:
+        """Resolve the guide/runtime URL for the first model in this order."""
+        if not selected_models:
+            return ""
+        if cluster_ref and self.cluster_registry:
+            return self.cluster_registry.get(cluster_ref).model_endpoints.get(
+                selected_models[0], ""
+            )
+        return os.environ.get("LITELLM_API_BASE", "")
+
     def _get_gw_lock(self, gw_namespace: str) -> threading.Lock:
         if gw_namespace not in self._gw_locks:
             self._gw_locks[gw_namespace] = threading.Lock()
@@ -500,6 +512,9 @@ class ProvisioningService:
             "required_resources": {
                 **plan.required_resources,
                 "requested_models": selected_models,
+                "maas_endpoint": self._selected_model_endpoint(
+                    preferred_cluster, selected_models
+                ),
                 "maas_api_key": maas_api_key,
                 "sandbox_data": sandbox_data,
             }

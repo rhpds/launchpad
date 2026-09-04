@@ -153,6 +153,24 @@ def test_preflight_receives_selected_cluster_model_endpoints():
     )
 
 
+def test_showroom_model_endpoint_comes_from_selected_cluster_registry():
+    service = ProvisioningService.__new__(ProvisioningService)
+    service.cluster_registry = ClusterRegistry([
+        target(
+            "arena",
+            10,
+            ["openshift", "model_endpoint"],
+            {"granite-3.2-8b-tools": "http://arena-tools:8000/v1"},
+        ),
+    ])
+
+    endpoint = service._selected_model_endpoint(
+        "arena", ["granite-3.2-8b-tools"]
+    )
+
+    assert endpoint == "http://arena-tools:8000/v1"
+
+
 def test_arena_only_registry_uses_arena_as_control_cluster(monkeypatch):
     monkeypatch.delenv("LAUNCHPAD_CONTROL_CLUSTER_REF", raising=False)
     service = ProvisioningService.__new__(ProvisioningService)

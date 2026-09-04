@@ -92,6 +92,16 @@ def test_showroom_is_deployed_by_gitops_not_inline_html():
     assert not hasattr(OpenShiftProvisioningAdapter, "_deploy_showroom")
 
 
+def test_showroom_prefers_model_endpoint_carried_by_provisioning_plan(monkeypatch):
+    monkeypatch.setenv("LITELLM_API_BASE", "http://global-litellm:4000/v1")
+
+    endpoint = OpenShiftProvisioningAdapter._showroom_maas_endpoint({
+        "maas_endpoint": "http://arena-tools:8000/v1",
+    })
+
+    assert endpoint == "http://arena-tools:8000"
+
+
 def test_wait_for_showroom_route_accepts_chart_proxy_route(monkeypatch):
     adapter = OpenShiftProvisioningAdapter.__new__(OpenShiftProvisioningAdapter)
     route_snapshots = iter([

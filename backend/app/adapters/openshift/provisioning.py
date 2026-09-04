@@ -133,6 +133,15 @@ class OpenShiftProvisioningAdapter:
             },
         )
 
+    @staticmethod
+    def _showroom_maas_endpoint(resources: dict) -> str:
+        """Return the selected cluster model base without the OpenAI `/v1` suffix."""
+        endpoint = str(
+            resources.get("maas_endpoint")
+            or os.environ.get("LITELLM_API_BASE", "")
+        ).rstrip("/")
+        return endpoint.removesuffix("/v1")
+
     def provision(self, plan: ProvisioningPlan) -> ProvisionResult:
         res = plan.required_resources
         res.get("deploy_method", "kustomize-dir")
@@ -218,8 +227,7 @@ class OpenShiftProvisioningAdapter:
         )
 
         if showroom_enabled:
-            maas_endpoint = os.environ.get("LITELLM_API_BASE", "").rstrip("/")
-            maas_endpoint = maas_endpoint.removesuffix("/v1")
+            maas_endpoint = self._showroom_maas_endpoint(res)
             requested_models = list(res.get("requested_models", []))
             showroom_app = build_showroom_application(
                 ShowroomSeat(
