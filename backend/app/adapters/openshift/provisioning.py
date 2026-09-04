@@ -213,7 +213,7 @@ class OpenShiftProvisioningAdapter:
                     content_ref=str(res["showroom_content_ref"]),
                     apps_domain=apps_domain,
                     console_url=(
-                        f"{self._target.console_url.rstrip('/')}/topology/ns/{demo_namespace}"
+                        f"{self._target.console_url.rstrip('/')}/k8s/ns/{demo_namespace}/core~v1~Pod"
                         if self._target and self._target.console_url
                         else os.environ.get("OPENSHIFT_CONSOLE_URL", "")
                     ),

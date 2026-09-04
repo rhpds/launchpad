@@ -110,7 +110,7 @@ def test_console_router_rewrites_origins_but_preserves_encoded_redirect_uri():
     assert encoded_callback in rewritten
 
 
-def test_console_router_collapses_the_proxy_prefix_after_oauth_callback():
+def test_console_router_uses_root_spa_paths_after_oauth_callback():
     router = _router_module()
     tunnel_host = "pilot.trycloudflare.com"
 
@@ -121,11 +121,19 @@ def test_console_router_collapses_the_proxy_prefix_after_oauth_callback():
     )
 
     assert rewritten == (
-        f"https://{tunnel_host}/console/topology/ns/participant-seat"
+        f"https://{tunnel_host}/k8s/ns/participant-seat/core~v1~Pod"
     )
     assert router._canonical_public_path(
         "console/console/topology/ns/participant-seat"
-    ) == "console/topology/ns/participant-seat"
+    ) == "k8s/ns/participant-seat/core~v1~Pod"
+    assert router._select_upstream("k8s/ns/participant-seat/core~v1~Pod") == (
+        router.CONSOLE_ORIGIN,
+        "k8s/ns/participant-seat/core~v1~Pod",
+        True,
+    )
+    assert router._rewrite_console_body(b'<base href="/"/>', tunnel_host) == (
+        b'<base href="/"/>'
+    )
 
 
 def test_console_router_keeps_http_only_and_scopes_proxy_cookie_paths():

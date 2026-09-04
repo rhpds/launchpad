@@ -55,8 +55,18 @@ INFRA01_API_HOST = "api.ocpv-infra01.dal12.infra.demo.redhat.com:6443"
 def _select_upstream(path: str) -> tuple:
     if path.startswith("console/"):
         return CONSOLE_ORIGIN, path[len("console/"):], True
-    # Console JS uses absolute paths for its API bridge
-    if path.startswith(("api/", "apis/", "api-resource-list/")):
+    # The Console SPA must see its normal root-level routes. Mounting it under
+    # /console changes window.location.pathname and breaks client-side route
+    # matching after OAuth. Keep Launchpad's explicit participant paths on the
+    # gateway and send only well-known Console routes to the Console service.
+    console_routes = (
+        "api/", "apis/", "api-resource-list/", "auth/", "static/",
+        "locales/", "k8s/", "topology/", "search/", "catalog/",
+        "operatorhub/", "dev-catalog/", "monitoring/", "dashboards/",
+        "multicloud/", "ns/", "add/", "import/", "deploy-image/",
+        "helm-releases/", "pipelines/", "jobs/", "project-details/",
+    )
+    if path.startswith(console_routes):
         return CONSOLE_ORIGIN, path, True
     if path.startswith("oauth/"):
         upstream_path = path
@@ -100,9 +110,9 @@ def _rewrite_url(value: str, tunnel_host: str) -> str:
     # query strings) must NOT be rewritten or OAuth token exchanges will
     # fail with redirect_uri mismatch errors.
     pairs = [
-        (f"https://{ARENA_CONSOLE_HOST}", f"https://{tunnel_host}/console"),
+        (f"https://{ARENA_CONSOLE_HOST}", f"https://{tunnel_host}"),
         (f"https://{ARENA_OAUTH_HOST}", f"https://{tunnel_host}/oauth"),
-        (f"https://{INFRA01_CONSOLE_HOST}", f"https://{tunnel_host}/console"),
+        (f"https://{INFRA01_CONSOLE_HOST}", f"https://{tunnel_host}"),
         (f"https://{INFRA01_OAUTH_HOST}", f"https://{tunnel_host}/oauth"),
         (f"https://{ARENA_KEYCLOAK_HOST}", f"https://{tunnel_host}"),
         (KEYCLOAK_INT_ORIGIN, f"https://{tunnel_host}"),
@@ -113,28 +123,37 @@ def _rewrite_url(value: str, tunnel_host: str) -> str:
         f"https://{INFRA01_API_HOST}",
         "https://api.arena.fm2aihpcsed.com:6443",
     )
-    # During Console OAuth, OpenShift returns the browser to the original
-    # public path (which already includes /console).  Replacing the native
-    # Console origin must not add that proxy prefix a second time.
+    # Normalize callbacks created by an already-running prefixed Console
+    # session. New sessions use the root-level Console SPA routes above.
     value = value.replace(
-        f"https://{tunnel_host}/console/console/",
         f"https://{tunnel_host}/console/",
+        f"https://{tunnel_host}/",
+    )
+    # Older provisioned Showrooms point at the Developer Topology route. A
+    # namespace-scoped participant may not have that perspective, while the
+    # core Pods page is present for every authenticated OpenShift user.
+    value = re.sub(
+        rf"https://{re.escape(tunnel_host)}/topology/ns/([^/?#]+)",
+        rf"https://{tunnel_host}/k8s/ns/\1/core~v1~Pod",
+        value,
     )
     value = value.replace(f"https://{tunnel_host}/oauth/oauth/", f"https://{tunnel_host}/oauth/")
     return value
 
 
 def _canonical_public_path(path: str) -> str:
-    """Collapse a duplicate Console prefix left by an in-flight OAuth flow."""
-    while path.startswith("console/console/"):
+    """Remove the legacy prefix so the Console SPA sees its native route."""
+    while path.startswith("console/"):
         path = path[len("console/"):]
+    topology = re.fullmatch(r"topology/ns/([^/]+)", path)
+    if topology:
+        return f"k8s/ns/{topology.group(1)}/core~v1~Pod"
     return path
 
 
 def _rewrite_console_body(body: bytes, tunnel_host: str) -> bytes:
     text = body.decode("utf-8", errors="replace")
     text = _rewrite_url(text, tunnel_host)
-    text = text.replace('<base href="/"/>', '<base href="/console/"/>')
     return text.encode("utf-8")
 
 

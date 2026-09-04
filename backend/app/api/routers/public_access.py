@@ -275,7 +275,7 @@ def resolve_gateway_target(
         target = provisioning_service.cluster_registry.get(lab_session.cluster_ref)
         console_url = target.public_console_url or target.console_url
         if console_url and lab_session.namespace:
-            console_url = f"{console_url.rstrip('/')}/topology/ns/{lab_session.namespace}"
+            console_url = f"{console_url.rstrip('/')}/k8s/ns/{lab_session.namespace}/core~v1~Pod"
         if workspace_url and ("example.com" in workspace_url or ".apps.cluster.local" in workspace_url):
             workspace_url = None
     return {
@@ -327,7 +327,7 @@ def resolve_oidc_identity(host: str, username: str, x_access_broker_key: str = H
         cluster = provisioning_service.cluster_registry.get(lab_session.cluster_ref)
         console_url = cluster.public_console_url or cluster.console_url
         if console_url and lab_session.namespace:
-            console_url = f"{console_url.rstrip('/')}/topology/ns/{lab_session.namespace}"
+            console_url = f"{console_url.rstrip('/')}/k8s/ns/{lab_session.namespace}/core~v1~Pod"
         if workspace_url and ("example.com" in workspace_url or ".apps.cluster.local" in workspace_url):
             workspace_url = None
     public_access_service._audit("authorize", policy.order_id, "granted", identity.participant_id)

@@ -171,7 +171,7 @@ class OpenShiftSandboxProvisioner:
             "openshift_cli_namespace": namespace,
         }
         console_base = str(res.get("console_url", "")).rstrip("/")
-        console_url = f"{console_base}/topology/ns/{namespace}" if console_base else ""
+        console_url = f"{console_base}/k8s/ns/{namespace}/core~v1~Pod" if console_base else ""
         lab_url = console_url
 
         if console_url and "openshift_console" in access_methods:

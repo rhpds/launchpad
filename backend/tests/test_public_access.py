@@ -361,7 +361,8 @@ def test_public_access_never_uses_placeholder_workspace_url():
     ).read_text()
     assert '"example.com" in workspace_url' in source
     assert '".apps.cluster.local" in workspace_url' in source
-    assert "/topology/ns/" in source
+    assert "/k8s/ns/" in source
+    assert "/core~v1~Pod" in source
 
 
 def test_backend_restart_recovers_policy_identity_entitlement_and_session():
