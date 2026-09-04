@@ -246,6 +246,7 @@ def test_cpu_serving_uses_pinned_openshift_compatible_workbench_image():
         in containerfile
     )
     assert "chgrp -R 0 /app" in containerfile
+    assert "rm -rf /app/server/node_modules/.prisma/client" in containerfile
     assert "name: anythingllm-openshift" in build_config
 
 
