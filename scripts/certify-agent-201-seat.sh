@@ -14,7 +14,11 @@ esac
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 host="$(oc get route showroom -n "$namespace" -o jsonpath='{.spec.host}')"
-page="$(curl -fsSk "https://${host}/www/modules/03-wire-agent.html")"
+curl_options=(-fsSk)
+if [[ -n "${ARENA_CURL_INTERFACE:-}" ]]; then
+  curl_options+=(--interface "$ARENA_CURL_INTERFACE")
+fi
+page="$(curl "${curl_options[@]}" "https://${host}/www/modules/03-wire-agent.html")"
 endpoint="$(printf '%s' "$page" | sed -n "s/.*--from-literal=api-base='\([^']*\)'.*/\1/p" | head -1)"
 api_key="$(printf '%s' "$page" | sed -n "s/.*--from-literal=api-key='\([^']*\)'.*/\1/p" | head -1)"
 model="$(printf '%s' "$page" | sed -n "s/.*ADVISOR_MODEL='\([^']*\)'.*/\1/p" | head -1)"
