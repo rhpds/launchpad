@@ -1,0 +1,8 @@
+FROM quay.io/rhpds/openshift-showroom-terminal-ocp@sha256:606317dc396db33b879c1d3807844990cd37bb0c787b0b525edbeb70283b5350
+
+USER 0
+COPY launchpad-runttyd /usr/local/bin/launchpad-runttyd
+RUN chmod 0755 /usr/local/bin/launchpad-runttyd
+USER 1001
+
+ENTRYPOINT ["/usr/bin/tini", "--", "/usr/local/bin/launchpad-runttyd"]

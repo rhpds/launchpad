@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+: "${NAMESPACE:?The Showroom terminal requires its seat namespace}"
+
+export USER=lab-user
+export HOME=/home/lab-user
+export KUBECONFIG="${HOME}/.kube/config"
+
+mkdir -p "${HOME}/.kube"
+umask 077
+cat >"${KUBECONFIG}" <<EOF
+apiVersion: v1
+kind: Config
+clusters:
+- name: in-cluster
+  cluster:
+    server: https://kubernetes.default.svc
+    certificate-authority: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+users:
+- name: showroom
+  user:
+    tokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+contexts:
+- name: seat
+  context:
+    cluster: in-cluster
+    user: showroom
+    namespace: ${NAMESPACE}
+current-context: seat
+EOF
+
+exec /usr/bin/runttyd

@@ -16,6 +16,10 @@ ARGO_PLURAL = "applications"
 SHOWROOM_CHART_REPOSITORY = "https://rhpds.github.io/showroom-deployer"
 SHOWROOM_CHART = "showroom-single-pod"
 SHOWROOM_CHART_VERSION = "2.2.*"
+SHOWROOM_TERMINAL_IMAGE = (
+    "image-registry.openshift-image-registry.svc:5000/partner-ai-launchpad/"
+    "launchpad-showroom-terminal:4.20"
+)
 
 
 def application_name(namespace: str) -> str:
@@ -115,7 +119,7 @@ def build_showroom_application(
         "deployer": {"domain": seat.apps_domain},
         "terminal": {
             "setup": "true",
-            "image": "quay.io/rhpds/openshift-showroom-terminal-ocp:4.20",
+            "image": SHOWROOM_TERMINAL_IMAGE,
             "storage": {
                 "setup": "true",
                 "storageClass": seat.storage_class,

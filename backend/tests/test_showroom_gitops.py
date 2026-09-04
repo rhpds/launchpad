@@ -1,3 +1,4 @@
+from pathlib import Path
 from unittest.mock import MagicMock
 
 import pytest
@@ -9,6 +10,8 @@ from app.adapters.openshift.showroom_gitops import (
     application_name,
     build_showroom_application,
 )
+
+ROOT = Path(__file__).resolve().parents[2]
 
 
 def test_builds_official_chart_application_with_personalized_git_content():
@@ -61,7 +64,23 @@ def test_operator_workshop_places_namespace_console_inside_showroom():
     assert user_data["cluster_display_name"] == "Arena CPU Execution"
     assert values["terminal"]["storage"]["setup"] == "false"
     assert values["terminal"]["resources"]["requests"]["cpu"] == "100m"
+    assert values["terminal"]["image"] == (
+        "image-registry.openshift-image-registry.svc:5000/partner-ai-launchpad/"
+        "launchpad-showroom-terminal:4.20"
+    )
     assert values["wetty"]["setup"] == "false"
+
+
+def test_launchpad_terminal_defaults_oc_to_its_rotating_seat_identity():
+    image_dir = ROOT / "workshop-images/showroom-terminal"
+    containerfile = (image_dir / "Containerfile").read_text()
+    entrypoint = (image_dir / "launchpad-runttyd").read_text()
+
+    assert "@sha256:606317dc396db33b879c1d3807844990cd37bb0c787b0b525edbeb70283b5350" in containerfile
+    assert "tokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token" in entrypoint
+    assert "namespace: ${NAMESPACE}" in entrypoint
+    assert 'KUBECONFIG="${HOME}/.kube/config"' in entrypoint
+    assert "exec /usr/bin/runttyd" in entrypoint
 
 
 def test_content_lab_receives_launchpad_runtime_values_and_named_workspace_tab():
