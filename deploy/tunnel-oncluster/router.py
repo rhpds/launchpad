@@ -133,7 +133,7 @@ def _rewrite_url(value: str, tunnel_host: str) -> str:
     # namespace-scoped participant may not have that perspective, while the
     # core Pods page is present for every authenticated OpenShift user.
     value = re.sub(
-        rf"https://{re.escape(tunnel_host)}/topology/ns/([^/?#]+)",
+        rf"https://{re.escape(tunnel_host)}/topology/ns/([^/?#\s]+)",
         rf"https://{tunnel_host}/k8s/ns/\1/core~v1~Pod",
         value,
     )

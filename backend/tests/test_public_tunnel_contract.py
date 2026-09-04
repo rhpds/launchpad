@@ -1,6 +1,8 @@
 import importlib.util
 from pathlib import Path
 
+import yaml
+
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -134,6 +136,26 @@ def test_console_router_uses_root_spa_paths_after_oauth_callback():
     assert router._rewrite_console_body(b'<base href="/"/>', tunnel_host) == (
         b'<base href="/"/>'
     )
+
+
+def test_console_url_rewrite_preserves_valid_showroom_yaml():
+    router = _router_module()
+    tunnel_host = "pilot.trycloudflare.com"
+    source = (
+        "type: showroom\n"
+        "tabs:\n"
+        "  - name: OpenShift Console\n"
+        "    url: https://console-openshift-console.apps.arena.fm2aihpcsed.com"
+        "/topology/ns/participant-seat\n"
+    )
+
+    rewritten = router._rewrite_url(source, tunnel_host)
+    parsed = yaml.safe_load(rewritten)
+
+    assert parsed["tabs"][0]["url"] == (
+        f"https://{tunnel_host}/k8s/ns/participant-seat/core~v1~Pod"
+    )
+    assert "\n/core~v1~Pod" not in rewritten
 
 
 def test_console_router_keeps_http_only_and_scopes_proxy_cookie_paths():
