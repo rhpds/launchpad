@@ -1,0 +1,306 @@
+{
+  "schema_version": "1.0",
+  "evidence_id": "EDD-INTEL-TOOL-CALLING-ARENA-25-20260904",
+  "generated_at": "2026-09-04T20:55:59Z",
+  "outcome": "pass",
+  "scope": "internal-twenty-five-seat-workshop",
+  "cluster": "arena",
+  "catalog_item_id": "intel-llm-tool-calling",
+  "catalog_version": "1.0.0",
+  "content_ref": "intel-guided-content-v1.0.4",
+  "source_commit": "20d3ed27e2a3de909c5a79f04119342645116ee4",
+  "seat_count": 25,
+  "public_access_certified": false,
+  "three_concurrent_workshops_certified": false,
+  "gnr2_independent_model_service_certified": false,
+  "certification_boundary": "This evidence promotes one internal 25-seat Tool Calling workshop on Arena. It does not certify public-code access, external DNS/TLS, three concurrent workshops, repeated 25-seat runs, or model service without gnr2; all seat workloads ran on rhgnr1 while the shared model pod ran on gnr2.",
+  "images": {
+    "backend": "sha256:ecb4c046a4ca3047cd78bd995ca6ce9f7ee469b32b8f03ce8ca9b411e7dd3ccf",
+    "showroom_terminal": "sha256:01e4ca6097f07e5011581e44862194944e08cccdbdef241dcce6701243c13a2a",
+    "tool_calling_model": "sha256:cf6577f6d526561651df5390aad916c53820a18a1659e3fb39c1c5a62aef0e3c"
+  },
+  "artifact_hashes": {
+    "backend/app/adapters/openshift/showroom_gitops.py": "6a558d8de2a6be0f7727643d45c614eb831a910fafd9b1c572ddbd3a7548fe0e",
+    "catalog/intel-llm-tool-calling/catalog-item.yaml": "dc0b2ace5898a6c0aaf7380644dc5fc069dab4002b7249a168fe25e13df202fa",
+    "content-intel-llm-tool-calling/antora.yml": "ba40bacdc99ad62b781122d4b0a8e5081df9794c0630880867b597fec5eb8c48",
+    "workshop-images/showroom-terminal/Containerfile": "3d6911f2f7637c00f18ee0f330475228f96bb40abaa4729739dbed1161106b69",
+    "workshop-images/showroom-terminal/launchpad-runttyd": "61cac0c56bee9f4d3762086b1458cd5767445cea22f719d90a37a65c972fb7cd"
+  },
+  "tdd": {
+    "red": [
+      "Catalog contract rejected max_workshop_seats=5 when the 25-seat gate was opened.",
+      "Catalog contract rejected the twenty-five-seat-candidate stage before live certification completed.",
+      "The 25-seat evidence contract failed with FileNotFoundError before this immutable manifest existed."
+    ],
+    "green": [
+      "Catalog maximum is 25 and certification_stage is twenty-five-seat after the live gate passed.",
+      "The evidence contract now validates readiness, participant paths, isolation, concurrency, cleanup, scope boundaries, and the 100-point rubric.",
+      "Defects from prior five-seat candidates remain covered by terminal and Showroom model URL regression tests."
+    ]
+  },
+  "cdd": {
+    "contracts": [
+      "workshop capacity preview, order, confirmation, and status API",
+      "persisted whole-workshop Arena affinity",
+      "25 unique seat, request, session, and namespace identities",
+      "Showroom user-data model URL and API key injection",
+      "terminal rotating service-account kubeconfig",
+      "namespace RoleBinding isolation",
+      "structured OpenAI-compatible tool-call response",
+      "idempotent bulk reclaim"
+    ],
+    "status": "pass"
+  },
+  "bdd": {
+    "scenario": "Given one 25-seat Tool Calling order targeted to Arena, when the owner confirms it, then all 25 independent Showroom seats become ready, every participant can build only in the assigned namespace, all participants can concurrently call the shared tool-capable model, and one bulk reclaim leaves no live workshop resources.",
+    "status": "pass"
+  },
+  "cbt": {
+    "components": {
+      "placement_and_capacity": "pass",
+      "workshop_orchestration": "pass",
+      "showroom_and_antora": "pass",
+      "terminal_identity": "pass",
+      "openshift_rbac": "pass",
+      "argocd_delivery": "pass",
+      "model_endpoint": "pass",
+      "cleanup_controller": "pass"
+    }
+  },
+  "test_runs": {
+    "catalog_workshop_showroom_placement_and_evidence_suite": "173 passed",
+    "live_arena_workshop": "25 seats ready, functionally validated, and reclaimed",
+    "live_arena_cleanup": "zero namespaces, Routes, Applications, and cross-namespace RoleBindings"
+  },
+  "workshop": {
+    "workshop_id": "6e2b689a-721d-4a2b-99dc-ffbe694af427",
+    "idempotency_key": "arena-tool-twenty-five-20260904-a",
+    "placement": "arena",
+    "placement_reason": "Entire workshop assigned to arena; seats were not split",
+    "requested_at": "2026-09-04T20:39:11.850553Z",
+    "ready_at": "2026-09-04T20:43:08.415214Z",
+    "status_after_reclaim": "completed",
+    "session_ids": [
+      "eac26c4d-b164-4ac3-9e6b-8dc30afa0a2d",
+      "3b3b713a-0ee3-4d00-a919-bcb5999335e5",
+      "675585f7-b734-47bd-a340-e9a0a96c99b4",
+      "1b05fa50-49b6-4112-8292-f0411b8bba94",
+      "aa6b2b03-cbaa-482c-ad90-827dfc7d623d",
+      "735aeffb-3d9c-4c10-9608-45a940269d11",
+      "cfa2a38b-8dd4-41da-a993-e71a7e7f8cd2",
+      "e650a58d-c53c-4903-90f7-b82125f3b650",
+      "df05e993-7e0e-4a4d-b2ed-c41b7a870457",
+      "7f14b677-b6ac-4351-9fe9-c2428b748b6c",
+      "a1e4de89-ca5f-47ce-b80a-92d26f8566f6",
+      "bbf9d0ae-f130-4ad8-aee2-960fd719555b",
+      "df5dc937-9fc0-44a2-93d6-18a71336aa09",
+      "afe9057e-17e6-49ea-997b-466e4b7a6da3",
+      "f1c52cbb-44cd-4f6a-976c-51a1d939e941",
+      "5d246468-016d-492f-9fcc-7fe796291472",
+      "54060a3d-baa4-47d6-94ba-0a84203b9338",
+      "834c01c4-51b4-4e37-bc35-6906fc6bb4f1",
+      "fa114c92-3ec7-4b16-823c-96dac4a08fce",
+      "6e72a15d-f0a8-4cf0-9f54-49212710a74b",
+      "4d0acb5e-bbb0-486b-a80f-7a18f332771b",
+      "c062cdd5-1eeb-4032-9a8a-5817c3bc076f",
+      "b3201fe4-b7ad-4b6d-9dcc-0ff824869dc0",
+      "0c9f6e2c-bf6c-44cb-b563-a958e6799b49",
+      "b08ba103-eb40-413b-a1ee-b72883f38af7"
+    ],
+    "namespaces": [
+      "launchpad-smoke-test-tenant-intel-llm-tool-cal-39561a",
+      "launchpad-smoke-test-tenant-intel-llm-tool-cal-cba684",
+      "launchpad-smoke-test-tenant-intel-llm-tool-cal-b66e84",
+      "launchpad-smoke-test-tenant-intel-llm-tool-cal-87857f",
+      "launchpad-smoke-test-tenant-intel-llm-tool-cal-8f2bef",
+      "launchpad-smoke-test-tenant-intel-llm-tool-cal-98d588",
+      "launchpad-smoke-test-tenant-intel-llm-tool-cal-c467cb",
+      "launchpad-smoke-test-tenant-intel-llm-tool-cal-160154",
+      "launchpad-smoke-test-tenant-intel-llm-tool-cal-8a4823",
+      "launchpad-smoke-test-tenant-intel-llm-tool-cal-9d434b",
+      "launchpad-smoke-test-tenant-intel-llm-tool-cal-3ddfe7",
+      "launchpad-smoke-test-tenant-intel-llm-tool-cal-62cb47",
+      "launchpad-smoke-test-tenant-intel-llm-tool-cal-220577",
+      "launchpad-smoke-test-tenant-intel-llm-tool-cal-c7aaae",
+      "launchpad-smoke-test-tenant-intel-llm-tool-cal-8272a8",
+      "launchpad-smoke-test-tenant-intel-llm-tool-cal-80a826",
+      "launchpad-smoke-test-tenant-intel-llm-tool-cal-15a00d",
+      "launchpad-smoke-test-tenant-intel-llm-tool-cal-e67088",
+      "launchpad-smoke-test-tenant-intel-llm-tool-cal-e53906",
+      "launchpad-smoke-test-tenant-intel-llm-tool-cal-c4ddee",
+      "launchpad-smoke-test-tenant-intel-llm-tool-cal-2f0866",
+      "launchpad-smoke-test-tenant-intel-llm-tool-cal-5cfe47",
+      "launchpad-smoke-test-tenant-intel-llm-tool-cal-7f59cd",
+      "launchpad-smoke-test-tenant-intel-llm-tool-cal-3c462b",
+      "launchpad-smoke-test-tenant-intel-llm-tool-cal-5537c2"
+    ]
+  },
+  "capacity_preview": {
+    "can_provision": true,
+    "selected_cluster": "arena",
+    "seats_requested": 25,
+    "catalog_seat_limit": 25,
+    "reserved_cpu_millicores": 4125,
+    "reserved_memory_mib": 11600,
+    "reserved_pods": 25,
+    "headroom_percent": 20,
+    "capacity_statement": "The preflight admitted this one 25-seat order. Reported theoretical seat counts are not treated as certified production capacity."
+  },
+  "provisioning": {
+    "all_seats_ready": true,
+    "collective_ready_seconds": 237,
+    "unique_seat_count": 25,
+    "unique_request_count": 25,
+    "unique_session_count": 25,
+    "unique_namespace_count": 25,
+    "validated_pods": 25,
+    "containers_ready_per_pod": "3/3",
+    "healthy_synced_argocd_applications": 25,
+    "seat_workload_node": "rhgnr1",
+    "seat_workload_pods_on_node": 25,
+    "shared_model_node": "gnr2.fm2aihpcsed.com"
+  },
+  "observer_interruption": {
+    "observed": true,
+    "phase": "provisioning after 22 seats were observed ready",
+    "symptom": "The local Arena VPN/DNS/API observer path temporarily became unavailable.",
+    "cluster_result": "The backend continued without intervention and the workshop reached 25 of 25 ready after observer connectivity recovered.",
+    "classification": "observer-network interruption; no workshop seat or cluster workload failure was recorded"
+  },
+  "participant_validation": {
+    "showroom_http_200": 25,
+    "guide_http_200": 25,
+    "resolved_model_urls": 25,
+    "default_project_matches_seat": 25,
+    "own_namespace_edit_allowed": 25,
+    "cross_seat_read_denied": 25,
+    "terminal_image_digest_matches": 25,
+    "complete_tool_protocol": "pass",
+    "complete_tool_protocol_result": "The model requested get_weather for Austin, accepted a matching tool result, and returned that Austin was sunny at 78 degrees Fahrenheit."
+  },
+  "concurrent_inference": {
+    "successful_calls": 25,
+    "structured_tool_calls": 25,
+    "latency_seconds": [
+      6.249888,
+      6.367624,
+      6.355514,
+      6.327817,
+      6.077234,
+      6.150621,
+      6.077806,
+      6.085062,
+      5.796211,
+      5.894154,
+      5.784477,
+      5.784088,
+      5.949221,
+      5.810824,
+      5.807541,
+      5.891746,
+      5.823233,
+      5.842680,
+      6.004374,
+      6.174654,
+      5.838606,
+      5.927658,
+      5.963283,
+      5.991095,
+      6.129283
+    ],
+    "p95_method": "nearest rank",
+    "p95_seconds": 6.355514,
+    "mean_seconds": 6.004188,
+    "min_seconds": 5.784088,
+    "max_seconds": 6.367624,
+    "function_name": "get_weather",
+    "arguments": {
+      "city": "Austin"
+    }
+  },
+  "cleanup": {
+    "started_at": "2026-09-04T20:53:26Z",
+    "completed_at": "2026-09-04T20:55:20Z",
+    "completed_seconds": 114,
+    "all_seats_reclaimed": true,
+    "reclaimed_seat_count": 25,
+    "remaining_namespaces": 0,
+    "remaining_routes": 0,
+    "remaining_applications": 0,
+    "remaining_cross_namespace_rolebindings": 0
+  },
+  "red_green_matrix": [
+    {
+      "requirement": "capacity preview and whole-workshop Arena placement",
+      "critical": true,
+      "status": "GREEN-live"
+    },
+    {
+      "requirement": "25 unique seats reach collective readiness within five minutes",
+      "critical": true,
+      "status": "GREEN-live"
+    },
+    {
+      "requirement": "all Argo applications become Synced and Healthy",
+      "critical": true,
+      "status": "GREEN-live"
+    },
+    {
+      "requirement": "Showroom and Antora participant routes",
+      "critical": true,
+      "status": "GREEN-live"
+    },
+    {
+      "requirement": "resolved copy-paste model connection values",
+      "critical": true,
+      "status": "GREEN-live"
+    },
+    {
+      "requirement": "all terminals default to their assigned namespace",
+      "critical": true,
+      "status": "GREEN-live"
+    },
+    {
+      "requirement": "all seats have own-namespace edit",
+      "critical": true,
+      "status": "GREEN-live"
+    },
+    {
+      "requirement": "all cross-seat reads are denied",
+      "critical": true,
+      "status": "GREEN-live"
+    },
+    {
+      "requirement": "25 simultaneous structured tool calls",
+      "critical": true,
+      "status": "GREEN-live"
+    },
+    {
+      "requirement": "complete tool-result protocol",
+      "critical": true,
+      "status": "GREEN-live"
+    },
+    {
+      "requirement": "provisioning survives observer network interruption",
+      "critical": true,
+      "status": "GREEN-live"
+    },
+    {
+      "requirement": "bulk reclaim within ten minutes with zero live residue",
+      "critical": true,
+      "status": "GREEN-live"
+    }
+  ],
+  "gate_rubric": {
+    "workshop_order_and_placement": 20,
+    "seat_and_namespace_isolation": 20,
+    "showroom_and_content": 15,
+    "shared_model_functionality": 15,
+    "reclaim_and_cleanup": 15,
+    "participant_usability": 5,
+    "evidence_integrity": 5,
+    "repeatability_and_failure_recovery": 5,
+    "score": 100,
+    "required": 100
+  }
+}
