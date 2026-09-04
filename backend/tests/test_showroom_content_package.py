@@ -17,6 +17,8 @@ INTEL_GUIDED_LABS = [
         "model": "granite-2b-cpu",
         "workspace_route": "app",
         "content_ref": "intel-guided-content-v1.0.1",
+        "max_workshop_seats": 1,
+        "certification_stage": "single-seat",
     },
     {
         "catalog_id": "intel-llm-cpu-serving",
@@ -27,6 +29,8 @@ INTEL_GUIDED_LABS = [
         "model": "granite-2b-cpu",
         "workspace_route": "rag",
         "content_ref": "intel-guided-content-v1.0.3",
+        "max_workshop_seats": 1,
+        "certification_stage": "single-seat",
     },
     {
         "catalog_id": "intel-llm-tool-calling",
@@ -37,6 +41,8 @@ INTEL_GUIDED_LABS = [
         "model": "granite-3.2-8b-tools",
         "workspace_route": "",
         "content_ref": "intel-guided-content-v1.0.2",
+        "max_workshop_seats": 5,
+        "certification_stage": "five-seat",
     },
 ]
 
@@ -120,8 +126,8 @@ def test_intel_guided_lab_is_native_launchpad_content(lab):
     assert metadata["showroom"] is True
     assert metadata["operator_workshop"] is True
     assert metadata["content_only"] is True
-    assert metadata["max_workshop_seats"] == 1
-    assert metadata["certification_stage"] == "single-seat"
+    assert metadata["max_workshop_seats"] == lab["max_workshop_seats"]
+    assert metadata["certification_stage"] == lab["certification_stage"]
     assert metadata["required_models"] == [lab["model"]]
     assert metadata["showroom_content_repo_url"] == (
         "https://github.com/rhpds/launchpad.git"
