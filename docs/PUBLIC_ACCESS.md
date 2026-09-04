@@ -7,9 +7,9 @@ identity label.
 
 ## Personas
 
-- **Platform operator:** configures `PUBLIC_LABS_DOMAIN`, wildcard DNS/TLS, the
-  dedicated public ingress, WAF limits, Keycloak broker secret and OpenShift
-  OIDC. Each execution cluster is certified independently.
+- **Platform operator:** configures `PUBLIC_LABS_DOMAIN`, the approved DNS/TLS
+  ingress mode, WAF limits, Keycloak broker secret and OpenShift OIDC. Each
+  execution cluster is certified independently.
 - **Catalog owner:** verifies the Showroom, workspace, Console, model and
   cleanup journeys before permitting public placement.
 - **Instructor:** copies the one-time code, distributes URL/code, monitors
@@ -36,6 +36,46 @@ every cluster command to the Arena kubeconfig.
 Only the entitlement-aware gateway, Keycloak, Console and OAuth routes may use
 the public ingress. The normal backend, seat routes, Argo CD, databases, model
 endpoints, admin APIs and internal service routes remain private.
+
+## Production ingress when wildcard DNS is prohibited
+
+Intel's external-ingress policy does not permit wildcard DNS and permits only
+HTTPS inbound traffic. That policy rules out the current per-order hostname
+shape (`https://<catalog>-<order>.<PUBLIC_LABS_DOMAIN>`), but it does not rule
+out public Launchpad access.
+
+Use one of these mutually exclusive production patterns:
+
+1. **Named Cloudflare Tunnel (preferred when outbound tunnel traffic is
+   approved):** Intel creates one exact `labs.fm2aihpcsed.com` CNAME for a
+   permanent, account-managed tunnel. Arena needs no public IP or inbound NAT.
+   The firewall must permit `cloudflared` egress on TCP or UDP 7844; HTTPS-only
+   browser traffic is unchanged. The hostname (or a delegated DNS zone
+   containing it) must be managed in the same Cloudflare account as the
+   tunnel; otherwise use the static-IP pattern. Quick Tunnels remain test-only.
+2. **Static IP with HTTPS-only NAT:** Intel creates one exact
+   `labs.fm2aihpcsed.com` A record and forwards TCP 443 to an isolated Arena
+   ingress/gateway. TCP 80 is optional and is not a prerequisite. Certificate
+   issuance must use DNS-01 or an Intel-provided public certificate because an
+   HTTP-01 challenge cannot depend on port 80.
+
+Both patterns require a single-origin URL contract such as
+`https://labs.fm2aihpcsed.com/labs/<catalog>-<order>`. The entitlement gateway
+must route order paths to private seat services and preserve WebSocket traffic.
+Keycloak/OIDC callback URLs must use the same stable origin. Native OpenShift
+Console exposure either needs separately approved exact Console and OAuth
+hostnames or must remain behind the same tested gateway; dynamic seat Routes
+must never be published individually.
+
+Before implementing this mode, version the public-access contract and add RED
+tests for path isolation, callback generation, multi-order routing, WebSockets,
+cross-order denial, rotation, expiration and cleanup. Do not set a production
+cluster's `public_access_enabled` flag from DNS approval alone.
+
+Cloudflare references: [Tunnel DNS records](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/routing-to-tunnel/dns/),
+[locally managed ingress rules](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/do-more-with-tunnels/local-management/configuration-file/),
+[Tunnel firewall requirements](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/configure-tunnels/tunnel-with-firewall/),
+and [Quick Tunnel limitations](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/do-more-with-tunnels/trycloudflare/).
 
 ## Proof package
 
