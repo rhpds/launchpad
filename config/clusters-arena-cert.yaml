@@ -9,4 +9,6 @@ clusters:
     priority: 10
     public_access_enabled: true
     public_ingress_domain: trycloudflare.com
-    capabilities: [cpu, openshift, operators, openshift-ai, showroom]
+    capabilities: [cpu, openshift, operators, openshift-ai, showroom, model_endpoint, control-plane]
+    model_endpoints:
+      granite-2b-cpu: http://ovms-granite-2b.fleet-llm-d.svc:8080/v1

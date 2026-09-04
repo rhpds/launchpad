@@ -2,12 +2,11 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
-
+from app.adapters.openshift.showroom_gitops import ShowroomSeat, build_showroom_application
 from app.domain.clusters import ClusterTarget
+from app.domain.models import LabRequest
 from app.services.cluster_registry import ClusterRegistry
 from app.services.provisioning import ProvisioningService
-from app.domain.models import LabRequest
-from app.adapters.openshift.showroom_gitops import ShowroomSeat, build_showroom_application
 
 
 def target(cluster_id, priority, capabilities, models=None):
@@ -86,6 +85,23 @@ def test_active_ai_sandbox_has_an_eligible_cluster():
         selected.model_endpoints
     )
     assert len(registry.get("arena").model_endpoints) == 1
+
+
+def test_arena_public_cert_registry_retains_model_routing():
+    root = Path(__file__).resolve().parents[2]
+    registry = ClusterRegistry.from_file(
+        str(root / "config" / "clusters-arena-cert.yaml")
+    )
+
+    selected = registry.select(
+        required_capabilities=["openshift", "showroom", "model_endpoint"],
+        required_models=["granite-2b-cpu"],
+        override="arena",
+        require_public_access=True,
+    )
+
+    assert selected.cluster_id == "arena"
+    assert "control-plane" in selected.capabilities
 
 
 def test_sandbox_model_selection_controls_cluster_placement():
