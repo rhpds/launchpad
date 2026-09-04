@@ -1,0 +1,37 @@
+= What's Next
+:navtitle: What's Next
+
+== What You Built
+
+In 45 minutes, you:
+
+* Deployed 3 MCP tools that return Intel hardware specs, OpenShift capabilities, and reference architectures
+* Deployed a LangGraph agent that orchestrates LLM reasoning over tool data
+* Generated solution briefs for 3+ customer scenarios
+* Wrote a custom system prompt for YOUR customer and deployed it
+* Compared two models on quality and latency
+* Produced an agent card capturing your configuration and next steps
+
+== The Pattern
+
+[cols="2,3",options="header"]
+|===
+| Component | What It Does
+| *LLM (brain)* | Reasoning, synthesis, natural language generation
+| *MCP Tools (hands)* | Structured data in milliseconds -- no hallucination
+| *System Prompt (expertise)* | Defines persona, process, output format
+| *LangGraph (workflow)* | Multi-step orchestration: understand → research → synthesize
+|===
+
+This pattern applies to any domain. Change the tools and prompt, keep the architecture.
+
+== Extend the Pattern
+
+Take the solution-agent as a starting point. Fork it and build your own:
+
+1. *Pick a domain*: Customer support, competitive analysis, demo preparation, RFP response
+2. *Design your tools*: What structured data does your agent need? Product catalogs, customer profiles, benchmark databases?
+3. *Write your prompt*: Define the persona, the process, and the output format
+4. *Deploy and test*: Same `oc apply` pattern you used in this lab
+
+The infrastructure is the same. The creativity is yours.

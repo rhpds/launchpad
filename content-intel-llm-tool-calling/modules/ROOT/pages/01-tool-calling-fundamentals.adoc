@@ -1,0 +1,123 @@
+= Module 1: Tool Calling Fundamentals
+
+_Estimated time: 10 minutes_
+
+In this module you will learn what tool calling is, why it matters for agentic AI, and how the protocol works at a conceptual level. No deployment yet -- this is about understanding the mechanics before you build.
+
+== The Problem: LLMs Can Reason but Cannot Act
+
+Large language models are powerful reasoners. They can analyze text, answer questions, write code, and summarize documents. But they have a fundamental limitation: *they cannot interact with the outside world*.
+
+Ask a model "What is the weather in Paris right now?" and it will either hallucinate an answer or tell you it cannot access live data. Ask it to look up an employee in your HR database and it will politely decline. The model's knowledge is frozen at its training cutoff.
+
+This is the gap that tool calling fills.
+
+== The Solution: Structured Function Calls
+
+Tool calling (also called function calling) gives the model a way to request actions from your application. Instead of generating a text answer, the model outputs a *structured JSON request* describing which function to call and with what arguments.
+
+The model does not execute the function. Your code does. The model is the brain that decides *what* to do. Your application is the hands that *do it*.
+
+Here is the complete lifecycle:
+
+1. *You define tools* -- Describe available functions using JSON Schema (name, description, parameters)
+2. *You send a message* -- Include the tool definitions alongside the user's question
+3. *The model returns a tool call* -- Instead of text, it returns `tool_calls` with a function name and arguments
+4. *You execute the function* -- Your code calls the actual API, database, or service
+5. *You return the result* -- Send the function output back to the model as a `role: "tool"` message
+6. *The model responds* -- It synthesizes the tool result into a natural language answer
+
+This is not magic. It is a protocol. You will execute every step by hand in Module 3.
+
+== The OpenAI Tools API Format
+
+Every major model provider supports the same format for tool definitions. The standard comes from the OpenAI API and has been adopted by vLLM, Ollama, LiteLLM, and others. A tool definition looks like this:
+
+[source,json]
+----
+{
+  "type": "function",
+  "function": {
+    "name": "get_weather",
+    "description": "Get the current weather for a city",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "location": {
+          "type": "string",
+          "description": "The city name, e.g. Paris"
+        },
+        "unit": {
+          "type": "string",
+          "enum": ["celsius", "fahrenheit"]
+        }
+      },
+      "required": ["location"]
+    }
+  }
+}
+----
+
+Key fields:
+
+* `name` -- The identifier the model uses to request this function
+* `description` -- Tells the model *when* to use this tool. Good descriptions are critical.
+* `parameters` -- JSON Schema defining the arguments the function accepts
+
+The quality of the `description` field directly affects whether the model calls the right tool at the right time. Vague descriptions lead to wrong tool calls.
+
+== When to Use Tool Calling
+
+[cols="1,3"]
+|===
+| Use Case | Why Tool Calling
+
+| *Live data retrieval*
+| Weather, stock prices, flight status -- anything that changes after training
+
+| *Private data access*
+| Employee records, inventory, internal APIs the model was never trained on
+
+| *Precise computation*
+| Math, date calculations, currency conversion -- tasks where approximation is not acceptable
+
+| *Multi-step workflows*
+| Look up a customer, check their order, then cancel it -- the model plans the sequence
+
+| *API orchestration*
+| The model decides which microservice to call based on the user's intent
+|===
+
+== When NOT to Use Tool Calling
+
+Tool calling adds latency (extra round trips) and complexity (dispatch logic, error handling). Skip it when:
+
+* *The model already knows the answer* -- "What is Python?" does not need a tool
+* *Creative tasks* -- "Write a poem" needs no external data
+* *Classification* -- "Is this email spam?" can be answered from the input alone
+* *Summarization* -- "Summarize this document" when the content is already in the prompt
+
+The rule: use tool calling when the model needs information or capabilities *it does not have*.
+
+== What You Will Build
+
+Over the next seven modules, you will:
+
+1. Deploy a model with tool calling enabled on {intel_platform} processors
+2. Execute the 6-step protocol by hand using `curl`
+3. Automate the loop in Python
+4. Build a multi-tool application that chains function calls
+5. Implement advanced patterns like error handling and guard rails
+
+Each module builds on the previous one. By the end, you will understand tool calling deeply enough to build your own agentic AI systems.
+
+== Checkpoint
+
+At this point you understand:
+
+* [x] Why LLMs need tool calling to interact with external systems
+* [x] The 6-step tool calling lifecycle
+* [x] The JSON Schema format for tool definitions
+* [x] When tool calling is and is not the right approach
+
+Proceed to xref:02-serving-with-tools.adoc[Module 2: Serve a Model with Tool Calling].

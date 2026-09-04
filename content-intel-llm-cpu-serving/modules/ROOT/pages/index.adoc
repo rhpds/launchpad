@@ -1,0 +1,134 @@
+= Serve LLMs on Intel Xeon CPUs
+:navtitle: Welcome
+
+In this lab you will explore *how CPU-based LLM inference works* and build a complete RAG (Retrieval-Augmented Generation) system using a model running on {intel_platform} processors via Model-as-a-Service (MaaS).
+
+You will not deploy model infrastructure.
+You will connect to a production-grade inference endpoint, understand the architecture behind it, build a RAG pipeline with real documents, and walk away knowing how enterprise CPU inference works end-to-end.
+
+== The Scenario
+
+Your organization wants to serve an LLM internally without GPU hardware.
+The model must answer employee questions grounded in real documents -- an HR assistant backed by Retrieval-Augmented Generation.
+The inference runs on {intel_platform} processors via Red Hat's MaaS platform -- $0/token, no GPU procurement, no infrastructure to manage.
+
+== What You Will Build
+
+By the end of this lab, you will have:
+
+[cols="1,2,2",options="header"]
+|===
+|Component |What It Does |How
+
+|*MaaS Connection*
+|Connect to a pre-deployed LLM running on {intel_platform} CPUs
+|OpenAI-compatible API via LiteLLM virtual keys
+
+|*API Exploration*
+|Understand the OpenAI-compatible chat completions API
+|curl requests, prompt engineering, response analysis
+
+|*RAG Frontend*
+|A chat workbench with document retrieval
+|AnythingLLM + LanceDB
+
+|*Document Pipeline*
+|Load, chunk, and embed documents into the vector store
+|AnythingLLM API + embedding model
+
+|*RAG vs Direct*
+|Compare grounded answers to ungrounded ones
+|Side-by-side queries with and without retrieved context
+|===
+
+== Architecture
+
+----
+User
+  |
+  v
+AnythingLLM (RAG workbench)
+  |                    \
+  | chat completions    \ document retrieval
+  v                      v
+MaaS / LiteLLM         LanceDB (vector store)
+({maas_model})          (embedded chunks)
+  |
+  v
+Intel Xeon (AMX / AVX-512)
+----
+
+== Lab Structure
+
+[cols="1,2,1",options="header"]
+|===
+|Module |What You Do |Time
+
+|xref:01-cpu-inference-fundamentals.adoc[1. CPU Inference Fundamentals]
+|Learn why CPU inference works and when to use it
+|15 min
+
+|xref:02-explore-maas.adoc[2. Explore Model-as-a-Service]
+|Connect to the MaaS endpoint, list models, understand the architecture
+|15 min
+
+|xref:03-query-the-model.adoc[3. Query the Model API]
+|Send chat completions, test prompts, explore the OpenAI-compatible API
+|15 min
+
+|xref:04-wire-rag-frontend.adoc[4. Wire a RAG Frontend]
+|Deploy AnythingLLM and connect it to the MaaS endpoint
+|15 min
+
+|xref:05-load-documents.adoc[5. Load and Chunk Documents]
+|Ingest documents, understand chunking and embedding
+|15 min
+
+|xref:06-query-with-rag.adoc[6. Query with RAG]
+|Ask questions with and without RAG, compare the results
+|15 min
+
+|xref:07-understand-cpu-performance.adoc[7. Understand CPU Inference Performance]
+|Measure latency, throughput, and understand tuning tradeoffs
+|10 min
+
+|xref:08-conclusion.adoc[8. Conclusion]
+|Review what you learned, next steps
+|5 min
+|===
+
+== Prerequisites
+
+* An active Launchpad participant session
+* A terminal (the *Terminal* tab in the showroom)
+* No GPU hardware required -- that is the point
+
+== Getting Started
+
+Launchpad has already authenticated this terminal and scoped it to the namespace assigned to this seat. Confirm the current identity and project:
+
+[source,bash,role="execute",subs="attributes+"]
+----
+oc whoami
+oc project {project_name}
+oc project -q
+----
+
+The final command must show `{project_name}`. The *OpenShift Console* tab uses the same Launchpad participant session and namespace-scoped RBAC. You are ready to start with the fundamentals.
+
+[.next-nav]
+xref:01-cpu-inference-fundamentals.adoc[Next: CPU Inference Fundamentals -->]
+
+== Powered by Intel
+
+AI inference in this lab runs on **Intel** hardware via Launchpad Model-as-a-Service.
+
+[cols="1,2",options="header"]
+|===
+|Component |Details
+
+|**LLM Inference**
+|{maas_model} on {intel_platform} via MaaS -- $0/token
+|===
+
+TIP: This lab is part of the Red Hat + Intel AI Inference Partnership.

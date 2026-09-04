@@ -1,0 +1,19 @@
+name: modules
+version: master
+title: "Serve LLMs on Intel Xeon CPUs"
+start_page: index.adoc
+nav:
+  - modules/ROOT/nav.adoc
+
+asciidoc:
+  attributes:
+    user: '%user%'
+    guid: '%guid%'
+    openshift_api_url: '%openshift_api_url%'
+    openshift_console_url: '%openshift_console_url%'
+    openshift_cluster_ingress_domain: '%openshift_cluster_ingress_domain%'
+    project_name: '%namespace%'
+    maas_endpoint: '%maas_endpoint%'
+    maas_model: '%maas_model%'
+    maas_api_key: '%maas_api_key%'
+    intel_platform: 'Intel Xeon'

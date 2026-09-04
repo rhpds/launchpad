@@ -1,0 +1,68 @@
+= Building an AI Agent — Hands-On Lab
+:navtitle: Welcome
+
+== What You'll Build
+
+In this lab you will build, deploy, and tune an AI agent on OpenShift. The *Red Hat + Intel Solution Architect Agent* takes customer workload requirements, looks up Intel hardware specs and OpenShift capabilities via MCP tools, and generates a joint solution brief.
+
+By the end, you will understand what makes an agent different from a model, and how to deploy one as standard Kubernetes infrastructure.
+
+== Learning Objectives
+
+* Understand the difference between a model (answers questions) and an agent (solves problems)
+* Deploy MCP tools that provide structured data to an agent
+* Deploy a LangGraph agent with a configurable system prompt
+* Test the agent with real customer scenarios
+* Tune agent behavior by swapping models and editing prompts
+
+== Why This Matters for You
+
+As a tech seller, you field workload discovery questions daily. This agent demonstrates sourced product lookup and platform-pattern recommendations. Its output is a conversation starter: validate sizing, availability, security requirements, and product compatibility before presenting a customer design.
+
+IMPORTANT: Use only fictional or sanitized scenarios in this workshop. Do not enter confidential, regulated, export-controlled, or customer-identifying information.
+
+More broadly: this is how enterprise AI gets built. Not one monolithic model, but a model wrapped in tools and orchestration. This pattern applies to any domain.
+
+== What's Pre-Deployed
+
+Your environment has Launchpad-managed shared model inference and an empty namespace. You will deploy everything else.
+
+[cols="2,2,2",options="header"]
+|===
+| Component | What It Is | You Deploy?
+| Launchpad MaaS | Shared CPU inference with an automatically assigned virtual key | No -- pre-deployed
+| Your Namespace | Empty, ready for your agent | Yes -- 3 pods
+|===
+
+== Connect to Your Lab Project
+
+Launchpad has already authenticated this terminal and scoped it to the namespace assigned to this seat. Do not run `oc login` with a shared cluster credential.
+
+[source,bash,role="execute",subs=attributes+]
+----
+oc whoami
+oc project {project_name}
+oc project -q
+----
+
+The final command must show `{project_name}`. The namespace and participant identity change with every seat; always use the values rendered in your current guide. The *OpenShift Console* tab uses the same Launchpad participant session and is restricted by namespace RBAC.
+
+== The Agent Pattern
+
+image::agent-pattern.svg[Red Hat and Intel AI agent pattern showing the customer request flowing through the system prompt and LangGraph workflow to three MCP tools and a grounded solution brief,align=center]
+
+A model answers questions. An *agent* uses a model, instructions, and tools to complete a structured workflow.
+
+== Lab Structure (~45 minutes)
+
+[cols="1,3,1",options="header"]
+|===
+| Module | What You'll Do | Time
+| xref:01-anatomy.adoc[Anatomy of an Agent] | See why a model alone is not enough | ~8 min
+| xref:02-deploy-tools.adoc[Deploy the MCP Tools] | Deploy and test 3 Intel/OpenShift tools | ~12 min
+| xref:03-wire-agent.adoc[Wire the Agent] | Deploy the agent, get your first solution brief | ~15 min
+| xref:04-test-and-tune.adoc[Make It Yours] | Write your own prompt, test with your customer, build your agent card | ~15 min
+|===
+
+[.next-nav]
+xref:01-anatomy.adoc[Start: Module 1 — Anatomy of an Agent →]

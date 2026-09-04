@@ -1,0 +1,19 @@
+name: modules
+title: "Intel Xeon 6 201 — Building an AI Agent"
+version: ~
+nav:
+  - modules/ROOT/nav.adoc
+asciidoc:
+  attributes:
+    experimental: true
+    page-pagination: true
+    showroom-collection-version: v1.6.8
+    guid: "%guid%"
+    user: "%user%"
+    openshift_api_url: "%openshift_api_url%"
+    openshift_console_url: "%openshift_console_url%"
+    openshift_cluster_ingress_domain: "%openshift_cluster_ingress_domain%"
+    litellm_api_endpoint: "%maas_url%"
+    litellm_virtual_key: "%litellm_api_key%"
+    maas_model: "%maas_model%"
+    project_name: "%namespace%"

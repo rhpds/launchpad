@@ -1,0 +1,320 @@
+= Module 5: Build a Multi-Tool Application
+
+_Estimated time: 15 minutes_
+
+In this module you will extend your tool calling application with a third tool, test queries that require multiple chained tool calls, implement error handling, and add logging to trace the model's reasoning. This is where tool calling becomes agentic -- the model plans a sequence of actions to answer a complex question.
+
+== Know: When Tool Calling Becomes Agentic
+
+A single tool call is useful. Multiple tool calls in sequence is where AI becomes _agentic_ -- the model is no longer just answering questions, it is planning and executing a series of actions to solve a problem.
+
+Consider the question: "What is the weather in the city where employee 12345 works?" No single tool can answer this. The model must:
+
+. Recognize that it needs the employee's location first
+. Call `lookup_employee` to get the office city
+. Use that city to call `get_weather`
+. Synthesize both results into a coherent answer
+
+The model was not programmed to do this sequence. It _infers_ the plan from the tool descriptions and the user's question. This emergent planning behavior is what separates tool calling from simple API integration -- and it is the foundation of every AI agent framework.
+
+In this module you will observe this planning behavior firsthand and learn to handle the edge cases that come with it: errors, unexpected tool calls, and the need for auditable traces.
+
+== Add a Third Tool
+
+Create an expanded application with three tools: weather, employee lookup, and inventory check. The interesting part is what happens when a question requires *more than one* tool call:
+
+[source,bash,role="execute"]
+----
+cat > ~/multi_tool_app.py << 'PYEOF'
+import json
+import os
+from openai import OpenAI
+
+client = OpenAI(base_url=os.environ["MODEL_URL"], api_key=os.environ["MODEL_API_KEY"])
+MODEL = os.environ["MODEL_NAME"]
+
+# --- Three Tool Definitions ---
+tools = [
+    {"type": "function", "function": {
+        "name": "get_weather",
+        "description": "Get the current weather for a location. Returns temperature, conditions, and humidity.",
+        "parameters": {"type": "object", "properties": {
+            "location": {"type": "string", "description": "City name"}
+        }, "required": ["location"]}
+    }},
+    {"type": "function", "function": {
+        "name": "lookup_employee",
+        "description": "Look up an employee by ID number. Returns their name, department, title, and office city.",
+        "parameters": {"type": "object", "properties": {
+            "employee_id": {"type": "integer", "description": "The employee ID number"}
+        }, "required": ["employee_id"]}
+    }},
+    {"type": "function", "function": {
+        "name": "check_inventory",
+        "description": "Check inventory levels for a product by name or SKU. Returns stock count and warehouse location.",
+        "parameters": {"type": "object", "properties": {
+            "product": {"type": "string", "description": "Product name or SKU code"}
+        }, "required": ["product"]}
+    }},
+]
+
+# --- Mock Implementations ---
+def get_weather(location: str) -> dict:
+    data = {
+        "Boston": {"temp": 72, "unit": "F", "condition": "partly cloudy", "humidity": 65},
+        "San Francisco": {"temp": 58, "unit": "F", "condition": "foggy", "humidity": 80},
+        "Austin": {"temp": 95, "unit": "F", "condition": "sunny", "humidity": 40},
+    }
+    for city, weather in data.items():
+        if city.lower() in location.lower():
+            return weather
+    return {"temp": 70, "unit": "F", "condition": "clear", "humidity": 50}
+
+def lookup_employee(employee_id: int) -> dict:
+    employees = {
+        12345: {"name": "Alice Johnson", "department": "Engineering", "title": "Staff Engineer", "office": "Boston"},
+        67890: {"name": "Bob Smith", "department": "Sales", "title": "Account Executive", "office": "San Francisco"},
+        11111: {"name": "Carol White", "department": "Operations", "title": "Warehouse Manager", "office": "Austin"},
+    }
+    return employees.get(employee_id, {"error": f"No employee with ID {employee_id}"})
+
+def check_inventory(product: str) -> dict:
+    inventory = {
+        "laptop-15": {"product": "Laptop 15-inch", "in_stock": 42, "warehouse": "Austin"},
+        "monitor-27": {"product": "Monitor 27-inch", "in_stock": 0, "warehouse": "Austin", "restock_date": "3 days"},
+        "keyboard-mx": {"product": "Mechanical Keyboard MX", "in_stock": 185, "warehouse": "Portland"},
+    }
+    return inventory.get(product.lower(), {"error": f"Product '{product}' not found in catalog"})
+
+TOOL_FUNCTIONS = {
+    "get_weather": get_weather,
+    "lookup_employee": lookup_employee,
+    "check_inventory": check_inventory,
+}
+
+# --- Tool Calling Loop with Logging ---
+def run_query(user_message: str):
+    print(f"\n{'='*60}")
+    print(f"USER: {user_message}")
+    print(f"{'='*60}")
+
+    messages = [{"role": "user", "content": user_message}]
+    step = 0
+
+    while step < 10:
+        response = client.chat.completions.create(
+            model=MODEL, messages=messages, tools=tools, tool_choice="auto",
+        )
+        msg = response.choices[0].message
+
+        if not msg.tool_calls:
+            print(f"\nASSISTANT: {msg.content}")
+            return
+
+        messages.append(msg)
+        for tc in msg.tool_calls:
+            fn_name = tc.function.name
+            fn_args = json.loads(tc.function.arguments)
+            step += 1
+            print(f"\n  Step {step}: {fn_name}({json.dumps(fn_args)})")
+
+            # Dispatch with error handling
+            if fn_name not in TOOL_FUNCTIONS:
+                result = {"error": f"Unknown function '{fn_name}'"}
+            else:
+                try:
+                    result = TOOL_FUNCTIONS[fn_name](**fn_args)
+                except Exception as e:
+                    result = {"error": str(e)}
+
+            result_str = json.dumps(result)
+            print(f"         -> {result_str}")
+            messages.append({"role": "tool", "tool_call_id": tc.id, "content": result_str})
+
+# --- Test Queries ---
+# Query 1: Single tool call
+run_query("What is the weather in Boston?")
+
+# Query 2: Single tool call with a different tool
+run_query("Check if we have any laptop-15 units in stock.")
+
+# Query 3: Multi-step -- requires TWO tool calls in sequence
+run_query("What is the weather in the city where employee 12345 works?")
+PYEOF
+----
+
+== Run the Multi-Tool Application
+
+[source,bash,role="execute"]
+----
+python3 ~/multi_tool_app.py
+----
+
+Watch Query 3 carefully. The model must:
+
+1. Call `lookup_employee(12345)` to discover that Alice Johnson works in Boston
+2. Call `get_weather("Boston")` to get the weather there
+3. Synthesize both results into a final answer
+
+This chaining is *emergent behavior*. You did not program the sequence. The model figured out that it needs Alice's office location before it can check the weather. This is the beginning of agentic reasoning.
+
+=== Verify: Multi-Step Chaining
+
+For Query 3 ("What is the weather in the city where employee 12345 works?"), you should see two tool calls in sequence:
+
+----
+  Step 1: lookup_employee({"employee_id": 12345})
+         -> {"name": "Alice Johnson", "department": "Engineering", "title": "Staff Engineer", "office": "Boston"}
+
+  Step 2: get_weather({"location": "Boston"})
+         -> {"temp": 72, "unit": "F", "condition": "partly cloudy", "humidity": 65}
+
+A: The weather in Boston, where Alice Johnson works, is 72°F and partly cloudy...
+----
+
+If the model calls both tools in a single turn (parallel calls) instead of sequentially, that is also valid -- it means the model can handle parallel tool execution. If it only calls one tool and answers with incomplete information, the model may not support multi-step reasoning well.
+
+== Test Error Handling
+
+What happens when a tool returns an error? The model should handle it gracefully:
+
+[source,bash,role="execute"]
+----
+cat > ~/error_test.py << 'PYEOF'
+import json, os
+from openai import OpenAI
+
+client = OpenAI(base_url=os.environ["MODEL_URL"], api_key=os.environ["MODEL_API_KEY"])
+MODEL = os.environ["MODEL_NAME"]
+
+tools = [{"type": "function", "function": {
+    "name": "check_inventory",
+    "description": "Check inventory levels for a product by name or SKU",
+    "parameters": {"type": "object", "properties": {
+        "product": {"type": "string"}
+    }, "required": ["product"]}
+}}]
+
+messages = [{"role": "user", "content": "How many widget-xyz units do we have in stock?"}]
+response = client.chat.completions.create(model=MODEL, messages=messages, tools=tools, tool_choice="auto")
+msg = response.choices[0].message
+
+if msg.tool_calls:
+    tc = msg.tool_calls[0]
+    print(f"Tool call: {tc.function.name}({tc.function.arguments})")
+
+    # Return a structured error
+    error_result = json.dumps({
+        "error": "product_not_found",
+        "message": "No product matching 'widget-xyz' exists in the catalog"
+    })
+    print(f"Error result: {error_result}\n")
+
+    messages.append(msg)
+    messages.append({"role": "tool", "tool_call_id": tc.id, "content": error_result})
+
+    final = client.chat.completions.create(model=MODEL, messages=messages)
+    print(f"Assistant: {final.choices[0].message.content}")
+PYEOF
+----
+
+[source,bash,role="execute"]
+----
+python3 ~/error_test.py
+----
+
+The model should acknowledge the error and tell the user the product was not found -- rather than hallucinating an inventory count. Returning structured errors (not raw exceptions) gives the model the information it needs to respond helpfully.
+
+== Add Trace Logging
+
+In production you need to trace every tool call for debugging and auditing. Add a simple trace logger:
+
+[source,bash,role="execute"]
+----
+cat > ~/traced_query.py << 'PYEOF'
+import json, os
+from datetime import datetime
+from openai import OpenAI
+
+client = OpenAI(base_url=os.environ["MODEL_URL"], api_key=os.environ["MODEL_API_KEY"])
+MODEL = os.environ["MODEL_NAME"]
+
+tools = [
+    {"type": "function", "function": {"name": "get_weather", "description": "Get weather for a city", "parameters": {"type": "object", "properties": {"location": {"type": "string"}}, "required": ["location"]}}},
+    {"type": "function", "function": {"name": "lookup_employee", "description": "Look up employee by ID number", "parameters": {"type": "object", "properties": {"employee_id": {"type": "integer"}}, "required": ["employee_id"]}}},
+]
+
+def get_weather(location):
+    return {"temp": 72, "condition": "sunny"}
+
+def lookup_employee(employee_id):
+    return {"name": "Alice Johnson", "office": "Boston"}
+
+FUNCS = {"get_weather": get_weather, "lookup_employee": lookup_employee}
+
+trace = []
+messages = [{"role": "user", "content": "What is the weather where employee 12345 is located?"}]
+print("Query: What is the weather where employee 12345 is located?\n")
+
+step = 0
+while step < 5:
+    response = client.chat.completions.create(model=MODEL, messages=messages, tools=tools, tool_choice="auto")
+    msg = response.choices[0].message
+    if not msg.tool_calls:
+        print(f"Final answer: {msg.content}\n")
+        break
+    messages.append(msg)
+    for tc in msg.tool_calls:
+        args = json.loads(tc.function.arguments)
+        result = FUNCS.get(tc.function.name, lambda **k: {"error": "unknown"})(**args)
+        entry = {"step": step + 1, "time": datetime.now().isoformat(), "function": tc.function.name, "args": args, "result": result}
+        trace.append(entry)
+        messages.append({"role": "tool", "tool_call_id": tc.id, "content": json.dumps(result)})
+        step += 1
+
+print("--- TRACE LOG ---")
+for entry in trace:
+    print(f"  Step {entry['step']}: {entry['function']}({json.dumps(entry['args'])}) -> {json.dumps(entry['result'])}")
+PYEOF
+----
+
+[source,bash,role="execute"]
+----
+python3 ~/traced_query.py
+----
+
+The trace log shows every tool call in sequence, with timestamps. In production, you would write these to a structured logging system for observability.
+
+== Key Insight
+
+Multi-step tool calling is where agents begin. The model is not just answering questions -- it is *planning a sequence of actions*. "Find employee 12345, get their city, check the weather there" is a three-step plan the model executes through tool calls. Every agent framework builds on this exact pattern.
+
+=== Troubleshooting
+
+[cols="1,2",options="header"]
+|===
+|Symptom |Resolution
+
+|Query 3 only calls one tool
+|The model may not support multi-step reasoning. Try rephrasing: "First find where employee 12345 works, then check the weather there."
+
+|Error handling test returns a hallucinated inventory count
+|The model may be ignoring the error result. Check that the error is returned as structured JSON (`{"error": "..."}`) not as a Python exception string.
+
+|Trace logging shows no tool calls
+|The `tools` array may be empty or malformed. Print it with `print(json.dumps(tools, indent=2))` to verify.
+
+|`TypeError` on function dispatch
+|The model may be sending arguments with wrong types (e.g., string instead of integer for `employee_id`). Add type coercion in the dispatch: `int(fn_args.get("employee_id", 0))`.
+|===
+
+== Checkpoint
+
+At this point you have:
+
+* [x] Built a three-tool application with weather, employee, and inventory functions
+* [x] Tested multi-step chaining where the model calls multiple tools in sequence
+* [x] Implemented error handling that returns structured errors to the model
+* [x] Added trace logging for debugging and auditing tool calls
+
+Proceed to xref:06-advanced-patterns.adoc[Module 6: Advanced Patterns].

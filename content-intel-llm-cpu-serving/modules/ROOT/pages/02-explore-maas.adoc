@@ -1,0 +1,166 @@
+= Explore Model-as-a-Service
+:navtitle: 2. Explore Model-as-a-Service
+
+_Estimated time: 15 minutes_
+
+In this module you will:
+
+* Understand how MaaS delivers CPU inference without cluster-side infrastructure
+* Connect to the MaaS endpoint and verify access
+* List available models and inspect their capabilities
+
+In a traditional self-managed setup, you would create KServe ServingRuntimes and InferenceServices to deploy models on your cluster. With MaaS, the platform team has already done this -- you consume inference as an API.
+
+== How MaaS Works Under the Hood
+
+The MaaS endpoint you are connecting to runs:
+
+[cols="1,2",options="header"]
+|===
+|Component |What It Does
+
+|*vLLM*
+|The inference engine. Runs with `--dtype bfloat16` to target AMX hardware acceleration on {intel_platform} processors.
+
+|*KServe ServingRuntime*
+|Defines the container image, startup flags, and resource limits for vLLM. In a self-managed deployment, you would create this yourself.
+
+|*KServe InferenceService*
+|Deploys the specific model (e.g., {maas_model}) and manages its lifecycle. In a self-managed deployment, you would create this yourself.
+
+|*LiteLLM*
+|A proxy that provides OpenAI-compatible API access, virtual API keys, and usage tracking. This is the layer you interact with.
+|===
+
+The key insight: all of these components exist, but they are managed centrally. Your application code talks to the LiteLLM proxy, which routes requests to the appropriate vLLM instance.
+
+== Set Up Your Environment
+
+Store your MaaS connection details as environment variables:
+
+[source,bash,role="execute",subs="attributes+"]
+----
+export MAAS_ENDPOINT="{maas_endpoint}"
+export MAAS_MODEL="{maas_model}"
+export MAAS_API_KEY="{maas_api_key}"
+----
+
+Verify the variables are set:
+
+[source,bash,role="execute"]
+----
+echo "Endpoint: ${MAAS_ENDPOINT}"
+echo "Model: ${MAAS_MODEL}"
+echo "API Key: ${MAAS_API_KEY:0:8}..."
+----
+
+== List Available Models
+
+The MaaS endpoint exposes an OpenAI-compatible `/v1/models` endpoint. Query it to see what models are available:
+
+[source,bash,role="execute"]
+----
+curl -s "${MAAS_ENDPOINT}/v1/models" \
+  -H "Authorization: Bearer ${MAAS_API_KEY}" | python3 -m json.tool
+----
+
+=== Verify: Models Are Accessible
+
+You should see a JSON response with a `data` array containing one or more model entries. Look for:
+
+* Your model `{maas_model}` listed in the response
+* The `id` field matches the model name you will use in chat completions
+
+If you get a connection error, verify your `MAAS_ENDPOINT` URL. If you get a 401, check your `MAAS_API_KEY`.
+
+== Understand the Architecture Difference
+
+In a *self-managed* deployment, your cluster needs:
+
+----
+Your Cluster:
+  - KServe operator (CRDs: ServingRuntime, InferenceService)
+  - ServingRuntime resource (defines vLLM container + flags)
+  - InferenceService resource (deploys the model)
+  - Model weights (~2-16 GB pulled from registry)
+  - 8-16 CPU cores dedicated to inference
+  - 8-32 GB memory for model weights + KV cache
+----
+
+With *MaaS*, your cluster needs:
+
+----
+Your Cluster:
+  - An API key
+  - Network access to the MaaS endpoint
+  - That's it.
+----
+
+The entire inference stack -- vLLM, KServe, model weights, hardware acceleration -- runs on dedicated {intel_platform} servers managed by the platform team. Your application cluster stays lean.
+
+== Check Model Details
+
+You can query for details about a specific model:
+
+[source,bash,role="execute"]
+----
+curl -s "${MAAS_ENDPOINT}/v1/models" \
+  -H "Authorization: Bearer ${MAAS_API_KEY}" | \
+  python3 -c "
+import sys, json
+data = json.load(sys.stdin)
+for m in data.get('data', []):
+    print(f\"Model: {m['id']}\")
+    print(f\"  Owner: {m.get('owned_by', 'N/A')}\")
+    print(f\"  Object: {m.get('object', 'N/A')}\")
+    print()
+"
+----
+
+== Test Basic Connectivity
+
+Send a minimal request to verify end-to-end connectivity:
+
+[source,bash,role="execute"]
+----
+curl -s "${MAAS_ENDPOINT}/v1/chat/completions" \
+  -H "Authorization: Bearer ${MAAS_API_KEY}" \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"model\": \"${MAAS_MODEL}\",
+    \"messages\": [{\"role\": \"user\", \"content\": \"Say hello in one word.\"}],
+    \"max_tokens\": 10
+  }" | python3 -m json.tool
+----
+
+=== Verify: End-to-End Connectivity
+
+You should see a JSON response with:
+
+* A `choices` array containing a `message` with the model's response
+* A `usage` block showing `prompt_tokens`, `completion_tokens`, and `total_tokens`
+* A `model` field confirming which model handled the request
+
+If this works, you have a live connection to CPU inference on {intel_platform} -- no GPUs, no local model deployment, no infrastructure to manage.
+
+=== Troubleshooting
+
+[cols="1,2",options="header"]
+|===
+|Symptom |Resolution
+
+|`Connection refused` or `Connection timed out`
+|The MaaS endpoint may not be reachable from your cluster. Check network connectivity: `curl -s -o /dev/null -w "%\{http_code\}" ${MAAS_ENDPOINT}/v1/models -H "Authorization: Bearer ${MAAS_API_KEY}"`
+
+|`401 Unauthorized`
+|Your API key is invalid or expired. Verify `MAAS_API_KEY` is set correctly. LiteLLM virtual keys have a 7-day TTL.
+
+|`404 Not Found`
+|The endpoint URL may be incorrect. Check that `MAAS_ENDPOINT` does not have a trailing slash or extra path component.
+
+|Empty or null response
+|The model may be temporarily unavailable. Wait 30 seconds and retry.
+|===
+
+[.next-nav]
+xref:03-query-the-model.adoc[Next: Query the Model API -->]

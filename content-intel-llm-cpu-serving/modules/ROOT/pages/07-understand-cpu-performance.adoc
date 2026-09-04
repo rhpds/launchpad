@@ -1,0 +1,145 @@
+= Understand CPU Inference Performance
+:navtitle: 7. Understand CPU Inference Performance
+
+_Estimated time: 10 minutes_
+
+In this module you will:
+
+* Measure real-world latency and throughput from the MaaS endpoint
+* Understand the performance characteristics of CPU inference
+* Learn when CPU inference is sufficient and when to scale
+
+You have a working RAG system. Now you will measure its performance and understand the tradeoffs that govern CPU-based AI serving.
+
+== Measure Latency and Throughput
+
+Run a series of requests and measure response times:
+
+[source,bash,role="execute"]
+----
+echo "=== Latency Test: 3 sequential requests ==="
+for i in 1 2 3; do
+  echo -n "Request $i: "
+  START=$(date +%s%N)
+  RESPONSE=$(curl -s "${MAAS_ENDPOINT}/v1/chat/completions" \
+    -H "Authorization: Bearer ${MAAS_API_KEY}" \
+    -H "Content-Type: application/json" \
+    -d "{
+      \"model\": \"${MAAS_MODEL}\",
+      \"messages\": [{\"role\": \"user\", \"content\": \"List three benefits of CPU inference for enterprise AI. Be concise.\"}],
+      \"max_tokens\": 100,
+      \"temperature\": 0.0
+    }")
+  END=$(date +%s%N)
+  ELAPSED=$(( (END - START) / 1000000 ))
+  TOKENS=$(echo "$RESPONSE" | python3 -c "import sys,json; u=json.load(sys.stdin)['usage']; print(f\"{u['completion_tokens']} tokens\")")
+  echo "${ELAPSED}ms -- ${TOKENS}"
+done
+----
+
+== Understand the Numbers
+
+CPU inference performance follows predictable patterns:
+
+[cols="1,2,2",options="header"]
+|===
+|Metric |Typical Range |What It Means
+
+|*Time to First Token*
+|1-3 seconds
+|Time to process the prompt (input tokens). Scales with prompt length.
+
+|*Generation Speed*
+|10-30 tokens/second
+|How fast the model produces output. Roughly constant regardless of prompt length.
+
+|*Total Response Time*
+|3-15 seconds (for 100-200 tokens)
+|First token latency + generation time. Acceptable for Q&A, not for real-time chat at scale.
+|===
+
+== Measure the Effect of Output Length
+
+See how response time scales with the number of tokens requested:
+
+[source,bash,role="execute"]
+----
+for max_tok in 50 100 200; do
+  echo -n "max_tokens=${max_tok}: "
+  START=$(date +%s%N)
+  RESPONSE=$(curl -s "${MAAS_ENDPOINT}/v1/chat/completions" \
+    -H "Authorization: Bearer ${MAAS_API_KEY}" \
+    -H "Content-Type: application/json" \
+    -d "{
+      \"model\": \"${MAAS_MODEL}\",
+      \"messages\": [{\"role\": \"user\", \"content\": \"Explain the benefits of remote work policies in financial services.\"}],
+      \"max_tokens\": ${max_tok},
+      \"temperature\": 0.0
+    }")
+  END=$(date +%s%N)
+  ELAPSED=$(( (END - START) / 1000000 ))
+  ACTUAL=$(echo "$RESPONSE" | python3 -c "import sys,json; print(json.load(sys.stdin)['usage']['completion_tokens'])")
+  echo "${ELAPSED}ms -- ${ACTUAL} tokens generated"
+done
+----
+
+Notice the relationship: longer outputs take proportionally longer. The time-to-first-token stays roughly constant -- it is the generation phase that scales linearly.
+
+== What Makes CPU Inference Fast (or Slow)
+
+The MaaS infrastructure running your requests uses these optimizations:
+
+[cols="1,2",options="header"]
+|===
+|Optimization |Impact
+
+|*AMX (Advanced Matrix Extensions)*
+|Hardware-accelerated BF16 matrix multiply on {intel_platform} 4th Gen+. Up to 8x faster than baseline FP32.
+
+|*BF16 dtype*
+|vLLM runs with `--dtype bfloat16`, targeting the AMX code path. Same model quality, half the memory bandwidth.
+
+|*KV Cache*
+|Caches intermediate computation across tokens. Reusing the cache makes each subsequent token cheaper than the first.
+
+|*Model size*
+|Smaller models (2-8B parameters) fit in CPU cache hierarchy. Memory bandwidth is the bottleneck -- smaller models move less data.
+|===
+
+== When CPU Inference Is Sufficient
+
+Based on what you measured:
+
+[cols="1,2",options="header"]
+|===
+|Use Case |CPU Inference Verdict
+
+|*HR assistant for a team of 20*
+|Sufficient. Low concurrency, short responses, cost-sensitive.
+
+|*Document Q&A in an internal portal*
+|Sufficient. Users expect seconds, not milliseconds.
+
+|*Batch classification of support tickets*
+|Sufficient. Throughput matters more than latency.
+
+|*Real-time customer chat with 1000 concurrent users*
+|Not sufficient. Need GPU for sub-second latency at scale.
+
+|*Image analysis or multimodal tasks*
+|Not sufficient. Vision models need GPU acceleration.
+|===
+
+== The MaaS Advantage
+
+With MaaS, the performance tuning is handled for you:
+
+* *Model placement* -- the platform team optimizes which models run on which hardware
+* *Scaling* -- the managed fleet scales independently of your application
+* *Warm cache* -- models stay loaded and warm. No 5-minute cold start.
+* *Shared service economics* -- CPU inference on {intel_platform} is provided by the Launchpad MaaS platform instead of a model server in every seat
+
+Your application code does not need to know about AMX, BF16, KV caches, or vLLM configuration. You just call the API.
+
+[.next-nav]
+xref:08-conclusion.adoc[Next: Conclusion -->]

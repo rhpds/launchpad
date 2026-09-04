@@ -1,0 +1,279 @@
+= Module 4: Build the Tool Calling Loop
+
+_Estimated time: 20 minutes_
+
+In this module you will automate the 6-step protocol from Module 3 in Python. You will write a dispatch loop that sends requests, detects tool calls, executes the right function, returns results, and repeats until the model gives a final answer. This is the pattern used in every production tool calling application.
+
+== Know: From Manual Steps to Production Code
+
+Every production tool calling system -- from LangChain agents to custom enterprise assistants -- automates the six-step protocol you executed by hand in Module 3. The libraries differ, but the pattern underneath is always the same: send, check, dispatch, collect, return, repeat.
+
+Writing this loop yourself first (before reaching for a framework) gives you two advantages:
+
+* _Debugging power_ -- when a framework's agent fails silently, you can drop down to the raw loop and see exactly where the protocol breaks
+* _Architecture control_ -- you decide the guard rails, the error handling, and the dispatch logic. Frameworks make opinionated choices here that may not fit your requirements.
+
+In this module you will write approximately 100 lines of Python that replicate what frameworks like LangChain do internally. The code is intentionally simple so you can see the pattern clearly.
+
+== The Dispatch Pattern
+
+In Module 3 you ran each step by hand. A real application automates the cycle:
+
+1. Send the user's message with tool definitions
+2. Check if the response contains `tool_calls`
+3. If yes: parse the function name and arguments, dispatch to the right function, collect results
+4. Append tool results to the message history
+5. Send back to the model for the next step
+6. If no tool calls: return the text response
+
+The loop repeats because the model may need multiple tool calls before it can answer. The key data structure is the *message history* -- an ever-growing list that contains the full conversation including tool calls and results.
+
+== Define the Tools
+
+Create the Python script. Start with the tool definitions and mock implementations:
+
+[source,bash,role="execute"]
+----
+cat > ~/tool_loop.py << 'PYEOF'
+import json
+import os
+from openai import OpenAI
+
+# --- Configuration ---
+client = OpenAI(
+    base_url=os.environ["MODEL_URL"],
+    api_key=os.environ["MODEL_API_KEY"],
+)
+MODEL = os.environ["MODEL_NAME"]
+
+# --- Tool Definitions (sent to the model) ---
+tools = [
+    {
+        "type": "function",
+        "function": {
+            "name": "get_weather",
+            "description": "Get the current weather for a location. Use this when the user asks about weather, temperature, or conditions in a city.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "location": {"type": "string", "description": "City name, e.g. Boston, Paris, Tokyo"},
+                },
+                "required": ["location"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "lookup_employee",
+            "description": "Look up an employee by name and return their department, title, and office location. Use this when the user asks about a specific person.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "name": {"type": "string", "description": "Employee full name"},
+                },
+                "required": ["name"],
+            },
+        },
+    },
+]
+
+# --- Mock Tool Implementations (your code runs these) ---
+def get_weather(location: str) -> dict:
+    """Simulates a weather API call."""
+    data = {
+        "Boston": {"temp": 72, "unit": "F", "condition": "partly cloudy"},
+        "Paris": {"temp": 22, "unit": "C", "condition": "sunny"},
+        "Tokyo": {"temp": 28, "unit": "C", "condition": "humid"},
+    }
+    # Try exact match, then check if location contains a known city
+    for city, weather in data.items():
+        if city.lower() in location.lower():
+            return weather
+    return {"temp": 20, "unit": "C", "condition": "unknown location"}
+
+def lookup_employee(name: str) -> dict:
+    """Simulates a database query."""
+    employees = {
+        "Alice Johnson": {"department": "Engineering", "title": "Staff Engineer", "office": "Boston"},
+        "Bob Smith": {"department": "Sales", "title": "Account Executive", "office": "Tokyo"},
+        "Carol White": {"department": "HR", "title": "Benefits Coordinator", "office": "Paris"},
+    }
+    return employees.get(name, {"error": f"No employee named '{name}' found"})
+
+# --- Dispatch Table ---
+# Maps function names to Python functions
+TOOL_FUNCTIONS = {
+    "get_weather": get_weather,
+    "lookup_employee": lookup_employee,
+}
+
+# --- The Tool Calling Loop ---
+def run_query(user_message: str):
+    print(f"\n{'='*60}")
+    print(f"USER: {user_message}")
+    print(f"{'='*60}")
+
+    messages = [{"role": "user", "content": user_message}]
+    iteration = 0
+
+    while iteration < 5:  # Guard rail: max 5 iterations
+        # Step 1: Send request with tools
+        response = client.chat.completions.create(
+            model=MODEL,
+            messages=messages,
+            tools=tools,
+            tool_choice="auto",
+        )
+        msg = response.choices[0].message
+
+        # Step 2: Check for tool calls
+        if not msg.tool_calls:
+            # No tool calls -- this is the final answer
+            print(f"\nASSISTANT: {msg.content}")
+            return msg.content
+
+        # Step 3: Process each tool call
+        messages.append(msg)  # Add assistant's tool call to history
+
+        for tc in msg.tool_calls:
+            fn_name = tc.function.name
+            fn_args = json.loads(tc.function.arguments)
+            print(f"\n  [TOOL CALL] {fn_name}({json.dumps(fn_args)})")
+
+            # Step 4: Dispatch to the right function
+            if fn_name in TOOL_FUNCTIONS:
+                result = TOOL_FUNCTIONS[fn_name](**fn_args)
+            else:
+                result = {"error": f"Unknown function: {fn_name}"}
+
+            result_str = json.dumps(result)
+            print(f"  [RESULT]    {result_str}")
+
+            # Step 5: Append tool result to message history
+            messages.append({
+                "role": "tool",
+                "tool_call_id": tc.id,
+                "content": result_str,
+            })
+
+        iteration += 1
+        # Loop back to Step 1 -- send updated history to model
+
+    print("\n  [WARNING] Max iterations reached")
+    return None
+
+# --- Run Three Queries ---
+run_query("What is the weather in Paris?")
+run_query("Look up Alice Johnson and tell me her role.")
+run_query("What is the capital of Japan?")
+PYEOF
+----
+
+== Run the Application
+
+Execute the script:
+
+[source,bash,role="execute"]
+----
+python3 ~/tool_loop.py
+----
+
+Watch the output for each query:
+
+* *Weather query* -- The model calls `get_weather` with "Paris", gets the result, and responds with temperature and conditions
+* *Employee query* -- The model calls `lookup_employee` with "Alice Johnson" and incorporates her department and title
+* *Capital query* -- The model answers directly without calling any tool. It already knows this.
+
+The third query is important: the model correctly decides that no tool is needed. The `auto` tool choice means the model uses tools only when they add value.
+
+=== Verify: All Three Queries Succeed
+
+Expected output pattern:
+
+----
+============================================================
+USER: What is the weather in Paris?
+============================================================
+
+  [TOOL CALL] get_weather({"location": "Paris"})
+  [RESULT]    {"temp": 22, "unit": "C", "condition": "sunny"}
+
+A: The weather in Paris is currently 22°C and sunny.
+
+============================================================
+USER: Look up Alice Johnson and tell me her role.
+============================================================
+
+  [TOOL CALL] lookup_employee({"name": "Alice Johnson"})
+  [RESULT]    {"department": "Engineering", "title": "Staff Engineer", "office": "Boston"}
+
+A: Alice Johnson is a Staff Engineer in the Engineering department...
+
+============================================================
+USER: What is the capital of Japan?
+============================================================
+
+A: The capital of Japan is Tokyo.
+----
+
+The third query is the critical test: the model should answer directly with no tool call. If it calls `get_weather` or `lookup_employee` for this question, the tool descriptions may need refinement.
+
+== Understand the Code
+
+Three things make this loop work:
+
+=== 1. The Message History
+
+The `messages` list grows with each step. After a tool call, it contains: the user message, the assistant's tool call, and the tool result. The model sees the full history on each request, which is how it knows what tools have already been called.
+
+=== 2. The Dispatch Table
+
+The `TOOL_FUNCTIONS` dictionary maps function names (strings from the model) to actual Python functions. This is the bridge between the model's decision and your code's execution.
+
+=== 3. The Guard Rail
+
+The `while iteration < 5` limit prevents infinite loops. If the model keeps requesting tool calls without reaching a final answer, the loop stops. This is a basic but essential safety measure.
+
+== The Key Insight
+
+The tool calling loop is simple. The hard part is *writing good tool descriptions*. The `description` field in each tool definition is what the model reads to decide when to call each tool. Compare:
+
+* Bad: `"description": "Gets weather"` -- Too vague. When should the model use it?
+* Good: `"description": "Get the current weather for a location. Use this when the user asks about weather, temperature, or conditions in a city."` -- Clear trigger conditions.
+
+The description is an instruction to the model. Write it like you are telling a colleague when to use this function.
+
+=== Troubleshooting
+
+[cols="1,2",options="header"]
+|===
+|Symptom |Resolution
+
+|`ModuleNotFoundError: No module named 'openai'`
+|The OpenAI library was not installed. Run `pip install openai` from Module 2.
+
+|`KeyError: 'MODEL_URL'`
+|Environment variables are not set. Re-run the export commands from Module 2.
+
+|Model calls tools for every query (never responds directly)
+|The `tool_choice` may be set to `"required"` instead of `"auto"`. Check the script.
+
+|Model enters infinite loop (hits max iterations)
+|The model may be calling the same tool repeatedly. Check the tool descriptions for ambiguity. Also verify the tool result is being appended correctly to the message history.
+
+|JSON decode error on `tc.function.arguments`
+|The model may have returned malformed JSON in the arguments. This can happen with smaller models. Try a different query or a larger model.
+|===
+
+== Checkpoint
+
+At this point you have:
+
+* [x] Written a Python application with two tool definitions
+* [x] Implemented the automated tool calling loop with dispatch
+* [x] Executed three queries and observed correct tool selection
+* [x] Verified the model skips tools when they are not needed
+* [x] Understood the role of message history, dispatch tables, and guard rails
+
+Proceed to xref:05-multi-tool-app.adoc[Module 5: Build a Multi-Tool Application].

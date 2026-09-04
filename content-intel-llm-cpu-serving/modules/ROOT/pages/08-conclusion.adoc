@@ -1,0 +1,94 @@
+= Conclusion
+:navtitle: 8. Conclusion
+
+_Congratulations._ You built a RAG-powered HR assistant using CPU inference via Model-as-a-Service.
+
+== What You Built
+
+[cols="1,2,2",options="header"]
+|===
+|Layer |What You Did |How
+
+|*MaaS Connection*
+|Connected to a managed LLM endpoint running on {intel_platform} CPUs
+|OpenAI-compatible API with LiteLLM virtual keys
+
+|*API Exploration*
+|Mastered the chat completions API -- system prompts, temperature, token management
+|curl requests with different prompting strategies
+
+|*RAG Frontend*
+|Deployed AnythingLLM wired to MaaS, with native embeddings and LanceDB
+|Created the Secret, Deployment, Service, and Route on OpenShift
+
+|*Document Pipeline*
+|Loaded, chunked, embedded, and stored HR documents in the vector store
+|Used the AnythingLLM API to ingest and embed documents
+
+|*RAG vs Direct*
+|Proved that retrieved context produces grounded, verifiable answers
+|Compared RAG queries through AnythingLLM with direct MaaS queries
+
+|*Performance*
+|Measured real-world CPU inference latency and understood the tradeoffs
+|Timed sequential requests and analyzed token throughput
+|===
+
+== The Key Insights
+
+* *CPU inference is viable for enterprise AI.* {maas_model} runs on standard {intel_platform} servers via MaaS. For a team-sized HR assistant, this is all you need -- no GPU.
+* *MaaS eliminates infrastructure complexity.* No KServe operators, no model downloads, no GPU procurement. Your cluster stays lean; inference happens on managed hardware.
+* *RAG does not make the model smarter -- it gives the model better information.* The same model gives materially different answers with and without retrieved context.
+* *The OpenAI-compatible API is universal.* The same curl commands and client libraries work with MaaS, local vLLM, or any other provider. Your application code is portable.
+* *$0/token on {intel_platform}.* CPU inference via MaaS has no per-token cost. The economics change the calculus for when to build vs buy AI capabilities.
+
+== Architecture Recap
+
+----
+User
+  |
+  v
+AnythingLLM (RAG workbench)
+  |                    \
+  | chat completions    \ vector retrieval
+  v                      v
+MaaS / LiteLLM         LanceDB
+({maas_model})          (embedded chunks)
+  |
+  v
+Intel Xeon (AMX / AVX-512)
+----
+
+== Next Steps
+
+Now that you understand how CPU inference and RAG work together, consider:
+
+* *Add your own documents* -- upload your organization's actual HR policies, handbooks, or regulatory documents into AnythingLLM
+* *Try different models* -- the MaaS platform offers multiple CPU-optimized models. Experiment with different sizes to see the quality-latency tradeoff.
+* *Build an application* -- use the MaaS endpoint from a Python or Node.js application instead of curl. The OpenAI client libraries work directly.
+* *Explore the Intel Xeon 6 201 lab* -- build an AI agent with LangGraph, MCP tools, and MaaS inference
+
+== Cleanup
+
+Remove the resources you created:
+
+[source,bash,role="execute",subs="attributes+"]
+----
+oc delete deployment anythingllm -n {project_name}
+oc delete svc anythingllm -n {project_name}
+oc delete route anythingllm -n {project_name}
+oc delete secret anythingllm-config -n {project_name}
+----
+
+== Resources
+
+* Launchpad source: https://github.com/rhpds/launchpad[github.com/rhpds/launchpad^]
+* Red Hat OpenShift AI: https://www.redhat.com/en/technologies/cloud-computing/openshift/openshift-ai[RHOAI docs^]
+* vLLM documentation: https://docs.vllm.ai[vLLM docs^]
+* AnythingLLM: https://anythingllm.com[AnythingLLM docs^]
+
+== Powered By
+
+*Red Hat Model-as-a-Service* running on *{intel_platform}* processors.
+
+All inference workloads in this lab were served on {intel_platform} via MaaS, demonstrating that enterprise AI does not require dedicated GPU hardware or complex infrastructure.

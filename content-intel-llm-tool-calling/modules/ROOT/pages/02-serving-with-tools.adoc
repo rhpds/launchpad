@@ -1,0 +1,129 @@
+= Module 2: Connect to a Tool-Calling Model
+
+_Estimated time: 15 minutes_
+
+In this module you will access the OpenShift cluster, learn how vLLM enables tool calling at the serving layer, connect to the pre-hosted model via Model as a Service (MaaS), and verify it is ready. You will understand *how* the serving layer enables tool calling before you use it.
+
+== See: Why the Serving Layer Matters for Tool Calling
+
+Tool calling is not just a prompt engineering trick -- it requires coordination between the model and the serving layer. Three things must align:
+
+* *Model training* -- the model must have been trained on tool calling examples so it knows how to produce structured `tool_calls` JSON instead of plain text
+* *Server configuration* -- the vLLM server must be told to parse tool call output from the model's specific format (Granite, Llama, and Hermes each format tool calls differently)
+* *Chat template* -- a Jinja2 template wraps tool definitions in special tokens so the model recognizes them as available functions
+
+If any of these three pieces is missing, tool calling silently fails -- the model responds with text instead of structured tool calls, and you have no error message to debug.
+
+== Learn: The Critical vLLM Flags
+
+When serving a tool-calling model with vLLM, three flags enable the capability:
+
+[cols="2,3"]
+|===
+| Flag | Purpose
+
+| `--enable-auto-tool-choice`
+| Lets the model autonomously decide when to call a tool versus responding with text. Without this flag, the model ignores tool definitions entirely.
+
+| `--tool-call-parser granite`
+| Tells vLLM how to parse the model's tool call output. Different model families format tool calls differently. Granite uses a specific token format; Llama uses `llama3_json`.
+
+| `--chat-template`
+| Points to a Jinja2 template that formats tool definitions for the model. The template wraps tools in role markers like `<\|start_of_role\|>available_tools<\|end_of_role\|>` so the model recognizes them.
+|===
+
+The key insight: *tool calling is a model capability enabled by the serving layer*. The model must be trained for tool calling, and the server must be configured to parse its output format. Neither alone is sufficient.
+
+In this lab, Launchpad provides a pre-hosted model via MaaS (Model as a Service). The serving endpoint is already running on Intel Xeon hardware with tool calling enabled -- so you can focus on building the tool calling application rather than managing infrastructure.
+
+== Do: Access the Cluster
+
+Open the OpenShift Console using the tab in the right panel, or navigate to:
+
+{openshift_console_url}
+
+Launchpad has already authenticated this terminal and scoped it to the namespace assigned to this seat. Do not run `oc login` with a shared cluster credential. Confirm the current identity and project:
+
+[source,bash,role="execute",subs="attributes+"]
+----
+oc whoami
+oc project {project_name}
+oc project -q
+----
+
+The final command must show `{project_name}`. The *OpenShift Console* tab uses the same Launchpad participant session and is restricted by namespace RBAC.
+
+== Do: Set Up Environment Variables
+
+Set the variables that the remaining modules will use:
+
+[source,bash,role="execute",subs="attributes+"]
+----
+export PROJECT={project_name}
+export MODEL_URL={maas_api_url}
+export MODEL_NAME={maas_model}
+export MODEL_API_KEY={maas_api_key}
+echo "Project: $\{PROJECT\}"
+echo "Model URL: $\{MODEL_URL\}"
+echo "Model Name: $\{MODEL_NAME\}"
+----
+
+The MaaS endpoint serves {maas_model} on Intel Xeon 6 hardware with tool calling support already enabled. All inference in this lab runs through this endpoint -- $0 per token, no GPU required.
+
+Install the Python OpenAI client library (you will need it in later modules):
+
+[source,bash,role="execute"]
+----
+pip install --quiet openai
+----
+
+== Do: Verify the Model
+
+List available models:
+
+[source,bash,role="execute"]
+----
+curl -s $\{MODEL_URL\}/models \
+  -H "Authorization: Bearer $\{MODEL_API_KEY\}" | python3 -m json.tool
+----
+
+You should see your model listed in the JSON response.
+
+Send a basic chat completion (no tools) to confirm the model is healthy:
+
+[source,bash,role="execute"]
+----
+curl -s $\{MODEL_URL\}/chat/completions \
+  -H "Authorization: Bearer $\{MODEL_API_KEY\}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "'"$\{MODEL_NAME\}"'",
+    "messages": [
+      {"role": "user", "content": "What is function calling in AI? Answer in two sentences."}
+    ],
+    "max_tokens": 150
+  }' | python3 -m json.tool
+----
+
+You should receive a natural language response. This confirms the endpoint is healthy and ready for tool calling in the next module.
+
+=== Verify: Model is Ready for Tool Calling
+
+You should see:
+
+* The `/models` endpoint returns a JSON object with your model name in the `data` array
+* The chat completion returns a `choices` array with a natural language response in `message.content`
+* The response includes a `usage` block with token counts
+
+If the `/models` endpoint returns an empty list or connection error, double-check your `MODEL_URL` variable with `echo $\{MODEL_URL\}`.
+
+== Checkpoint
+
+At this point you have:
+
+* [x] Logged into the OpenShift cluster and set up environment variables
+* [x] Understood the three critical vLLM flags that enable tool calling
+* [x] Connected to the MaaS-hosted model endpoint
+* [x] Verified the model is responding to basic requests
+
+Proceed to xref:03-anatomy-of-tool-call.adoc[Module 3: Anatomy of a Tool Call].

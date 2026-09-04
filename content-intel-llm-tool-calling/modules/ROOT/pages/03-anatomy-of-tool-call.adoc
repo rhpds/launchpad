@@ -1,0 +1,275 @@
+= Module 3: Anatomy of a Tool Call
+
+_Estimated time: 20 minutes_
+
+In this module you will execute the complete 6-step tool calling protocol by hand using `curl`. You will define a tool, send it to the model, parse the response, execute a mock function, return the result, and get a final answer. Every step is manual so you understand exactly what happens at the protocol level.
+
+== Know: Why Execute the Protocol by Hand?
+
+In this module you will do something that seems tedious: execute the entire tool calling protocol manually, step by step, using `curl` commands. Every production system automates this with libraries like the OpenAI Python SDK. So why do it by hand?
+
+Because when tool calling breaks in production -- and it will -- you need to know exactly where in the protocol the failure happened. Was it the tool definition? The model's response format? The result parsing? The message history construction?
+
+Developers who learned tool calling through a framework often cannot debug it because they never saw the raw protocol. By the end of this module, you will be able to reconstruct the entire flow from memory. That understanding is permanent and framework-independent.
+
+== Step 1: Define a Tool
+
+A tool definition tells the model what functions are available, what they do, and what arguments they accept. Create a request file with a `get_weather` tool:
+
+[source,bash,role="execute"]
+----
+cat > ~/tool_request.json << 'ENDJSON'
+{
+  "model": "MODEL_PLACEHOLDER",
+  "messages": [
+    {"role": "user", "content": "What is the weather like in Paris today?"}
+  ],
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "get_weather",
+        "description": "Get the current weather for a city",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The city name, e.g. Paris, London, Tokyo"
+            },
+            "unit": {
+              "type": "string",
+              "enum": ["celsius", "fahrenheit"],
+              "description": "Temperature unit, defaults to celsius"
+            }
+          },
+          "required": ["location"]
+        }
+      }
+    }
+  ],
+  "tool_choice": "auto"
+}
+ENDJSON
+----
+
+Substitute your model name into the request:
+
+[source,bash,role="execute"]
+----
+sed -i "s/MODEL_PLACEHOLDER/$\{MODEL_NAME\}/" ~/tool_request.json
+cat ~/tool_request.json | python3 -m json.tool
+----
+
+Examine the structure:
+
+* `tools` -- An array of tool definitions sent alongside the user message
+* `tool_choice: "auto"` -- The model decides whether to call a tool or respond directly
+* `parameters` -- JSON Schema describing the function's expected arguments
+* `description` -- The model reads this to decide *when* to use the tool
+
+== Step 2: Send the Request
+
+Send the request to the model endpoint:
+
+[source,bash,role="execute"]
+----
+curl -s $\{MODEL_URL\}/chat/completions \
+  -H "Authorization: Bearer $\{MODEL_API_KEY\}" \
+  -H "Content-Type: application/json" \
+  -d @~/tool_request.json > ~/tool_response.json
+cat ~/tool_response.json | python3 -m json.tool
+----
+
+Look at the response carefully. Instead of a regular `content` field with text, the assistant's message contains a `tool_calls` array. The model is saying: "I need to call the `get_weather` function with these arguments before I can answer."
+
+== Step 3: Parse the Tool Call
+
+Extract the tool call details from the response:
+
+[source,bash,role="execute"]
+----
+TOOL_CALL_ID=$(python3 -c "
+import json
+r = json.load(open('$\{HOME\}/tool_response.json'))
+tc = r['choices'][0]['message']['tool_calls'][0]
+print(tc['id'])
+")
+FUNCTION_NAME=$(python3 -c "
+import json
+r = json.load(open('$\{HOME\}/tool_response.json'))
+tc = r['choices'][0]['message']['tool_calls'][0]
+print(tc['function']['name'])
+")
+FUNCTION_ARGS=$(python3 -c "
+import json
+r = json.load(open('$\{HOME\}/tool_response.json'))
+tc = r['choices'][0]['message']['tool_calls'][0]
+print(tc['function']['arguments'])
+")
+echo "Tool Call ID: $\{TOOL_CALL_ID\}"
+echo "Function: $\{FUNCTION_NAME\}"
+echo "Arguments: $\{FUNCTION_ARGS\}"
+----
+
+Three pieces of data come back from the model:
+
+* *Tool Call ID* -- A unique identifier for this specific call (used to match results later)
+* *Function Name* -- Which tool the model wants to invoke
+* *Arguments* -- A JSON string with the parameters the model extracted from the user's question
+
+The model parsed "Paris" from the user's question and structured it as a `location` argument. This is the core value of tool calling: *the model translates natural language into structured function calls*.
+
+=== Verify: Tool Call Parsed Correctly
+
+You should see output like:
+
+----
+Tool Call ID: call_abc123...
+Function: get_weather
+Arguments: {"location": "Paris"}
+----
+
+The function name should be `get_weather` and the arguments should contain `"location": "Paris"` (the model extracted this from the user's question). If you see an error about `tool_calls` being `None`, the model responded with text instead of a tool call -- this means the tool calling flags may not be configured correctly on the server (revisit Module 2).
+
+== Step 4: Execute the Tool
+
+In production, you would call an actual weather API here. For this lab, simulate the tool execution with mock data:
+
+[source,bash,role="execute"]
+----
+TOOL_RESULT='{"temperature": 22, "unit": "celsius", "condition": "sunny", "humidity": 45}'
+echo "Mock tool result: $\{TOOL_RESULT\}"
+----
+
+This is where *your code* runs. The model decided what to call. You decide how to execute it. This separation is what makes tool calling safe -- the model never runs code directly.
+
+== Step 5: Return the Result to the Model
+
+Send the complete conversation back to the model, including the original message, the assistant's tool call, and the tool result:
+
+[source,bash,role="execute"]
+----
+ASSISTANT_MSG=$(python3 -c "
+import json
+r = json.load(open('$\{HOME\}/tool_response.json'))
+print(json.dumps(r['choices'][0]['message']))
+")
+
+curl -s $\{MODEL_URL\}/chat/completions \
+  -H "Authorization: Bearer $\{MODEL_API_KEY\}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "'"$\{MODEL_NAME\}"'",
+    "messages": [
+      {"role": "user", "content": "What is the weather like in Paris today?"},
+      '"$\{ASSISTANT_MSG\}"',
+      {
+        "role": "tool",
+        "tool_call_id": "'"$\{TOOL_CALL_ID\}"'",
+        "content": "'"$\{TOOL_RESULT\}"'"
+      }
+    ]
+  }' | python3 -m json.tool
+----
+
+Notice the `role: "tool"` message. This is how you return function results to the model. The `tool_call_id` links this result to the specific tool call the model made.
+
+== Step 6: Read the Final Answer
+
+The model now generates a natural language response using the tool result. Instead of guessing the weather, it uses the actual data you provided: 22 degrees Celsius, sunny, 45% humidity.
+
+This is the complete protocol. Six steps, executed manually, with full visibility into every piece of data flowing between your code and the model.
+
+=== Verify: Complete Protocol
+
+The final response should:
+
+* Contain natural language (not JSON or a tool call)
+* Reference the specific data from your mock tool result (22 degrees, sunny, 45% humidity)
+* NOT hallucinate additional weather details that were not in the tool result
+
+If the model ignores the tool result and makes up weather data, the `tool_call_id` in Step 5 may not match. The model uses this ID to link results to requests.
+
+== The Complete Message Flow
+
+Here is the sequence you just executed:
+
+[cols="1,1,3"]
+|===
+| Step | Role | Content
+
+| 1 | `user` | "What is the weather like in Paris today?"
+| 2 | `assistant` | `tool_calls: [{name: "get_weather", arguments: {location: "Paris"}}]`
+| 3 | `tool` | `{temperature: 22, condition: "sunny", humidity: 45}`
+| 4 | `assistant` | "The weather in Paris is currently 22C and sunny..."
+|===
+
+Every tool calling implementation -- whether you use Python, TypeScript, or an agent framework -- follows this exact sequence. The libraries automate it, but the protocol underneath is always these six steps.
+
+== Try a Non-Tool Question
+
+Send a question that does not require a tool. The model should respond with text, not a tool call:
+
+[source,bash,role="execute"]
+----
+curl -s $\{MODEL_URL\}/chat/completions \
+  -H "Authorization: Bearer $\{MODEL_API_KEY\}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "'"$\{MODEL_NAME\}"'",
+    "messages": [
+      {"role": "user", "content": "What is the capital of France?"}
+    ],
+    "tools": [
+      {"type": "function", "function": {
+        "name": "get_weather",
+        "description": "Get the current weather for a city",
+        "parameters": {"type": "object", "properties": {
+          "location": {"type": "string"}
+        }, "required": ["location"]}
+      }}
+    ],
+    "tool_choice": "auto"
+  }' | python3 -m json.tool
+----
+
+The model should answer directly with "Paris" -- no tool call needed. With `tool_choice: "auto"`, the model decides when a tool is necessary. This is the intelligence in tool calling: the model knows the difference between "I need data" and "I already know the answer."
+
+=== Verify: Tool Choice Auto
+
+The response should contain a `message.content` field with text (not a `tool_calls` array). The model correctly determined that answering "What is the capital of France?" does not require checking the weather.
+
+If the model still calls `get_weather` for this question, the tool `description` may be too broad. A good description includes clear trigger conditions so the model knows when to use the tool and when to respond directly.
+
+=== Troubleshooting
+
+[cols="1,2",options="header"]
+|===
+|Symptom |Resolution
+
+|Model returns text instead of `tool_calls`
+|The `--enable-auto-tool-choice` flag may not be set on the vLLM server. Or the model may not support tool calling. Verify with Module 2's deployment.
+
+|JSON parsing error on `tool_response.json`
+|The curl command may have failed silently. Check the raw response: `cat ~/tool_response.json`. If it contains an HTML error page, the URL is wrong.
+
+|`sed` substitution does not replace MODEL_PLACEHOLDER
+|The `MODEL_NAME` environment variable may not be set. Run `echo $MODEL_NAME` to verify.
+
+|Final answer ignores the tool result
+|Ensure the `tool_call_id` in Step 5 matches exactly. Copy-paste errors in the ID cause the model to disregard the result.
+|===
+
+== Checkpoint
+
+At this point you have:
+
+* [x] Defined a tool using JSON Schema in the OpenAI format
+* [x] Sent a tool-enabled request and received a `tool_calls` response
+* [x] Parsed the function name, arguments, and tool call ID
+* [x] Executed a mock tool and returned the result as a `role: "tool"` message
+* [x] Received a final answer grounded in tool output
+* [x] Verified the model skips tool calls when they are not needed
+
+Proceed to xref:04-build-tool-loop.adoc[Module 4: Build the Tool Calling Loop].

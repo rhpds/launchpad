@@ -1,0 +1,20 @@
+name: modules
+version: master
+title: "Enable AI Tool Calling on OpenShift"
+start_page: index.adoc
+nav:
+  - modules/ROOT/nav.adoc
+
+asciidoc:
+  attributes:
+    user: '%user%'
+    guid: '%guid%'
+    openshift_api_url: '%openshift_api_url%'
+    openshift_console_url: '%openshift_console_url%'
+    openshift_cluster_ingress_domain: '%openshift_cluster_ingress_domain%'
+    project_name: '%namespace%'
+    quickstart_repo: 'https://github.com/rhpds/vllm-tool-calling.git'
+    maas_api_url: '%maas_endpoint%/v1'
+    maas_api_key: '%maas_api_key%'
+    maas_model: '%maas_model%'
+    intel_platform: 'Intel Xeon'

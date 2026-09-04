@@ -1,0 +1,126 @@
+= Query with RAG
+:navtitle: 6. Query with RAG
+
+_Estimated time: 15 minutes_
+
+You have a model endpoint, a RAG frontend, and documents loaded into the vector store.
+Now you will see how RAG actually works at query time -- and prove that it makes a measurable difference.
+
+== The RAG Query Flow
+
+When you ask a question through AnythingLLM with documents loaded, five things happen:
+
+----
+[1] User asks: "What are the FMLA eligibility requirements?"
+         |
+[2] AnythingLLM embeds the question into a vector
+         |
+[3] Vector similarity search finds the most relevant document chunks
+         |
+[4] Retrieved chunks are injected into the prompt as context
+         |
+[5] MaaS generates an answer grounded in the retrieved context
+----
+
+The model does not search the vector store itself. AnythingLLM handles retrieval, builds the augmented prompt, and sends it to the MaaS endpoint. The model just sees a system prompt, context documents, and a user question.
+
+== Ask a Domain-Specific Question -- With RAG
+
+Open the AnythingLLM interface in your browser and navigate to the *hr-assistant* workspace. Ask:
+
+----
+What are the eligibility requirements for FMLA leave?
+----
+
+Observe the response. If the FMLA document was loaded correctly in Module 5, the answer should reference specific requirements from the document -- not generic knowledge.
+
+You can also query via the API:
+
+[source,bash,role="execute",subs="attributes+"]
+----
+curl -s -X POST $\{ANYTHINGLLM_URL\}/api/v1/workspace/hr-assistant/chat \
+  -H "Authorization: Bearer $\{ANYTHINGLLM_API_KEY\}" \
+  -H "Content-Type: application/json" \
+  -d '{"message": "What are the eligibility requirements for FMLA leave?", "mode": "chat"}' | python3 -m json.tool
+----
+
+== Ask the Same Question -- Without RAG
+
+Now ask the same question directly to the MaaS endpoint, bypassing AnythingLLM and the document store entirely:
+
+[source,bash,role="execute"]
+----
+curl -s "${MAAS_ENDPOINT}/v1/chat/completions" \
+  -H "Authorization: Bearer ${MAAS_API_KEY}" \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"model\": \"${MAAS_MODEL}\",
+    \"messages\": [
+      {\"role\": \"user\", \"content\": \"What are the eligibility requirements for FMLA leave?\"}
+    ],
+    \"max_tokens\": 256
+  }" | python3 -c "import sys,json; print(json.load(sys.stdin)['choices'][0]['message']['content'])"
+----
+
+== Compare the Results
+
+[cols="1,1",options="header"]
+|===
+|With RAG (AnythingLLM) |Without RAG (Direct MaaS)
+
+|References specific FMLA requirements from the loaded document
+|Gives a generic answer from training data
+
+|May cite 12-month employment period, 1,250 hours worked
+|May state vague or partially correct requirements
+
+|Answers are grounded in source material you can verify
+|Answers are plausible but unverifiable
+
+|Quality depends on the loaded documents
+|Quality depends only on model training
+|===
+
+The key insight: *RAG does not make the model smarter. It gives the model better information.* A CPU-optimized model with the right documents retrieved can outperform a much larger model answering from memory alone.
+
+== Try More Questions
+
+Ask these in the AnythingLLM workspace, then repeat them directly against the MaaS endpoint to see the difference:
+
+* "How much overtime pay is required by federal law?"
+* "What notice must an employer provide for FMLA leave?"
+* "Can an employer deny FMLA leave?"
+
+== Use Query Mode to See Retrieved Chunks
+
+AnythingLLM supports a *query* mode that shows you exactly which chunks were retrieved:
+
+[source,bash,role="execute",subs="attributes+"]
+----
+curl -s -X POST $\{ANYTHINGLLM_URL\}/api/v1/workspace/hr-assistant/chat \
+  -H "Authorization: Bearer $\{ANYTHINGLLM_API_KEY\}" \
+  -H "Content-Type: application/json" \
+  -d '{"message": "What are the FMLA eligibility requirements?", "mode": "query"}' | python3 -m json.tool
+----
+
+In `query` mode, the response includes the retrieved source chunks alongside the answer. This lets you verify that the system found the right documents and trace the answer back to its source.
+
+== When RAG Fails
+
+Try asking a question about a topic *not* covered by your loaded documents:
+
+----
+What is the company policy on remote work?
+----
+
+Since you did not load a remote work policy, the model either says it does not know (good) or generates a generic answer (less good). This highlights an important principle: *RAG is only as good as the documents in the vector store.*
+
+== What You Proved
+
+* The *same model* gives different quality answers depending on whether it has retrieved context
+* Retrieved context produces answers grounded in verifiable source material
+* The RAG pipeline is transparent -- you can inspect which chunks were retrieved
+* Missing documents lead to missing answers, which is preferable to hallucinated answers
+
+[.next-nav]
+xref:07-understand-cpu-performance.adoc[Next: Understand CPU Inference Performance -->]

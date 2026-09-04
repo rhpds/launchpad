@@ -1,0 +1,135 @@
+= Module 7: The Intel Xeon Story
+
+_Estimated time: 5 minutes_
+
+In this module you will:
+
+* Understand why tool calling's stop-and-go pattern favors CPU over GPU
+* Inspect the Intel hardware powering your cluster
+* Calculate the cost difference between CPU and GPU deployment for agentic workloads
+
+In this module you will understand why CPU-based inference is well-suited to tool calling workloads, check the Intel hardware powering your cluster, and see how {intel_platform} processors deliver the right economics for agentic AI.
+
+== Why CPU Inference Fits Tool Calling
+
+Tool calling has a distinctive performance profile that differs from long-form text generation. The model produces a short structured response (the tool call JSON), *waits* for the tool to execute, then produces another short response. This stop-and-go pattern plays to CPU strengths:
+
+* *Short output sequences* -- Tool call responses are typically 50-200 tokens of JSON, not pages of text
+* *I/O-bound latency* -- The bottleneck is the external tool (API call, database query), not inference speed
+* *Lower concurrency* -- Agentic workflows are per-user, not batch processing thousands of prompts
+* *No additional hardware cost* -- You run inference on {intel_platform} servers already in your data center
+
+The model is idle while tools execute. GPU utilization during that idle time is wasted. CPUs handle this intermittent pattern efficiently.
+
+== Check the Cluster Hardware
+
+Examine the nodes powering your cluster:
+
+[source,bash,role="execute",subs="attributes+"]
+----
+oc get nodes -o custom-columns=NAME:.metadata.name,CPU:.status.capacity.cpu,MEMORY:.status.capacity.memory
+----
+
+Depending on the {intel_platform} generation in your cluster, the vLLM runtime may leverage:
+
+* *AVX-512* -- Advanced Vector Extensions that accelerate matrix operations (3rd Gen Intel Xeon Scalable and later)
+* *AMX (Advanced Matrix Extensions)* -- Hardware acceleration for INT8 and BF16 matrix multiply (4th Gen Intel Xeon Scalable and later)
+* *VNNI (Vector Neural Network Instructions)* -- Optimized instructions for inference workloads
+
+These extensions narrow the performance gap with GPU, particularly for smaller models and the short-output patterns that define tool calling.
+
+=== Verify: Hardware Capabilities
+
+You should see the node names, CPU core counts, and memory capacity. For {intel_platform} nodes:
+
+* *CPU cores*: typically 32-128 cores per node
+* *Memory*: typically 128-512 Gi per node
+
+The exact specifications depend on the cluster provisioned for this lab. The key observation is that these nodes have enough CPU and memory to run the tool calling model alongside your other workloads — no dedicated AI hardware needed.
+
+== Check Resource Usage
+
+See how much CPU and memory the model server consumes:
+
+[source,bash,role="execute",subs="attributes+"]
+----
+oc adm top pods -n {project_name}
+----
+
+Tool calling models on CPU typically show moderate, intermittent resource usage. The model is active only during the generate phases -- between tool calls, it is idle.
+
+=== Verify: Efficient Resource Usage
+
+Compare the model server's resource consumption to the total node capacity from the previous command. For a tool calling workload:
+
+* *CPU usage during inference*: typically 4-10 cores (a fraction of the node's total)
+* *CPU usage while waiting for tools*: near zero — the model is idle
+* *Memory*: stable at 3-8 Gi depending on the model size
+
+This intermittent usage pattern is why CPU deployment makes economic sense for tool calling. A GPU would sit idle during tool execution — and GPU idle time is expensive.
+
+== The Economics
+
+Consider deploying an agentic assistant that calls three tools per user query:
+
+* *GPU path:* Procure GPU hardware, set up GPU operator, configure node affinity, manage drivers. Timeline: weeks to months. Cost: thousands per month per GPU.
+* *CPU path:* Deploy on existing {intel_platform} infrastructure. Same OpenShift cluster running your other workloads. Timeline: the `oc apply -k` command you ran in Module 2. Additional hardware cost: zero.
+
+For tool calling workloads where the model produces short outputs and waits for external services between turns, CPU inference delivers the same functionality at a fraction of the cost.
+
+=== Exercise: Calculate Your Savings
+
+Based on the resource usage you observed, estimate the cost difference:
+
+. Note the CPU cores used during active inference from `oc adm top pods`
+. A single NVIDIA A100 GPU costs approximately $2-3/hour on cloud providers
+. Your model server uses approximately 8 CPU cores — a fraction of a standard {intel_platform} node that costs $0.50-1.50/hour
+. For a tool calling workload where the model is active only 20-30% of the time (the rest is tool execution), GPU utilization drops further
+
+For an agentic assistant serving 10 users with 3 tool calls per query, CPU inference at $0/incremental hardware cost delivers the same functionality as a $2,000+/month GPU instance.
+
+== When CPU Works for AI
+
+[cols="1,2"]
+|===
+| Workload | Why CPU Works
+
+| *Agentic assistants*
+| Short outputs, tool wait times dominate total latency
+
+| *API orchestration*
+| Model routes requests to the right API; output is structured JSON
+
+| *Data retrieval agents*
+| Model queries databases and summarizes results; I/O is the bottleneck
+
+| *Small to medium models (up to 14B)*
+| Fit in system memory with acceptable inference speed on {intel_platform}
+|===
+
+=== Troubleshooting
+
+[cols="1,2",options="header"]
+|===
+|Symptom |Resolution
+
+|`oc adm top pods` returns "metrics not available"
+|The cluster metrics server may not be running. This is a cluster-level configuration, not specific to your deployment.
+
+|Node shows very low CPU count (e.g., 2-4 cores)
+|You may be on a minimal lab cluster. The lab still works but inference will be slower.
+
+|No AMX/AVX-512 references in the hardware description
+|Older CPUs may not have these extensions. Inference still works using standard instruction sets, just without hardware acceleration.
+|===
+
+== Checkpoint
+
+At this point you have:
+
+* [x] Understood why tool calling's stop-and-go pattern suits CPU inference
+* [x] Checked the node hardware and Intel-specific optimizations available
+* [x] Reviewed real resource usage of the model server
+* [x] Understood the cost comparison between CPU and GPU deployment
+
+Proceed to xref:08-conclusion.adoc[Module 8: Conclusion] to wrap up the lab.

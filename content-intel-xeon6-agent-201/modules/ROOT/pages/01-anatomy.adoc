@@ -1,0 +1,81 @@
+= Module 1: Anatomy of an Agent
+:navtitle: Anatomy of an Agent
+
+== Objective
+
+Understand what makes an agent different from a model by seeing where a model alone fails, and previewing the components you will assemble.
+
+== Exercise 1: Understand the Model Baseline
+
+Launchpad MaaS provides the shared CPU model used by this lab. The environment and a short-lived virtual key are assigned automatically when the lab is provisioned; you do not configure or validate the shared service yourself.
+
+The model contributes language understanding and synthesis, but a model by itself is not a product catalog or validated architecture library. Asking it for exact SKUs, operators, benchmarks, or current product facts can produce plausible but unsupported answers.
+
+[sidebar]
+****
+*Record:*
+
+* Which customer facts must the agent extract? ___
+* Which recommendation facts require an authoritative tool? ___
+* Which parts should the model synthesize rather than invent? ___
+
+The model _guesses_. It cannot look up current product specs, benchmark data, or reference architectures. It may hallucinate SKU numbers, invent performance figures, or recommend products that do not exist.
+****
+
+== Exercise 2: What an Agent Adds
+
+An agent wraps a model with three additional components:
+
+[cols="2,3",options="header"]
+|===
+| Component | What It Does
+| *MCP Tools* | Return structured data in milliseconds -- product specs, benchmarks, platform capabilities. No guessing.
+| *System Prompt* | Defines the agent's persona, process, and output format. The model follows instructions instead of free-associating.
+| *LangGraph* | Orchestrates a multi-step workflow: understand requirements → look up data → synthesize recommendation.
+|===
+
+The model provides reasoning. The tools provide data. The prompt provides structure. Together, they produce a recommendation backed by real facts instead of hallucinations.
+
+== Exercise 3: Preview the Components
+
+You will deploy three pods in the next modules:
+
+Confirm that the terminal is still using the tenant project assigned to this lab. Do not deploy lab workloads into the `showroom-{guid}` namespace, which only hosts the guide and terminal:
+
+[source,bash,role="execute",subs=attributes+]
+----
+oc project {project_name}
+oc whoami
+oc project -q
+----
+
+[source,bash,role="execute",subs=attributes+]
+----
+echo "=== Components you will deploy ==="
+echo ""
+echo "1. solution-tools    — MCP server with 3 Intel/OpenShift data tools"
+echo "2. solution-agent    — LangGraph agent that calls the model + tools"
+echo "3. solution-ui       — Web chat interface for the agent"
+echo ""
+echo "Current namespace status:"
+oc project -q
+oc get pods
+----
+
+Your namespace should still be empty. You will fill it in Modules 2 and 3.
+
+== Verify
+
+[%interactive]
+* [ ] Model-only limitations understood
+* [ ] Three components understood: tools, agent, UI
+* [ ] `{project_name}` selected and confirmed empty
+
+== Learning Outcomes
+
+* A model hallucinates when asked for specific product data it was not trained on
+* An agent wraps the model with tools (for data), a system prompt (for structure), and orchestration (for multi-step reasoning)
+* MCP (Model Context Protocol) is the standard for tool-model integration -- the same protocol used by Claude, VS Code, and other AI systems
+
+[.next-nav]
+xref:02-deploy-tools.adoc[Next: Module 2 — Deploy the MCP Tools →]

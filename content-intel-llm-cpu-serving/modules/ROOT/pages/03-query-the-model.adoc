@@ -1,0 +1,207 @@
+= Query the Model API
+:navtitle: 3. Query the Model API
+
+_Estimated time: 15 minutes_
+
+In this module you will:
+
+* Master the OpenAI-compatible chat completions API
+* Craft effective prompts and analyze model responses
+* Understand token usage, latency, and response structure
+* Compare different prompting strategies
+
+You have a live connection to the MaaS endpoint.
+Now you will explore the API in depth -- understanding the request format, response structure, and how different prompts affect output quality.
+
+== The Chat Completions API
+
+The `/v1/chat/completions` endpoint is the standard interface for conversational LLM interaction. Every major LLM provider (OpenAI, Anthropic, local servers) uses this same format. Learning it once means you can work with any provider.
+
+=== Request Structure
+
+[source,json]
+----
+{
+  "model": "granite-2b-cpu",           // <1>
+  "messages": [                         // <2>
+    {"role": "system", "content": "..."},
+    {"role": "user", "content": "..."}
+  ],
+  "max_tokens": 256,                    // <3>
+  "temperature": 0.7                    // <4>
+}
+----
+
+<1> *model* -- which model to use. Must match an available model from `/v1/models`.
+<2> *messages* -- the conversation history. System messages set behavior; user messages are the query.
+<3> *max_tokens* -- maximum tokens to generate. Lower values = faster responses, fewer costs.
+<4> *temperature* -- controls randomness. 0.0 = deterministic, 1.0 = creative.
+
+== Exercise: Basic Query
+
+Send a straightforward question:
+
+[source,bash,role="execute"]
+----
+curl -s "${MAAS_ENDPOINT}/v1/chat/completions" \
+  -H "Authorization: Bearer ${MAAS_API_KEY}" \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"model\": \"${MAAS_MODEL}\",
+    \"messages\": [
+      {\"role\": \"user\", \"content\": \"What is the capital of France? Answer in one sentence.\"}
+    ],
+    \"max_tokens\": 50
+  }" | python3 -m json.tool
+----
+
+=== Analyze the Response
+
+Look at the `usage` block in the response:
+
+* `prompt_tokens` -- how many tokens your input consumed
+* `completion_tokens` -- how many tokens the model generated
+* `total_tokens` -- the sum. This is what determines cost (though MaaS is $0/token).
+
+== Exercise: System Prompts
+
+System prompts set the model's persona and behavior. Compare these two approaches:
+
+*Without a system prompt:*
+
+[source,bash,role="execute"]
+----
+curl -s "${MAAS_ENDPOINT}/v1/chat/completions" \
+  -H "Authorization: Bearer ${MAAS_API_KEY}" \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"model\": \"${MAAS_MODEL}\",
+    \"messages\": [
+      {\"role\": \"user\", \"content\": \"Explain what FMLA is.\"}
+    ],
+    \"max_tokens\": 200
+  }" | python3 -c "import sys,json; r=json.load(sys.stdin); print(r['choices'][0]['message']['content'])"
+----
+
+*With an HR assistant system prompt:*
+
+[source,bash,role="execute"]
+----
+curl -s "${MAAS_ENDPOINT}/v1/chat/completions" \
+  -H "Authorization: Bearer ${MAAS_API_KEY}" \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"model\": \"${MAAS_MODEL}\",
+    \"messages\": [
+      {\"role\": \"system\", \"content\": \"You are an HR compliance assistant for a US financial services company. Provide concise, actionable guidance. Always note when the user should consult legal counsel.\"},
+      {\"role\": \"user\", \"content\": \"Explain what FMLA is.\"}
+    ],
+    \"max_tokens\": 200
+  }" | python3 -c "import sys,json; r=json.load(sys.stdin); print(r['choices'][0]['message']['content'])"
+----
+
+Notice the difference: the system prompt shapes the tone, detail level, and domain focus of the response.
+
+== Exercise: Temperature and Determinism
+
+Temperature controls how "creative" the model is. Try the same prompt at different temperatures:
+
+*Temperature 0.0 (deterministic):*
+
+[source,bash,role="execute"]
+----
+curl -s "${MAAS_ENDPOINT}/v1/chat/completions" \
+  -H "Authorization: Bearer ${MAAS_API_KEY}" \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"model\": \"${MAAS_MODEL}\",
+    \"messages\": [{\"role\": \"user\", \"content\": \"List 3 benefits of remote work.\"}],
+    \"max_tokens\": 150,
+    \"temperature\": 0.0
+  }" | python3 -c "import sys,json; r=json.load(sys.stdin); print(r['choices'][0]['message']['content'])"
+----
+
+*Temperature 1.0 (creative):*
+
+[source,bash,role="execute"]
+----
+curl -s "${MAAS_ENDPOINT}/v1/chat/completions" \
+  -H "Authorization: Bearer ${MAAS_API_KEY}" \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"model\": \"${MAAS_MODEL}\",
+    \"messages\": [{\"role\": \"user\", \"content\": \"List 3 benefits of remote work.\"}],
+    \"max_tokens\": 150,
+    \"temperature\": 1.0
+  }" | python3 -c "import sys,json; r=json.load(sys.stdin); print(r['choices'][0]['message']['content'])"
+----
+
+Run the temperature 0.0 query twice -- you should get identical output. Run temperature 1.0 twice -- the output will vary.
+
+For a RAG-based HR assistant, *temperature 0.0-0.3* is usually best. You want consistent, factual answers grounded in retrieved documents, not creative writing.
+
+== Exercise: Measure Latency
+
+Time a request to understand CPU inference performance:
+
+[source,bash,role="execute"]
+----
+time curl -s "${MAAS_ENDPOINT}/v1/chat/completions" \
+  -H "Authorization: Bearer ${MAAS_API_KEY}" \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"model\": \"${MAAS_MODEL}\",
+    \"messages\": [{\"role\": \"user\", \"content\": \"What are three key HR compliance requirements for financial services companies?\"}],
+    \"max_tokens\": 200
+  }" | python3 -c "
+import sys, json
+r = json.load(sys.stdin)
+u = r['usage']
+print(f\"Response: {r['choices'][0]['message']['content'][:100]}...\")
+print(f\"Tokens: {u['prompt_tokens']} in / {u['completion_tokens']} out / {u['total_tokens']} total\")
+"
+----
+
+Typical CPU inference latency:
+
+* *First token* -- 1-3 seconds (prompt processing)
+* *Generation* -- 10-30 tokens per second
+* *Total for 200 tokens* -- 5-15 seconds
+
+This is acceptable for an interactive Q&A assistant where users submit questions and wait for answers. It would not be acceptable for real-time chat at high concurrency.
+
+== Exercise: Batch Multiple Questions
+
+Send several questions in sequence to feel the throughput:
+
+[source,bash,role="execute"]
+----
+for q in \
+  "What is overtime pay?" \
+  "Define workplace harassment." \
+  "What is an employee handbook?"; do
+  echo "Q: $q"
+  time curl -s "${MAAS_ENDPOINT}/v1/chat/completions" \
+    -H "Authorization: Bearer ${MAAS_API_KEY}" \
+    -H "Content-Type: application/json" \
+    -d "{
+      \"model\": \"${MAAS_MODEL}\",
+      \"messages\": [{\"role\": \"user\", \"content\": \"${q} Answer in 2 sentences.\"}],
+      \"max_tokens\": 100
+    }" | python3 -c "import sys,json; print('A:', json.load(sys.stdin)['choices'][0]['message']['content'])"
+  echo "---"
+done
+----
+
+== What You Learned
+
+* The OpenAI-compatible API is the universal interface for LLM interaction
+* System prompts shape model behavior without changing the model
+* Temperature controls determinism vs creativity
+* CPU inference delivers usable latency for interactive Q&A
+* All of this runs on {intel_platform} CPUs -- no GPU required
+
+In the next module, you will connect a RAG frontend to this endpoint to build a document-grounded assistant.
+
+[.next-nav]
+xref:04-wire-rag-frontend.adoc[Next: Wire a RAG Frontend -->]

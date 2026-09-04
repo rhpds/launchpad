@@ -1,0 +1,133 @@
+= CPU Inference Fundamentals
+:navtitle: 1. CPU Inference Fundamentals
+
+_Estimated time: 15 minutes_
+
+Before you connect to anything, you need to understand *why* running LLMs on CPU works and when it is the right choice.
+This module is conceptual -- no deployment, no YAML. Just the foundation you need for the rest of the lab.
+
+== Why CPU Inference?
+
+Most enterprise data centers run on x86 processors. GPU hardware requires separate procurement, specialized cooling, higher power budgets, and driver management. For many AI workloads, CPU inference eliminates all of these barriers.
+
+The economics are straightforward:
+
+* *No additional hardware cost* -- inference runs on servers you already own
+* *No GPU procurement delays* -- GPU supply chains can add months to project timelines
+* *Standard infrastructure* -- same monitoring, networking, and security tooling
+* *Elastic scaling* -- scale model serving across the same OpenShift cluster that runs your other workloads
+
+== Intel Hardware Acceleration
+
+Modern {intel_platform} processors include instruction set extensions that accelerate neural network math:
+
+=== AMX (Advanced Matrix Extensions)
+
+Available on 4th Gen {intel_platform} Scalable (Sapphire Rapids) and later. AMX provides dedicated hardware for BF16 and INT8 matrix multiplication -- the core operation in transformer inference. Think of it as a small matrix engine built into the CPU.
+
+When vLLM (the inference engine behind MaaS) runs with `--dtype bfloat16`, it targets the AMX code path. This is not just a precision choice -- it selects the fastest hardware path available.
+
+=== AVX-512 VNNI
+
+Available on 3rd Gen {intel_platform} Scalable (Ice Lake) and later. AVX-512 provides 512-bit vector operations, and VNNI (Vector Neural Network Instructions) adds fused multiply-accumulate for int8 inference. Older than AMX but still significantly faster than baseline x86.
+
+== When CPU Inference Is the Right Choice
+
+[cols="1,2",options="header"]
+|===
+|Workload |Why CPU Works
+
+|*Small models (under 8B parameters)*
+|Model weights fit in system memory. Inference latency is acceptable for interactive use.
+
+|*Classification and entity extraction*
+|Short outputs (labels, entities) minimize generation time.
+
+|*RAG retrieval pipelines*
+|The retrieval step is I/O-bound. The generation step with a small LLM runs well on CPU.
+
+|*Embedding generation*
+|Batch embedding of documents for vector search is throughput-oriented, not latency-critical.
+
+|*Low-concurrency serving*
+|Teams of 10-50 users with intermittent queries.
+|===
+
+== When You Need GPU
+
+[cols="1,2",options="header"]
+|===
+|Workload |Why GPU Is Needed
+
+|*Large models (70B+ parameters)*
+|Model weights exceed practical CPU memory bandwidth.
+
+|*High-throughput batch generation*
+|Hundreds of concurrent requests require GPU parallelism.
+
+|*Vision and multimodal models*
+|Image processing pipelines benefit significantly from GPU acceleration.
+
+|*Real-time streaming at scale*
+|Sub-100ms latency requirements at high concurrency.
+|===
+
+== The {maas_model} Model
+
+In this lab you will use *{maas_model}* -- a model optimized for CPU inference on {intel_platform} processors. It is served via Red Hat's Model-as-a-Service (MaaS) platform.
+
+Key characteristics:
+
+* *Optimized for CPU* -- specifically tuned for {intel_platform} hardware with AMX/AVX-512 acceleration
+* *Architecture* -- standard transformer architecture, so vLLM's optimized CPU kernels apply directly
+* *Quality* -- sufficient for document Q&A, summarization, and classification tasks
+* *Cost* -- $0/token via MaaS. No GPU procurement, no infrastructure management
+
+== What Is Model-as-a-Service (MaaS)?
+
+MaaS is a managed inference platform. Instead of deploying model infrastructure in every cluster, the platform team runs optimized inference servers centrally and exposes them via an OpenAI-compatible API.
+
+----
+Your Application
+      |
+      v
+MaaS / LiteLLM (OpenAI-compatible API)
+      |
+      v
+vLLM on Intel Xeon (managed fleet)
+      |
+      v
+Intel Xeon 6 (AMX acceleration)
+----
+
+Benefits:
+
+* *No CRDs or operators required* -- your cluster does not need KServe, ServingRuntime, or any AI-specific operators
+* *No model weight downloads* -- the model is already loaded and warm
+* *Instant availability* -- no 5-minute cold start waiting for model weights to load
+* *Centralized scaling* -- the MaaS fleet scales independently of your application cluster
+* *Standard API* -- same OpenAI-compatible API that works with any LLM client library
+
+== Key Concepts for This Lab
+
+[cols="1,3",options="header"]
+|===
+|Concept |What It Means in This Lab
+
+|*MaaS Endpoint*
+|The URL of the managed inference service. You will connect to this in Module 2.
+
+|*LiteLLM Virtual Key*
+|An API key scoped to your lab session. It gives you access to specific models with usage tracking.
+
+|*OpenAI-compatible API*
+|The standard `/v1/chat/completions` and `/v1/models` endpoints. Any tool that speaks this protocol works with MaaS.
+
+|*RAG*
+|Retrieval-Augmented Generation -- searching documents first, then generating answers grounded in the retrieved content. You will build this in Modules 4-6.
+|===
+
+You now have the conceptual foundation. Time to connect.
+
+[.next-nav]
+xref:02-explore-maas.adoc[Next: Explore Model-as-a-Service -->]

@@ -1,0 +1,294 @@
+= Module 6: Advanced Patterns
+
+_Estimated time: 10 minutes_
+
+In this module you will explore advanced tool calling patterns: parallel tool calls, forced tool choice, schema validation, failure modes, and guard rails. These are the patterns that separate a prototype from a production system.
+
+== Parallel Tool Calls
+
+Some models can request multiple tool calls in a single response. When asked "Compare the weather in Boston and Tokyo," the model may return two `get_weather` calls at once instead of chaining them sequentially.
+
+Test parallel tool calling:
+
+[source,bash,role="execute"]
+----
+curl -s $\{MODEL_URL\}/chat/completions \
+  -H "Authorization: Bearer $\{MODEL_API_KEY\}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "'"$\{MODEL_NAME\}"'",
+    "messages": [
+      {"role": "user", "content": "Compare the weather in Boston and Tokyo right now."}
+    ],
+    "tools": [
+      {"type": "function", "function": {
+        "name": "get_weather",
+        "description": "Get the current weather for a city",
+        "parameters": {"type": "object", "properties": {
+          "location": {"type": "string", "description": "City name"}
+        }, "required": ["location"]}
+      }}
+    ]
+  }' | python3 -c "
+import json, sys
+r = json.load(sys.stdin)
+tcs = r['choices'][0]['message'].get('tool_calls', [])
+print(f'Number of tool calls returned: {len(tcs)}')
+for tc in tcs:
+    print(f'  {tc[\"function\"][\"name\"]}({tc[\"function\"][\"arguments\"]})')
+if len(tcs) > 1:
+    print('\nThe model requested parallel execution.')
+    print('Your application should execute all tools and return all results before the next model call.')
+else:
+    print('\nThe model will chain these sequentially -- both approaches produce correct results.')
+"
+----
+
+Not all models support parallel tool calls. If the model returns only one call, it will chain them across multiple turns. Your dispatch loop from Module 4 handles both cases -- it processes *all* tool calls in `msg.tool_calls` before sending results back.
+
+== Tool Choice Control
+
+The `tool_choice` parameter controls how the model uses tools:
+
+[cols="1,3"]
+|===
+| Value | Behavior
+
+| `"auto"`
+| The model decides whether to call a tool or respond directly. Default.
+
+| `"none"`
+| The model is forbidden from calling tools, even if they are defined.
+
+| `{"type": "function", "function": {"name": "get_weather"}}`
+| The model is forced to call the specified tool. Useful when you know which tool is needed.
+|===
+
+Test forced tool choice:
+
+[source,bash,role="execute"]
+----
+curl -s $\{MODEL_URL\}/chat/completions \
+  -H "Authorization: Bearer $\{MODEL_API_KEY\}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "'"$\{MODEL_NAME\}"'",
+    "messages": [
+      {"role": "user", "content": "Tell me about Boston"}
+    ],
+    "tools": [
+      {"type": "function", "function": {
+        "name": "get_weather",
+        "description": "Get the current weather for a city",
+        "parameters": {"type": "object", "properties": {
+          "location": {"type": "string"}
+        }, "required": ["location"]}
+      }}
+    ],
+    "tool_choice": {"type": "function", "function": {"name": "get_weather"}}
+  }' | python3 -c "
+import json, sys
+r = json.load(sys.stdin)
+msg = r['choices'][0]['message']
+tcs = msg.get('tool_calls', [])
+if tcs:
+    print(f'Forced tool call: {tcs[0][\"function\"][\"name\"]}({tcs[0][\"function\"][\"arguments\"]})')
+else:
+    print(f'Response: {msg.get(\"content\", \"(empty)\")}')
+"
+----
+
+With `tool_choice` forced to `get_weather`, the model calls the weather tool even though "Tell me about Boston" is a general question it could answer without tools. Use forced choice sparingly -- it overrides the model's judgment.
+
+== When Tool Calling Breaks
+
+Tool calling is not perfect. Models can fail in several ways:
+
+[cols="1,3"]
+|===
+| Failure Mode | What Happens
+
+| *Hallucinated tool names*
+| The model invents a function that does not exist. Your dispatch table returns an "unknown function" error.
+
+| *Wrong arguments*
+| The model calls the right tool but passes incorrect argument types or missing required fields.
+
+| *Infinite loops*
+| The model keeps requesting tool calls without reaching a final answer. Your iteration guard rail catches this.
+
+| *Tool avoidance*
+| The model answers from its training data instead of calling a tool, even when fresh data is needed.
+|===
+
+Test argument validation:
+
+[source,bash,role="execute"]
+----
+cat > ~/validate_args.py << 'PYEOF'
+import json, os
+from openai import OpenAI
+
+client = OpenAI(base_url=os.environ["MODEL_URL"], api_key=os.environ["MODEL_API_KEY"])
+MODEL = os.environ["MODEL_NAME"]
+
+tools = [{"type": "function", "function": {
+    "name": "lookup_employee",
+    "description": "Look up an employee by their numeric ID",
+    "parameters": {"type": "object", "properties": {
+        "employee_id": {"type": "integer", "description": "Numeric employee ID"}
+    }, "required": ["employee_id"]}
+}}]
+
+messages = [{"role": "user", "content": "Look up the employee named Alice"}]
+response = client.chat.completions.create(model=MODEL, messages=messages, tools=tools, tool_choice="auto")
+msg = response.choices[0].message
+
+if msg.tool_calls:
+    tc = msg.tool_calls[0]
+    args = json.loads(tc.function.arguments)
+    print(f"Tool call: {tc.function.name}({json.dumps(args)})")
+
+    # Validate: employee_id should be an integer
+    if "employee_id" not in args:
+        print("VALIDATION FAILED: missing required field 'employee_id'")
+    elif not isinstance(args["employee_id"], int):
+        print(f"VALIDATION FAILED: employee_id should be int, got {type(args['employee_id']).__name__}")
+    else:
+        print(f"VALIDATION PASSED: employee_id = {args['employee_id']}")
+else:
+    print(f"No tool call. Response: {msg.content}")
+PYEOF
+----
+
+[source,bash,role="execute"]
+----
+python3 ~/validate_args.py
+----
+
+The user asked for "Alice" but the tool expects a numeric ID. The model might pass a string, guess an ID, or skip the tool call entirely. In production, validate arguments before executing the tool.
+
+== Guard Rails for Production
+
+A production tool calling system needs these safeguards:
+
+[source,bash,role="execute"]
+----
+cat > ~/guardrails.py << 'PYEOF'
+import json, os, time
+from openai import OpenAI
+
+client = OpenAI(base_url=os.environ["MODEL_URL"], api_key=os.environ["MODEL_API_KEY"])
+MODEL = os.environ["MODEL_NAME"]
+
+tools = [{"type": "function", "function": {
+    "name": "get_weather",
+    "description": "Get weather for a city",
+    "parameters": {"type": "object", "properties": {
+        "location": {"type": "string"}
+    }, "required": ["location"]}
+}}]
+
+FUNCS = {"get_weather": lambda location: {"temp": 72, "condition": "sunny"}}
+
+def run_with_guardrails(user_message, max_iterations=3, timeout_seconds=30):
+    messages = [{"role": "user", "content": user_message}]
+    start_time = time.time()
+    iteration = 0
+
+    while iteration < max_iterations:
+        # Guard rail 1: Timeout
+        elapsed = time.time() - start_time
+        if elapsed > timeout_seconds:
+            print(f"  TIMEOUT after {elapsed:.1f}s -- falling back to text-only")
+            response = client.chat.completions.create(
+                model=MODEL, messages=messages, tool_choice="none"
+            )
+            return response.choices[0].message.content
+
+        response = client.chat.completions.create(
+            model=MODEL, messages=messages, tools=tools, tool_choice="auto"
+        )
+        msg = response.choices[0].message
+
+        if not msg.tool_calls:
+            return msg.content
+
+        messages.append(msg)
+        for tc in msg.tool_calls:
+            fn_name = tc.function.name
+            fn_args = json.loads(tc.function.arguments)
+
+            # Guard rail 2: Unknown function
+            if fn_name not in FUNCS:
+                messages.append({"role": "tool", "tool_call_id": tc.id,
+                    "content": json.dumps({"error": f"Function '{fn_name}' does not exist"})})
+                continue
+
+            # Guard rail 3: Execute with error handling
+            try:
+                result = FUNCS[fn_name](**fn_args)
+            except Exception as e:
+                result = {"error": f"Execution failed: {str(e)}"}
+
+            messages.append({"role": "tool", "tool_call_id": tc.id, "content": json.dumps(result)})
+
+        iteration += 1
+
+    # Guard rail 4: Max iterations -- force a text response
+    print(f"  MAX ITERATIONS ({max_iterations}) -- falling back to text-only")
+    response = client.chat.completions.create(model=MODEL, messages=messages, tool_choice="none")
+    return response.choices[0].message.content
+
+print("Query: What is the weather in Boston?\n")
+answer = run_with_guardrails("What is the weather in Boston?")
+print(f"Answer: {answer}")
+PYEOF
+----
+
+[source,bash,role="execute"]
+----
+python3 ~/guardrails.py
+----
+
+Four guard rails protect this system:
+
+1. *Timeout* -- Abort after a time limit and fall back to text-only
+2. *Unknown function check* -- Return an error instead of crashing on hallucinated tool names
+3. *Exception handling* -- Catch tool execution errors and return structured error messages
+4. *Max iterations* -- Force a text response after too many tool call rounds
+
+== Decision Framework
+
+When should you use tool calling versus other approaches?
+
+[cols="1,1,2"]
+|===
+| Approach | Use When | Example
+
+| *Tool Calling*
+| The model needs live data or must take actions
+| "What is the weather?" / "Book a meeting"
+
+| *RAG (Retrieval Augmented Generation)*
+| The model needs context from a document corpus
+| "What does our policy say about..." (search docs, inject context)
+
+| *Direct Prompting*
+| The model already has the knowledge
+| "Explain quantum computing" / "Write a haiku"
+|===
+
+Tool calling and RAG are complementary. You can define a `search_documents` tool that performs RAG retrieval -- the model decides when to search, and your tool handles the vector lookup.
+
+== Checkpoint
+
+At this point you have:
+
+* [x] Tested parallel tool calling behavior
+* [x] Controlled tool choice with `auto`, `none`, and forced selection
+* [x] Validated tool call arguments before execution
+* [x] Implemented production guard rails: timeout, unknown function, error handling, max iterations
+* [x] Understood the decision framework for tool calling vs RAG vs direct prompting
+
+Proceed to xref:07-intel-story.adoc[Module 7: The Intel Xeon Story].

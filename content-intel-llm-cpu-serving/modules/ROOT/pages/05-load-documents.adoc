@@ -1,0 +1,160 @@
+= Load and Chunk Documents
+:navtitle: 5. Load and Chunk Documents
+
+_Estimated time: 15 minutes_
+
+In this module you will:
+
+* Understand why RAG systems need a document ingestion pipeline
+* Load and embed documents into the vector store
+* Verify that documents are chunked and searchable
+
+You have a model endpoint and a RAG workbench connected to it.
+But without documents, the model answers only from its training data.
+In this module you will load documents into AnythingLLM, understand how chunking and embedding work, and inspect the vector store.
+
+== Know: Why Your Assistant Needs Documents
+
+Right now, your HR assistant answers questions from its training data only. Ask it about your organization's parental leave policy and it will confidently generate a plausible-sounding answer -- that has nothing to do with your actual policy.
+
+This is the core problem RAG solves: the model does not need to _know_ your company's policies. It needs to _read_ the right documents at query time and ground its answers in that context.
+
+== The RAG Ingestion Pipeline
+
+Every RAG system transforms raw documents into searchable vectors. The pipeline has four steps:
+
+----
+Source document (web page, PDF, text)
+    --> [1] Parse: extract raw text
+    --> [2] Chunk: split into 256-512 token passages
+    --> [3] Embed: convert each chunk to a vector
+    --> [4] Store: save text + vector in the vector database
+----
+
+Each step matters. Parse badly and you get garbled text. Chunk too large and retrieval becomes imprecise. Chunk too small and you lose context.
+
+== Chunking and Embedding
+
+LLMs have a finite context window. *Chunking* splits documents into passages small enough to fit, while keeping each self-contained. AnythingLLM uses ~512-token chunks by default -- a good balance of precision and context for policy documents.
+
+*Embedding* converts each chunk into a vector (list of numbers) capturing its meaning. Similar text produces similar vectors, enabling semantic search. AnythingLLM uses a built-in embedding model (`EMBEDDING_ENGINE: native`), independent of the LLM.
+
+=== Why 512 Tokens per Chunk?
+
+* *Too large* (2000+ tokens) -- the retriever returns passages with too much irrelevant content
+* *Too small* (50-100 tokens) -- each chunk lacks enough context to be useful on its own
+* *Just right* (256-512 tokens) -- each chunk is self-contained, small enough to be precise
+
+== Get the AnythingLLM API Key
+
+The AnythingLLM API requires an API key. Retrieve it from the running instance:
+
+[source,bash,role="execute",subs="attributes+"]
+----
+export ANYTHINGLLM_URL=$(oc get route anythingllm -n {project_name} -o jsonpath='https://\{.spec.host\}')
+echo "Get your API key from: $\{ANYTHINGLLM_URL\}/settings/api-keys"
+----
+
+Open the settings page in your browser and generate an API key. Set it in your terminal:
+
+[source,bash,role="execute"]
+----
+export ANYTHINGLLM_API_KEY="your-api-key-here"
+----
+
+== Create a Workspace
+
+Create an HR Assistant workspace via the API:
+
+[source,bash,role="execute",subs="attributes+"]
+----
+curl -s -X POST $\{ANYTHINGLLM_URL\}/api/v1/workspace/new \
+  -H "Authorization: Bearer $\{ANYTHINGLLM_API_KEY\}" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "hr-assistant"}' | python3 -m json.tool
+----
+
+== Load a Document via URL
+
+Load an HR compliance document from the web into the workspace:
+
+[source,bash,role="execute",subs="attributes+"]
+----
+curl -s -X POST $\{ANYTHINGLLM_URL\}/api/v1/document/create-link \
+  -H "Authorization: Bearer $\{ANYTHINGLLM_API_KEY\}" \
+  -H "Content-Type: application/json" \
+  -d '{"link": "https://www.dol.gov/agencies/whd/fmla"}' | python3 -m json.tool
+----
+
+This fetches the page, parses the HTML into text, chunks the text into passages, embeds each chunk, and stores the vectors in LanceDB.
+
+== Embed the Document into the Workspace
+
+After uploading, embed the document so it is searchable:
+
+[source,bash,role="execute",subs="attributes+"]
+----
+curl -s -X POST $\{ANYTHINGLLM_URL\}/api/v1/workspace/hr-assistant/update-embeddings \
+  -H "Authorization: Bearer $\{ANYTHINGLLM_API_KEY\}" \
+  -H "Content-Type: application/json" \
+  -d '{"adds": ["custom-documents/url-www.dol.gov-agencies-whd-fmla.json"]}' | python3 -m json.tool
+----
+
+== Verify the Loaded Documents
+
+Check the workspace document list:
+
+[source,bash,role="execute",subs="attributes+"]
+----
+curl -s $\{ANYTHINGLLM_URL\}/api/v1/workspace/hr-assistant \
+  -H "Authorization: Bearer $\{ANYTHINGLLM_API_KEY\}" | python3 -m json.tool
+----
+
+=== Verify: Documents Are Embedded
+
+The response should show a workspace object with document count greater than zero. If the document count is zero, the embedding step may have failed. Re-run the update-embeddings API call.
+
+== Load Additional Documents
+
+Load more documents to build a richer knowledge base:
+
+[source,bash,role="execute",subs="attributes+"]
+----
+curl -s -X POST $\{ANYTHINGLLM_URL\}/api/v1/document/create-link \
+  -H "Authorization: Bearer $\{ANYTHINGLLM_API_KEY\}" \
+  -H "Content-Type: application/json" \
+  -d '{"link": "https://www.dol.gov/agencies/whd/overtime"}' | python3 -m json.tool
+----
+
+== What Happened Under the Hood
+
+When you loaded a document, AnythingLLM performed the full RAG ingestion pipeline:
+
+. *Fetched* the web page and extracted text content
+. *Chunked* the text into passages (default ~512 tokens each)
+. *Embedded* each chunk using the native embedding model
+. *Stored* the chunk text, vector, and metadata in LanceDB
+
+The LLM inference (via MaaS) is not involved in this step. Embedding uses a separate, lightweight model running locally inside the AnythingLLM pod.
+
+=== Troubleshooting
+
+[cols="1,2",options="header"]
+|===
+|Symptom |Resolution
+
+|`create-link` API returns 403
+|The API key is missing or incorrect. Regenerate it from the AnythingLLM settings page.
+
+|Document shows in workspace but with zero embeddings
+|The embedding step (`update-embeddings`) was not run, or the document filename does not match.
+
+|Embedding is very slow
+|AnythingLLM's native embedding model runs on CPU inside the pod. For large documents, this can take 1-2 minutes.
+
+|`update-embeddings` returns 404
+|The workspace name in the URL must match exactly.
+|===
+
+[.next-nav]
+xref:06-query-with-rag.adoc[Next: Query with RAG -->]
