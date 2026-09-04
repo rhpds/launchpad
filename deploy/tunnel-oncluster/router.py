@@ -113,8 +113,22 @@ def _rewrite_url(value: str, tunnel_host: str) -> str:
         f"https://{INFRA01_API_HOST}",
         "https://api.arena.fm2aihpcsed.com:6443",
     )
+    # During Console OAuth, OpenShift returns the browser to the original
+    # public path (which already includes /console).  Replacing the native
+    # Console origin must not add that proxy prefix a second time.
+    value = value.replace(
+        f"https://{tunnel_host}/console/console/",
+        f"https://{tunnel_host}/console/",
+    )
     value = value.replace(f"https://{tunnel_host}/oauth/oauth/", f"https://{tunnel_host}/oauth/")
     return value
+
+
+def _canonical_public_path(path: str) -> str:
+    """Collapse a duplicate Console prefix left by an in-flight OAuth flow."""
+    while path.startswith("console/console/"):
+        path = path[len("console/"):]
+    return path
 
 
 def _rewrite_console_body(body: bytes, tunnel_host: str) -> bytes:
@@ -199,6 +213,14 @@ async def health():
 
 @app.api_route("/{path:path}", methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"])
 async def route(path: str, request: Request):
+    canonical_path = _canonical_public_path(path)
+    if canonical_path != path:
+        query = f"?{request.url.query}" if request.url.query else ""
+        return Response(
+            status_code=302,
+            headers={"location": f"/{canonical_path}{query}"},
+        )
+    path = canonical_path
     origin, upstream_path, is_tls = _select_upstream(path)
     tunnel_host = request.headers.get("host", "")
 

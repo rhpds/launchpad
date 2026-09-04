@@ -8,15 +8,6 @@ metadata:
     app.kubernetes.io/part-of: partner-ai-launchpad
 automountServiceAccountToken: false
 ---
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: tunnel-router
-  namespace: partner-ai-launchpad
-data:
-  router.py: |
-    # Replaced from deploy/tunnel-oncluster/router.py by apply.sh.
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -46,7 +37,6 @@ spec:
         runAsNonRoot: true
         seccompProfile: {type: RuntimeDefault}
       volumes:
-        - {name: shared, emptyDir: {}}
         - name: router-script
           configMap: {name: tunnel-router}
       containers:
@@ -79,13 +69,7 @@ spec:
             capabilities: {drop: [ALL]}
         - name: cloudflared
           image: cloudflare/cloudflared:latest
-          command: [/bin/sh, -c]
-          args:
-            - >-
-              cloudflared tunnel --url http://127.0.0.1:8080 --no-autoupdate
-              2>&1 | tee /shared/cloudflared.log
-          volumeMounts:
-            - {name: shared, mountPath: /shared}
+          args: [tunnel, --url, http://127.0.0.1:8080, --no-autoupdate]
           resources:
             requests: {cpu: 50m, memory: 64Mi}
             limits: {cpu: 500m, memory: 256Mi}

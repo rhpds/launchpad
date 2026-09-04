@@ -25,6 +25,16 @@ def test_on_cluster_tunnel_has_a_dedicated_unprivileged_identity():
     assert "serviceAccountName: launchpad-backend" not in manifest
 
 
+def test_tunnel_manifest_cannot_overwrite_rendered_router_or_require_a_shell():
+    manifest = (ROOT / "deploy/tunnel-oncluster/deployment.yaml").read_text()
+
+    assert "kind: ConfigMap" not in manifest
+    assert "Replaced from deploy/tunnel-oncluster/router.py" not in manifest
+    assert "args: [tunnel, --url, http://127.0.0.1:8080, --no-autoupdate]" in manifest
+    assert "command: [/bin/sh" not in manifest
+    assert "tee /shared/cloudflared.log" not in manifest
+
+
 def test_tunnel_does_not_take_ownership_of_managed_console_or_authentication():
     scripts = "\n".join(
         (ROOT / path).read_text()
@@ -98,6 +108,24 @@ def test_console_router_rewrites_origins_but_preserves_encoded_redirect_uri():
 
     assert rewritten.startswith(f"https://{tunnel_host}/oauth/authorize")
     assert encoded_callback in rewritten
+
+
+def test_console_router_collapses_the_proxy_prefix_after_oauth_callback():
+    router = _router_module()
+    tunnel_host = "pilot.trycloudflare.com"
+
+    rewritten = router._rewrite_url(
+        "https://console-openshift-console.apps.arena.fm2aihpcsed.com"
+        "/console/topology/ns/participant-seat",
+        tunnel_host,
+    )
+
+    assert rewritten == (
+        f"https://{tunnel_host}/console/topology/ns/participant-seat"
+    )
+    assert router._canonical_public_path(
+        "console/console/topology/ns/participant-seat"
+    ) == "console/topology/ns/participant-seat"
 
 
 def test_console_router_keeps_http_only_and_scopes_proxy_cookie_paths():
