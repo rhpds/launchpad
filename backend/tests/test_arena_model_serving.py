@@ -64,3 +64,11 @@ def test_arena_registries_and_tool_lab_use_dedicated_endpoint():
         (ROOT / "catalog/intel-llm-tool-calling/catalog-item.yaml").read_text()
     )
     assert catalog["metadata"]["required_models"] == ["granite-3.2-8b-tools"]
+
+    overlay = yaml.safe_load(
+        (ROOT / "deploy/launchpad/overlays/arena/arena-clusters.yaml").read_text()
+    )
+    overlay_config = yaml.safe_load(overlay["data"]["clusters.yaml"])
+    assert overlay_config["clusters"][0]["model_endpoints"][
+        "granite-3.2-8b-tools"
+    ] == endpoint
