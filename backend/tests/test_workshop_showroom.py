@@ -92,7 +92,7 @@ class TestWorkshopSessionLimits:
             assert len(result.session_ids) == 10
 
     def test_workshop_respects_workshop_limit(self):
-        """MAX_ACTIVE_PER_WORKSHOP caps total workshop sessions."""
+        """Reject oversized orders instead of silently dropping requested seats."""
         svc = _make_service(max_workshop=3)
         workshop = Workshop(
             tenant_id="test-tenant",
@@ -101,8 +101,8 @@ class TestWorkshopSessionLimits:
             ttl="4h",
         )
         with patch.dict(os.environ, {"MAX_ACTIVE_SESSIONS_PER_WORKSHOP": "3"}, clear=False):
-            result = svc.provision_workshop(workshop)
-        assert len(result.session_ids) == 3
+            with pytest.raises(ValueError, match="supported limit of 3"):
+                svc.provision_workshop(workshop)
 
 
 # ── Task 9: Workshop handoff endpoint ────────────────────────────────

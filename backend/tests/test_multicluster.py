@@ -1,5 +1,6 @@
 from pathlib import Path
 from types import SimpleNamespace
+from unittest.mock import MagicMock
 
 import pytest
 from app.adapters.openshift.showroom_gitops import ShowroomSeat, build_showroom_application
@@ -127,6 +128,29 @@ def test_sandbox_model_selection_controls_cluster_placement():
     )
 
     assert service._select_target_cluster(request, catalog_item) == "oberon"
+
+
+def test_preflight_receives_selected_cluster_model_endpoints():
+    service = ProvisioningService.__new__(ProvisioningService)
+    service.cluster_registry = ClusterRegistry([
+        target(
+            "arena",
+            10,
+            ["openshift", "model_endpoint"],
+            {"granite-3.2-8b-tools": "http://arena-tools:8000/v1"},
+        ),
+    ])
+    service.preflight = MagicMock()
+    catalog_item = SimpleNamespace(metadata={"required_models": ["granite-3.2-8b-tools"]})
+
+    service._run_preflight(catalog_item, "arena")
+
+    service.preflight.check.assert_called_once_with(
+        catalog_item,
+        model_endpoints={
+            "granite-3.2-8b-tools": "http://arena-tools:8000/v1",
+        },
+    )
 
 
 def test_arena_only_registry_uses_arena_as_control_cluster(monkeypatch):

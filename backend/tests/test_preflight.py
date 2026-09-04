@@ -67,6 +67,48 @@ class TestPassesWhenModelsHealthy:
             headers={"Authorization": "Bearer test-key"},
         )
 
+    def test_uses_selected_cluster_model_endpoint_instead_of_global_base(self):
+        from app.adapters.openshift.preflight import LiteLLMPreflightChecker
+
+        checker = LiteLLMPreflightChecker(api_base="http://global-litellm:4000/v1")
+        item = _make_item(required_models=["granite-3.2-8b-tools"])
+
+        with patch("app.adapters.openshift.preflight.httpx") as mock_httpx:
+            mock_response = MagicMock()
+            mock_response.json.return_value = {
+                "data": [{"id": "granite-3.2-8b-tools"}]
+            }
+            mock_httpx.get.return_value = mock_response
+
+            result = checker.check(
+                item,
+                model_endpoints={
+                    "granite-3.2-8b-tools": (
+                        "http://vllm-granite-3-2-8b-tools.fleet-llm-d.svc:8000/v1"
+                    )
+                },
+            )
+
+        assert result.passed is True
+        mock_httpx.get.assert_called_once_with(
+            "http://vllm-granite-3-2-8b-tools.fleet-llm-d.svc:8000/v1/models",
+            timeout=10,
+            headers={},
+        )
+
+    def test_fails_closed_when_selected_cluster_has_no_model_endpoint(self):
+        from app.adapters.openshift.preflight import LiteLLMPreflightChecker
+
+        checker = LiteLLMPreflightChecker(api_base="http://global-litellm:4000/v1")
+        item = _make_item(required_models=["granite-3.2-8b-tools"])
+
+        with patch("app.adapters.openshift.preflight.httpx") as mock_httpx:
+            result = checker.check(item, model_endpoints={})
+
+        assert result.passed is False
+        assert "no endpoint configured" in result.checks[0].message.lower()
+        mock_httpx.get.assert_not_called()
+
 
 # ── Gate 3.2: test_fails_when_model_missing ──────────────────────────
 

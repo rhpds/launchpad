@@ -279,6 +279,16 @@ class ProvisioningService:
         )
         return target.cluster_id
 
+    def _run_preflight(self, catalog_item, cluster_ref: Optional[str]):
+        """Validate models against the endpoints on the persisted target cluster."""
+        model_endpoints = None
+        if cluster_ref and self.cluster_registry:
+            model_endpoints = self.cluster_registry.get(cluster_ref).model_endpoints
+        return self.preflight.check(
+            catalog_item,
+            model_endpoints=model_endpoints,
+        )
+
     def _get_gw_lock(self, gw_namespace: str) -> threading.Lock:
         if gw_namespace not in self._gw_locks:
             self._gw_locks[gw_namespace] = threading.Lock()
@@ -433,15 +443,16 @@ class ProvisioningService:
                 }
             })
 
+        hw, qp = self._resolve_hardware(request, catalog_item)
+        preferred_cluster = self._select_target_cluster(request, catalog_item)
+
         if self.preflight:
-            preflight_result = self.preflight.check(catalog_item)
+            preflight_result = self._run_preflight(catalog_item, preferred_cluster)
             if not preflight_result.passed:
                 failed = [c for c in preflight_result.checks if c.status == "fail"]
                 reasons = "; ".join(c.message for c in failed)
                 raise ValueError(f"Preflight failed for {catalog_item.catalog_item_id}: {reasons}")
 
-        hw, qp = self._resolve_hardware(request, catalog_item)
-        preferred_cluster = self._select_target_cluster(request, catalog_item)
         target_pool = self._get_pool(preferred_cluster)
         if not target_pool.check_capacity(hw, qp):
             raise ValueError(f"No capacity available for hardware={hw} quota={qp}")
@@ -1338,19 +1349,6 @@ class ProvisioningService:
             provision_event.set()
             return workshop
 
-        if self.preflight:
-            preflight_result = self.preflight.check(catalog_item)
-            if not preflight_result.passed:
-                failed = [c for c in preflight_result.checks if c.status == "fail"]
-                reasons = "; ".join(c.message for c in failed)
-                workshop = workshop.model_copy(update={
-                    "status": WorkshopStatus.PREFLIGHT_FAILED,
-                    "metadata": {**workshop.metadata, "preflight_failure": reasons},
-                })
-                self._save_workshop(workshop)
-                provision_event.set()
-                return workshop
-
         # The direct create-and-provision API does not pass through
         # create_workshop_order(), so it must persist placement here before
         # any seat request is created.  Otherwise each seat independently
@@ -1376,6 +1374,21 @@ class ProvisioningService:
                 return workshop
             workshop = workshop.model_copy(update={"cluster_ref": selected_cluster})
             self._save_workshop(workshop)
+
+        if self.preflight:
+            preflight_result = self._run_preflight(
+                catalog_item, workshop.cluster_ref
+            )
+            if not preflight_result.passed:
+                failed = [c for c in preflight_result.checks if c.status == "fail"]
+                reasons = "; ".join(c.message for c in failed)
+                workshop = workshop.model_copy(update={
+                    "status": WorkshopStatus.PREFLIGHT_FAILED,
+                    "metadata": {**workshop.metadata, "preflight_failure": reasons},
+                })
+                self._save_workshop(workshop)
+                provision_event.set()
+                return workshop
 
         # Capacity is revalidated immediately before mutations. On retry,
         # existing seat sessions already consume cluster capacity, so only
