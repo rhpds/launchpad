@@ -40,7 +40,7 @@ INTEL_GUIDED_LABS = [
         "title": "Enable AI Tool Calling on OpenShift",
         "model": "granite-3.2-8b-tools",
         "workspace_route": "",
-        "content_ref": "intel-guided-content-v1.0.2",
+        "content_ref": "intel-guided-content-v1.0.4",
         "max_workshop_seats": 5,
         "certification_stage": "five-seat",
     },
@@ -162,6 +162,10 @@ def test_intel_guided_lab_is_native_launchpad_content(lab):
     assert component["asciidoc"]["attributes"]["cluster_display_name"] == (
         "%cluster_display_name%"
     )
+    if lab["catalog_id"] == "intel-llm-tool-calling":
+        assert component["asciidoc"]["attributes"]["maas_api_url"] == (
+            "%maas_api_url%"
+        )
 
     nav = ROOT / lab["content_path"] / "modules/ROOT/nav.adoc"
     index = ROOT / lab["content_path"] / "modules/ROOT/pages/index.adoc"

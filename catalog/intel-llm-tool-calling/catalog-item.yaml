@@ -30,7 +30,7 @@ metadata:
   showroom_journey: intel-llm-tool-calling
   showroom_title: "LLM Tool Calling on Intel"
   showroom_content_repo_url: "https://github.com/rhpds/launchpad.git"
-  showroom_content_ref: "intel-guided-content-v1.0.2"
+  showroom_content_ref: "intel-guided-content-v1.0.4"
   showroom_content_playbook: "site-intel-llm-tool-calling.yml"
   required_models:
     - granite-3.2-8b-tools

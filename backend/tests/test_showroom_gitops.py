@@ -118,6 +118,7 @@ def test_content_lab_receives_launchpad_runtime_values_and_named_workspace_tab()
     assert user_data["openshift_cluster_ingress_domain"] == "apps.example.com"
     assert user_data["maas_endpoint"] == "https://models.example.com"
     assert user_data["maas_url"] == "https://models.example.com"
+    assert user_data["maas_api_url"] == "https://models.example.com/v1"
     assert user_data["maas_api_key"] == "sk-seat-1"
     assert user_data["litellm_api_key"] == "sk-seat-1"
     assert user_data["maas_model"] == "granite-2b-cpu"

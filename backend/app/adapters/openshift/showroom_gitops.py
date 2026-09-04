@@ -92,6 +92,9 @@ def build_showroom_application(
         "showroom_journey": seat.journey,
         "maas_endpoint": seat.maas_endpoint,
         "maas_url": seat.maas_endpoint,
+        "maas_api_url": f"{seat.maas_endpoint.rstrip('/')}/v1"
+        if seat.maas_endpoint
+        else "",
         "maas_api_key": seat.maas_api_key,
         "litellm_api_key": seat.maas_api_key,
         "maas_model": seat.maas_model,
