@@ -17,8 +17,8 @@ INTEL_GUIDED_LABS = [
         "model": "granite-2b-cpu",
         "workspace_route": "app",
         "content_ref": "intel-guided-content-v1.0.1",
-        "max_workshop_seats": 1,
-        "certification_stage": "single-seat",
+        "max_workshop_seats": 5,
+        "certification_stage": "five-seat",
     },
     {
         "catalog_id": "intel-llm-cpu-serving",
