@@ -1,0 +1,253 @@
+{
+  "schema_version": "1.0",
+  "evidence_id": "EDD-INTEL-CPU-SERVING-ARENA-5-20260904",
+  "generated_at": "2026-09-04T21:29:09Z",
+  "outcome": "pass",
+  "scope": "internal-five-seat-workshop",
+  "cluster": "arena",
+  "catalog_item_id": "intel-llm-cpu-serving",
+  "catalog_version": "1.0.0",
+  "content_ref": "intel-guided-content-v1.0.5",
+  "source_commit": "3ee152ca2184d891d1d9c0113767d0abfa91dec1",
+  "seat_count": 5,
+  "public_access_certified": false,
+  "twenty_five_seat_certified": false,
+  "certification_boundary": "This evidence promotes one internal five-seat CPU Serving workshop on Arena. It does not certify public-code access, external DNS/TLS, a 25-seat workshop, or the AnythingLLM image outside Arena's internal registry.",
+  "images": {
+    "backend": "sha256:e4b784a4a7f8bbaec7b0291b4a1f3b25eb31112a427c89ba70d5bf43b1bab54a",
+    "showroom_terminal": "sha256:01e4ca6097f07e5011581e44862194944e08cccdbdef241dcce6701243c13a2a",
+    "anythingllm_openshift": "sha256:1eee2162bed8ab643133dd9420ea086566f7c778849e9ff3eddc71a6a6cd8f98",
+    "ovms": "sha256:069a1c1191995e2b1338879137efc9551829e47f1d2e97049004453a6076d898",
+    "ovms_tls_proxy": "sha256:0ae19f15f7aac55c1c6d3019009d7d5a83ad1ee2af90ad9f04a89aaab0baf85b"
+  },
+  "artifact_hashes": {
+    "catalog/intel-llm-cpu-serving/catalog-item.yaml": "11c66077948db02e11fc5c7aecf135e407babbedac79c96c3beee2f37246dac6",
+    "content-intel-llm-cpu-serving/antora.yml": "3cbd64b1de1c747eeeb5202703bf0d8e13a5c196bc4be47657d95ad0e04bb0f5",
+    "content-intel-llm-cpu-serving/modules/ROOT/pages/04-wire-rag-frontend.adoc": "2a732e94fea109ee5336efb8ba2db332eb23f5fd0cfca28dc27d0cd3350d6791",
+    "workshop-images/anythingllm-openshift/Containerfile": "611665ac8fba07280f750f4835db5d8838c8c26d62fef7df0aa54631319dc74b",
+    "scripts/certify-cpu-serving-seat.sh": "5625a43a149004b60aed24b6d095242fdb60786650ae8b0cadff2ad93dddb96f",
+    "scripts/certify-cpu-serving-rag.sh": "2ed5c9bed54609d01c72ef20be17e63fad18c3bd6729fc52192c5385a286d2fa"
+  },
+  "test_runs": {
+    "catalog_workshop_showroom_placement_and_evidence_suite": "178 passed",
+    "live_arena_workshop": "5 seats ready, each completed a grounded and cited RAG journey, and all were reclaimed",
+    "live_arena_cleanup": "zero namespaces, Routes, Applications, and cross-namespace RoleBindings"
+  },
+  "tdd": {
+    "red": [
+      "Catalog contract rejected max_workshop_seats=1 when the five-seat gate was opened.",
+      "The five-seat evidence contract failed with FileNotFoundError before this manifest existed.",
+      "A live grounded RAG request returned HTTP 500 because genericOpenAi was not a valid provider identifier for the pinned AnythingLLM image.",
+      "The provider contract test rejected the camel-case provider value in the guide."
+    ],
+    "green": [
+      "Catalog maximum is five and certification_stage is five-seat after the live gate passed.",
+      "The guide and repeatable deployment driver use the pinned provider identifier generic-openai.",
+      "Five concurrent AnythingLLM RAG journeys returned grounded, cited answers through the shared CPU model.",
+      "The evidence contract validates scope, readiness, isolation, functional RAG, and cleanup."
+    ]
+  },
+  "cdd": {
+    "contracts": [
+      "workshop capacity preview, order, confirmation, and status API",
+      "persisted whole-workshop Arena affinity",
+      "Showroom Antora runtime attributes",
+      "terminal rotating service-account kubeconfig",
+      "namespace RoleBinding isolation",
+      "AnythingLLM generic OpenAI provider environment",
+      "AnythingLLM workspace, raw-document, and chat APIs",
+      "OpenAI-compatible OVMS chat completion",
+      "idempotent bulk reclaim"
+    ],
+    "status": "pass"
+  },
+  "bdd": {
+    "scenario": "Given one five-seat CPU Serving order targeted to Arena, when the owner confirms it and each participant follows the guide, then every isolated seat can deploy AnythingLLM, ingest the policy, retrieve it, receive a cited grounded answer through shared CPU inference, and one bulk reclaim removes all workshop resources.",
+    "status": "pass"
+  },
+  "cbt": {
+    "components": {
+      "placement_and_capacity": "pass",
+      "workshop_orchestration": "pass",
+      "showroom_and_antora": "pass",
+      "terminal_identity": "pass",
+      "openshift_rbac": "pass",
+      "anythingllm_workload": "pass",
+      "native_embedding_and_retrieval": "pass",
+      "ovms_model_endpoint": "pass",
+      "cleanup_controller": "pass"
+    }
+  },
+  "discarded_candidate_runs": [
+    {
+      "workshop_id": "aa54cfe1-6222-4616-af36-62d0d410e89c",
+      "result": "red-regression-added",
+      "reason": "Five seats, participant deployments, routes, and direct model calls passed, but the guide configured AnythingLLM with the invalid provider value genericOpenAi. The workshop was reclaimed and excluded from promotion evidence."
+    },
+    {
+      "workshop_id": "c8650d28-aacf-4e64-99a8-b51b096e1523",
+      "result": "red-regression-added",
+      "reason": "The explicit RAG chat check reproduced HTTP 500 with the invalid provider error. The seat was reclaimed and excluded from promotion evidence."
+    },
+    {
+      "workshop_id": "3f01638c-4eef-4e50-9cd9-bdcc817327da",
+      "result": "fix-verification",
+      "reason": "Fresh content v1.0.5 completed one grounded, cited RAG answer after the provider fix. The seat was reclaimed before the final five-seat rerun."
+    }
+  ],
+  "workshop": {
+    "workshop_id": "04cc7235-df9d-4f70-9f96-b6b1b58b622a",
+    "idempotency_key": "arena-cpu-five-20260904-final",
+    "placement": "arena",
+    "placement_reason": "Entire workshop assigned to arena; seats were not split",
+    "requested_at": "2026-09-04T21:24:16.028342Z",
+    "ready_at": "2026-09-04T21:25:12.895535Z",
+    "status_after_reclaim": "completed",
+    "session_ids": [
+      "f2727cfb-472f-441f-9147-26605004fec2",
+      "610506dc-18ca-423b-b6d6-3fff0604f10a",
+      "8f63fb58-9a53-40e3-af5d-e81298d75de7",
+      "66b83f85-36f2-46d6-8cbb-3dfdac8dac4c",
+      "84f269d8-03b9-49c5-9aa5-7651de202e79"
+    ],
+    "namespaces": [
+      "launchpad-smoke-test-tenant-intel-llm-cpu-serv-ebd6a3",
+      "launchpad-smoke-test-tenant-intel-llm-cpu-serv-334a7e",
+      "launchpad-smoke-test-tenant-intel-llm-cpu-serv-ee98ea",
+      "launchpad-smoke-test-tenant-intel-llm-cpu-serv-cfc8c2",
+      "launchpad-smoke-test-tenant-intel-llm-cpu-serv-e8887e"
+    ]
+  },
+  "capacity_preview": {
+    "can_provision": true,
+    "selected_cluster": "arena",
+    "seats_requested": 5,
+    "catalog_seat_limit": 5,
+    "reserved_cpu_millicores": 3325,
+    "reserved_memory_mib": 7440,
+    "reserved_pods": 10,
+    "headroom_percent": 20
+  },
+  "provisioning": {
+    "all_seats_ready": true,
+    "collective_ready_seconds": 57,
+    "unique_session_count": 5,
+    "unique_namespace_count": 5,
+    "showroom_pods_ready": 5,
+    "showroom_containers_ready_per_pod": "3/3",
+    "healthy_synced_argocd_applications": 5,
+    "participant_workload_pods_ready": 5,
+    "total_ready_pods_after_participant_deployments": 10,
+    "seat_workload_node": "rhgnr1",
+    "shared_model_node": "rhgnr1"
+  },
+  "participant_validation": {
+    "showroom_http_200": 5,
+    "guide_http_200": 5,
+    "resolved_model_values": 5,
+    "valid_provider_values": 5,
+    "default_project_matches_seat": 5,
+    "own_namespace_edit_allowed": 5,
+    "cross_seat_read_denied": 5,
+    "anythingllm_deployments_ready": 5,
+    "anythingllm_http_200": 5,
+    "anythingllm_ping_http_200": 5,
+    "anythingllm_zero_restarts": 5,
+    "anythingllm_provider_valid": 5,
+    "anythingllm_image_digest_matches": 5
+  },
+  "concurrent_rag": {
+    "successful_calls": 5,
+    "grounded_answers": 5,
+    "cited_documents": 5,
+    "document_title": "orion-leave-policy.txt",
+    "expected_fact": "17 days of Orion leave per calendar year",
+    "latency_seconds": [
+      7.125583,
+      6.655765,
+      5.305553,
+      7.370557,
+      6.969625
+    ],
+    "p95_method": "nearest rank",
+    "p95_seconds": 7.370557,
+    "mean_seconds": 6.685417,
+    "min_seconds": 5.305553,
+    "max_seconds": 7.370557
+  },
+  "cleanup": {
+    "started_at": "2026-09-04T21:27:18Z",
+    "completed_at": "2026-09-04T21:28:40Z",
+    "completed_seconds": 82,
+    "all_seats_reclaimed": true,
+    "reclaimed_seat_count": 5,
+    "remaining_namespaces": 0,
+    "remaining_routes": 0,
+    "remaining_applications": 0,
+    "remaining_cross_namespace_rolebindings": 0
+  },
+  "red_green_matrix": [
+    {
+      "requirement": "capacity preview and whole-workshop Arena placement",
+      "critical": true,
+      "status": "GREEN-live"
+    },
+    {
+      "requirement": "five unique seats reach collective readiness",
+      "critical": true,
+      "status": "GREEN-live"
+    },
+    {
+      "requirement": "Showroom and corrected Antora guide",
+      "critical": true,
+      "status": "GREEN-live"
+    },
+    {
+      "requirement": "terminal project and namespace isolation",
+      "critical": true,
+      "status": "GREEN-live"
+    },
+    {
+      "requirement": "five participant-owned AnythingLLM deployments",
+      "critical": true,
+      "status": "GREEN-live"
+    },
+    {
+      "requirement": "valid generic OpenAI provider configuration",
+      "critical": true,
+      "status": "GREEN-live"
+    },
+    {
+      "requirement": "five simultaneous document ingestion and grounded RAG answers",
+      "critical": true,
+      "status": "GREEN-live"
+    },
+    {
+      "requirement": "five cited source documents",
+      "critical": true,
+      "status": "GREEN-live"
+    },
+    {
+      "requirement": "bulk reclaim within ten minutes with zero live residue",
+      "critical": true,
+      "status": "GREEN-live"
+    }
+  ],
+  "gate_rubric": {
+    "workshop_order_and_placement": 15,
+    "seat_and_namespace_isolation": 15,
+    "showroom_and_content": 15,
+    "participant_workload_deployment": 15,
+    "grounded_rag_functionality": 20,
+    "reclaim_and_cleanup": 10,
+    "evidence_integrity": 5,
+    "repeatability_and_regression_recovery": 5,
+    "score": 100,
+    "required": 100
+  },
+  "known_limits": [
+    "Public-code participant access was not exercised.",
+    "A 25-seat CPU Serving workshop has not been certified.",
+    "The pinned AnythingLLM derivative is retained in Arena's internal registry and must be promoted to a durable external registry before wider production rollout."
+  ]
+}
