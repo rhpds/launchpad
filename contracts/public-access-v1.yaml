@@ -25,6 +25,44 @@ paths:
       responses:
         '200': {description: Stable subject, username, seat and expiry}
         '403': {description: Uniform denial}
+        '503': {description: Namespace authorization could not be granted; claim was revoked}
+  /api/v1/public-access/private/validate-by-code:
+    post:
+      operationId: validateForClusterConsole
+      description: Resolve the unique active order from its high-entropy code when the OpenShift OAuth callback host does not identify a lab.
+      security: [{brokerKey: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, code]
+              properties:
+                email: {type: string, format: email, description: Unverified identity label}
+                code: {type: string, writeOnly: true}
+      responses:
+        '200': {description: Stable order, subject, username, seat and expiry}
+        '403': {description: Uniform denial}
+        '503': {description: Namespace authorization could not be granted; claim was revoked}
+  /api/v1/public-access/admin/orders/{order_id}/public-url:
+    patch:
+      operationId: updatePilotPublicOrigin
+      description: Admin-only audited replacement for direct database edits when a temporary pilot hostname changes.
+      parameters:
+        - {name: order_id, in: path, required: true, schema: {type: string}}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [public_url]
+              properties:
+                public_url: {type: string, format: uri, description: Bare HTTPS origin}
+      responses:
+        '200': {description: Updated public-order summary}
+        '400': {description: Invalid origin or missing policy}
 components:
   securitySchemes:
     brokerKey: {type: apiKey, in: header, name: X-Access-Broker-Key}

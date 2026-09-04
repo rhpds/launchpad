@@ -36,12 +36,19 @@ public final class LaunchpadCodeAuthenticator implements Authenticator {
         String email = value(form, "email");
         String code = value(form, "code");
         String order = value(form, "order_id");
-        if (email.isBlank() || code.isBlank() || order.isBlank()) { deny(context); return; }
+        if (email.isBlank() || code.isBlank()) { deny(context); return; }
         try {
             String backend = required("LAUNCHPAD_ACCESS_VALIDATION_URL");
             String brokerKey = required("ACCESS_BROKER_KEY");
-            String payload = JSON.createObjectNode().put("order_id", order).put("email", email).put("code", code).toString();
-            HttpRequest request = HttpRequest.newBuilder(URI.create(backend))
+            var payloadNode = JSON.createObjectNode().put("email", email).put("code", code);
+            String endpoint = backend;
+            if (order.isBlank()) {
+                endpoint = backend.substring(0, backend.lastIndexOf('/')) + "/validate-by-code";
+            } else {
+                payloadNode.put("order_id", order);
+            }
+            String payload = payloadNode.toString();
+            HttpRequest request = HttpRequest.newBuilder(URI.create(endpoint))
                 .timeout(Duration.ofSeconds(8)).header("Content-Type", "application/json")
                 .header("X-Access-Broker-Key", brokerKey)
                 .POST(HttpRequest.BodyPublishers.ofString(payload, StandardCharsets.UTF_8)).build();
@@ -50,7 +57,8 @@ public final class LaunchpadCodeAuthenticator implements Authenticator {
             JsonNode result = JSON.readTree(response.body());
             String username = result.path("preferred_username").asText();
             String subject = result.path("subject").asText();
-            if (username.isBlank() || subject.isBlank()) { deny(context); return; }
+            String resolvedOrder = result.path("order_id").asText();
+            if (username.isBlank() || subject.isBlank() || resolvedOrder.isBlank()) { deny(context); return; }
             RealmModel realm = context.getRealm();
             UserModel user = context.getSession().users().getUserByUsername(realm, username);
             if (user == null) user = context.getSession().users().addUser(realm, username);
@@ -68,7 +76,7 @@ public final class LaunchpadCodeAuthenticator implements Authenticator {
             user.setFirstName("Launchpad");
             user.setLastName("Participant");
             user.setSingleAttribute("launchpad_participant_id", subject);
-            user.setSingleAttribute("launchpad_order_id", order);
+            user.setSingleAttribute("launchpad_order_id", resolvedOrder);
             context.setUser(user);
             context.success();
         } catch (Exception ignored) { deny(context); }

@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from types import SimpleNamespace
 
 import pytest
+from fastapi import HTTPException
 
 from app.domain.access import EntitlementStatus, ExposurePolicy
 from app.domain.clusters import ClusterTarget
@@ -131,12 +132,74 @@ def test_shared_pilot_host_selects_only_current_active_policy():
     assert access.get_policy_by_host("pilot.example.io").order_id == "current"
 
 
+def test_shared_pilot_origin_is_used_without_creating_unroutable_subdomains():
+    access = PublicAccessService(
+        enabled=True,
+        shared_origin="https://public-pilot.trycloudflare.com",
+    )
+
+    policy, _ = access.create_policy(
+        order_id="shared-pilot",
+        order_type="workshop",
+        catalog_slug="operators",
+        seat_refs=["seat-1"],
+        expires_at=datetime.utcnow() + timedelta(hours=1),
+    )
+
+    assert policy.public_url == "https://public-pilot.trycloudflare.com"
+
+
+def test_shared_pilot_origin_rejects_a_second_active_order():
+    access = PublicAccessService(
+        enabled=True,
+        shared_origin="https://public-pilot.trycloudflare.com",
+    )
+    access.create_policy(
+        order_id="first-pilot",
+        order_type="workshop",
+        catalog_slug="operators",
+        seat_refs=["seat-1", "seat-2"],
+        expires_at=datetime.utcnow() + timedelta(hours=1),
+    )
+
+    with pytest.raises(ValueError, match="already has an active order"):
+        access.create_policy(
+            order_id="second-pilot",
+            order_type="individual",
+            catalog_slug="operators",
+            seat_refs=["seat-3"],
+            expires_at=datetime.utcnow() + timedelta(hours=1),
+        )
+
+
 def test_public_placement_requires_public_enabled_cluster():
     registry = ClusterRegistry([
         ClusterTarget(cluster_id="private", display_name="Private", ingress_domain="apps.private", capabilities=["openshift"]),
         ClusterTarget(cluster_id="public", display_name="Public", ingress_domain="apps.public", capabilities=["openshift"], public_access_enabled=True, public_ingress_domain="labs.example.io"),
     ])
     assert registry.select(["openshift"], require_public_access=True).cluster_id == "public"
+
+
+def test_arena_pilot_flag_does_not_make_any_other_cluster_public(monkeypatch):
+    registry = ClusterRegistry([
+        ClusterTarget(
+            cluster_id="arena",
+            display_name="Arena",
+            ingress_domain="apps.arena.example",
+            capabilities=["openshift"],
+        ),
+        ClusterTarget(
+            cluster_id="other",
+            display_name="Other",
+            ingress_domain="apps.other.example",
+            capabilities=["openshift"],
+        ),
+    ])
+    monkeypatch.setenv("PUBLIC_ACCESS_PILOT_CLUSTER", "arena")
+
+    eligible = registry.eligible(["openshift"], require_public_access=True)
+
+    assert [target.cluster_id for target in eligible] == ["arena"]
 
 
 def test_only_failed_claims_consume_rate_limit_budget():
@@ -175,6 +238,120 @@ def test_owner_summary_counts_only_active_claims(monkeypatch):
     monkeypatch.setattr(public_access_router, "public_access_service", fake_service)
 
     assert public_access_router._owner_summary("order-summary")["claim_count"] == 1
+
+
+def test_keycloak_validation_fails_closed_when_namespace_binding_fails(monkeypatch):
+    access = service()
+    _, code = access.create_policy(
+        order_id="binding-failure",
+        order_type="workshop",
+        catalog_slug="operators",
+        seat_refs=["seat-1"],
+        expires_at=datetime.utcnow() + timedelta(hours=1),
+    )
+
+    class RejectBinding:
+        @staticmethod
+        def bind_public_participant(*_args):
+            raise RuntimeError("Arena rejected the RoleBinding")
+
+    monkeypatch.setenv("ACCESS_BROKER_KEY", "test-broker-key")
+    monkeypatch.setattr(public_access_router, "public_access_service", access)
+    monkeypatch.setattr(public_access_router, "provisioning_service", RejectBinding())
+
+    with pytest.raises(HTTPException) as exc:
+        public_access_router.keycloak_validate(
+            public_access_router.ClaimRequest(
+                order_id="binding-failure",
+                email="first@example.com",
+                code=code,
+            ),
+            SimpleNamespace(client=SimpleNamespace(host="192.0.2.40")),
+            "test-broker-key",
+        )
+
+    assert exc.value.status_code == 503
+    assert not [
+        entitlement
+        for entitlement in access._entitlements.values()
+        if entitlement.order_id == "binding-failure"
+        and entitlement.status == EntitlementStatus.ACTIVE
+    ]
+    assert access.claim(
+        "binding-failure", "second@example.com", code, "192.0.2.41"
+    ).entitlement.seat_ref == "seat-1"
+
+
+def test_keycloak_can_recover_order_from_unique_active_code(monkeypatch):
+    access = service()
+    _, code = access.create_policy(
+        order_id="console-sso",
+        order_type="workshop",
+        catalog_slug="operators",
+        seat_refs=["seat-1"],
+        expires_at=datetime.utcnow() + timedelta(hours=1),
+    )
+    bindings = []
+
+    class RecordBinding:
+        @staticmethod
+        def bind_public_participant(order_id, seat_ref, username):
+            bindings.append((order_id, seat_ref, username))
+
+    monkeypatch.setenv("ACCESS_BROKER_KEY", "test-broker-key")
+    monkeypatch.setattr(public_access_router, "public_access_service", access)
+    monkeypatch.setattr(public_access_router, "provisioning_service", RecordBinding())
+
+    result = public_access_router.keycloak_validate_by_code(
+        public_access_router.CodeClaimRequest(
+            email="participant@example.com",
+            code=code,
+        ),
+        SimpleNamespace(client=SimpleNamespace(host="192.0.2.42")),
+        "test-broker-key",
+    )
+
+    assert result["active"] is True
+    assert result["order_id"] == "console-sso"
+    assert result["seat_ref"] == "seat-1"
+    assert bindings == [("console-sso", "seat-1", result["preferred_username"])]
+
+
+def test_admin_can_change_only_the_https_origin_for_a_pilot_order():
+    access = service()
+    access.create_policy(
+        order_id="pilot-url",
+        order_type="workshop",
+        catalog_slug="operators",
+        seat_refs=["seat-1"],
+        expires_at=datetime.utcnow() + timedelta(hours=1),
+    )
+
+    updated = access.set_public_url(
+        "pilot-url", "https://public-pilot.trycloudflare.com"
+    )
+
+    assert updated.public_url == "https://public-pilot.trycloudflare.com"
+    assert access.get_policy_by_host("public-pilot.trycloudflare.com").order_id == "pilot-url"
+    for invalid in (
+        "http://public-pilot.trycloudflare.com",
+        "https://user:secret@public-pilot.trycloudflare.com",
+        "https://public-pilot.trycloudflare.com/another-app",
+    ):
+        with pytest.raises(ValueError, match="HTTPS origin"):
+            access.set_public_url("pilot-url", invalid)
+
+    access.create_policy(
+        order_id="second-pilot-url",
+        order_type="individual",
+        catalog_slug="operators",
+        seat_refs=["seat-2"],
+        expires_at=datetime.utcnow() + timedelta(hours=1),
+    )
+    with pytest.raises(ValueError, match="already belongs to an active order"):
+        access.set_public_url(
+            "second-pilot-url", "https://public-pilot.trycloudflare.com"
+        )
 
 
 def test_public_access_never_uses_placeholder_workspace_url():

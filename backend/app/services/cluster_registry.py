@@ -44,15 +44,21 @@ class ClusterRegistry:
     ) -> list[ClusterTarget]:
         capabilities = set(required_capabilities)
         models = set(required_models)
+        pilot_cluster = os.getenv("PUBLIC_ACCESS_PILOT_CLUSTER", "").strip()
         return sorted(
             [
                 target
                 for target in self.list_enabled()
                 if capabilities.issubset(set(target.capabilities))
                 and models.issubset(set(target.model_endpoints))
-                and (not require_public_access or (
-                    target.public_access_enabled and bool(target.public_ingress_domain)
-                ))
+                and (
+                    not require_public_access
+                    or (
+                        target.public_access_enabled
+                        and bool(target.public_ingress_domain)
+                    )
+                    or target.cluster_id == pilot_cluster
+                )
             ],
             key=lambda target: (target.priority, target.cluster_id),
         )

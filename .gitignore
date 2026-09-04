@@ -27,6 +27,10 @@ demos/.env
 *.token
 kubeconfig*
 *-kubeconfig
+.tunnel-pids
+.tunnel-hostname
+.tunnel-hostname.prev
+.cloudflared-config.yml
 .sandbox/
 secrets/
 

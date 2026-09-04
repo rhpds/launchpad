@@ -1,0 +1,94 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: launchpad-public-tunnel
+  namespace: partner-ai-launchpad
+  labels:
+    app.kubernetes.io/name: cloudflare-tunnel
+    app.kubernetes.io/part-of: partner-ai-launchpad
+automountServiceAccountToken: false
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tunnel-router
+  namespace: partner-ai-launchpad
+data:
+  router.py: |
+    # Replaced from deploy/tunnel-oncluster/router.py by apply.sh.
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudflare-tunnel
+  namespace: partner-ai-launchpad
+  labels:
+    app.kubernetes.io/name: cloudflare-tunnel
+    app.kubernetes.io/part-of: partner-ai-launchpad
+    launchpad.redhat.com/purpose: public-access-pilot
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: cloudflare-tunnel
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: cloudflare-tunnel
+        app.kubernetes.io/part-of: partner-ai-launchpad
+        launchpad.redhat.com/purpose: public-access-pilot
+    spec:
+      serviceAccountName: launchpad-public-tunnel
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile: {type: RuntimeDefault}
+      volumes:
+        - {name: shared, emptyDir: {}}
+        - name: router-script
+          configMap: {name: tunnel-router}
+      containers:
+        - name: router
+          image: image-registry.openshift-image-registry.svc:5000/partner-ai-launchpad/launchpad-backend:latest
+          command: [uvicorn]
+          args: [router:app, --host, 0.0.0.0, --port, "8080", --app-dir, /opt/tunnel]
+          env:
+            - name: ACCESS_BROKER_KEY
+              valueFrom:
+                secretKeyRef: {name: launchpad-public-access, key: ACCESS_BROKER_KEY}
+          ports:
+            - {name: http, containerPort: 8080}
+          volumeMounts:
+            - name: router-script
+              mountPath: /opt/tunnel/router.py
+              subPath: router.py
+              readOnly: true
+          readinessProbe:
+            httpGet: {path: /health, port: http}
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: {path: /health, port: http}
+            periodSeconds: 30
+          resources:
+            requests: {cpu: 100m, memory: 128Mi}
+            limits: {cpu: "1", memory: 512Mi}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities: {drop: [ALL]}
+        - name: cloudflared
+          image: cloudflare/cloudflared:latest
+          command: [/bin/sh, -c]
+          args:
+            - >-
+              cloudflared tunnel --url http://127.0.0.1:8080 --no-autoupdate
+              2>&1 | tee /shared/cloudflared.log
+          volumeMounts:
+            - {name: shared, mountPath: /shared}
+          resources:
+            requests: {cpu: 50m, memory: 64Mi}
+            limits: {cpu: 500m, memory: 256Mi}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities: {drop: [ALL]}

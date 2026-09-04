@@ -36,3 +36,18 @@ merge templates, not directly deployable replacements. Back up the live
 Keycloak/OAuth resources and merge only the described provider/client/flow.
 Run `scripts/certify_public_access.py --host <test-order-host>` from an external
 network and retain its immutable output in the certification evidence bundle.
+
+## Arena disposable pilot
+
+Until stable public DNS and ingress exist, use
+`deploy/tunnel-oncluster/README.md` for a temporary Arena-only browser test.
+That workflow keeps the Console and authentication operators managed, uses an
+unprivileged tunnel identity, updates the order origin through the Launchpad
+API, and never rotates the instructor code implicitly. A Quick Tunnel result is
+functional evidence only and cannot make the production DNS/TLS rows green.
+
+The Keycloak authenticator first reuses its existing SSO cookie. If an embedded
+OpenShift Console cannot send that cookie, the form can recover the unique
+active order from the instructor code through the private
+`validate-by-code` contract. Namespace RBAC must succeed before either path
+returns a usable identity.

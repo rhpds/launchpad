@@ -1,0 +1,357 @@
+"""On-cluster tunnel router for Cloudflare Quick Tunnel.
+
+Runs as a pod on Arena and routes tunnel traffic to in-cluster services:
+  /console/…        → OpenShift Console  (console.openshift-console.svc:443)
+  /oauth/…          → OpenShift OAuth    (oauth-openshift.openshift-authentication.svc:443)
+  /realms/…         → Keycloak           (keycloak-service.keycloak.svc:8080)
+  /resources/…      → Keycloak           (keycloak-service.keycloak.svc:8080)
+  everything else   → Public gateway     (public-access-gateway.partner-ai-launchpad.svc:8443)
+"""
+
+from __future__ import annotations
+
+import asyncio
+import logging
+import os
+import re
+import ssl
+import traceback
+
+import httpx
+import websockets
+
+from fastapi import FastAPI, Request, Response, WebSocket, WebSocketDisconnect
+
+logging.basicConfig(level=logging.INFO)
+log = logging.getLogger("router")
+
+app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
+
+NOSSL = ssl.create_default_context()
+NOSSL.check_hostname = False
+NOSSL.verify_mode = ssl.CERT_NONE
+
+CONSOLE_ORIGIN = os.environ.get(
+    "CONSOLE_ORIGIN", "https://console.openshift-console.svc:443"
+)
+OAUTH_ORIGIN = os.environ.get(
+    "OAUTH_ORIGIN", "https://oauth-openshift.openshift-authentication.svc:443"
+)
+KEYCLOAK_ORIGIN = os.environ.get("KEYCLOAK_ORIGIN", "http://keycloak-service.keycloak.svc:8080")
+GATEWAY_ORIGIN = os.environ.get(
+    "GATEWAY_ORIGIN", "http://public-access-gateway.partner-ai-launchpad.svc:8443"
+)
+
+ARENA_CONSOLE_HOST = "console-openshift-console.apps.arena.fm2aihpcsed.com"
+ARENA_OAUTH_HOST = "oauth-openshift.apps.arena.fm2aihpcsed.com"
+ARENA_KEYCLOAK_HOST = "keycloak.apps.arena.fm2aihpcsed.com"
+KEYCLOAK_INT_ORIGIN = "http://keycloak-service.keycloak.svc:8080"
+
+INFRA01_CONSOLE_HOST = "console-openshift-console.apps.ocpv-infra01.dal12.infra.demo.redhat.com"
+INFRA01_OAUTH_HOST = "oauth-openshift.apps.ocpv-infra01.dal12.infra.demo.redhat.com"
+INFRA01_API_HOST = "api.ocpv-infra01.dal12.infra.demo.redhat.com:6443"
+
+
+def _select_upstream(path: str) -> tuple:
+    if path.startswith("console/"):
+        return CONSOLE_ORIGIN, path[len("console/"):], True
+    # Console JS uses absolute paths for its API bridge
+    if path.startswith(("api/", "apis/", "api-resource-list/")):
+        return CONSOLE_ORIGIN, path, True
+    if path.startswith("oauth/"):
+        upstream_path = path
+        # /oauth/oauth2callback/* is a rewrite artifact — the actual OAuth
+        # server path is /oauth2callback/* (no /oauth/ prefix)
+        if path.startswith("oauth/oauth2callback/"):
+            upstream_path = path[len("oauth/"):]
+        return OAUTH_ORIGIN, upstream_path, True
+    if path.startswith(("realms/", "resources/", "robots.txt")):
+        return KEYCLOAK_ORIGIN, path, False
+    return GATEWAY_ORIGIN, path, False
+
+
+_SAMESITE_RE = re.compile(r";\s*SameSite=\w+", re.IGNORECASE)
+_DOMAIN_RE = re.compile(r";\s*Domain=[^;]+", re.IGNORECASE)
+_PATH_RE = re.compile(r";\s*Path=[^;]+", re.IGNORECASE)
+
+
+def _fix_cookie_samesite(
+    cookie: str, path_prefix: str = "", same_site: str = "None"
+) -> str:
+    cookie = _SAMESITE_RE.sub("", cookie)
+    cookie = _DOMAIN_RE.sub("", cookie)
+    if path_prefix == "console/":
+        cookie = _PATH_RE.sub("", cookie)
+        cookie += "; Path=/"
+    elif path_prefix:
+        cookie = _PATH_RE.sub("", cookie)
+        cookie += f"; Path=/{path_prefix}"
+    elif not _PATH_RE.search(cookie):
+        cookie += "; Path=/"
+
+    if "Secure" not in cookie:
+        cookie += "; Secure"
+    cookie += f"; SameSite={same_site}"
+    return cookie
+
+
+def _rewrite_url(value: str, tunnel_host: str) -> str:
+    # Only plain-text rewrites. URL-encoded forms (redirect_uri params in
+    # query strings) must NOT be rewritten or OAuth token exchanges will
+    # fail with redirect_uri mismatch errors.
+    pairs = [
+        (f"https://{ARENA_CONSOLE_HOST}", f"https://{tunnel_host}/console"),
+        (f"https://{ARENA_OAUTH_HOST}", f"https://{tunnel_host}/oauth"),
+        (f"https://{INFRA01_CONSOLE_HOST}", f"https://{tunnel_host}/console"),
+        (f"https://{INFRA01_OAUTH_HOST}", f"https://{tunnel_host}/oauth"),
+        (f"https://{ARENA_KEYCLOAK_HOST}", f"https://{tunnel_host}"),
+        (KEYCLOAK_INT_ORIGIN, f"https://{tunnel_host}"),
+    ]
+    for old, new in pairs:
+        value = value.replace(old, new)
+    value = value.replace(
+        f"https://{INFRA01_API_HOST}",
+        "https://api.arena.fm2aihpcsed.com:6443",
+    )
+    value = value.replace(f"https://{tunnel_host}/oauth/oauth/", f"https://{tunnel_host}/oauth/")
+    return value
+
+
+def _rewrite_console_body(body: bytes, tunnel_host: str) -> bytes:
+    text = body.decode("utf-8", errors="replace")
+    text = _rewrite_url(text, tunnel_host)
+    text = text.replace('<base href="/"/>', '<base href="/console/"/>')
+    return text.encode("utf-8")
+
+
+BACKEND_URL = os.environ.get(
+    "BACKEND_URL", "http://backend.partner-ai-launchpad.svc:8000/api/v1"
+)
+BROKER_KEY = os.environ.get("ACCESS_BROKER_KEY", "")
+
+
+async def _resolve_showroom_ws(headers: dict, path: str) -> str | None:
+    """Resolve the Showroom WebSocket URL by making an authenticated HTTP
+    request through the gateway's oauth2-proxy (which works for HTTP), then
+    connecting the WebSocket directly to the Showroom route (which doesn't
+    require auth for terminal connections)."""
+    ws_log = logging.getLogger("router.ws")
+    tunnel_host = headers.get("host", "")
+    cookie = headers.get("cookie", "")
+
+    if not cookie or not tunnel_host:
+        ws_log.warning("No cookie or host for WS resolve")
+        return None
+
+    try:
+        # oauth2-proxy validates the browser session and returns the trusted
+        # stable participant username in its auth-response headers.
+        auth_url = f"{GATEWAY_ORIGIN}/oauth2/auth"
+        async with httpx.AsyncClient(timeout=10, verify=False) as client:
+            resp = await client.get(
+                auth_url,
+                headers={"host": tunnel_host, "cookie": cookie},
+            )
+            username = resp.headers.get("x-auth-request-email", "") or resp.headers.get(
+                "x-auth-request-user", ""
+            )
+            ws_log.info(
+                "Resolved username from oauth2: %s (status=%s)",
+                username,
+                resp.status_code,
+            )
+
+        if not username:
+            ws_log.warning("Could not resolve username from oauth2/auth")
+            return None
+
+        # Now call the backend directly with the broker key
+        async with httpx.AsyncClient(timeout=10, verify=False) as client:
+            resp = await client.get(
+                f"{BACKEND_URL}/public-access/private/resolve-identity",
+                params={"host": tunnel_host.split(":")[0], "username": username},
+                headers={"X-Access-Broker-Key": BROKER_KEY},
+            )
+            if resp.status_code != 200:
+                ws_log.warning("resolve-identity returned %s", resp.status_code)
+                return None
+            data = resp.json()
+            showroom_url = data.get("showroom_url", "")
+            if not showroom_url:
+                return None
+
+        # Connect WebSocket directly to the Showroom route URL
+        ws_path = path
+        scheme = "wss" if showroom_url.startswith("https://") else "ws"
+        base = showroom_url.split("://", 1)[1].rstrip("/")
+        result = f"{scheme}://{base}/{ws_path}"
+        ws_log.info("Resolved showroom WS: %s", result)
+        return result
+    except Exception:
+        ws_log.error("resolve failed: %s", traceback.format_exc())
+        return None
+
+
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
+
+
+@app.api_route("/{path:path}", methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"])
+async def route(path: str, request: Request):
+    origin, upstream_path, is_tls = _select_upstream(path)
+    tunnel_host = request.headers.get("host", "")
+
+    headers = {
+        key: value
+        for key, value in request.headers.items()
+        if key.casefold() not in {"content-length", "accept-encoding", "connection"}
+    }
+
+    if is_tls and origin == CONSOLE_ORIGIN:
+        headers["host"] = ARENA_CONSOLE_HOST
+    elif is_tls and origin == OAUTH_ORIGIN:
+        headers["host"] = ARENA_OAUTH_HOST
+
+    async with httpx.AsyncClient(
+        timeout=60, follow_redirects=False, verify=False
+    ) as client:
+        upstream = await client.request(
+            request.method,
+            f"{origin}/{upstream_path}",
+            params=request.query_params,
+            headers=headers,
+            content=await request.body(),
+        )
+
+    excluded = {
+        "content-length", "content-encoding", "connection",
+        "transfer-encoding", "set-cookie",
+    }
+    if is_tls:
+        excluded |= {"x-frame-options", "content-security-policy", "content-security-policy-report-only"}
+
+    resp_headers = {
+        key: _rewrite_url(value, tunnel_host) if key.casefold() == "location" else value
+        for key, value in upstream.headers.items()
+        if key.casefold() not in excluded
+    }
+
+    body = upstream.content
+    content_type = upstream.headers.get("content-type", "")
+    is_text_like = (
+        "text/" in content_type
+        or "yaml" in content_type
+        or "json" in content_type
+        or "javascript" in content_type
+        or "xml" in content_type
+        or path.endswith((".yml", ".yaml", ".json", ".js", ".html", ".css"))
+    )
+    if is_tls and origin == CONSOLE_ORIGIN:
+        body = _rewrite_console_body(body, tunnel_host)
+    elif is_text_like:
+        text = body.decode("utf-8", errors="replace")
+        rewritten = _rewrite_url(text, tunnel_host)
+        if rewritten != text:
+            body = rewritten.encode("utf-8")
+
+    response = Response(
+        body,
+        status_code=upstream.status_code,
+        headers=resp_headers,
+    )
+    if is_tls:
+        response.headers["content-security-policy"] = (
+            "frame-ancestors 'self' "
+            f"https://{tunnel_host} https://*.apps.arena.fm2aihpcsed.com"
+        )
+    cookie_prefix = ""
+    if origin == CONSOLE_ORIGIN:
+        cookie_prefix = "console/"
+    elif origin == OAUTH_ORIGIN:
+        cookie_prefix = "oauth/"
+    for cookie in upstream.headers.get_list("set-cookie"):
+        cookie = _fix_cookie_samesite(cookie, path_prefix=cookie_prefix)
+        response.headers.append("set-cookie", cookie)
+
+    return response
+
+
+@app.websocket("/{path:path}")
+async def websocket_route(path: str, client: WebSocket):
+    original_host = client.headers.get("host", "")
+    headers = {
+        key: value
+        for key, value in client.headers.items()
+        if key.casefold()
+        not in {
+            "host",
+            "connection",
+            "upgrade",
+            "sec-websocket-key",
+            "sec-websocket-version",
+            "sec-websocket-extensions",
+        }
+    }
+    # Preserve the original Host header so oauth2-proxy can validate
+    # the session cookie (it was set for the tunnel domain, not the
+    # internal service name).
+    headers["host"] = original_host
+
+    origin, upstream_path, is_tls = _select_upstream(path)
+    scheme = "wss" if is_tls else "ws"
+    svc_host = origin.split("://", 1)[1]
+    upstream_url = f"{scheme}://{svc_host}/{upstream_path}"
+    if client.url.query:
+        upstream_url += "?" + client.url.query
+
+    requested_protocols = [
+        value.strip()
+        for value in client.headers.get("sec-websocket-protocol", "").split(",")
+    ]
+    selected_protocol = "tty" if "tty" in requested_protocols else None
+    await client.accept(subprotocol=selected_protocol)
+    try:
+        # For terminal WebSocket: resolve the Showroom URL from the backend
+        # and connect directly, bypassing the gateway's oauth2-proxy which
+        # doesn't reliably proxy WebSocket upgrades.
+        if upstream_path.startswith("terminal/"):
+            actual_url = await _resolve_showroom_ws(headers, upstream_path)
+            if actual_url:
+                upstream_url = actual_url
+
+        ws_kwargs = dict(
+            additional_headers={k: v for k, v in headers.items() if k.casefold() != "host"},
+            subprotocols=[selected_protocol] if selected_protocol else None,
+        )
+        if upstream_url.startswith("wss://") or is_tls:
+            ws_kwargs["ssl"] = NOSSL
+
+        logging.getLogger("router.ws").info("Connecting WS to %s", upstream_url)
+
+        async with websockets.connect(upstream_url, **ws_kwargs) as upstream:
+            async def to_upstream():
+                while True:
+                    message = await client.receive()
+                    if message.get("bytes") is not None:
+                        await upstream.send(message["bytes"])
+                    elif message.get("text") is not None:
+                        await upstream.send(message["text"])
+                    else:
+                        break
+
+            async def to_client():
+                async for message in upstream:
+                    if isinstance(message, bytes):
+                        await client.send_bytes(message)
+                    else:
+                        await client.send_text(message)
+
+            tasks = [asyncio.create_task(to_upstream()), asyncio.create_task(to_client())]
+            _, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
+            for task in pending:
+                task.cancel()
+    except WebSocketDisconnect:
+        pass
+    except Exception:
+        logging.getLogger("router.ws").error("WebSocket error: %s", traceback.format_exc())

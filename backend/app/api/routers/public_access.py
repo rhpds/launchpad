@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import os
 from datetime import datetime
 
@@ -10,10 +11,16 @@ from app.api.deps import provisioning_service, public_access_service
 from app.auth.oauth import User, require_admin
 
 router = APIRouter(prefix="/public-access", tags=["public-access"])
+logger = logging.getLogger("launchpad.public_access")
 
 
 class ClaimRequest(BaseModel):
     order_id: str
+    email: str
+    code: str
+
+
+class CodeClaimRequest(BaseModel):
     email: str
     code: str
 
@@ -29,10 +36,44 @@ class IdentityCodeClaimRequest(BaseModel):
     code: str
 
 
+class PublicUrlRequest(BaseModel):
+    public_url: str
+
+
 def _require_broker(key: str) -> None:
     expected = os.getenv("ACCESS_BROKER_KEY", "")
     if not expected or not __import__("secrets").compare_digest(expected, key):
         raise HTTPException(403, "Forbidden")
+
+
+def _bind_claim_or_fail_closed(order_id: str, result) -> None:
+    """Finish a claim only after Arena grants the participant's RBAC.
+
+    Claim allocation and Kubernetes RoleBinding creation currently cross two
+    storage systems. Compensate a failed binding by revoking the entitlement so
+    Keycloak cannot issue a usable identity without namespace authorization and
+    the seat remains available for a later retry.
+    """
+    try:
+        provisioning_service.bind_public_participant(
+            order_id,
+            result.entitlement.seat_ref,
+            result.identity.keycloak_username,
+        )
+    except Exception as exc:
+        try:
+            public_access_service.remove_participant(
+                order_id, result.identity.participant_id
+            )
+        except Exception:
+            logger.exception(
+                "Failed to compensate participant claim after RBAC failure: "
+                "order=%s seat=%s participant=%s",
+                order_id,
+                result.entitlement.seat_ref,
+                result.identity.participant_id,
+            )
+        raise HTTPException(503, "Claimed environment is not ready") from exc
 
 
 def _owner_summary(order_id: str) -> dict:
@@ -70,13 +111,7 @@ def claim(body: ClaimRequest, request: Request, response: Response):
         )
     except ValueError as exc:
         raise HTTPException(403, str(exc))
-    try:
-        provisioning_service.bind_public_participant(
-            body.order_id, result.entitlement.seat_ref, result.identity.keycloak_username
-        )
-    except ValueError as exc:
-        public_access_service.remove_participant(body.order_id, result.identity.participant_id)
-        raise HTTPException(503, "Claimed environment is not ready") from exc
+    _bind_claim_or_fail_closed(body.order_id, result)
     response.set_cookie(
         "launchpad_access", result.session_token, httponly=True, secure=True,
         samesite="lax", path="/",
@@ -119,6 +154,19 @@ def rotate(order_id: str, _user: User = Depends(require_admin)):
         raise HTTPException(404, str(exc))
 
 
+@router.patch("/admin/orders/{order_id}/public-url")
+def update_public_url(
+    order_id: str,
+    body: PublicUrlRequest,
+    _user: User = Depends(require_admin),
+):
+    try:
+        public_access_service.set_public_url(order_id, body.public_url)
+    except ValueError as exc:
+        raise HTTPException(400, str(exc))
+    return _owner_summary(order_id)
+
+
 @router.delete("/admin/orders/{order_id}/participants/{participant_id}", status_code=204)
 def remove_participant(order_id: str, participant_id: str, _user: User = Depends(require_admin)):
     try:
@@ -136,18 +184,61 @@ def keycloak_validate(body: ClaimRequest, request: Request, x_access_broker_key:
     _require_broker(x_access_broker_key)
     try:
         result = public_access_service.claim(body.order_id, body.email, body.code, request.client.host if request.client else "keycloak")
-        provisioning_service.bind_public_participant(
-            body.order_id, result.entitlement.seat_ref, result.identity.keycloak_username
-        )
-        return {
-            "active": True,
-            "subject": result.identity.participant_id,
-            "preferred_username": result.identity.keycloak_username,
-            "seat_ref": result.entitlement.seat_ref,
-            "expires_at": result.entitlement.expires_at,
-        }
     except ValueError:
         raise HTTPException(403, "Access request cannot be completed")
+    _bind_claim_or_fail_closed(body.order_id, result)
+    return {
+        "active": True,
+        "order_id": body.order_id,
+        "subject": result.identity.participant_id,
+        "preferred_username": result.identity.keycloak_username,
+        "seat_ref": result.entitlement.seat_ref,
+        "expires_at": result.entitlement.expires_at,
+    }
+
+
+@router.post("/private/validate-by-code")
+def keycloak_validate_by_code(
+    body: CodeClaimRequest,
+    request: Request,
+    x_access_broker_key: str = Header(default=""),
+):
+    """Validate Console OIDC when its callback host cannot identify an order.
+
+    OpenShift's OAuth callback belongs to the cluster rather than an individual
+    lab. The high-entropy instructor code is therefore used to select the one
+    active policy before the normal atomic claim and RBAC binding path runs.
+    """
+    _require_broker(x_access_broker_key)
+    now = datetime.utcnow()
+    matches = [
+        policy
+        for policy in public_access_service._policies.values()
+        if policy.enabled
+        and policy.expires_at > now
+        and public_access_service._verify(policy, body.code)
+    ]
+    if len(matches) != 1:
+        raise HTTPException(403, "Access request cannot be completed")
+    policy = matches[0]
+    try:
+        result = public_access_service.claim(
+            policy.order_id,
+            body.email,
+            body.code,
+            request.client.host if request.client else "keycloak",
+        )
+    except ValueError:
+        raise HTTPException(403, "Access request cannot be completed")
+    _bind_claim_or_fail_closed(policy.order_id, result)
+    return {
+        "active": True,
+        "order_id": policy.order_id,
+        "subject": result.identity.participant_id,
+        "preferred_username": result.identity.keycloak_username,
+        "seat_ref": result.entitlement.seat_ref,
+        "expires_at": result.entitlement.expires_at,
+    }
 
 
 @router.get("/private/resolve")
@@ -285,11 +376,9 @@ def claim_oidc_identity(body: IdentityClaimRequest, x_access_broker_key: str = H
         result = public_access_service.claim(
             policy.order_id, identity.normalized_email, body.code, "oidc-gateway"
         )
-        provisioning_service.bind_public_participant(
-            policy.order_id, result.entitlement.seat_ref, identity.keycloak_username
-        )
     except ValueError:
         raise HTTPException(403, "Access request cannot be completed")
+    _bind_claim_or_fail_closed(policy.order_id, result)
     return {"order_id": policy.order_id, "seat_ref": result.entitlement.seat_ref}
 
 
@@ -318,11 +407,9 @@ def claim_oidc_identity_by_code(
         result = public_access_service.claim(
             policy.order_id, identity.normalized_email, body.code, "participant-hub"
         )
-        provisioning_service.bind_public_participant(
-            policy.order_id, result.entitlement.seat_ref, identity.keycloak_username
-        )
     except ValueError:
         raise HTTPException(403, "Access request cannot be completed")
+    _bind_claim_or_fail_closed(policy.order_id, result)
     return {
         "order_id": policy.order_id,
         "seat_ref": result.entitlement.seat_ref,

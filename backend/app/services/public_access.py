@@ -8,6 +8,7 @@ import threading
 import time
 from collections import defaultdict, deque
 from datetime import datetime
+from urllib.parse import urlsplit
 
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
@@ -35,10 +36,21 @@ class PublicAccessService:
     def __init__(
         self,
         public_domain: str | None = None,
+        shared_origin: str | None = None,
         enabled: bool | None = None,
         store=None,
     ) -> None:
         self.public_domain = (public_domain or os.getenv("PUBLIC_LABS_DOMAIN", "")).strip(".")
+        raw_shared_origin = (
+            shared_origin
+            if shared_origin is not None
+            else os.getenv("PUBLIC_LABS_SHARED_ORIGIN", "")
+        )
+        self.shared_origin = (
+            self._normalize_https_origin(raw_shared_origin)
+            if raw_shared_origin
+            else ""
+        )
         self.enabled = (
             enabled if enabled is not None
             else os.getenv("PUBLIC_ACCESS_ENABLED", "false").lower() == "true"
@@ -92,29 +104,82 @@ class PublicAccessService:
         seat_refs: list[str],
         expires_at: datetime,
     ) -> tuple[AccessPolicy, str]:
-        if not self.enabled or not self.public_domain:
+        if not self.enabled or not (self.public_domain or self.shared_origin):
             raise ValueError("Public access is not enabled")
         if not seat_refs:
             raise ValueError("Public access requires at least one seat")
         with self._lock:
             if order_id in self._policies:
                 raise ValueError("Public access policy already exists")
+            if self.shared_origin and any(
+                policy.enabled
+                and policy.expires_at > datetime.utcnow()
+                and policy.public_url == self.shared_origin
+                for policy in self._policies.values()
+            ):
+                raise ValueError("Shared public pilot already has an active order")
             plaintext = self._new_code()
-            short_id = re.sub(r"[^a-z0-9]", "", order_id.casefold())[:8]
-            host = f"{self._slug(catalog_slug)}-{short_id}.{self.public_domain}"
+            if self.shared_origin:
+                public_url = self.shared_origin
+            else:
+                short_id = re.sub(r"[^a-z0-9]", "", order_id.casefold())[:8]
+                host = f"{self._slug(catalog_slug)}-{short_id}.{self.public_domain}"
+                public_url = f"https://{host}"
             policy = AccessPolicy(
                 order_id=order_id,
                 order_type=order_type,
                 catalog_slug=self._slug(catalog_slug),
                 code_hash=self._hasher.hash(plaintext),
                 seat_refs=seat_refs,
-                public_url=f"https://{host}",
+                public_url=public_url,
                 expires_at=expires_at,
             )
             self._policies[order_id] = policy
             if self.store:
                 self.store.save_policy(policy)
             return policy, plaintext
+
+    def set_public_url(self, order_id: str, public_url: str) -> AccessPolicy:
+        """Update a pilot order origin without bypassing service persistence.
+
+        Quick Tunnel hostnames are temporary. Keeping this mutation in the
+        service and admin API avoids direct database edits and leaves an audit
+        event while still restricting the value to a bare HTTPS origin.
+        """
+        origin = self._normalize_https_origin(public_url)
+        with self._lock:
+            policy = self._policies.get(order_id)
+            if not policy:
+                raise ValueError("Public access policy not found")
+            if any(
+                existing.order_id != order_id
+                and existing.enabled
+                and existing.expires_at > datetime.utcnow()
+                and existing.public_url == origin
+                for existing in self._policies.values()
+            ):
+                raise ValueError("Public URL already belongs to an active order")
+            policy = policy.model_copy(update={"public_url": origin})
+            self._policies[order_id] = policy
+            if self.store:
+                self.store.save_policy(policy)
+            self._audit("public_url_changed", order_id, "updated")
+            return policy
+
+    @staticmethod
+    def _normalize_https_origin(public_url: str) -> str:
+        parsed = urlsplit(public_url.strip())
+        if (
+            parsed.scheme != "https"
+            or not parsed.hostname
+            or parsed.username is not None
+            or parsed.password is not None
+            or parsed.path not in {"", "/"}
+            or parsed.query
+            or parsed.fragment
+        ):
+            raise ValueError("Public URL must be a bare HTTPS origin")
+        return f"https://{parsed.netloc}"
 
     def _rate_limit_keys(self, order_id: str, email: str, ip_address: str) -> tuple[str, str]:
         return f"ip:{order_id}:{ip_address}", f"email:{order_id}:{email}"

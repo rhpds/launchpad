@@ -35,3 +35,14 @@ def test_login_brand_marks_are_inline_and_do_not_depend_on_external_images():
     assert 'font-family: "Red Hat Text"' in template
     assert "radial-gradient" in template
     assert "keycloak-bg-darken.svg" not in template
+
+
+def test_console_oidc_fallback_can_validate_a_code_without_redirect_host_order():
+    source = (
+        Path(__file__).resolve().parents[2]
+        / "keycloak-authenticator/src/main/java/com/redhat/launchpad/LaunchpadCodeAuthenticator.java"
+    ).read_text()
+
+    assert '"/validate-by-code"' in source
+    assert 'result.path("order_id").asText()' in source
+    assert "email.isBlank() || code.isBlank() || order.isBlank()" not in source
