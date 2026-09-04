@@ -56,7 +56,7 @@ VECTOR_DB: lancedb                                      # <7>
 ----
 
 <1> *LLM_PROVIDER* -- tells AnythingLLM to use the generic OpenAI-compatible provider.
-<2> *BASE_PATH* -- the MaaS endpoint URL. This is the external endpoint, not a cluster-internal service.
+<2> *BASE_PATH* -- the cluster-private shared inference endpoint assigned to this lab.
 <3> *MODEL_PREF* -- the model name as reported by `/v1/models`.
 <4> *API_KEY* -- your LiteLLM virtual key for authentication.
 <5> *MAX_TOKENS* -- maximum tokens per response.
@@ -107,12 +107,29 @@ spec:
     spec:
       containers:
         - name: anythingllm
-          image: ghcr.io/mintplex-labs/anything-llm:latest
+          image: image-registry.openshift-image-registry.svc:5000/partner-ai-launchpad/anythingllm-openshift:1.16.1
           ports:
             - containerPort: 3001
           envFrom:
             - secretRef:
                 name: anythingllm-config
+          env:
+            - name: STORAGE_DIR
+              value: /tmp/anythingllm-storage
+          startupProbe:
+            tcpSocket:
+              port: 3001
+            failureThreshold: 60
+            periodSeconds: 5
+          readinessProbe:
+            tcpSocket:
+              port: 3001
+            periodSeconds: 5
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
           resources:
             requests:
               cpu: "1"
@@ -137,7 +154,7 @@ oc create route edge rag --service=anythingllm --port=3001 -n {project_name}
 
 [source,bash,role="execute",subs="attributes+"]
 ----
-oc rollout status deployment/anythingllm -n {project_name} --timeout=120s
+oc rollout status deployment/anythingllm -n {project_name} --timeout=300s
 ----
 
 === Verify: Pod is Running
@@ -151,8 +168,12 @@ Expected output:
 
 ----
 NAME                           READY   STATUS    RESTARTS   AGE
-anythingllm-xxxxx-xxxxx        1/1     Running   0          30s
+anythingllm-xxxxx-xxxxx        1/1     Running   0          2m
 ----
+
+The OpenShift-compatible image is pinned and prebuilt by Launchpad. Its first
+pull to a worker can take several minutes; subsequent seats on that worker use
+the cached image layers.
 
 == Verify the Connection
 

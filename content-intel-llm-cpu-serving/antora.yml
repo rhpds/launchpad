@@ -12,6 +12,7 @@ asciidoc:
     openshift_api_url: '%openshift_api_url%'
     openshift_console_url: '%openshift_console_url%'
     openshift_cluster_ingress_domain: '%openshift_cluster_ingress_domain%'
+    cluster_display_name: '%cluster_display_name%'
     project_name: '%namespace%'
     maas_endpoint: '%maas_endpoint%'
     maas_model: '%maas_model%'

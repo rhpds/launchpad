@@ -5,10 +5,10 @@ _Estimated time: 5 minutes_
 In this module you will:
 
 * Understand why tool calling's stop-and-go pattern favors CPU over GPU
-* Inspect the Intel hardware powering your cluster
+* Confirm the Intel execution target assigned to your seat
 * Calculate the cost difference between CPU and GPU deployment for agentic workloads
 
-In this module you will understand why CPU-based inference is well-suited to tool calling workloads, check the Intel hardware powering your cluster, and see how {intel_platform} processors deliver the right economics for agentic AI.
+In this module you will understand why CPU-based inference is well-suited to tool calling workloads, confirm the execution target assigned to your seat, and see how {intel_platform} processors deliver the right economics for agentic AI.
 
 == Why CPU Inference Fits Tool Calling
 
@@ -21,14 +21,22 @@ Tool calling has a distinctive performance profile that differs from long-form t
 
 The model is idle while tools execute. GPU utilization during that idle time is wasted. CPUs handle this intermittent pattern efficiently.
 
-== Check the Cluster Hardware
+== Confirm Your Execution Target
 
-Examine the nodes powering your cluster:
+Launchpad assigns the complete workshop to one certified execution cluster.
+Confirm the cluster and your namespace-scoped workload view:
 
 [source,bash,role="execute",subs="attributes+"]
 ----
-oc get nodes -o custom-columns=NAME:.metadata.name,CPU:.status.capacity.cpu,MEMORY:.status.capacity.memory
+echo "Execution cluster: {cluster_display_name}"
+echo "Intel platform: {intel_platform}"
+oc project {project_name}
+oc get pods -o custom-columns=NAME:.metadata.name,CPU_REQUEST:.spec.containers[*].resources.requests.cpu,MEMORY_REQUEST:.spec.containers[*].resources.requests.memory
+oc auth can-i list nodes
 ----
+
+The final command should return `no`. That is intentional: a participant can
+edit only the assigned namespace and cannot inspect cluster-wide node data.
 
 Depending on the {intel_platform} generation in your cluster, the vLLM runtime may leverage:
 
@@ -38,33 +46,33 @@ Depending on the {intel_platform} generation in your cluster, the vLLM runtime m
 
 These extensions narrow the performance gap with GPU, particularly for smaller models and the short-output patterns that define tool calling.
 
-=== Verify: Hardware Capabilities
+=== Verify: Isolation and Platform Assignment
 
-You should see the node names, CPU core counts, and memory capacity. For {intel_platform} nodes:
-
-* *CPU cores*: typically 32-128 cores per node
-* *Memory*: typically 128-512 Gi per node
-
-The exact specifications depend on the cluster provisioned for this lab. The key observation is that these nodes have enough CPU and memory to run the tool calling model alongside your other workloads — no dedicated AI hardware needed.
+You should see `{cluster_display_name}`, the pods in only your seat namespace,
+and `no` for node access. Platform operators certify the underlying Intel CPU
+and memory headroom before Launchpad advertises workshop capacity.
 
 == Check Resource Usage
 
-See how much CPU and memory the model server consumes:
+See how much CPU and memory your seat currently consumes:
 
 [source,bash,role="execute",subs="attributes+"]
 ----
 oc adm top pods -n {project_name}
 ----
 
-Tool calling models on CPU typically show moderate, intermittent resource usage. The model is active only during the generate phases -- between tool calls, it is idle.
+The shared model server runs in a protected platform namespace, so participant
+credentials cannot inspect it directly. The command above intentionally shows
+only this seat's Showroom and terminal usage. Model utilization belongs in the
+Launchpad operations view.
 
 === Verify: Efficient Resource Usage
 
-Compare the model server's resource consumption to the total node capacity from the previous command. For a tool calling workload:
+For a tool-calling workload:
 
-* *CPU usage during inference*: typically 4-10 cores (a fraction of the node's total)
+* *CPU usage during inference*: concentrated in short generation bursts
 * *CPU usage while waiting for tools*: near zero — the model is idle
-* *Memory*: stable at 3-8 Gi depending on the model size
+* *Memory*: held by one shared model rather than duplicated in every seat
 
 This intermittent usage pattern is why CPU deployment makes economic sense for tool calling. A GPU would sit idle during tool execution — and GPU idle time is expensive.
 
@@ -81,10 +89,10 @@ For tool calling workloads where the model produces short outputs and waits for 
 
 Based on the resource usage you observed, estimate the cost difference:
 
-. Note the CPU cores used during active inference from `oc adm top pods`
+. Note that your seat uses a shared endpoint rather than loading another model
 . A single NVIDIA A100 GPU costs approximately $2-3/hour on cloud providers
-. Your model server uses approximately 8 CPU cores — a fraction of a standard {intel_platform} node that costs $0.50-1.50/hour
-. For a tool calling workload where the model is active only 20-30% of the time (the rest is tool execution), GPU utilization drops further
+. Shared CPU serving amortizes model memory and runtime overhead across the workshop
+. Tool execution time creates idle gaps that make accelerator utilization harder to sustain
 
 For an agentic assistant serving 10 users with 3 tool calls per query, CPU inference at $0/incremental hardware cost delivers the same functionality as a $2,000+/month GPU instance.
 
@@ -128,8 +136,8 @@ For an agentic assistant serving 10 users with 3 tool calls per query, CPU infer
 At this point you have:
 
 * [x] Understood why tool calling's stop-and-go pattern suits CPU inference
-* [x] Checked the node hardware and Intel-specific optimizations available
-* [x] Reviewed real resource usage of the model server
+* [x] Confirmed the assigned Intel execution target and namespace boundary
+* [x] Reviewed seat resource usage without cluster-wide privilege
 * [x] Understood the cost comparison between CPU and GPU deployment
 
 Proceed to xref:08-conclusion.adoc[Module 8: Conclusion] to wrap up the lab.

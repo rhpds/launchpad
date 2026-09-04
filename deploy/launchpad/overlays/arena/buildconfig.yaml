@@ -80,3 +80,25 @@ spec:
   resources:
     requests: {cpu: "500m", memory: 1Gi, ephemeral-storage: 2Gi}
     limits: {cpu: "2", memory: 2Gi, ephemeral-storage: 8Gi}
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata: {name: anythingllm-openshift}
+---
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata: {name: anythingllm-openshift}
+spec:
+  runPolicy: SerialLatestOnly
+  source:
+    type: Git
+    git: {uri: "https://github.com/rhpds/launchpad.git", ref: main}
+    contextDir: workshop-images/anythingllm-openshift
+  strategy:
+    type: Docker
+    dockerStrategy: {dockerfilePath: Containerfile}
+  output:
+    to: {kind: ImageStreamTag, name: "anythingllm-openshift:1.16.1"}
+  resources:
+    requests: {cpu: "1", memory: 2Gi, ephemeral-storage: 8Gi}
+    limits: {cpu: "4", memory: 4Gi, ephemeral-storage: 20Gi}

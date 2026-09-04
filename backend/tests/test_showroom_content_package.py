@@ -16,6 +16,7 @@ INTEL_GUIDED_LABS = [
         "title": "Intel Xeon 6 201 — Building an AI Agent",
         "model": "granite-2b-cpu",
         "workspace_route": "app",
+        "content_ref": "intel-guided-content-v1.0.1",
     },
     {
         "catalog_id": "intel-llm-cpu-serving",
@@ -25,6 +26,7 @@ INTEL_GUIDED_LABS = [
         "title": "Serve LLMs on Intel Xeon CPUs",
         "model": "granite-2b-cpu",
         "workspace_route": "rag",
+        "content_ref": "intel-guided-content-v1.0.2",
     },
     {
         "catalog_id": "intel-llm-tool-calling",
@@ -34,6 +36,7 @@ INTEL_GUIDED_LABS = [
         "title": "Enable AI Tool Calling on OpenShift",
         "model": "granite-3.2-8b-tools",
         "workspace_route": "",
+        "content_ref": "intel-guided-content-v1.0.2",
     },
 ]
 
@@ -123,7 +126,7 @@ def test_intel_guided_lab_is_native_launchpad_content(lab):
     assert metadata["showroom_content_repo_url"] == (
         "https://github.com/rhpds/launchpad.git"
     )
-    assert metadata["showroom_content_ref"] == "intel-guided-content-v1.0.1"
+    assert metadata["showroom_content_ref"] == lab["content_ref"]
     assert metadata["showroom_content_playbook"] == lab["playbook"]
     assert metadata.get("workspace_route_name", "") == lab["workspace_route"]
 
@@ -150,6 +153,9 @@ def test_intel_guided_lab_is_native_launchpad_content(lab):
     component = yaml.safe_load((ROOT / lab["content_path"] / "antora.yml").read_text())
     assert component["title"] == lab["title"]
     assert component["asciidoc"]["attributes"]["project_name"] == "%namespace%"
+    assert component["asciidoc"]["attributes"]["cluster_display_name"] == (
+        "%cluster_display_name%"
+    )
 
     nav = ROOT / lab["content_path"] / "modules/ROOT/nav.adoc"
     index = ROOT / lab["content_path"] / "modules/ROOT/pages/index.adoc"
@@ -214,3 +220,41 @@ def test_cpu_serving_content_uses_route_name_that_fits_launchpad_namespace():
     assert "oc create route edge rag --service=anythingllm" in content
     assert "oc get route rag" in content
     assert "oc get route anythingllm" not in content
+
+
+def test_cpu_serving_uses_pinned_openshift_compatible_workbench_image():
+    page = (
+        ROOT
+        / "content-intel-llm-cpu-serving/modules/ROOT/pages/04-wire-rag-frontend.adoc"
+    ).read_text()
+    containerfile = (
+        ROOT / "workshop-images/anythingllm-openshift/Containerfile"
+    ).read_text()
+    build_config = (
+        ROOT / "deploy/launchpad/overlays/arena/buildconfig.yaml"
+    ).read_text()
+
+    assert "anything-llm:latest" not in page
+    assert (
+        "partner-ai-launchpad/anythingllm-openshift:1.16.1" in page
+    )
+    assert "STORAGE_DIR" in page
+    assert "--timeout=300s" in page
+    assert (
+        "ghcr.io/mintplex-labs/anything-llm@sha256:"
+        "e7751e8e65f470506379dbc2059d6a4c61eb3f22de58c184aef536a42bdd8335"
+        in containerfile
+    )
+    assert "chgrp -R 0 /app" in containerfile
+    assert "name: anythingllm-openshift" in build_config
+
+
+def test_tool_calling_hardware_story_respects_participant_rbac_boundary():
+    page = (
+        ROOT
+        / "content-intel-llm-tool-calling/modules/ROOT/pages/07-intel-story.adoc"
+    ).read_text()
+
+    assert "oc get nodes" not in page
+    assert "{cluster_display_name}" in page
+    assert "namespace-scoped" in page

@@ -13,6 +13,7 @@ asciidoc:
     openshift_api_url: "%openshift_api_url%"
     openshift_console_url: "%openshift_console_url%"
     openshift_cluster_ingress_domain: "%openshift_cluster_ingress_domain%"
+    cluster_display_name: "%cluster_display_name%"
     litellm_api_endpoint: "%maas_url%"
     litellm_virtual_key: "%litellm_api_key%"
     maas_model: "%maas_model%"
