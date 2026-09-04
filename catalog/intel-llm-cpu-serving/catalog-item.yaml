@@ -27,10 +27,10 @@ metadata:
   content_only: true
   showroom_journey: intel-llm-cpu-serving
   showroom_title: "Serve LLMs on Intel Xeon CPUs"
-  workspace_route_name: anythingllm
+  workspace_route_name: rag
   workspace_title: "RAG Assistant"
   showroom_content_repo_url: "https://github.com/rhpds/launchpad.git"
-  showroom_content_ref: "3d176f7ca76e80d424e3a2bd5168248d337ebeab"
+  showroom_content_ref: "intel-guided-content-v1.0.1"
   showroom_content_playbook: "site-intel-llm-cpu-serving.yml"
   required_models:
     - granite-2b-cpu

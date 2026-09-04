@@ -1,5 +1,4 @@
 """Contract for the repository-owned Antora/Nookbag Showroom package."""
-import re
 from pathlib import Path
 
 import pytest
@@ -16,6 +15,7 @@ INTEL_GUIDED_LABS = [
         "content_path": "content-intel-xeon6-agent-201",
         "title": "Intel Xeon 6 201 — Building an AI Agent",
         "model": "granite-2b-cpu",
+        "workspace_route": "app",
     },
     {
         "catalog_id": "intel-llm-cpu-serving",
@@ -24,6 +24,7 @@ INTEL_GUIDED_LABS = [
         "content_path": "content-intel-llm-cpu-serving",
         "title": "Serve LLMs on Intel Xeon CPUs",
         "model": "granite-2b-cpu",
+        "workspace_route": "rag",
     },
     {
         "catalog_id": "intel-llm-tool-calling",
@@ -32,6 +33,7 @@ INTEL_GUIDED_LABS = [
         "content_path": "content-intel-llm-tool-calling",
         "title": "Enable AI Tool Calling on OpenShift",
         "model": "granite-2b-cpu",
+        "workspace_route": "",
     },
 ]
 
@@ -119,9 +121,18 @@ def test_intel_guided_lab_is_native_launchpad_content(lab):
     assert metadata["showroom_content_repo_url"] == (
         "https://github.com/rhpds/launchpad.git"
     )
-    assert re.fullmatch(r"[0-9a-f]{40}", metadata["showroom_content_ref"])
-    assert metadata["showroom_content_ref"] == "3d176f7ca76e80d424e3a2bd5168248d337ebeab"
+    assert metadata["showroom_content_ref"] == "intel-guided-content-v1.0.1"
     assert metadata["showroom_content_playbook"] == lab["playbook"]
+    assert metadata.get("workspace_route_name", "") == lab["workspace_route"]
+
+    # OpenShift's generated route host uses <route>-<namespace> as one DNS
+    # label. Keep it below the 63-character label limit for the longest
+    # namespace shape emitted by the Launchpad provisioner.
+    if lab["workspace_route"]:
+        tenant = "smoke-test-tenant"[:18]
+        catalog_id = lab["catalog_id"][:18]
+        namespace = f"launchpad-{tenant}-{catalog_id}-abcdef"
+        assert len(f"{lab['workspace_route']}-{namespace}") <= 63
 
     playbook = yaml.safe_load((ROOT / lab["playbook"]).read_text())
     assert playbook["site"]["start_page"] == "modules::index.adoc"
@@ -153,3 +164,51 @@ def test_intel_guided_lab_uses_launchpad_sso_instructions(lab):
     assert "oc login -u {user} -p {password}" not in content
     assert "*Password:* `{password}`" not in content
     assert "Launchpad has already authenticated this terminal" in content
+
+
+def test_agent_content_uses_launchpad_safe_workload_manifests():
+    content_root = ROOT / "content-intel-xeon6-agent-201"
+    pages = content_root / "modules/ROOT/pages"
+    content = "\n".join(path.read_text() for path in sorted(pages.glob("*.adoc")))
+
+    assert "intel-guided-content-v1.0.1" in content
+    assert "raw.githubusercontent.com/rhpds/triforce" not in content
+    assert "phi3-mini-cpu" not in content
+    assert "qwen25-3b-cpu" not in content
+
+    expected_routes = {
+        "solution-tools.yaml": "tools",
+        "solution-agent.yaml": "agent",
+        "solution-ui.yaml": "app",
+    }
+    for filename, route_name in expected_routes.items():
+        manifest = content_root / "manifests" / filename
+        assert manifest.exists()
+        resources = list(yaml.safe_load_all(manifest.read_text()))
+        route = next(resource for resource in resources if resource["kind"] == "Route")
+        deployment = next(
+            resource for resource in resources if resource["kind"] == "Deployment"
+        )
+        assert route["metadata"]["name"] == route_name
+        assert "@sha256:" in deployment["spec"]["template"]["spec"]["containers"][0]["image"]
+
+    ui_resources = list(
+        yaml.safe_load_all(
+            (content_root / "manifests" / "solution-ui.yaml").read_text()
+        )
+    )
+    ui_deployment = next(
+        resource for resource in ui_resources if resource["kind"] == "Deployment"
+    )
+    assert ui_deployment["spec"]["template"]["spec"]["containers"][0][
+        "resources"
+    ]["limits"]["memory"] == "512Mi"
+
+
+def test_cpu_serving_content_uses_route_name_that_fits_launchpad_namespace():
+    pages = ROOT / "content-intel-llm-cpu-serving/modules/ROOT/pages"
+    content = "\n".join(path.read_text() for path in sorted(pages.glob("*.adoc")))
+
+    assert "oc create route edge rag --service=anythingllm" in content
+    assert "oc get route rag" in content
+    assert "oc get route anythingllm" not in content

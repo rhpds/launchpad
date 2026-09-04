@@ -27,10 +27,10 @@ metadata:
   content_only: true
   showroom_journey: intel-xeon6-agent-201
   showroom_title: "Intel Xeon 6 201: Building an AI Agent"
-  workspace_route_name: solution-ui
+  workspace_route_name: app
   workspace_title: "Solution Architect"
   showroom_content_repo_url: "https://github.com/rhpds/launchpad.git"
-  showroom_content_ref: "3d176f7ca76e80d424e3a2bd5168248d337ebeab"
+  showroom_content_ref: "intel-guided-content-v1.0.1"
   showroom_content_playbook: "site-intel-xeon6-agent-201.yml"
   required_models:
     - granite-2b-cpu
