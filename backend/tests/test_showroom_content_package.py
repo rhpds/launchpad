@@ -41,8 +41,8 @@ INTEL_GUIDED_LABS = [
         "model": "granite-3.2-8b-tools",
         "workspace_route": "",
         "content_ref": "intel-guided-content-v1.0.4",
-        "max_workshop_seats": 5,
-        "certification_stage": "five-seat",
+        "max_workshop_seats": 25,
+        "certification_stage": "twenty-five-seat",
     },
 ]
 
