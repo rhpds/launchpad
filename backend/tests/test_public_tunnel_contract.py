@@ -1,4 +1,5 @@
 import importlib.util
+import json
 from pathlib import Path
 
 import yaml
@@ -156,6 +157,32 @@ def test_console_url_rewrite_preserves_valid_showroom_yaml():
         f"https://{tunnel_host}/k8s/ns/participant-seat/core~v1~Pod"
     )
     assert "\n/core~v1~Pod" not in rewritten
+
+
+def test_console_url_rewrite_preserves_json_boundaries():
+    router = _router_module()
+    tunnel_host = "pilot.trycloudflare.com"
+    source = json.dumps({
+        "items": [{
+            "metadata": {
+                "annotations": {
+                    "console_url": (
+                        "https://console-openshift-console.apps.arena.fm2aihpcsed.com"
+                        "/topology/ns/participant-seat"
+                    ),
+                    "status": "ready",
+                }
+            }
+        }]
+    })
+
+    rewritten = router._rewrite_url(source, tunnel_host)
+    parsed = json.loads(rewritten)
+
+    assert parsed["items"][0]["metadata"]["annotations"]["console_url"] == (
+        f"https://{tunnel_host}/k8s/ns/participant-seat/core~v1~Pod"
+    )
+    assert parsed["items"][0]["metadata"]["annotations"]["status"] == "ready"
 
 
 def test_console_router_keeps_http_only_and_scopes_proxy_cookie_paths():
