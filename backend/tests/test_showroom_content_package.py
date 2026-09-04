@@ -28,7 +28,7 @@ INTEL_GUIDED_LABS = [
         "title": "Serve LLMs on Intel Xeon CPUs",
         "model": "granite-2b-cpu",
         "workspace_route": "rag",
-        "content_ref": "intel-guided-content-v1.0.3",
+        "content_ref": "intel-guided-content-v1.0.5",
         "max_workshop_seats": 5,
         "certification_stage": "five-seat",
     },
@@ -252,6 +252,8 @@ def test_cpu_serving_uses_pinned_openshift_compatible_workbench_image():
     )
     assert "STORAGE_DIR" in page
     assert "DISABLE_TELEMETRY" in page
+    assert "LLM_PROVIDER: generic-openai" in page
+    assert "LLM_PROVIDER: genericOpenAi" not in page
     assert "--timeout=300s" in page
     assert (
         "ghcr.io/mintplex-labs/anything-llm@sha256:"

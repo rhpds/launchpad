@@ -46,7 +46,7 @@ Examine each field:
 
 [source,yaml]
 ----
-LLM_PROVIDER: genericOpenAi                            # <1>
+LLM_PROVIDER: generic-openai                           # <1>
 GENERIC_OPEN_AI_BASE_PATH: {maas_endpoint}/v1           # <2>
 GENERIC_OPEN_AI_MODEL_PREF: {maas_model}                # <3>
 GENERIC_OPEN_AI_API_KEY: <your-litellm-virtual-key>     # <4>
@@ -74,7 +74,7 @@ metadata:
   name: anythingllm-config
 type: Opaque
 stringData:
-  LLM_PROVIDER: genericOpenAi
+  LLM_PROVIDER: generic-openai
   GENERIC_OPEN_AI_BASE_PATH: "{maas_endpoint}/v1"
   GENERIC_OPEN_AI_MODEL_PREF: "{maas_model}"
   GENERIC_OPEN_AI_API_KEY: "{maas_api_key}"
