@@ -85,4 +85,6 @@ def test_api_workflow_rejects_bad_request(client):
 
 def test_api_workflow_provision_missing_request(client):
     resp = client.post("/api/v1/lab-requests/fake-id/provision")
-    assert resp.status_code == 400
+    # Missing and inaccessible requests intentionally share the same response
+    # so the API does not disclose another tenant's request identifiers.
+    assert resp.status_code == 404

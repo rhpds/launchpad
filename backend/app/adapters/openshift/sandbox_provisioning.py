@@ -62,6 +62,7 @@ class OpenShiftSandboxProvisioner:
         meta = catalog_item.metadata or {}
         req_meta = request.metadata or {}
         sandbox_config = req_meta.get("sandbox_config", {})
+        target = getattr(self, "_target", None)
 
         stack_level = sandbox_config.get("stack_level") or meta.get("stack_level", "minimal")
         access_methods = sandbox_config.get("access_methods") or meta.get("access_methods", ["ssh"])
@@ -82,7 +83,7 @@ class OpenShiftSandboxProvisioner:
         return ProvisioningPlan(
             request_id=request.request_id,
             target_namespace=namespace,
-            target_cluster=self._target.cluster_id if self._target else request.metadata.get("target_cluster"),
+            target_cluster=target.cluster_id if target else request.metadata.get("target_cluster"),
             steps=[
                 ProvisioningStep(name="create-namespace", adapter="openshift-sandbox", action="create_namespace", order=1),
                 ProvisioningStep(name="grant-requester-access", adapter="openshift-sandbox", action="grant_requester_access", order=2),
@@ -107,9 +108,9 @@ class OpenShiftSandboxProvisioner:
                 "requester_id": request.requester_id,
                 "catalog_item_id": request.catalog_item_id,
                 "operator_capabilities": meta.get("optional_capabilities", []),
-                "storage_class": self._target.storage_class if self._target else "nfs-storage",
-                "ingress_domain": self._target.ingress_domain if self._target else os.environ.get("OPENSHIFT_APPS_DOMAIN", "apps.oberon.fm2aihpcsed.com"),
-                "console_url": self._target.console_url if self._target else os.environ.get("OPENSHIFT_CONSOLE_URL", ""),
+                "storage_class": target.storage_class if target else "nfs-storage",
+                "ingress_domain": target.ingress_domain if target else os.environ.get("OPENSHIFT_APPS_DOMAIN", "apps.oberon.fm2aihpcsed.com"),
+                "console_url": target.console_url if target else os.environ.get("OPENSHIFT_CONSOLE_URL", ""),
             },
         )
 
@@ -331,13 +332,14 @@ class OpenShiftSandboxProvisioner:
                     logger.warning("Failed to create secret '%s' in namespace %s: %s", name, namespace, e.reason)
 
     def _create_pvc(self, namespace: str, storage_size: str) -> None:
+        target = getattr(self, "_target", None)
         try:
             self._core_v1.create_namespaced_persistent_volume_claim(namespace, client.V1PersistentVolumeClaim(
                 metadata=client.V1ObjectMeta(name="sandbox-home"),
                 spec=client.V1PersistentVolumeClaimSpec(
                     access_modes=["ReadWriteOnce"],
                     storage_class_name=(
-                        self._target.storage_class if self._target
+                        target.storage_class if target
                         else os.environ.get("SANDBOX_STORAGE_CLASS") or None
                     ),
                     resources=client.V1VolumeResourceRequirements(requests={"storage": storage_size}),

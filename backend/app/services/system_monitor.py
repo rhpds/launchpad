@@ -24,10 +24,15 @@ class SystemMonitor:
     def list_containers(self) -> List[Dict[str, Any]]:
         if not _PODMAN_AVAILABLE:
             return []
-        result = subprocess.run(
-            [PODMAN_BIN, "ps", "-a", "--format", "json"],
-            capture_output=True, text=True, timeout=10,
-        )
+        try:
+            result = subprocess.run(
+                [PODMAN_BIN, "ps", "-a", "--format", "json"],
+                capture_output=True, text=True, timeout=10,
+            )
+        except (OSError, subprocess.SubprocessError):
+            # Diagnostics must remain available when the local container
+            # runtime is stopped, wedged, or absent.
+            return []
         if result.returncode != 0:
             return []
         try:
@@ -50,10 +55,17 @@ class SystemMonitor:
     def get_container_logs(self, container_name: str, lines: int = 100) -> Dict[str, Any]:
         if not _PODMAN_AVAILABLE:
             return {"name": container_name, "logs": "", "success": False}
-        result = subprocess.run(
-            [PODMAN_BIN, "logs", "--tail", str(lines), container_name],
-            capture_output=True, text=True, timeout=15,
-        )
+        try:
+            result = subprocess.run(
+                [PODMAN_BIN, "logs", "--tail", str(lines), container_name],
+                capture_output=True, text=True, timeout=15,
+            )
+        except (OSError, subprocess.SubprocessError) as exc:
+            return {
+                "name": container_name,
+                "logs": f"Container runtime unavailable: {exc}",
+                "success": False,
+            }
         return {
             "name": container_name,
             "logs": result.stdout + result.stderr if result.returncode == 0 else f"Error: {result.stderr}",
@@ -63,10 +75,17 @@ class SystemMonitor:
     def restart_container(self, container_name: str) -> Dict[str, Any]:
         if not _PODMAN_AVAILABLE:
             return {"name": container_name, "success": False, "message": "Podman not available"}
-        result = subprocess.run(
-            [PODMAN_BIN, "restart", container_name],
-            capture_output=True, text=True, timeout=30,
-        )
+        try:
+            result = subprocess.run(
+                [PODMAN_BIN, "restart", container_name],
+                capture_output=True, text=True, timeout=30,
+            )
+        except (OSError, subprocess.SubprocessError) as exc:
+            return {
+                "name": container_name,
+                "success": False,
+                "message": f"Container runtime unavailable: {exc}",
+            }
         return {
             "name": container_name,
             "success": result.returncode == 0,
@@ -76,10 +95,13 @@ class SystemMonitor:
     def get_container_stats(self) -> List[Dict[str, Any]]:
         if not _PODMAN_AVAILABLE:
             return []
-        result = subprocess.run(
-            [PODMAN_BIN, "stats", "--no-stream", "--format", "json"],
-            capture_output=True, text=True, timeout=15,
-        )
+        try:
+            result = subprocess.run(
+                [PODMAN_BIN, "stats", "--no-stream", "--format", "json"],
+                capture_output=True, text=True, timeout=15,
+            )
+        except (OSError, subprocess.SubprocessError):
+            return []
         if result.returncode != 0:
             return []
         try:

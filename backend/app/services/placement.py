@@ -46,7 +46,18 @@ class PlacementService:
         if not self._cache_is_valid():
             if self._cache_is_stale():
                 return PlacementRecommendation(fallback=True, reasoning="capacity data too stale (>10m)")
-            logger.debug("Using stale capacity cache (%ds old)", (datetime.utcnow() - self._cache_updated_at).total_seconds() if self._cache_updated_at else 0)
+            age = (
+                (datetime.utcnow() - self._cache_updated_at).total_seconds()
+                if self._cache_updated_at
+                else 0
+            )
+            return PlacementRecommendation(
+                fallback=True,
+                reasoning=(
+                    f"capacity cache expired ({age:.0f}s old; "
+                    f"TTL {self.cache_ttl_seconds}s)"
+                ),
+            )
 
         candidates = [
             c for c in self._capacity_cache.values()
