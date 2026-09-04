@@ -519,8 +519,6 @@ class ProvisioningService:
                 "sandbox_data": sandbox_data,
             }
         })
-        self._save_plan(plan)
-
         # Persist the target before the first cluster mutation. This makes
         # retry, reconciliation, and cleanup deterministic after interruption.
         session = LabSession(
@@ -540,6 +538,13 @@ class ProvisioningService:
                 }
             },
         )
+        plan = plan.model_copy(update={
+            "required_resources": {
+                **plan.required_resources,
+                "session_id": session.session_id,
+            }
+        })
+        self._save_plan(plan)
         session = transition(session, SessionStatus.PROVISIONING, reason="target selected; provisioning started")
         self._save_session(session)
         self._save_request(request.model_copy(update={"status": LabRequestStatus.PROVISIONING}))

@@ -16,7 +16,7 @@ INTEL_GUIDED_LABS = [
         "title": "Intel Xeon 6 201 — Building an AI Agent",
         "model": "granite-2b-cpu",
         "workspace_route": "app",
-        "content_ref": "intel-guided-content-v1.0.1",
+        "content_ref": "intel-guided-content-v1.0.6",
         "max_workshop_seats": 5,
         "certification_stage": "five-seat",
     },
@@ -189,7 +189,11 @@ def test_agent_content_uses_launchpad_safe_workload_manifests():
     pages = content_root / "modules/ROOT/pages"
     content = "\n".join(path.read_text() for path in sorted(pages.glob("*.adoc")))
 
-    assert "intel-guided-content-v1.0.1" in content
+    assert "intel-guided-content-v1.0.6" in content
+    component = yaml.safe_load((content_root / "antora.yml").read_text())
+    attributes = component["asciidoc"]["attributes"]
+    assert attributes["litellm_api_endpoint"] == "%maas_endpoint%"
+    assert attributes["litellm_virtual_key"] == "%maas_api_key%"
     assert "raw.githubusercontent.com/rhpds/triforce" not in content
     assert "phi3-mini-cpu" not in content
     assert "qwen25-3b-cpu" not in content

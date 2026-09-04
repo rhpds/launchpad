@@ -48,13 +48,20 @@ def _managed_namespaces(core=None) -> list[str]:
     )
 
 
-def _namespace_metadata(namespace: str, core) -> tuple[str | None, datetime | None]:
+def _namespace_metadata(
+    namespace: str, core
+) -> tuple[set[str], datetime | None]:
     item = core.read_namespace(namespace)
     labels = item.metadata.labels or {}
-    return (
-        labels.get("launchpad.redhat.com/session-id"),
-        item.metadata.creation_timestamp,
-    )
+    owners = {
+        value
+        for value in (
+            labels.get("launchpad.redhat.com/session-id"),
+            labels.get("launchpad.redhat.com/request-id"),
+        )
+        if value
+    }
+    return owners, item.metadata.creation_timestamp
 
 
 def _database_available() -> bool:
@@ -153,7 +160,7 @@ def reconcile_resources(service: Any, *, delete_orphans: bool = True) -> dict[st
             # while provisioning is still in flight.
             if core is not None:
                 try:
-                    owner, created_at = _namespace_metadata(namespace, core)
+                    owners, created_at = _namespace_metadata(namespace, core)
                     # A reconciliation process can hold a stale session
                     # snapshot while a new workshop creates namespaces. Never
                     # delete a recently created namespace solely because that
@@ -163,9 +170,10 @@ def reconcile_resources(service: Any, *, delete_orphans: bool = True) -> dict[st
                             created_at = created_at.replace(tzinfo=timezone.utc)
                         if datetime.now(timezone.utc) - created_at < orphan_grace:
                             continue
-                    if owner and any(
-                        session.request_id == owner
-                        or session.request_id.startswith(owner)
+                    if owners and any(
+                        session.session_id in owners
+                        or session.request_id in owners
+                        or any(session.request_id.startswith(owner) for owner in owners)
                         for session in service._sessions.values()
                         if session.status in ACTIVE_STATES
                     ):

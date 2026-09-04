@@ -126,7 +126,8 @@ class OpenShiftSandboxProvisioner:
         # 1. Create namespace with tracking labels
         ns_labels = {
             "launchpad.redhat.com/tenant": plan.required_resources.get("tenant_id", ""),
-            "launchpad.redhat.com/session-id": plan.request_id[:8],
+            "launchpad.redhat.com/session-id": str(res.get("session_id", plan.request_id)),
+            "launchpad.redhat.com/request-id": plan.request_id,
             "launchpad.redhat.com/catalog-item": plan.required_resources.get("catalog_item_id", ""),
             "launchpad.redhat.com/purpose": plan.required_resources.get("purpose", "self-service"),
             "launchpad.redhat.com/cluster-id": plan.target_cluster or "oberon",

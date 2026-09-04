@@ -182,7 +182,8 @@ class OpenShiftProvisioningAdapter:
             demo_namespace,
             {
                 **({"argocd.argoproj.io/managed-by": "argocd"} if showroom_enabled else {}),
-                "launchpad.redhat.com/session-id": plan.request_id,
+                "launchpad.redhat.com/session-id": str(res.get("session_id", plan.request_id)),
+                "launchpad.redhat.com/request-id": plan.request_id,
                 "launchpad.redhat.com/workshop-id": str(res.get("workshop_id", "")),
                 "launchpad.redhat.com/seat-id": str(res.get("seat_id", "")),
                 "launchpad.redhat.com/tenant": tenant_id,

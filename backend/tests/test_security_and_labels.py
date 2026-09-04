@@ -198,6 +198,20 @@ class TestLabels:
         labels = session.metadata.get("labels", {})
         assert labels.get("launchpad.redhat.com/tenant") == "partner-test"
 
+    def test_provisioning_plan_carries_the_persisted_session_id(self):
+        """The cluster ownership label must identify the session, not its request."""
+        svc = _make_service()
+        request = _make_request()
+        accepted = svc.submit_request(request)
+        session = svc.provision(accepted.request_id)
+        plan = next(
+            plan for plan in svc._plans.values()
+            if plan.request_id == accepted.request_id
+        )
+
+        assert plan.required_resources["session_id"] == session.session_id
+        assert plan.required_resources["session_id"] != session.request_id
+
     def test_session_resources_include_catalog_item_label(self):
         """RED: session resources should include catalog-item label."""
         svc = _make_service()
