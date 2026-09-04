@@ -4,15 +4,15 @@ import json
 import logging
 import os
 import re
-import requests
 import shutil
 import subprocess
 import threading
 import time
 import uuid
-import yaml
 from pathlib import Path
-from typing import Optional
+
+import requests
+import yaml
 
 try:
     from kubernetes import client, config
@@ -44,7 +44,7 @@ logger = logging.getLogger("launchpad.openshift.provisioning")
 
 
 class OpenShiftProvisioningAdapter:
-    def __init__(self, overlay_path: Optional[Path] = None, *, clients=None, target=None, argocd_custom_objects=None):
+    def __init__(self, overlay_path: Path | None = None, *, clients=None, target=None, argocd_custom_objects=None):
         self._overlay_path = overlay_path or DEMO_DEPLOY_ROOT
         self._active_namespaces: dict[str, str] = {}
         self._gateway_bootstrap_lock = threading.Lock()
@@ -111,11 +111,14 @@ class OpenShiftProvisioningAdapter:
                 "catalog_item_id": catalog_item.catalog_item_id,
                 "demo_pages": meta.get("demo_pages", "all"),
                 "workspace_path": meta.get("workspace_path", ""),
+                "workspace_route_name": meta.get("workspace_route_name", ""),
+                "workspace_title": meta.get("workspace_title", "RAG Workspace"),
                 "showroom_enabled": bool(meta.get("showroom", False)),
                 "showroom_title": meta.get("showroom_title", catalog_item.display_name),
                 "showroom_steps": meta.get("showroom_steps", []),
                 "showroom_journey": meta.get("showroom_journey", "guided-rag"),
                 "operator_workshop": bool(meta.get("operator_workshop", False)),
+                "content_only": bool(meta.get("content_only", False)),
                 "workshop_id": request.metadata.get("workshop_id", request.request_id),
                 "seat_id": request.metadata.get("seat_id", request.request_id),
                 "participant_id": request.metadata.get("participant_id", request.requester_id),
@@ -196,12 +199,28 @@ class OpenShiftProvisioningAdapter:
 
         # --- Step 4: Retrieve routes from demo namespace ---
         routes = self._get_routes(demo_namespace)
-        workspace_url = self._workspace_url(
-            routes.get("demo", ""), res.get("workspace_path", "")
+        apps_domain = (
+            self._target.ingress_domain
+            if self._target
+            else os.environ.get(
+                "OPENSHIFT_APPS_DOMAIN", "apps.oberon.fm2aihpcsed.com"
+            )
+        )
+        workspace_route_name = str(res.get("workspace_route_name", "")).strip()
+        workspace_url = (
+            self._content_workspace_url(
+                workspace_route_name, demo_namespace, apps_domain
+            )
+            if workspace_route_name
+            else self._workspace_url(
+                routes.get("demo", ""), res.get("workspace_path", "")
+            )
         )
 
         if showroom_enabled:
-            apps_domain = self._target.ingress_domain if self._target else os.environ.get("OPENSHIFT_APPS_DOMAIN", "apps.oberon.fm2aihpcsed.com")
+            maas_endpoint = os.environ.get("LITELLM_API_BASE", "").rstrip("/")
+            maas_endpoint = maas_endpoint.removesuffix("/v1")
+            requested_models = list(res.get("requested_models", []))
             showroom_app = build_showroom_application(
                 ShowroomSeat(
                     namespace=demo_namespace,
@@ -209,6 +228,9 @@ class OpenShiftProvisioningAdapter:
                     seat_id=str(res.get("seat_id", plan.request_id)),
                     participant_id=str(res.get("participant_id", "lab-user")),
                     workspace_url=workspace_url,
+                    workspace_title=str(
+                        res.get("workspace_title", "RAG Workspace")
+                    ),
                     content_repo_url=str(res["showroom_content_repo_url"]),
                     content_ref=str(res["showroom_content_ref"]),
                     apps_domain=apps_domain,
@@ -224,8 +246,15 @@ class OpenShiftProvisioningAdapter:
                         self._target.display_name
                         if self._target else "Oberon Primary"
                     ),
+                    openshift_api_url=(
+                        self._target.api_url if self._target else ""
+                    ),
+                    maas_endpoint=maas_endpoint,
+                    maas_api_key=session_maas_key,
+                    maas_model=requested_models[0] if requested_models else "",
                     content_playbook=str(res.get("showroom_content_playbook", "site.yml")),
                     journey=str(res.get("showroom_journey", "guided-rag")),
+                    content_only=bool(res.get("content_only", False)),
                 ),
                 argocd_namespace=os.environ.get("SHOWROOM_ARGOCD_NAMESPACE", "argocd"),
                 argocd_project=os.environ.get("SHOWROOM_ARGOCD_PROJECT", "default"),
@@ -401,6 +430,16 @@ http {{
         if not path:
             return base_url
         return f"{base_url.rstrip('/')}/{path.lstrip('/')}"
+
+    @staticmethod
+    def _content_workspace_url(
+        route_name: str, namespace: str, apps_domain: str
+    ) -> str:
+        """Return the stable hostname OpenShift assigns to an unnamed Route."""
+        route = re.sub(r"[^a-z0-9-]+", "-", route_name.lower()).strip("-")
+        if not route or not namespace or not apps_domain:
+            return ""
+        return f"https://{route}-{namespace}.{apps_domain}"
 
     def _wait_for_showroom_route(self, namespace: str) -> dict[str, str]:
         """Wait for Argo CD to sync far enough for the chart route to exist."""

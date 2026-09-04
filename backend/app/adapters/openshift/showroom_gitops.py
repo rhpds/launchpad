@@ -37,6 +37,7 @@ class ShowroomSeat:
     content_repo_url: str
     content_ref: str
     apps_domain: str
+    workspace_title: str = "RAG Workspace"
     destination_server: str = "https://kubernetes.default.svc"
     storage_class: str = "nfs-storage"
     cluster_id: str = "oberon"
@@ -45,6 +46,11 @@ class ShowroomSeat:
     content_playbook: str = "site.yml"
     ui_config_path: str = "ui-config.yml"
     journey: str = "guided-rag"
+    content_only: bool = False
+    openshift_api_url: str = ""
+    maas_endpoint: str = ""
+    maas_api_key: str = ""
+    maas_model: str = ""
 
     def __post_init__(self) -> None:
         if not self.content_ref.strip():
@@ -67,22 +73,31 @@ def build_showroom_application(
         "launchpad.redhat.com/cluster-id": seat.cluster_id,
     }
     user_data = {
+        "guid": seat.seat_id,
         "user": seat.participant_id,
         "workshop_id": seat.workshop_id,
         "seat_id": seat.seat_id,
         "namespace": seat.namespace,
+        "project_name": seat.namespace,
         "workspace_url": seat.workspace_url,
+        "openshift_api_url": seat.openshift_api_url,
         "openshift_console_url": seat.console_url,
+        "openshift_cluster_ingress_domain": seat.apps_domain,
         "cluster_display_name": seat.cluster_display_name,
         "content_revision": seat.content_ref,
         "showroom_journey": seat.journey,
+        "maas_endpoint": seat.maas_endpoint,
+        "maas_url": seat.maas_endpoint,
+        "maas_api_key": seat.maas_api_key,
+        "litellm_api_key": seat.maas_api_key,
+        "maas_model": seat.maas_model,
     }
     # Antora content is Showroom's primary guide pane, so it must not also be
     # configured as a tool tab. Doing so duplicates (and through a public
     # reverse proxy can recursively embed) the Showroom shell.
     tabs = [{"name": "Terminal", "path": "/terminal", "port": 443}]
     if seat.workspace_url:
-        tabs.insert(1, {"name": "RAG Workspace", "url": seat.workspace_url})
+        tabs.insert(1, {"name": seat.workspace_title, "url": seat.workspace_url})
     if seat.console_url:
         tabs.append({"name": "OpenShift Console", "url": seat.console_url})
     ui_config = {
@@ -116,7 +131,7 @@ def build_showroom_application(
             "zero_touch_bundle": "https://github.com/rhpds/nookbag/releases/download/nookbag-v0.4.0/nookbag-v0.4.0.zip",
         },
     }
-    if seat.journey == "openshift-operators":
+    if seat.journey == "openshift-operators" or seat.content_only:
         # Operator workshops need an oc terminal, not a heavyweight development
         # workstation. Keep each seat ephemeral and small enough for cohorts.
         values["terminal"]["storage"] = {"setup": "false"}

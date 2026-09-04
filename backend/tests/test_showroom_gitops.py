@@ -2,7 +2,6 @@ from unittest.mock import MagicMock
 
 import pytest
 import yaml
-
 from app.adapters.openshift.showroom_gitops import (
     SHOWROOM_CHART,
     ShowroomGitOpsAdapter,
@@ -63,6 +62,47 @@ def test_operator_workshop_places_namespace_console_inside_showroom():
     assert values["terminal"]["storage"]["setup"] == "false"
     assert values["terminal"]["resources"]["requests"]["cpu"] == "100m"
     assert values["wetty"]["setup"] == "false"
+
+
+def test_content_lab_receives_launchpad_runtime_values_and_named_workspace_tab():
+    app = build_showroom_application(ShowroomSeat(
+        namespace="launchpad-seat-agent-1",
+        workshop_id="workshop-1",
+        seat_id="seat-1",
+        participant_id="lp-user-1",
+        workspace_url="https://solution-ui-launchpad-seat-agent-1.apps.example.com",
+        workspace_title="Solution Architect",
+        content_repo_url="https://github.com/rhpds/launchpad.git",
+        content_ref="main",
+        content_playbook="site-intel-xeon6-agent-201.yml",
+        apps_domain="apps.example.com",
+        console_url="https://console.example.com/k8s/ns/launchpad-seat-agent-1",
+        openshift_api_url="https://api.example.com:6443",
+        maas_endpoint="https://models.example.com",
+        maas_api_key="sk-seat-1",
+        maas_model="granite-2b-cpu",
+        journey="intel-xeon6-agent-201",
+        content_only=True,
+    ))
+
+    values = yaml.safe_load(app["spec"]["source"]["helm"]["values"])
+    ui = yaml.safe_load(values["content"]["uiConfig"])
+    assert [tab["name"] for tab in ui["tabs"]] == [
+        "Terminal",
+        "Solution Architect",
+        "OpenShift Console",
+    ]
+    user_data = yaml.safe_load(values["content"]["user_data"])
+    assert user_data["namespace"] == "launchpad-seat-agent-1"
+    assert user_data["project_name"] == "launchpad-seat-agent-1"
+    assert user_data["openshift_api_url"] == "https://api.example.com:6443"
+    assert user_data["openshift_cluster_ingress_domain"] == "apps.example.com"
+    assert user_data["maas_endpoint"] == "https://models.example.com"
+    assert user_data["maas_url"] == "https://models.example.com"
+    assert user_data["maas_api_key"] == "sk-seat-1"
+    assert user_data["litellm_api_key"] == "sk-seat-1"
+    assert user_data["maas_model"] == "granite-2b-cpu"
+    assert values["terminal"]["storage"]["setup"] == "false"
 
 
 def test_application_name_is_stable_dns_safe_and_bounded():

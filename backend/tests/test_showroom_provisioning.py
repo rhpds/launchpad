@@ -77,6 +77,16 @@ def test_guided_workspace_deep_links_to_the_rag_experience():
     assert url == "https://workspace.example.test/try-it"
 
 
+def test_content_workspace_route_uses_stable_openshift_route_hostname():
+    url = OpenShiftProvisioningAdapter._content_workspace_url(
+        "solution-ui", "launchpad-seat-agent-1", "apps.arena.example"
+    )
+
+    assert url == (
+        "https://solution-ui-launchpad-seat-agent-1.apps.arena.example"
+    )
+
+
 def test_showroom_is_deployed_by_gitops_not_inline_html():
     assert not hasattr(OpenShiftProvisioningAdapter, "_showroom_html")
     assert not hasattr(OpenShiftProvisioningAdapter, "_deploy_showroom")

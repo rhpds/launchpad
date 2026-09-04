@@ -1,6 +1,6 @@
 # Intel x Red Hat AI Partner Launchpad
 
-Launchpad is an internal self-service lab platform running on the **Oberon OpenShift cluster**. It provisions individual environments and multi-seat workshops, validates them before handoff, exposes participant access, and reclaims generated resources at the end of a session.
+Launchpad is an internal self-service lab platform running on the **Arena OpenShift cluster**. It provisions individual environments and multi-seat workshops, validates them before handoff, exposes participant access, and reclaims generated resources at the end of a session.
 
 Its target operating model is self-service at both layers: users and CIs can
 request or contribute governed experiences, while the platform detects and
@@ -37,11 +37,11 @@ Quick paths:
 
 | Surface | URL |
 |---|---|
-| Partner portal | <https://launchpad.apps.oberon.fm2aihpcsed.com> |
-| Admin dashboard | <https://launchpad-admin.apps.oberon.fm2aihpcsed.com> |
-| Backend API | <https://launchpad-api.apps.oberon.fm2aihpcsed.com> |
+| Partner portal | <https://launchpad.apps.arena.fm2aihpcsed.com> |
+| Admin dashboard | <https://launchpad-admin.apps.arena.fm2aihpcsed.com> |
+| Backend API | <https://launchpad-api.apps.arena.fm2aihpcsed.com> |
 
-The portal and API are protected by OpenShift OAuth. The deployment is managed by the `launchpad` Argo CD Application using `deploy/launchpad/overlays/oberon`.
+The portal and API are protected by OpenShift OAuth. The deployment is managed by the `launchpad` Argo CD Application using `deploy/launchpad/overlays/arena`.
 
 ## Supported user journeys
 
@@ -57,7 +57,7 @@ Use **Request Environment → Multi-seat Workshop** to order one workshop contai
 
 The `ai-sandbox` catalog item is OpenShift-first. Its primary access is the real OpenShift Console scoped to the generated namespace, with Web Terminal and browser IDE access where available. The requester receives the namespace-level `edit` role; Launchpad does not grant cluster-admin. Jupyter is not a default access method.
 
-The shared Oberon platform currently provides Red Hat OpenShift AI, Serverless, Service Mesh, cluster observability, Argo CD, and Intel device plugins. These operators are centrally managed; a sandbox order does not install cluster-wide operators.
+The shared Arena platform provides the centrally managed OpenShift capabilities used by catalog experiences. A sandbox or guided lab order receives namespace-scoped access and does not install cluster-wide operators.
 
 The request form shows the live healthy model inventory and permits multiple
 model selections. Models remain centrally served behind LiteLLM; the sandbox
@@ -69,6 +69,9 @@ receives scoped API access and does not load model weights into its pod.
 |---|---|---|
 | `ai-sandbox` | OpenShift Developer Sandbox | Open sandbox |
 | `cpu-inference-serving` | LLM CPU Serving on Xeon | Quick start |
+| `intel-llm-cpu-serving` | Intel AI Quickstart: Serve LLMs on Intel Xeon CPUs | Guided build |
+| `intel-llm-tool-calling` | Intel AI Quickstart: LLM Tool Calling on Intel | Guided build |
+| `intel-xeon6-agent-201` | Intel Xeon 6 201: Building an AI Agent | Guided build |
 | `openshift-operators-workshop` | OpenShift AI Operator Workshop | Guided build |
 | `rag-on-xeon` | RAG on Intel Xeon | Quick start |
 | `smoke-test` | Smoke Test Demo | Quick start |
@@ -88,7 +91,7 @@ FastAPI provisioning service
     └── persisted lifecycle state
     │
     ▼
-Oberon OpenShift adapters
+Arena OpenShift adapters
     ├── namespace and namespace-scoped RBAC
     ├── workload/service/route deployment
     ├── per-seat Showroom Argo CD Application
@@ -106,7 +109,7 @@ frontend/      Partner portal
 admin/         Internal operations UI
 catalog/       Active file-backed catalog definitions
 content/       Antora/AsciiDoc Showroom content
-content-operators/ Operator-workshop Antora/AsciiDoc Showroom content
+content-*/      Catalog-specific Antora/AsciiDoc Showroom content
 demos/         Demo frontend, gateway, and sandbox image
 deploy/        Kustomize, build, and optional RHDP/AgnosticV assets
 docs/          Current runbooks plus historical design documents
@@ -127,10 +130,10 @@ provisioning plan, functional validation, Showroom journey, and deterministic
 cleanup. Follow the staged CI checklist in
 [docs/persona-onboarding.md](docs/persona-onboarding.md#content-integrator-ci-onboarding).
 
-Use an explicit Oberon context for every cluster command; do not change the current kubeconfig context:
+Use Arena's dedicated kubeconfig for every cluster command; do not change the current kubeconfig context:
 
 ```bash
-oc --context='default/api-oberon-fm2aihpcsed-com:6443/kube:admin' ...
+KUBECONFIG=/Users/jkershaw/.kube/config-arena oc ...
 ```
 
 ## Current limitations
