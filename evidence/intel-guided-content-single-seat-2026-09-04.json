@@ -1,0 +1,184 @@
+{
+  "schema_version": "1.0",
+  "evidence_id": "EDD-INTEL-GUIDED-20260904-ARENA",
+  "generated_at": "2026-09-04T19:44:00Z",
+  "commit_sha": "b93b2934c12ff4180dd730c88a2005ceac88a2ba",
+  "cluster": "arena",
+  "scope": "single-seat-native-content",
+  "content_tags": [
+    "intel-guided-content-v1.0.1",
+    "intel-guided-content-v1.0.2",
+    "intel-guided-content-v1.0.3"
+  ],
+  "catalog_items": [
+    {
+      "catalog_item_id": "intel-xeon6-agent-201",
+      "content_ref": "intel-guided-content-v1.0.1",
+      "model": "granite-2b-cpu",
+      "max_workshop_seats": 1
+    },
+    {
+      "catalog_item_id": "intel-llm-cpu-serving",
+      "content_ref": "intel-guided-content-v1.0.3",
+      "model": "granite-2b-cpu",
+      "max_workshop_seats": 1
+    },
+    {
+      "catalog_item_id": "intel-llm-tool-calling",
+      "content_ref": "intel-guided-content-v1.0.2",
+      "model": "granite-3.2-8b-tools",
+      "max_workshop_seats": 1
+    }
+  ],
+  "methodology": {
+    "tdd": "Failing model-routing, endpoint-injection, content-safety, and workshop-limit tests were captured before implementation.",
+    "edd": "This manifest links source, live session IDs, runtime digests, functional probes, and cleanup results.",
+    "cdd": "Catalog, preflight, placement, Showroom user-data, and workshop seat-limit contracts are executable tests.",
+    "bdd": "Native participant journeys cover order, provision, Showroom, terminal, model call, workload deploy, route access, and reclaim.",
+    "cbt": "Preflight, cluster registry, Antora packages, Showroom GitOps, provisioning, model serving, and workshop limits were tested independently."
+  },
+  "red_green_evidence": [
+    {
+      "phase": "RED",
+      "evidence": "Cluster-aware preflight tests failed because model_endpoints was unsupported and provisioning had no target-aware preflight helper."
+    },
+    {
+      "phase": "RED",
+      "evidence": "A live tool-calling order selected Arena but queried the global Granite 2B endpoint for granite-3.2-8b-tools."
+    },
+    {
+      "phase": "RED",
+      "evidence": "The upstream AnythingLLM image failed under restricted-v2 first on /app/server access and then on UID-owned Prisma generation."
+    },
+    {
+      "phase": "GREEN",
+      "evidence": "134 focused backend tests passed; all three Antora playbooks built without warnings; live functional checks passed."
+    }
+  ],
+  "validation_matrix": [
+    {
+      "requirement_id": "CATALOG-3-NATIVE",
+      "critical": true,
+      "unit": "GREEN",
+      "contract": "GREEN",
+      "component": "GREEN",
+      "bdd": "GREEN",
+      "live": "GREEN",
+      "cleanup": "GREEN"
+    },
+    {
+      "requirement_id": "ARENA-PLACEMENT-PREFLIGHT",
+      "critical": true,
+      "unit": "GREEN",
+      "contract": "GREEN",
+      "component": "GREEN",
+      "bdd": "GREEN",
+      "live": "GREEN",
+      "cleanup": "GREEN"
+    },
+    {
+      "requirement_id": "TOOL-CALL-STRUCTURED",
+      "critical": true,
+      "unit": "GREEN",
+      "contract": "GREEN",
+      "component": "GREEN",
+      "bdd": "GREEN",
+      "live": "GREEN",
+      "cleanup": "GREEN"
+    },
+    {
+      "requirement_id": "CPU-RAG-RESTRICTED-SCC",
+      "critical": true,
+      "unit": "GREEN",
+      "contract": "GREEN",
+      "component": "GREEN",
+      "bdd": "GREEN",
+      "live": "GREEN",
+      "cleanup": "GREEN"
+    },
+    {
+      "requirement_id": "SINGLE-SEAT-CERT-GATE",
+      "critical": true,
+      "unit": "GREEN",
+      "contract": "GREEN",
+      "component": "GREEN",
+      "bdd": "GREEN",
+      "live": "GREEN",
+      "cleanup": "GREEN"
+    }
+  ],
+  "live_runs": [
+    {
+      "catalog_item_id": "intel-xeon6-agent-201",
+      "session_id": "814d2529-232a-4e7b-9f52-1da2172bb719",
+      "result": "GREEN",
+      "proof": [
+        "Showroom, solution-agent, solution-tools, and solution-ui ready",
+        "Arena namespace-scoped workflow completed",
+        "session reclaimed"
+      ]
+    },
+    {
+      "catalog_item_id": "intel-llm-tool-calling",
+      "session_id": "02693626-a40c-41de-a58c-ee6856216c37",
+      "result": "GREEN",
+      "proof": [
+        "Showroom route HTTP 200",
+        "seat terminal reached granite-3.2-8b-tools",
+        "structured get_weather tool call returned",
+        "five concurrent model calls valid with p95 3.71 seconds",
+        "session reclaimed"
+      ]
+    },
+    {
+      "catalog_item_id": "intel-llm-cpu-serving",
+      "session_id": "7c986b06-a5e0-4309-8f53-a4a80d48b7a9",
+      "result": "GREEN",
+      "proof": [
+        "Showroom route HTTP 200 on content v1.0.3",
+        "seat terminal deployed AnythingLLM in 10 seconds with cached layers",
+        "AnythingLLM ready with zero restarts under restricted-v2",
+        "RAG UI and /api/ping returned HTTP 200",
+        "telemetry disabled and Granite 2B endpoint reachable",
+        "session reclaimed"
+      ]
+    }
+  ],
+  "runtime_digests": {
+    "launchpad_backend": "sha256:d64cdfd5c9dec1369028d6cbcbb9e385efc71baa1c66d9fbe2bfd0f87c9c274e",
+    "anythingllm_openshift": "sha256:1eee2162bed8ab643133dd9420ea086566f7c778849e9ff3eddc71a6a6cd8f98",
+    "granite_3_2_8b_vllm_image": "sha256:cf6577f6d526561651df5390aad916c53820a18a1659e3fb39c1c5a62aef0e3c"
+  },
+  "artifact_hashes": {
+    "catalog/intel-xeon6-agent-201/catalog-item.yaml": "16c210e86537a94e26bae46db74ba58028628d554a336644b4952d5229921881",
+    "catalog/intel-llm-cpu-serving/catalog-item.yaml": "142a7e3efbd10df25ca928c72ff222931e98781a206b74197f0090c9435779a9",
+    "catalog/intel-llm-tool-calling/catalog-item.yaml": "3e3171dd122a42c6a04a2ab48cfbe914f1f43a8d2c25d1817cfe270c9504cfd3",
+    "deploy/models/arena/granite-3.2-8b-tools.yaml": "de00a1fe6c4459a2c55cbe2d67b8c5aec223783110255aceff1838bb200ba98d",
+    "workshop-images/anythingllm-openshift/Containerfile": "611665ac8fba07280f750f4835db5d8838c8c26d62fef7df0aa54631319dc74b"
+  },
+  "cleanup": {
+    "matching_certification_namespaces": 0,
+    "matching_argocd_applications": 0,
+    "shared_model_deployments_ready": 2
+  },
+  "rubric": {
+    "scope": "single-seat-native-content",
+    "required_score": 100,
+    "score": 100,
+    "categories": {
+      "catalog_and_content_contracts": 15,
+      "antora_and_showroom_delivery": 15,
+      "arena_placement_and_model_routing": 15,
+      "openshift_security_and_rbac": 15,
+      "functional_model_behavior": 20,
+      "participant_workload_journey": 10,
+      "reclaim_and_residue": 10
+    }
+  },
+  "known_limits": [
+    "Certification is single-seat only; every new Intel item remains capped at one workshop seat.",
+    "Five-seat and twenty-five-seat full lab certifications have not been run.",
+    "Public-code participant access was not exercised for these three new content packages.",
+    "The certified AnythingLLM derivative is currently retained in Arena's internal registry and must be promoted to a durable external registry before production workshop scale."
+  ]
+}
