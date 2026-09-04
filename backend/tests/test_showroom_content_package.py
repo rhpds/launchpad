@@ -26,7 +26,7 @@ INTEL_GUIDED_LABS = [
         "title": "Serve LLMs on Intel Xeon CPUs",
         "model": "granite-2b-cpu",
         "workspace_route": "rag",
-        "content_ref": "intel-guided-content-v1.0.2",
+        "content_ref": "intel-guided-content-v1.0.3",
     },
     {
         "catalog_id": "intel-llm-tool-calling",
@@ -236,9 +236,12 @@ def test_cpu_serving_uses_pinned_openshift_compatible_workbench_image():
 
     assert "anything-llm:latest" not in page
     assert (
-        "partner-ai-launchpad/anythingllm-openshift:1.16.1" in page
+        "partner-ai-launchpad/anythingllm-openshift@sha256:"
+        "1eee2162bed8ab643133dd9420ea086566f7c778849e9ff3eddc71a6a6cd8f98"
+        in page
     )
     assert "STORAGE_DIR" in page
+    assert "DISABLE_TELEMETRY" in page
     assert "--timeout=300s" in page
     assert (
         "ghcr.io/mintplex-labs/anything-llm@sha256:"

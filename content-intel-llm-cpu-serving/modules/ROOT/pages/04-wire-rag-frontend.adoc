@@ -107,7 +107,7 @@ spec:
     spec:
       containers:
         - name: anythingllm
-          image: image-registry.openshift-image-registry.svc:5000/partner-ai-launchpad/anythingllm-openshift:1.16.1
+          image: image-registry.openshift-image-registry.svc:5000/partner-ai-launchpad/anythingllm-openshift@sha256:1eee2162bed8ab643133dd9420ea086566f7c778849e9ff3eddc71a6a6cd8f98
           ports:
             - containerPort: 3001
           envFrom:
@@ -116,6 +116,8 @@ spec:
           env:
             - name: STORAGE_DIR
               value: /tmp/anythingllm-storage
+            - name: DISABLE_TELEMETRY
+              value: "true"
           startupProbe:
             tcpSocket:
               port: 3001
