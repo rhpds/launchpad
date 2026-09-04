@@ -130,7 +130,7 @@ Expose AnythingLLM so you can access it from your browser:
 [source,bash,role="execute",subs="attributes+"]
 ----
 oc expose deployment anythingllm --port=3001 -n {project_name}
-oc create route edge anythingllm --service=anythingllm --port=3001 -n {project_name}
+oc create route edge rag --service=anythingllm --port=3001 -n {project_name}
 ----
 
 == Wait for the Pod
@@ -160,7 +160,7 @@ Get the AnythingLLM URL:
 
 [source,bash,role="execute",subs="attributes+"]
 ----
-export ANYTHINGLLM_URL=$(oc get route anythingllm -n {project_name} -o jsonpath='https://\{.spec.host\}')
+export ANYTHINGLLM_URL=$(oc get route rag -n {project_name} -o jsonpath='https://\{.spec.host\}')
 echo "AnythingLLM URL: $\{ANYTHINGLLM_URL\}"
 ----
 

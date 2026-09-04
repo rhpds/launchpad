@@ -17,7 +17,7 @@ oc project -q
 
 [source,bash,role="execute",subs=attributes+]
 ----
-oc apply -f https://raw.githubusercontent.com/rhpds/triforce/201-v1.0.0/infrastructure/manifests-201/solution-tools.yaml
+oc apply -f https://raw.githubusercontent.com/rhpds/launchpad/intel-guided-content-v1.0.1/content-intel-xeon6-agent-201/manifests/solution-tools.yaml
 ----
 
 Wait for the pod to be ready:
@@ -26,7 +26,7 @@ Wait for the pod to be ready:
 ----
 oc rollout status deploy/solution-tools --timeout=60s
 
-export MCP_URL="https://$(oc get route solution-tools -o jsonpath='{.spec.host}')"
+export MCP_URL="https://$(oc get route tools -o jsonpath='{.spec.host}')"
 ----
 
 == Exercise 2: List Available Tools
@@ -35,7 +35,7 @@ The MCP server exposes tools via JSON-RPC 2.0 -- the same protocol used by Claud
 
 [source,bash,role="execute"]
 ----
-MCP_URL="https://$(oc get route solution-tools -o jsonpath='{.spec.host}')"
+MCP_URL="https://$(oc get route tools -o jsonpath='{.spec.host}')"
 curl -fsS -X POST "${MCP_URL}/mcp" \
   -H "Content-Type: application/json" \
   -d '{"jsonrpc":"2.0","id":"1","method":"tools/list","params":{}}' \
@@ -57,7 +57,7 @@ Look up Intel Xeon 6 processors optimized for AI inference:
 
 [source,bash,role="execute"]
 ----
-MCP_URL="https://$(oc get route solution-tools -o jsonpath='{.spec.host}')"
+MCP_URL="https://$(oc get route tools -o jsonpath='{.spec.host}')"
 curl -fsS -X POST "${MCP_URL}/mcp" \
   -H "Content-Type: application/json" \
   -d '{
@@ -83,7 +83,7 @@ Look up the AI/ML capabilities of the OpenShift platform:
 
 [source,bash,role="execute"]
 ----
-MCP_URL="https://$(oc get route solution-tools -o jsonpath='{.spec.host}')"
+MCP_URL="https://$(oc get route tools -o jsonpath='{.spec.host}')"
 curl -fsS -X POST "${MCP_URL}/mcp" \
   -H "Content-Type: application/json" \
   -d '{
@@ -107,7 +107,7 @@ Get a joint Red Hat + Intel reference architecture for retail:
 
 [source,bash,role="execute"]
 ----
-MCP_URL="https://$(oc get route solution-tools -o jsonpath='{.spec.host}')"
+MCP_URL="https://$(oc get route tools -o jsonpath='{.spec.host}')"
 curl -fsS -X POST "${MCP_URL}/mcp" \
   -H "Content-Type: application/json" \
   -d '{

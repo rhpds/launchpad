@@ -76,7 +76,7 @@ Remove the resources you created:
 ----
 oc delete deployment anythingllm -n {project_name}
 oc delete svc anythingllm -n {project_name}
-oc delete route anythingllm -n {project_name}
+oc delete route rag -n {project_name}
 oc delete secret anythingllm-config -n {project_name}
 ----
 

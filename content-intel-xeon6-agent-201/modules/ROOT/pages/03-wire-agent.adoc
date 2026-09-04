@@ -17,7 +17,7 @@ oc project -q
 
 [source,bash,role="execute",subs=attributes+]
 ----
-oc apply -f https://raw.githubusercontent.com/rhpds/triforce/201-v1.0.0/infrastructure/manifests-201/advisor-prompt-configmap.yaml
+oc apply -f https://raw.githubusercontent.com/rhpds/launchpad/intel-guided-content-v1.0.1/content-intel-xeon6-agent-201/manifests/advisor-prompt-configmap.yaml
 ----
 
 [source,bash,role="execute",subs=attributes+]
@@ -52,11 +52,11 @@ oc create secret generic litellm-api-key \
 
 [source,bash,role="execute",subs=attributes+]
 ----
-oc apply -f https://raw.githubusercontent.com/rhpds/triforce/201-v1.0.0/infrastructure/manifests-201/solution-agent.yaml
+oc apply -f https://raw.githubusercontent.com/rhpds/launchpad/intel-guided-content-v1.0.1/content-intel-xeon6-agent-201/manifests/solution-agent.yaml
 oc set env deployment/solution-agent ADVISOR_MODEL='{maas_model}'
 oc rollout status deploy/solution-agent --timeout=90s
 
-export ADVISOR_URL="https://$(oc get route solution-agent -o jsonpath='{.spec.host}')"
+export ADVISOR_URL="https://$(oc get route agent -o jsonpath='{.spec.host}')"
 ----
 
 Check the agent's environment:
@@ -81,7 +81,7 @@ Deploy the chat interface:
 
 [source,bash,role="execute",subs=attributes+]
 ----
-oc apply -f https://raw.githubusercontent.com/rhpds/triforce/201-v1.0.0/infrastructure/manifests-201/solution-ui.yaml
+oc apply -f https://raw.githubusercontent.com/rhpds/launchpad/intel-guided-content-v1.0.1/content-intel-xeon6-agent-201/manifests/solution-ui.yaml
 oc rollout status deploy/solution-ui --timeout=60s
 ----
 
@@ -91,7 +91,7 @@ Confirm that the UI Route belongs to the tenant namespace before opening the tab
 
 [source,bash,role="execute",subs=attributes+]
 ----
-oc get route solution-ui
+oc get route app
 oc project -q
 ----
 
@@ -101,7 +101,7 @@ Send a request via the terminal:
 
 [source,bash,role="execute"]
 ----
-ADVISOR_URL="https://$(oc get route solution-agent -o jsonpath='{.spec.host}')"
+ADVISOR_URL="https://$(oc get route agent -o jsonpath='{.spec.host}')"
 curl -fsS -X POST "${ADVISOR_URL}/api/v1/advise" \
   -H "Content-Type: application/json" \
   -d '{

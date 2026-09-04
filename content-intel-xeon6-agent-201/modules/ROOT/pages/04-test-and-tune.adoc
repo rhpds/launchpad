@@ -15,7 +15,7 @@ oc project -q
 
 [source,bash,role="execute"]
 ----
-export ADVISOR_URL="https://$(oc get route solution-agent -o jsonpath='{.spec.host}')"
+export ADVISOR_URL="https://$(oc get route agent -o jsonpath='{.spec.host}')"
 ----
 
 == Exercise 1: Three Customer Scenarios
@@ -24,7 +24,7 @@ Run a financial services scenario:
 
 [source,bash,role="execute"]
 ----
-ADVISOR_URL="https://$(oc get route solution-agent -o jsonpath='{.spec.host}')"
+ADVISOR_URL="https://$(oc get route agent -o jsonpath='{.spec.host}')"
 curl -fsS -X POST "${ADVISOR_URL}/api/v1/advise" \
   -H "Content-Type: application/json" \
   -d '{
@@ -36,7 +36,7 @@ A manufacturing scenario:
 
 [source,bash,role="execute"]
 ----
-ADVISOR_URL="https://$(oc get route solution-agent -o jsonpath='{.spec.host}')"
+ADVISOR_URL="https://$(oc get route agent -o jsonpath='{.spec.host}')"
 curl -fsS -X POST "${ADVISOR_URL}/api/v1/advise" \
   -H "Content-Type: application/json" \
   -d '{
@@ -48,7 +48,7 @@ A cost-savings scenario:
 
 [source,bash,role="execute"]
 ----
-ADVISOR_URL="https://$(oc get route solution-agent -o jsonpath='{.spec.host}')"
+ADVISOR_URL="https://$(oc get route agent -o jsonpath='{.spec.host}')"
 curl -fsS -X POST "${ADVISOR_URL}/api/v1/advise" \
   -H "Content-Type: application/json" \
   -d '{
@@ -136,7 +136,7 @@ Write a query that matches your customer scenario and test it:
 [source,bash]
 ----
 # Replace with YOUR customer's situation:
-ADVISOR_URL="https://$(oc get route solution-agent -o jsonpath='{.spec.host}')"
+ADVISOR_URL="https://$(oc get route agent -o jsonpath='{.spec.host}')"
 curl -fsS -X POST "${ADVISOR_URL}/api/v1/advise" \
   -H "Content-Type: application/json" \
   -d '{
@@ -153,38 +153,22 @@ curl -fsS -X POST "${ADVISOR_URL}/api/v1/advise" \
 * What would you change in the prompt to improve the output? ___
 ****
 
-== Exercise 4: Swap the Model
+== Exercise 4: Review the Assigned Model
 
-Try a larger model to see if the recommendation quality improves:
+This lab uses the model selected and authorized when the environment was
+ordered: *{maas_model}*. Keep the agent on that model so every request stays
+inside the lab's scoped MaaS entitlement.
 
 [source,bash,role="execute",subs=attributes+]
 ----
-oc set env deploy/solution-agent ADVISOR_MODEL=phi3-mini-cpu
-oc rollout status deploy/solution-agent --timeout=90s
+oc get deployment solution-agent \
+  -o jsonpath='{.spec.template.spec.containers[0].env[?(@.name=="ADVISOR_MODEL")].value}{"\n"}'
 ----
 
-Re-run your customer scenario:
-
-[source,bash]
-----
-ADVISOR_URL="https://$(oc get route solution-agent -o jsonpath='{.spec.host}')"
-curl -fsS -X POST "${ADVISOR_URL}/api/v1/advise" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "query": "YOUR SAME CUSTOMER SCENARIO"
-  }' | jq '{brief: .brief, inference_log: .inference_log}'
-----
-
-[sidebar]
-****
-*Record:*
-
-* 3B model quality (1-5): ___
-* 3.8B model quality (1-5): ___
-* 3B model inference time: ___ ms
-* 3.8B model inference time: ___ ms
-* Worth the extra latency? ___
-****
+If a future catalog version advertises more than one compatible model, the
+requester can select the model before provisioning and Launchpad will inject
+that choice. Do not type an arbitrary model name: placement and the session
+credential are both model-scoped.
 
 == Exercise 5: Your Agent Card
 
@@ -198,7 +182,7 @@ Fill in this summary — it captures what you built and what you would show a cu
 
 *System prompt customization*: What did you add or change from the default? ___
 
-*Model selected*: [ ] qwen25-3b-cpu (3B, faster) [ ] phi3-mini-cpu (3.8B, richer)
+*Model selected*: {maas_model}
 
 *Why*: ___
 
@@ -224,14 +208,14 @@ Fill in this summary — it captures what you built and what you would show a cu
 * [ ] Three canned scenarios returned different recommendations
 * [ ] Custom system prompt deployed and tested
 * [ ] Customer-specific query returned relevant output
-* [ ] Model swap compared (quality + latency)
+* [ ] Assigned model and inference latency recorded
 * [ ] Agent card filled in
 
 == Learning Outcomes
 
 * The system prompt is the primary control surface — change the persona, process, and output format without touching code
 * Prompt engineering is iterative: write, test, observe, revise
-* Model selection is a quality/latency tradeoff — test both, pick based on your use case
+* Model selection is a quality/latency tradeoff controlled by the catalog order and its scoped entitlement
 * Every change is a ConfigMap or env var — standard Kubernetes operations that any platform team can manage
 * You leave with an agent configured for YOUR customer scenario
 
