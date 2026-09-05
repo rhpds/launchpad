@@ -106,12 +106,12 @@ metadata:
   seat_pods: 15
   seat_storage_gib: 30
   workload_repo: https://github.com/rhpds/launchpad.git
-  workload_revision: 6936ee6b9d64df8ccda8902279b8cc3a1e4c0545
+  workload_revision: 6fc278ec8200802a5dd536a1e76656bd160d697e
   workload_deploy_type: helm
   workload_deployment_scope: seat
   workload_deploy_path: deploy/workloads/agentops-seat
   workload_source_kind: launchpad-seat-chart
-  workload_gitops_ready: false
+  workload_gitops_ready: true
   workload_release_name: agentops
   workload_helm_values:
     storageClass: launchpad-nfs-ephemeral

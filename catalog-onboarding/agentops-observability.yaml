@@ -22,7 +22,7 @@ sources:
     start_path: content-agentops-observability
   workload:
     repo_url: "https://github.com/rhpds/launchpad.git"
-    revision: "6936ee6b9d64df8ccda8902279b8cc3a1e4c0545"
+    revision: "6fc278ec8200802a5dd536a1e76656bd160d697e"
     deploy_path: deploy/workloads/agentops-seat
 
 references:
@@ -107,7 +107,7 @@ runtime:
       source: https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/
   workload:
     source_kind: launchpad-seat-chart
-    gitops_ready: false
+    gitops_ready: true
     release_name: agentops
     identity_value_path: identity
     runtime_secret_name: agentops-runtime

@@ -113,7 +113,7 @@ The detailed RHDP topology and Launchpad adaptation decisions are recorded in
 - upstream Showroom provenance: `rhpds/agentops-intel-showroom` at
   `f1881c61de55ebf5640c27e76469f4efe458edaf`;
 - Launchpad seat chart: `rhpds/launchpad`, `deploy/workloads/agentops-seat`, at
-  `6936ee6b9d64df8ccda8902279b8cc3a1e4c0545`;
+  `6fc278ec8200802a5dd536a1e76656bd160d697e`;
 - referenced RHDP automation: `rhpds/agentops-in-prod-automation` at
   `6ea100531ac869fa66abe69ae223d6b56dbce9a2`;
 - transitive Mortgage AI application: `rh-ai-quickstart/multi-agent-loan-origination`
@@ -127,7 +127,7 @@ deploy the application chart directly. It runs the bootstrap chart from
 `6ea100531ac869fa66abe69ae223d6b56dbce9a2`. That repository is retained as
 immutable provenance, but it is not Launchpad's deployable workload source.
 The deployable source is the Launchpad-owned namespace-scoped seat chart at
-`6936ee6b9d64df8ccda8902279b8cc3a1e4c0545`. The application repository remains
+`6fc278ec8200802a5dd536a1e76656bd160d697e`. The application repository remains
 recorded as transitive source provenance.
 
 Its source and Antora build pass. The Launchpad-owned component replaces the
