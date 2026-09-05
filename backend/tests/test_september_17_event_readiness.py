@@ -37,14 +37,14 @@ def test_event_readiness_manifest_keeps_the_exact_workshop_target_and_budget():
     assert declared == {
         "cpu_millicores": 89500,
         "memory_mib": 239200,
-        "pod_slots": 500,
+        "pod_slots": 550,
         "storage_gib_minimum": 750,
     }
     protected = readiness["admission_target_with_twenty_percent_headroom"]
     assert protected == {
         "cpu_millicores": 107400,
         "memory_mib": 287040,
-        "pod_slots": 600,
+        "pod_slots": 660,
         "storage_gib_minimum": 900,
     }
 
@@ -53,12 +53,12 @@ def test_event_readiness_manifest_keeps_the_exact_workshop_target_and_budget():
     )
     assert readiness["public_access_certified"] is False
     assert readiness["overall_status"] == "RED"
-    assert readiness["next_gate"] == "agentops-five-seat-remediation"
+    assert readiness["next_gate"] == "agentops-twenty-five-seat-certification"
     assert readiness["latest_agentops_component_evidence"] == (
         "evidence/agentops-launchpad-one-seat-2026-09-05.json"
     )
     assert readiness["latest_agentops_five_seat_evidence"] == (
-        "evidence/agentops-five-seat-red-live-build77-2026-09-05.json"
+        "evidence/agentops-five-seat-functional-live-build84-2026-09-05.json"
     )
     assert readiness["latest_fleet_snapshot"]["clusters"]["brutus"][
         "additional_slots_after_reserve"
@@ -79,7 +79,7 @@ def test_event_runbook_names_every_gate_and_does_not_overclaim_capacity():
         "1 -> 5 -> 25",
         "89,500m",
         "239,200 MiB",
-        "500",
+        "550",
         "750 GiB",
         "evidence/arena-staggered-three-workshops-2026-09-04.json",
     ):

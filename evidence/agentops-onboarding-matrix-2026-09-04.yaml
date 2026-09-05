@@ -7,7 +7,7 @@ status: blocked
 source_pins:
   showroom: 59563b0a77252e8b91077c30c23ab524a8402bce
   upstream_showroom: f1881c61de55ebf5640c27e76469f4efe458edaf
-  launchpad_seat_chart: 3e2d3d2655400f9fc1de6577f76786ff1c24521a
+  launchpad_seat_chart: 322beb64d42f692aa30058812ab7c9ea01245e55
   agnosticv: 48fc6eebedb295bddf1b915a230e5e90f89db0af
   automation: 6ea100531ac869fa66abe69ae223d6b56dbce9a2
   application: 1e50e51c334c1b6ed854d81a3f28fd324792f481
@@ -214,6 +214,16 @@ matrix:
       - backend/tests/test_showroom_provisioning.py
       - backend/tests/test_agentops_pipeline_database_tls_evidence.py
       - evidence/agentops-pipeline-database-tls-live-2026-09-05.json
+  - id: LIVE-AGENTOPS-022
+    requirement: Five AgentOps seats complete isolated participant journeys and both normal and interrupted-provisioning reclaim with zero run-specific residue
+    red: Builds 77 and 83 exposed unstable-worker placement, post-reclaim queued-seat provisioning, manual cleanup, and protected RED-run storage residue
+    green_local: pass-node-qualification-queued-reclaim-and-evidence-contracts
+    green_integration: pass-one-seat-regression-and-bounded-two-seat-waves
+    green_live: pass-5-of-5-ready-functional-and-isolated-100-of-100-zero-residue
+    evidence:
+      - backend/tests/test_agentops_five_seat_functional_live_build84_evidence.py
+      - evidence/agentops-five-seat-red-live-build83-2026-09-05.json
+      - evidence/agentops-five-seat-functional-live-build84-2026-09-05.json
 
 rubric:
   source_and_contract: {earned: 15, possible: 15}
@@ -222,18 +232,21 @@ rubric:
   shared_service_readiness: {earned: 14, possible: 15}
   participant_tabs_and_journey: {earned: 14, possible: 15}
   cleanup_and_repeatability: {earned: 10, possible: 10}
-  five_seat_certification: {earned: 0, possible: 5}
+  five_seat_certification: {earned: 5, possible: 5}
   twenty_five_seat_certification: {earned: 0, possible: 10}
-  total: {earned: 83, possible: 100}
+  total: {earned: 88, possible: 100}
 
 decision: >-
   Keep the catalog item draft. Source intake is valid, but the AgentOps
-  experience passed one internal Launchpad-created seat, including the
-  namespaced runtime Secret, operator-aware readiness, participant journey,
-  logging isolation, and automatic zero-residue reclaim. Keep the item capped
-  at one seat until logging storage is suitable for five-seat testing. The
+  experience passed five internal Launchpad-created seats, including isolated
+  runtime Secrets, operator-aware readiness, five concurrent participant
+  journeys, and automatic zero-residue normal and interrupted-provisioning
+  reclaim. Keep the item capped at five seats until the 25-seat topology and
+  capacity gate is GREEN-live; only `gnr2` is currently qualified. The
   per-seat pipeline database and shared MLflow metadata now use verified
   service-ca TLS. RHOAI 3.5 podToPodTLS remains disabled under a documented
   compatibility workaround and must be replaced with an upstream-supported
-  encrypted internal component configuration before production. Public-code
-  access and trusted public TLS remain separate certification gates.
+  encrypted internal component configuration before production. The protected
+  build-83 RED-run PV also requires approved storage-administrator
+  reconciliation. Public-code access and trusted public TLS remain separate
+  certification gates.

@@ -8,7 +8,7 @@ participant seats must remain usable concurrently:
 
 | Provision order | Catalog item | Participant seats | Current release state | Candidate target |
 |---|---|---:|---|---|
-| 1 | `agentops-observability` | 25 | RED: five-seat Arena gate failed, limited to one seat | Arena after topology reduction/capacity repair |
+| 1 | `agentops-observability` | 25 | GREEN-live-5 internal; 25-seat gate remains RED | Arena after topology reduction or qualified capacity expansion |
 | 2 | `intel-llm-cpu-serving` | 25 | GREEN-live-25 on Arena | Oberon after re-certification |
 | 3 | `intel-xeon6-agent-201` | 25 | GREEN-live-25 internal on Brutus | Brutus, placement-disabled pending event go/no-go |
 
@@ -31,7 +31,8 @@ by 75 concurrent participant journeys, and reclaimed with zero residue. The
 run included the exact Serve LLMs and Building an AI Agent catalog items.
 
 That evidence does not include AgentOps. Its third workshop was LLM Tool
-Calling. It also does not certify public access or the proposed Brutus/Oberon
+Calling. AgentOps now has separate GREEN-live five-seat evidence, but neither
+proof certifies 25 AgentOps seats, public access, or the proposed Brutus/Oberon
 placement. Therefore the previous run proves the Launchpad orchestration
 pattern, not the September 17 release candidate.
 
@@ -43,14 +44,14 @@ plane services that are already running.
 
 | Workshop | CPU | Memory | Pod slots | Declared seat storage |
 |---|---:|---:|---:|---:|
-| AgentOps, 25 seats | 62,500m | 179,200 MiB | 375 | 750 GiB |
+| AgentOps, 25 seats | 62,500m | 179,200 MiB | 425 | 750 GiB |
 | Serve LLMs, 25 seats | 16,625m | 37,200 MiB | 50 | not declared by catalog |
 | Building an AI Agent, 25 seats | 10,375m | 22,800 MiB | 75 | not declared by catalog |
-| **Event total** | **89,500m** | **239,200 MiB** | **500** | **at least 750 GiB** |
+| **Event total** | **89,500m** | **239,200 MiB** | **550** | **at least 750 GiB** |
 
 Admission must retain at least 20 percent additional headroom for scheduling,
 operator activity, model services, temporary rollout overlap, and measurement
-error. The protected target is therefore 107,400m CPU, 287,040 MiB memory, 600
+error. The protected target is therefore 107,400m CPU, 287,040 MiB memory, 660
 pod slots, and at least 900 GiB schedulable storage.
 
 These are reservations, not a statement of current availability. **The current
@@ -70,17 +71,22 @@ and `rhgnr1` are schedulable workers:
 |---|---:|
 | Schedulable worker nodes | 2 |
 | Schedulable pod slots | 500 |
-| Running pods on workers | 193 |
+| Running pods on workers | 223 |
+| AgentOps-qualified workers | 1 (`gnr2`) |
+| Running pods on the qualified worker | 43 |
 | Unrequested worker CPU | 336,989m |
 | Unrequested worker memory | 1,281,934 MiB |
 | NFS free space reported | 6.5 TiB |
 
-CPU, memory, and NFS fit the event reservation. Pod slots do not. The current
-193 worker pods plus 500 declared event pods would require 693 slots; applying
-the event's 20 percent protection requires 793. One additional 250-pod worker
-would provide 750 total slots and fit the unprotected estimate, but not the
-protected target, so the recommended event path is **two additional 250-pod
-workers**.
+CPU, memory, and NFS are not the immediate constraint. Pod slots and qualified
+worker topology are. Twenty-five AgentOps seats reserve 425 pod slots. The only
+qualified worker has 250 slots and 43 active pods; retaining the standard 20
+percent node reserve leaves 157 additional slots, a 268-slot shortage. Even if
+the currently unstable `rhgnr1` were relabeled without remediation, the two
+workers together have only 177 additional protected slots at the current
+223-pod baseline. The measured path is a shared-service topology reduction or
+**two additional qualified 250-pod workers**; one new worker still would not
+retain the required headroom at the current baseline.
 
 A pilot-only alternative is to add targeted tolerations to Launchpad workloads
 so selected participant pods can use the three otherwise idle control-plane
@@ -89,29 +95,39 @@ availability risk and needs its own load, eviction, API-latency, rollback, and
 failure certification. It must not be enabled as an incidental chart change.
 
 Scaling down unrelated deployments cannot solve this constraint: even an
-otherwise empty two-worker pool cannot retain headroom around all 500 declared event pods.
+otherwise empty two-worker pool cannot retain headroom around all 550 declared event pods.
 Running the workshops sequentially also does not meet the
 requirement because all 75 participants must use the labs concurrently.
 
 ### Live fleet decision — September 5 after the AgentOps five-seat run
 
-The corrected AgentOps build removed the PostgreSQL restart defect and the
-workshop reclaimer found every persisted session. It still failed live: the
-first four seats concentrated on `rhgnr1`, which stopped posting Ready at about
-239 active pods. The fifth seat then failed closed before namespace creation
-because the required model endpoint was unreachable. Cleanup reached zero
-residue only after bounded removal of stale pod records, two orphan Argo hook
-finalizers, and four Released NFS PVs. The five-seat gate remains RED; see
-`evidence/agentops-five-seat-red-live-build77-2026-09-05.json`.
+The build-83 RED run exposed two independent defects: seats concentrated on
+unstable `rhgnr1`, and a queued seat could begin after workshop reclaim. Bounded
+cleanup removed the run namespaces, but one protected PostgreSQL PV remains
+quarantined because its backing NFS files belong to the deleted namespace UID.
+It requires an approved storage-administrator procedure and is not hidden by
+later evidence. See
+`evidence/agentops-five-seat-red-live-build83-2026-09-05.json`.
+
+Build 84 then passed the internal five-seat release gate at 100/100. All five
+seats became Ready on qualified `gnr2` in bounded two-seat waves: 65/65 steady
+pods were Ready with zero restarts, 55/55 guide pages returned 200, all five
+namespace and cross-seat authorization checks passed, all five knowledge bases
+held 41 embedded chunks, and five simultaneous grounded agent journeys
+completed at 40.669-second p95. Normal bulk reclaim completed in 106 seconds
+with zero run-specific namespaces, Applications, or PVs. A separate reclaim
+during provisioning created only two sessions, canceled the other three queued
+seats, and completed in 171.517 seconds with the same zero-residue result. See
+`evidence/agentops-five-seat-functional-live-build84-2026-09-05.json`.
 
 Current pod-slot snapshots and the standard 20 percent reserve produce this
 candidate fleet assignment:
 
 | Cluster | Schedulable pod slots | Active worker pods | Additional slots after reserve | Candidate event role |
 |---|---:|---:|---:|---|
-| Arena | 500 | 220 after cleanup | 180 | AgentOps only, after redesign or added stable capacity |
+| Arena | 500 | 223 | 177 | AgentOps; five seats certified, 25 blocked on qualified capacity/topology |
 | Brutus | 250 | 109 | 91 | Building an AI Agent; 75-pod contract passed the internal 25-seat gate |
-| Oberon | 500 | 361 | 39 | Serve LLMs; currently eleven slots short of its 50-slot peak contract |
+| Oberon | 500 | 359 | 41 | Serve LLMs; currently nine slots short of its 50-slot peak contract |
 
 Brutus and Oberon are now registered with separate least-privilege Launchpad
 and Argo credentials but remain disabled for normal placement. Brutus's compact
@@ -141,9 +157,11 @@ three-cluster path is now:
 3. Re-enable Oberon only after removing at least eleven baseline pod slots and
    passing Serve LLMs 1 -> 5 -> 25 plus full reclaim.
 
-No catalog limit or target override changes until those measurements are
+The AgentOps catalog may now expose up to five internal seats. Do not raise it
+above five or enable uncertified targets until the next measurements are
 GREEN-live. Placement must include per-node pod, CPU, memory, taint, topology,
-and recent Ready-transition checks; aggregate cluster totals are insufficient.
+qualification labels, and recent Ready-transition checks; aggregate cluster
+totals are insufficient.
 
 ## Critical path: AgentOps 1 -> 5 -> 25
 
@@ -199,7 +217,7 @@ That proof uses a documented RHOAI 3.5 compatibility boundary: `podToPodTLS`
 is disabled because the operator-generated MLMD server TLS configuration drops
 the database TLS options. The external MLMD route is disabled and NetworkPolicy
 limits database ingress, but an upstream-supported encrypted configuration for
-every internal pipeline hop is still required before production. Before Gate B,
+every internal pipeline hop is still required before production. Before production activation,
 the `1x.demo` NFS/MinIO logging topology remains a pilot boundary. Arena has
 only two storage-capable workers; a supported internal ODF deployment requires
 three. The controlled five-seat certification can retain the pilot while it
@@ -211,15 +229,12 @@ storage, and production sizing. Evidence is in
 
 ### Gate B: five AgentOps seats
 
-- Use the admin-only certification override to request exactly the next
-  declared promotion target while the normal catalog maximum remains one.
-- Provision five seats through a single workshop order.
-- Require 5/5 collective readiness and five successful concurrent participant
-  journeys, including embeddings, an agent exchange, a trace, metrics, logs,
-  an evaluation, and a pipeline check.
-- Measure NFS consumption and latency, shared embedding/model saturation,
-  operator/API throttling, pod restarts, and reclaim duration.
-- Reclaim the workshop and require zero residue.
+GREEN-live on build 84. One five-seat workshop achieved 5/5 collective
+readiness, isolated terminals/databases/traces, five simultaneous grounded
+agent journeys, and zero-residue reclaim. The interrupted-provisioning scenario
+also proved queued seats cannot start after reclaim. The catalog is capped at
+five internal seats. Public access and the 25-seat boundary remain separate
+gates.
 
 ### Gate C: 25 AgentOps seats
 
@@ -250,8 +265,8 @@ storage, and production sizing. Evidence is in
 |---|---|
 | Sep 5 | Freeze the exact trio, capacity contract, evidence schema, and stop/go criteria. |
 | Sep 6-7 | Complete AgentOps Gate A, including embeddings, shared observability, participant tabs, authorization, and reclaim. |
-| Sep 8 | Repeat Gate A from a clean state and complete Gate B with five seats. |
-| Sep 9-10 | Correct any RED results, repeat five seats if needed, then complete Gate C at 25 seats. |
+| Sep 8 | Gate B is GREEN-live; publish the five-seat catalog cap and preserve the build-83 storage exception. |
+| Sep 9-10 | Add/qualify capacity or reduce topology, then complete Gate C at 25 seats. |
 | Sep 11 | Run the first exact staggered 25 + 25 + 25 event trio. |
 | Sep 12-13 | Run a second exact trio, tune only from evidence, and repeat any failed gate. |
 | Sep 14 | Browser and operator rehearsal with representative participant identities and all lab journeys. |

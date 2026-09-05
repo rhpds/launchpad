@@ -24,8 +24,9 @@ def test_agentops_is_registered_as_a_fail_closed_draft():
     assert catalog == build_catalog_item(intake)
     assert catalog["catalog_item_id"] == "agentops-observability"
     assert catalog["status"] == "draft"
-    assert catalog["metadata"]["certification_stage"] == "five-seat-remediation"
-    assert catalog["metadata"]["max_workshop_seats"] == 1
+    assert catalog["version"] == "0.1.3"
+    assert catalog["metadata"]["certification_stage"] == "twenty-five-seat-certification"
+    assert catalog["metadata"]["max_workshop_seats"] == 5
     assert catalog["metadata"]["activation_blockers"]
     assert catalog["metadata"]["showroom_content_repo_url"] == (
         "https://github.com/rhpds/launchpad.git"

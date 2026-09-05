@@ -1,0 +1,196 @@
+{
+  "schema_version": "1.0",
+  "evidence_id": "EDD-AGENTOPS-FIVE-SEAT-FUNCTIONAL-LIVE-BUILD84-20260905",
+  "captured_at": "2026-09-05T22:29:25Z",
+  "outcome": "pass",
+  "scope": "internal-five-seat-workshop",
+  "cluster": "arena",
+  "catalog_item_id": "agentops-observability",
+  "catalog_version": "0.1.2",
+  "model": "granite-3.2-8b-tools",
+  "seat_count": 5,
+  "public_access_certified": false,
+  "twenty_five_seat_certified": false,
+  "source": {
+    "implementation_commit": "dc9e4ac3b7bfddcffe8eb543b9e159e3c5cdb718",
+    "digest_pin_commit": "2d77efd",
+    "backend_build": 84,
+    "backend_image_digest": "sha256:801ed8a7e4c58600bec0aeb949e0c4bbe7cf63b8d4e6f4f3fcb2630b7eb4870b",
+    "workload_revision": "322beb64d42f692aa30058812ab7c9ea01245e55"
+  },
+  "one_seat_regression": {
+    "workshop_id": "bcd989e0-e329-4061-a37d-519c7aefcc91",
+    "seat_id": "1d0480bb-7e5c-4bbb-94c7-7937ae02f818",
+    "session_id": "60288f2d-f303-4bc6-b26a-e6382efcfc0d",
+    "namespace": "launchpad-smoke-test-tenant-agentops-1d0480",
+    "node": "gnr2.fm2aihpcsed.com",
+    "seconds_started_to_ready": 84.514,
+    "steady_pods": 13,
+    "container_restarts": 0,
+    "showroom_pages_http_200": 11,
+    "agent_terminal_event": "done",
+    "agent_seconds": 27.433,
+    "agent_answer_characters": 830,
+    "knowledge_base": {
+      "documents": 8,
+      "chunks": 41,
+      "embedded_chunks": 41,
+      "dimensions": 768
+    },
+    "cleanup_seconds": 81,
+    "remaining_namespaces": 0,
+    "remaining_applications": 0,
+    "remaining_persistent_volumes": 0
+  },
+  "provisioning": {
+    "workshop_id": "5344a6ce-dfb3-44fc-b04a-7d65195c6d33",
+    "created_at": "2026-09-05T21:59:54.491373Z",
+    "started_at": "2026-09-05T21:59:56.086201Z",
+    "collective_ready_at": "2026-09-05T22:05:39.575538Z",
+    "collective_ready_seconds": 343.489,
+    "all_seats_ready": true,
+    "unique_session_count": 5,
+    "unique_namespace_count": 5,
+    "provisioning_concurrency": 2,
+    "qualified_node_label": "launchpad.redhat.com/agentops-certified=true",
+    "selected_nodes": [
+      "gnr2.fm2aihpcsed.com"
+    ],
+    "namespace_selectors_correct": 5,
+    "steady_pods": 65,
+    "not_ready_pods": 0,
+    "container_restarts": 0,
+    "off_node_pods": 0,
+    "dspa_ready": 5,
+    "healthy_synced_argocd_applications": 10
+  },
+  "capacity": {
+    "preview_can_provision": true,
+    "preview_capacity_seats": 10,
+    "estimated_cpu_millicores": 12500,
+    "estimated_memory_mib": 35840,
+    "estimated_pod_slots": 85,
+    "gnr2_active_pods_before_run": 41,
+    "gnr2_post_load_cpu_millicores": 7093,
+    "gnr2_post_load_cpu_percent": 2,
+    "gnr2_post_load_memory_mib": 105220,
+    "gnr2_post_load_memory_percent": 14,
+    "gnr2_ready": true,
+    "gnr2_pressure_conditions_false": true
+  },
+  "participant_validation": {
+    "showroom_pages_http_200": 55,
+    "showroom_pages_expected": 55,
+    "mortgage_app_http_200": 5,
+    "default_project_matches_seat": 5,
+    "own_namespace_edit_allowed": 5,
+    "cross_namespace_read_denied": 5,
+    "terminal_model_connection_values_present": 5,
+    "knowledge_base_documents": 40,
+    "knowledge_base_chunks": 205,
+    "embedded_chunks": 205,
+    "embedding_dimensions": 768,
+    "mlflow_workspaces_with_one_trace": 5,
+    "mlflow_ok_traces": 5
+  },
+  "concurrent_agent_journeys": {
+    "concurrent_seats": 5,
+    "successful_journeys": 5,
+    "grounded_answers": 5,
+    "wall_seconds": 40.73,
+    "p95_seconds": 40.669,
+    "answer_characters": [
+      792,
+      709,
+      876,
+      909,
+      1186
+    ]
+  },
+  "normal_cleanup": {
+    "reclaim_requested_at": "2026-09-05T22:10:45Z",
+    "workshop_completed_at": "2026-09-05T22:12:23.536388Z",
+    "all_seats_reclaimed": true,
+    "completed_seconds": 106,
+    "remaining_namespaces": 0,
+    "remaining_applications": 0,
+    "remaining_persistent_volumes": 0,
+    "manual_cleanup_required": false
+  },
+  "queued_reclaim_fault": {
+    "workshop_id": "46474a86-15bd-421b-a558-ac4442aeb324",
+    "created_at": "2026-09-05T22:13:38.069383Z",
+    "started_at": "2026-09-05T22:13:39.355726Z",
+    "reclaim_requested_at": "2026-09-05T22:13:42Z",
+    "namespaces_at_reclaim": 2,
+    "maximum_namespaces_observed": 2,
+    "maximum_sessions_observed": 2,
+    "queued_seats_without_sessions": 3,
+    "queued_seat_cancellation_contract_passed": true,
+    "workshop_completed_at": "2026-09-05T22:16:33.517265Z",
+    "cleanup_seconds": 171.517,
+    "final_verified_at": "2026-09-05T22:29:25Z",
+    "final_state": {
+      "workshop": "completed",
+      "reclaimed_seats": 5,
+      "seats_with_sessions": 2,
+      "queued_seats_reclaimed_without_sessions": 3,
+      "namespaces": 0,
+      "applications": 0,
+      "persistent_volumes": 0
+    },
+    "final_cleanup_verified": true,
+    "observer_note": "The Arena API VIP was temporarily unreachable from the operator workstation after the last in-progress observation. Persisted completion time and a post-recovery inventory prove cleanup completed normally with zero run-specific residue."
+  },
+  "red_green_matrix": [
+    {
+      "id": "AGENTOPS-5-TOPOLOGY",
+      "critical": true,
+      "red": "Builds 77 and 83 placed seats on rhgnr1, which repeatedly became NotReady.",
+      "green_local": "Exact workload capability-label filtering is contract tested.",
+      "green_live": "All five namespaces and all 65 pods ran on qualified gnr2 with zero restarts."
+    },
+    {
+      "id": "AGENTOPS-5-FUNCTIONAL",
+      "critical": true,
+      "red": "Earlier five-seat runs never reached collective participant readiness.",
+      "green_local": "Showroom, terminal, RBAC, operator, embedding, MLflow, and WebSocket components are independently tested.",
+      "green_live": "Five seats passed 55 guide pages, five isolated terminals/databases/traces, and five simultaneous agent journeys."
+    },
+    {
+      "id": "AGENTOPS-5-NORMAL-CLEANUP",
+      "critical": true,
+      "red": "Build 83 cleanup required stale pod and hook intervention and left one protected PV.",
+      "green_local": "Ephemeral storage and group reclaim contracts pass.",
+      "green_live": "The build 84 functional run reclaimed five seats and left zero run-specific namespaces, Applications, or PVs in 106 seconds."
+    },
+    {
+      "id": "AGENTOPS-5-QUEUED-RECLAIM",
+      "critical": true,
+      "red": "Build 83 started a queued fifth seat after reclaim was requested.",
+      "green_local": "Queued seats re-read persisted workshop status and finish reclaimed without sessions.",
+      "green_live": "Three queued seats were reclaimed without sessions or namespaces; the two in-flight seats reclaimed normally and the final inventory contained zero run-specific namespaces, Applications, or PVs."
+    }
+  ],
+  "gate_rubric": {
+    "functional_scale": {"earned": 30, "possible": 30},
+    "namespace_and_node_isolation": {"earned": 20, "possible": 20},
+    "operator_and_shared_services": {"earned": 15, "possible": 15},
+    "normal_cleanup": {"earned": 15, "possible": 15},
+    "fault_recovery": {"earned": 20, "possible": 20},
+    "score": 100,
+    "required": 100
+  },
+  "release_decision": {
+    "catalog_max_workshop_seats": 5,
+    "five_seat_functional_gate": "passed",
+    "five_seat_release_gate": "passed",
+    "next_action": "Publish the five-seat catalog limit, then add or qualify enough stable Arena worker capacity before attempting the 25-seat AgentOps certification gate."
+  },
+  "known_prior_residue_excluded_from_green_run": {
+    "pv": "pvc-6ee523d9-5b82-456c-9c44-69af6276ae34",
+    "source_workshop": "a1b0cab9-a2ec-4376-841e-882cd95dad09",
+    "reason": "Build 83 RED-run PostgreSQL data is owned by a deleted project UID; it remains quarantined rather than using privilege escalation."
+  },
+  "contains_plaintext_credentials": false
+}

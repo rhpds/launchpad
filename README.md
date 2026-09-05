@@ -86,7 +86,7 @@ order flow until runtime and live certification gates pass:
 
 | ID | Name | Current gate |
 |---|---|---|
-| `agentops-observability` | AgentOps in Production: End-to-End Observability with Red Hat AI | Internal one-seat journey and TLS PostgreSQL-backed MLflow are live; pipeline TLS and production Logging storage block the five-seat gate |
+| `agentops-observability` | AgentOps in Production: End-to-End Observability with Red Hat AI | Five internal seats are GREEN-live with isolated concurrent journeys and zero-residue normal/fault reclaim; 25-seat capacity, public access, and production Logging/TLS remain gated |
 
 ## Architecture
 
