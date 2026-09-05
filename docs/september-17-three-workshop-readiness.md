@@ -134,11 +134,21 @@ absent from Argo CD and cleared from the reclaimed session. Evidence is in
 
 Public-code access and trusted external TLS remain RED and are not implied by
 the internal Gate A result. Shared MLflow metadata moved to persistent
-PostgreSQL with verified OpenShift service-ca TLS on September 5. Before Gate
-B, the pipeline MariaDB still needs service-ca TLS, and logging must move from
-the `1x.demo` NFS/MinIO pilot to durable S3-compatible object storage, dynamic
-block storage, and production sizing. Evidence is in
-`evidence/agentops-mlflow-postgres-live-2026-09-05.json`.
+PostgreSQL with verified OpenShift service-ca TLS on September 5. A second
+clean Launchpad order also proved that the per-seat pipeline MariaDB rejects
+plaintext, accepts hostname-verified service-ca TLS 1.3, creates all pipeline
+tables, reaches current-generation DSPA Ready, stays Argo Synced/Healthy after
+CA injection, and reclaims with zero residue in 66 seconds.
+
+That proof uses a documented RHOAI 3.5 compatibility boundary: `podToPodTLS`
+is disabled because the operator-generated MLMD server TLS configuration drops
+the database TLS options. The external MLMD route is disabled and NetworkPolicy
+limits database ingress, but an upstream-supported encrypted configuration for
+every internal pipeline hop is still required before production. Before Gate B,
+logging must also move from the `1x.demo` NFS/MinIO pilot to durable
+S3-compatible object storage, dynamic block storage, and production sizing.
+Evidence is in `evidence/agentops-mlflow-postgres-live-2026-09-05.json` and
+`evidence/agentops-pipeline-database-tls-live-2026-09-05.json`.
 
 ### Gate B: five AgentOps seats
 

@@ -203,6 +203,17 @@ matrix:
       - backend/tests/test_arena_shared_mlflow.py
       - backend/tests/test_agentops_mlflow_postgres_evidence.py
       - evidence/agentops-mlflow-postgres-live-2026-09-05.json
+  - id: LIVE-AGENTOPS-021
+    requirement: Per-seat RHOAI pipeline metadata persists through verified service-ca TLS without Argo drift
+    red: MLMD lost database TLS when pod-to-pod server TLS was enabled, the first NetworkPolicy blocked the DSPO health check, and injected CA data left Argo OutOfSync
+    green_local: pass-chart-application-and-evidence-contracts
+    green_integration: pass-service-ca-dspa-networkpolicy-and-ignore-difference-contracts
+    green_live: pass-tls13-27-tables-13-stable-pods-and-zero-residue
+    evidence:
+      - backend/tests/test_agentops_seat_chart.py
+      - backend/tests/test_showroom_provisioning.py
+      - backend/tests/test_agentops_pipeline_database_tls_evidence.py
+      - evidence/agentops-pipeline-database-tls-live-2026-09-05.json
 
 rubric:
   source_and_contract: {earned: 15, possible: 15}
@@ -220,7 +231,9 @@ decision: >-
   experience passed one internal Launchpad-created seat, including the
   namespaced runtime Secret, operator-aware readiness, participant journey,
   logging isolation, and automatic zero-residue reclaim. Keep the item capped
-  at one seat until pipeline TLS and logging storage are suitable for five-seat
-  testing. Shared MLflow is now backed by persistent PostgreSQL over verified
-  service-ca TLS. Public-code access and trusted public TLS remain separate
-  certification gates.
+  at one seat until logging storage is suitable for five-seat testing. The
+  per-seat pipeline database and shared MLflow metadata now use verified
+  service-ca TLS. RHOAI 3.5 podToPodTLS remains disabled under a documented
+  compatibility workaround and must be replaced with an upstream-supported
+  encrypted internal component configuration before production. Public-code
+  access and trusted public TLS remain separate certification gates.

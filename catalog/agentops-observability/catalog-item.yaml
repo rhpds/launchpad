@@ -54,10 +54,12 @@ metadata:
     write authorization, OpenShift AI 3.5, Data Science Pipelines, and a seven-span
     AgentOps trace were confirmed live on 2026-09-05. Trusted external TLS is still
     RED.
-  - Clean-live-certify the RHOAI 3.5 MLMD compatibility workaround and its service-ca
-    TLS pipeline database connection before promotion beyond one seat. Shared MLflow
-    metadata moved to persistent PostgreSQL with verified OpenShift service-ca TLS
-    on 2026-09-05.
+  - Replace the clean-live-certified RHOAI 3.5 MLMD compatibility workaround with
+    an upstream-supported encrypted internal component configuration before production.
+    The per-seat MariaDB connection now enforces and verifies OpenShift service-ca
+    TLS; podToPodTLS remains disabled because the RHOAI-generated MLMD server TLS
+    config drops the database TLS options. Shared MLflow metadata uses persistent
+    PostgreSQL with verified service-ca TLS.
   - Replace the one-seat 1x.demo Loki/MinIO/NFS pilot with durable S3-compatible object
     storage, dynamic block storage, and production sizing before the five-seat load
     gate.

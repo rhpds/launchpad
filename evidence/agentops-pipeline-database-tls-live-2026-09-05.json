@@ -1,0 +1,129 @@
+{
+  "schema": "launchpad.redhat.com/evidence/v1",
+  "evidence_id": "EDD-AGENTOPS-PIPELINE-DATABASE-TLS-2026-09-05",
+  "captured_at": "2026-09-05T11:31:06Z",
+  "commit_sha": "74a8b1a26a6cf4770c267a6cc23ff958a3d18756",
+  "backend_image_digest": "sha256:62020c0e8b6b2f601a4d9005c9a9212e712287e843da008cb18bf70228020249",
+  "cluster": {
+    "cluster_id": "arena",
+    "api": "https://api.arena.fm2aihpcsed.com:6443",
+    "openshift_version": "4.22.3",
+    "rhoai_version": "3.5"
+  },
+  "scope": "launchpad-created-agentops-pipeline-database-transport",
+  "result": "pass-internal-one-seat-with-rhoai-compatibility-workaround",
+  "order": {
+    "workshop_id": "85f82682-1c5c-4984-9c0a-5789d0812ee9",
+    "session_id": "afc12ad1-9fce-448a-a9d6-1d84dcc56bc4",
+    "request_id": "c6b51229-4565-4c2f-be1b-7220acad0068",
+    "namespace": "launchpad-smoke-test-tenant-agentops-bc2bc3",
+    "cluster_ref": "arena",
+    "catalog_item_id": "agentops-observability",
+    "workload_revision": "e177a2fa92533d23b7e7846c93efe08a9a63493b",
+    "exposure_policy": "internal",
+    "requested_at": "2026-09-05T11:20:48.497652Z",
+    "ready_at": "2026-09-05T11:22:23.434989Z",
+    "provisioning_seconds": 94.937337
+  },
+  "red": {
+    "local": [
+      "A chart contract first failed because RHOAI podToPodTLS was enabled while the required database TLS compatibility behavior was absent.",
+      "The Argo application contract first failed because catalog workloads could not declare controller-mutated fields to ignore."
+    ],
+    "live": [
+      {
+        "session_id": "361aa11a-6e4e-4500-b781-1dd254e8a662",
+        "finding": "RHOAI generated an MLMD server TLS config whose repeated MySQL connection block omitted the database TLS options; the metadata gRPC pod crash-looped because MariaDB correctly rejected plaintext."
+      },
+      {
+        "session_id": "4c482c30-e007-4366-9d69-23a3c9efb2a8",
+        "finding": "The first database NetworkPolicy blocked the cross-namespace DSPO health check, and service-ca injection left the workload Application OutOfSync on ConfigMap /data."
+      }
+    ]
+  },
+  "green": {
+    "local": {
+      "catalog_and_application_contracts": "pass",
+      "workload_application_supports_named_json_pointer_ignore": true,
+      "unsafe_or_unscoped_ignore_rules_rejected": true
+    },
+    "integration": {
+      "database_service_publish_not_ready_addresses": true,
+      "service_ca_bundle_injected": true,
+      "dspa_database_tls_parameter": true,
+      "dspa_api_server_ca_bundle_configured": true,
+      "mlmd_uses_ssl_root_certificate": true,
+      "mlmd_external_route_present": false,
+      "database_network_policy_scopes": [
+        "same-namespace data-science-pipelines pods",
+        "same database workload",
+        "redhat-ods-applications data-science-pipelines-operator health check"
+      ],
+      "argo_ignore_difference": {
+        "resource": "ConfigMap/agentops-pipeline-service-ca",
+        "json_pointer": "/data",
+        "sync_option": "RespectIgnoreDifferences=true"
+      }
+    },
+    "live": {
+      "workshop_status": "ready",
+      "session_status_before_reclaim": "ready",
+      "workload_application": "Synced/Healthy",
+      "showroom_application": "Synced/Healthy",
+      "steady_pods": 13,
+      "not_fully_ready_pods": 0,
+      "container_restarts": 0,
+      "dspa_ready": true,
+      "dspa_current_generation": true,
+      "pipeline_api_health": true,
+      "plaintext_database_connection_denied": true,
+      "verified_database_tls": true,
+      "database_tls_version": "TLSv1.3",
+      "database_tls_cipher": "TLS_AES_256_GCM_SHA384",
+      "database_require_secure_transport": true,
+      "pipeline_schema_tables": 27,
+      "seat_pvcs": 4,
+      "seat_storage_gib": 35,
+      "shared_mlflow_available": true,
+      "shared_mlflow_backend_uri_source": "Secret/mlflow-postgres",
+      "shared_mlflow_ca_bundle": "ConfigMap/mlflow-postgres-ca"
+    }
+  },
+  "cleanup": {
+    "requested_at": "2026-09-05T11:29:15.751024Z",
+    "reclaimed_at": "2026-09-05T11:30:21.825455Z",
+    "duration_seconds": 66.074431,
+    "launchpad_session_status": "reclaimed",
+    "model_key_retained": false,
+    "remaining_namespaces": 0,
+    "remaining_applications": 0,
+    "remaining_persistent_volumes": 0,
+    "remaining_test_probes": 0,
+    "manual_resource_deletion_required": false
+  },
+  "security": {
+    "database_server_certificate": "OpenShift service-ca serving certificate",
+    "client_verification": "hostname-verified against the injected OpenShift service CA",
+    "minimum_server_protocol": "TLSv1.2",
+    "observed_protocol": "TLSv1.3",
+    "database_plaintext_allowed": false,
+    "database_credentials_printed_or_committed": false,
+    "external_mlmd_route_enabled": false,
+    "compensating_control": "MLMD external routing is disabled and database ingress is restricted while the RHOAI 3.5 pod-to-pod TLS incompatibility is tracked."
+  },
+  "proof_model": {
+    "TDD": "The chart compatibility and Argo controller-mutation contracts were captured RED before implementation and pass GREEN.",
+    "EDD": "This manifest records immutable code and image revisions, order identity, lifecycle timing, operator state, TLS negotiation, schema state, and exact cleanup.",
+    "CDD": "Catalog intake, WorkloadSeat, Argo Application, DSPA, service-ca ConfigMap, Service, Secret, and NetworkPolicy contracts are explicit and tested.",
+    "BDD": "Given a clean Arena AgentOps order, Launchpad waits for a current-generation DSPA, the metadata service reaches MariaDB only over verified TLS, and normal reclaim leaves zero residue.",
+    "CBT": "Database TLS, CA injection, MLMD startup, DSPO health checks, Argo drift handling, pipeline API health, pod stability, persistence, and cleanup were validated independently."
+  },
+  "limitations": [
+    "RHOAI 3.5 podToPodTLS remains disabled because its generated MLMD server TLS configuration drops the required database TLS settings. This compatibility workaround must be replaced by an upstream-supported configuration before production.",
+    "Per-seat MariaDB transport is enforced and verified, but disabling podToPodTLS means this evidence does not certify encryption for every internal Data Science Pipelines component hop.",
+    "The Mortgage AI workload still uses MLFLOW_TRACKING_INSECURE_TLS=true; client trust for the shared MLflow service remains a separate production remediation.",
+    "The one-seat 1x.demo Loki/MinIO/NFS logging stack still requires durable object and block storage plus production sizing before five-seat testing.",
+    "Public-code access and externally trusted TLS remain separate gates.",
+    "This proof does not promote AgentOps beyond its one-seat catalog cap."
+  ]
+}
