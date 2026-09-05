@@ -29,8 +29,8 @@ INTEL_GUIDED_LABS = [
         "model": "granite-2b-cpu",
         "workspace_route": "rag",
         "content_ref": "intel-guided-content-v1.0.5",
-        "max_workshop_seats": 5,
-        "certification_stage": "five-seat",
+        "max_workshop_seats": 25,
+        "certification_stage": "twenty-five-seat-candidate",
     },
     {
         "catalog_id": "intel-llm-tool-calling",
