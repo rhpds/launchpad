@@ -1,0 +1,43 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: vllm-granite-3-2-8b-tools
+  namespace: fleet-llm-d
+  annotations:
+    haproxy.router.openshift.io/timeout: 300s
+  labels:
+    app.kubernetes.io/part-of: partner-ai-launchpad
+    app.kubernetes.io/managed-by: launchpad
+    launchpad.redhat.com/exposure: private
+spec:
+  to:
+    kind: Service
+    name: vllm-granite-3-2-8b-tools
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-private-route-to-granite-tools
+  namespace: fleet-llm-d
+  labels:
+    app.kubernetes.io/part-of: partner-ai-launchpad
+    app.kubernetes.io/managed-by: launchpad
+spec:
+  podSelector:
+    matchLabels:
+      app: vllm-granite-3-2-8b-tools
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              network.openshift.io/policy-group: ingress
+      ports:
+        - protocol: TCP
+          port: 8080

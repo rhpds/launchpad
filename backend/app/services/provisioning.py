@@ -223,6 +223,7 @@ class ProvisioningService:
                 clients=clients,
                 target=target,
                 argocd_custom_objects=control_clients.custom if control_clients else None,
+                control_core=control_clients.core if control_clients else None,
             )
         return self.provisioner
 
@@ -1174,6 +1175,11 @@ class ProvisioningService:
         required_passes = max(
             1, int(os.environ.get("WORKSHOP_STABILITY_PASSES", "3"))
         )
+        tls_verify: bool | str = (
+            os.environ.get("REQUESTS_CA_BUNDLE")
+            or os.environ.get("SSL_CERT_FILE")
+            or True
+        )
         deadline = time.monotonic() + timeout
         consecutive_passes = 0
         failures: dict[int, str] = {}
@@ -1184,7 +1190,7 @@ class ProvisioningService:
             def check_endpoint(item: tuple[int, str]) -> tuple[int, str | None]:
                 seat_number, url = item
                 try:
-                    response = requests.get(url, timeout=10, verify=False)
+                    response = requests.get(url, timeout=10, verify=tls_verify)
                     if response.status_code == 200:
                         return seat_number, None
                     return seat_number, f"showroom endpoint returned HTTP {response.status_code}"

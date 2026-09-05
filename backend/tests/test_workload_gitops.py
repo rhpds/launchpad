@@ -151,6 +151,8 @@ def test_runtime_secret_retry_preserves_existing_owned_credentials():
         metadata=SimpleNamespace(
             labels={
                 "app.kubernetes.io/managed-by": "launchpad",
+                "launchpad.redhat.com/workshop-id": "workshop-1",
+                "launchpad.redhat.com/seat-id": "seat-1",
                 "launchpad.redhat.com/session-id": "session-1",
             }
         )
@@ -171,7 +173,7 @@ def test_runtime_secret_retry_preserves_existing_owned_credentials():
     adapter._core_v1.patch_namespaced_secret.assert_not_called()
 
 
-def test_runtime_secret_retry_rejects_a_secret_owned_by_another_session():
+def test_runtime_secret_retry_refreshes_credentials_for_the_same_stable_seat():
     from app.adapters.openshift.provisioning import OpenShiftProvisioningAdapter
 
     adapter = OpenShiftProvisioningAdapter.__new__(OpenShiftProvisioningAdapter)
@@ -181,7 +183,45 @@ def test_runtime_secret_retry_rejects_a_secret_owned_by_another_session():
         metadata=SimpleNamespace(
             labels={
                 "app.kubernetes.io/managed-by": "launchpad",
-                "launchpad.redhat.com/session-id": "different-session",
+                "launchpad.redhat.com/workshop-id": "workshop-1",
+                "launchpad.redhat.com/seat-id": "seat-1",
+                "launchpad.redhat.com/session-id": "previous-session",
+            }
+        )
+    )
+    secret = build_runtime_secret(
+        name="example-runtime",
+        namespace="launchpad-seat-1",
+        workshop_id="workshop-1",
+        seat_id="seat-1",
+        session_id="replacement-session",
+        tenant_id="tenant-1",
+        cluster_id="arena",
+        string_data={"POSTGRES_PASSWORD": "replacement-random-value"},
+    )
+
+    adapter._apply_workload_runtime_secret(secret)
+
+    adapter._core_v1.patch_namespaced_secret.assert_called_once_with(
+        "example-runtime",
+        "launchpad-seat-1",
+        body=secret,
+    )
+
+
+def test_runtime_secret_retry_rejects_a_secret_owned_by_another_seat():
+    from app.adapters.openshift.provisioning import OpenShiftProvisioningAdapter
+
+    adapter = OpenShiftProvisioningAdapter.__new__(OpenShiftProvisioningAdapter)
+    adapter._core_v1 = MagicMock()
+    adapter._core_v1.create_namespaced_secret.side_effect = ApiException(status=409)
+    adapter._core_v1.read_namespaced_secret.return_value = SimpleNamespace(
+        metadata=SimpleNamespace(
+            labels={
+                "app.kubernetes.io/managed-by": "launchpad",
+                "launchpad.redhat.com/workshop-id": "workshop-1",
+                "launchpad.redhat.com/seat-id": "different-seat",
+                "launchpad.redhat.com/session-id": "previous-session",
             }
         )
     )
@@ -196,5 +236,5 @@ def test_runtime_secret_retry_rejects_a_secret_owned_by_another_session():
         string_data={"POSTGRES_PASSWORD": "new-random-value"},
     )
 
-    with pytest.raises(ValueError, match="owned by another session"):
+    with pytest.raises(ValueError, match="owned by another seat"):
         adapter._apply_workload_runtime_secret(secret)

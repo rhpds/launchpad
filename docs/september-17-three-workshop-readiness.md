@@ -111,19 +111,27 @@ candidate fleet assignment:
 |---|---:|---:|---:|---|
 | Arena | 500 | 220 after cleanup | 180 | AgentOps only, after redesign or added stable capacity |
 | Brutus | 250 | 109 | 91 | Building an AI Agent; currently nine slots short of its 100-slot peak contract |
-| Oberon | 500 | 359 | 41 | Serve LLMs; currently nine slots short of its 50-slot peak contract |
+| Oberon | 500 | 361 | 39 | Serve LLMs; currently eleven slots short of its 50-slot peak contract |
 
-Brutus is not registered as a Launchpad target and currently lacks the
-AgentOps/RHOAI operator set, but it has ample CPU and memory for a lightweight
-workshop. Oberon is disabled for placement and must be re-certified before it
-hosts event seats. The preferred three-cluster path is therefore:
+Brutus and Oberon are now registered with separate least-privilege Launchpad
+and Argo credentials but remain disabled for normal placement. Brutus passed a
+one-seat Build-an-Agent certification on September 5: the Launchpad order was
+pinned to Brutus, Showroom and terminal worked, the real three-tool advisor
+journey returned HTTP 200 in 69.1 seconds, own-namespace edit succeeded,
+cross-namespace access was denied, and reclaim removed the namespace and Argo
+applications in 43 seconds. The run also exposed and corrected remote RBAC,
+same-seat retry, model CA trust, and model Route timeout defects. It does not
+certify Brutus at five or twenty-five seats. Oberon is disabled for placement
+and must be re-certified before it hosts event seats. The preferred
+three-cluster path is therefore:
 
 1. Keep Arena dedicated to AgentOps and reduce the per-seat topology by moving
    DSPA, pipeline database, MinIO, Grafana, and other safe components to one
    workshop-scoped shared stack, or add stable worker capacity.
-2. Onboard Brutus and remove at least nine baseline pod slots (or reduce the
-   Building an AI Agent peak contract) before its 1 -> 5 -> 25 certification.
-3. Re-enable Oberon only after removing at least nine baseline pod slots and
+2. Pre-seed Brutus from a durable external registry, automate the verified
+   model CA bundle, and remove at least nine baseline pod slots (or prove a
+   lower per-seat pod contract) before its 5 -> 25 certification.
+3. Re-enable Oberon only after removing at least eleven baseline pod slots and
    passing Serve LLMs 1 -> 5 -> 25 plus full reclaim.
 
 No catalog limit or target override changes until those measurements are
@@ -132,9 +140,10 @@ and recent Ready-transition checks; aggregate cluster totals are insufficient.
 
 ## Critical path: AgentOps 1 -> 5 -> 25
 
-Serve LLMs and Building an AI Agent already have 25-seat live evidence. The
-release critical path is AgentOps, which stays draft and capped at one seat
-until each gate is green.
+Serve LLMs and Building an AI Agent have earlier 25-seat evidence on Arena, but
+their candidate remote targets still need target-specific certification. The
+release critical path is AgentOps plus Brutus/Oberon 1 -> 5 -> 25 promotion;
+none may be promoted from another cluster's result.
 
 ### Gate A: one Launchpad-created AgentOps seat
 

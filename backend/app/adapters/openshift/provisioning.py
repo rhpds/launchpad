@@ -60,6 +60,7 @@ class OpenShiftProvisioningAdapter:
         clients=None,
         target=None,
         argocd_custom_objects=None,
+        control_core=None,
     ):
         self._overlay_path = overlay_path or DEMO_DEPLOY_ROOT
         self._active_namespaces: dict[str, str] = {}
@@ -91,6 +92,7 @@ class OpenShiftProvisioningAdapter:
             self._apps_v1 = clients.apps
             self._custom_objects = clients.custom
             self._rbac_v1 = clients.rbac
+        self._control_core_v1 = control_core or self._core_v1
         self._showroom_gitops = ShowroomGitOpsAdapter(
             argocd_custom_objects or self._custom_objects,
             os.environ.get("SHOWROOM_ARGOCD_NAMESPACE", "argocd"),
@@ -255,6 +257,16 @@ class OpenShiftProvisioningAdapter:
             grant_application_logs="openshift_logging" in set(res.get("required_capabilities", [])),
         )
         requested_models = list(res.get("requested_models", []))
+        # Model-backed workloads mount the same trust bundle on every target.
+        # Copy it even when a cluster currently resolves its model through an
+        # internal HTTP Service so the manifest is portable to a verified
+        # HTTPS route without a cluster-specific volume contract.
+        if requested_models:
+            self._apply_model_ca_bundle(
+                demo_namespace,
+                resources=res,
+                cluster_id=plan.target_cluster or "oberon",
+            )
         maas_endpoint = self._showroom_maas_endpoint(res)
         if showroom_enabled:
             # Participant credentials are written directly to a namespaced
@@ -786,18 +798,110 @@ http {{
             labels = (
                 metadata.get("labels", {}) if isinstance(metadata, dict) else metadata.labels or {}
             )
-            expected_session = secret["metadata"]["labels"]["launchpad.redhat.com/session-id"]
+            expected_labels = secret["metadata"]["labels"]
             if (
                 labels.get("app.kubernetes.io/managed-by") != "launchpad"
-                or labels.get("launchpad.redhat.com/session-id") != expected_session
+                or labels.get("launchpad.redhat.com/workshop-id")
+                != expected_labels.get("launchpad.redhat.com/workshop-id")
+                or labels.get("launchpad.redhat.com/seat-id")
+                != expected_labels.get("launchpad.redhat.com/seat-id")
             ):
                 raise ValueError(
-                    f"Workload runtime Secret '{name}' is owned by another session"
+                    f"Workload runtime Secret '{name}' is owned by another seat"
                 ) from exc
+            expected_session = expected_labels.get("launchpad.redhat.com/session-id")
+            if labels.get("launchpad.redhat.com/session-id") != expected_session:
+                self._core_v1.patch_namespaced_secret(name, namespace, body=secret)
+                logger.info(
+                    "Refreshed runtime Secret %s/%s for a retried seat session",
+                    namespace,
+                    name,
+                )
+                return
             logger.info(
                 "Preserving existing runtime Secret %s/%s during idempotent retry",
                 namespace,
                 name,
+            )
+
+    def _apply_model_ca_bundle(
+        self,
+        namespace: str,
+        *,
+        resources: dict,
+        cluster_id: str,
+    ) -> None:
+        """Copy the control-plane trust bundle into one model-consuming seat."""
+        source_namespace = os.environ.get(
+            "MODEL_CA_BUNDLE_NAMESPACE", "partner-ai-launchpad"
+        )
+        source_name = os.environ.get(
+            "MODEL_CA_BUNDLE_CONFIGMAP", "launchpad-cluster-ca-bundle"
+        )
+        try:
+            source = self._control_core_v1.read_namespaced_config_map(
+                source_name, source_namespace
+            )
+        except ApiException as exc:
+            raise ValueError(
+                f"Model CA bundle ConfigMap '{source_namespace}/{source_name}' is unavailable"
+            ) from exc
+        data = source.get("data", {}) if isinstance(source, dict) else source.data or {}
+        bundle = str(data.get("ca-bundle.crt", "")).strip()
+        if not bundle:
+            raise ValueError(
+                f"Model CA bundle ConfigMap '{source_namespace}/{source_name}' has no ca-bundle.crt"
+            )
+
+        labels = {
+            "app.kubernetes.io/component": "model-trust",
+            "app.kubernetes.io/managed-by": "launchpad",
+            "launchpad.redhat.com/workshop-id": str(resources.get("workshop_id", "")),
+            "launchpad.redhat.com/seat-id": str(resources.get("seat_id", "")),
+            "launchpad.redhat.com/session-id": str(resources.get("session_id", "")),
+            "launchpad.redhat.com/tenant": str(resources.get("tenant_id", "default")),
+            "launchpad.redhat.com/cluster-id": cluster_id,
+        }
+        body = client.V1ConfigMap(
+            metadata=client.V1ObjectMeta(
+                name="launchpad-model-ca-bundle",
+                namespace=namespace,
+                labels=labels,
+            ),
+            data={"ca-bundle.crt": bundle + "\n"},
+        )
+        try:
+            self._core_v1.create_namespaced_config_map(namespace, body=body)
+        except ApiException as exc:
+            if exc.status != 409:
+                raise ValueError(
+                    f"Failed to create model CA bundle in namespace '{namespace}': {exc.reason}"
+                ) from exc
+            existing = self._core_v1.read_namespaced_config_map(
+                "launchpad-model-ca-bundle", namespace
+            )
+            metadata = (
+                existing.get("metadata", {})
+                if isinstance(existing, dict)
+                else existing.metadata
+            )
+            existing_labels = (
+                metadata.get("labels", {})
+                if isinstance(metadata, dict)
+                else metadata.labels or {}
+            )
+            if (
+                existing_labels.get("app.kubernetes.io/managed-by") != "launchpad"
+                or existing_labels.get("launchpad.redhat.com/workshop-id")
+                != labels["launchpad.redhat.com/workshop-id"]
+                or existing_labels.get("launchpad.redhat.com/seat-id")
+                != labels["launchpad.redhat.com/seat-id"]
+            ):
+                raise ValueError(
+                    "Model CA bundle ConfigMap is owned by another seat"
+                ) from exc
+            self._core_v1.patch_namespaced_config_map(
+                "launchpad-model-ca-bundle", namespace, body=body
             )
 
     def _apply_showroom_runtime_secret(

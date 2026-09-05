@@ -1,0 +1,98 @@
+{
+  "schema": "launchpad.redhat.com/workshop-certification/v1",
+  "evidence_id": "EDD-BRUTUS-AGENT201-ONE-SEAT-20260905",
+  "captured_at": "2026-09-05T16:47:48Z",
+  "source_commit_before_candidate": "dc6c7d20be7140edf6cb61b174e69b4f747817e7",
+  "catalog_item_id": "intel-xeon6-agent-201",
+  "cluster_ref": "brutus",
+  "workshop_id": "84029ec7-8a95-4118-8115-597d5e231b45",
+  "ready_session_id": "d1cf6baf-a314-4f2b-a051-5fa3b9c6c8c3",
+  "namespace": "launchpad-smoke-test-tenant-intel-xeon6-agent-47b744",
+  "exposure_policy": "internal",
+  "result": "GREEN-live-one-seat",
+  "normal_placement_enabled_after_run": false,
+  "capacity_preview": {
+    "can_provision": true,
+    "safe_seats": 22,
+    "requested_seats": 1,
+    "seat_cpu_millicores": 415,
+    "seat_memory_mib": 912,
+    "seat_pods": 4,
+    "headroom_percent": 20
+  },
+  "red_green_matrix": [
+    {
+      "id": "BRUTUS-CA-001",
+      "red": "Backend rejected Arena model Route because its ingress CA was not trusted.",
+      "green": "Combined system and cluster ingress CA bundle mounted; verified requests returned 200."
+    },
+    {
+      "id": "BRUTUS-RBAC-001",
+      "red": "Remote provisioner could create RoleBindings but could not bind the edit ClusterRole.",
+      "green": "Provisioner can bind only edit, system:image-puller, and cluster-logging-application-view."
+    },
+    {
+      "id": "BRUTUS-IMAGE-001",
+      "red": "Showroom init container entered ImagePullBackOff on Arena-internal image references.",
+      "green": "Three required immutable image digests were mirrored to Brutus and pulled successfully."
+    },
+    {
+      "id": "BRUTUS-RETRY-001",
+      "red": "A same-seat retry rejected its runtime Secret after the session ID changed.",
+      "green": "Stable workshop and seat ownership permits credential refresh while cross-seat ownership remains denied."
+    },
+    {
+      "id": "BRUTUS-MODEL-001",
+      "red": "Final advisor generation returned 504 through the private model Route.",
+      "green": "Private model Route timeout is 300 seconds; the complete journey returned HTTP 200."
+    }
+  ],
+  "performance": {
+    "warm_seat_ready_seconds": 11,
+    "warm_workshop_ready_seconds": 64,
+    "functional_journey_seconds": 69.061936,
+    "reclaim_seconds": 43,
+    "cold_showroom_terminal_mirror_seconds": 641.54,
+    "solution_agent_mirror_first_attempt_seconds": 444.39,
+    "solution_agent_mirror_retry_seconds": 98.45,
+    "solution_agent_mirror_first_attempt_result": "HTTP 408; resumed successfully"
+  },
+  "functional_validation": {
+    "showroom_http_status": 200,
+    "terminal_namespace": "launchpad-smoke-test-tenant-intel-xeon6-agent-47b744",
+    "tools_route_http_status": 200,
+    "agent_route_http_status": 200,
+    "app_route_http_status": 200,
+    "model_id": "granite-3.2-8b-tools",
+    "required_tools": [
+      "intel_hardware_lookup",
+      "openshift_capabilities",
+      "reference_architectures"
+    ],
+    "inference_errors": 0
+  },
+  "authorization": {
+    "participant_own_namespace_edit": true,
+    "participant_default_namespace_edit": false,
+    "participant_list_nodes": false,
+    "terminal_own_namespace_edit": true,
+    "terminal_default_namespace_edit": false
+  },
+  "cleanup": {
+    "workshop_status": "completed",
+    "seat_status": "reclaimed",
+    "all_retry_sessions_status": "reclaimed",
+    "remaining_namespaces": 0,
+    "remaining_showroom_applications": 0,
+    "remaining_workload_applications": 0
+  },
+  "not_certified": [
+    "five-seat workshop",
+    "twenty-five-seat workshop",
+    "durable external image registry",
+    "Brutus public access",
+    "Brutus OpenShift Console OIDC participant flow"
+  ],
+  "next_gate": "Pre-seed durable images, retain at least 100 protected pod slots or prove a lower contract, then run five seats.",
+  "contains_plaintext_credentials": false
+}

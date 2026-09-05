@@ -179,7 +179,7 @@ def test_agent_content_uses_launchpad_safe_workload_manifests():
     pages = content_root / "modules/ROOT/pages"
     content = "\n".join(path.read_text() for path in sorted(pages.glob("*.adoc")))
 
-    assert "intel-guided-content-v1.0.10" in content
+    assert "intel-guided-content-v1.0.11" in content
     assert "{litellm_api_endpoint}" not in content
     assert "{litellm_virtual_key}" not in content
     assert "{maas_endpoint}" in content
@@ -237,6 +237,9 @@ def test_agent_201_runtime_bounds_cpu_generation_for_workshop_scale():
     assert "contextDir: workshop-images/solution-agent" in build_config
     assert "REQUIREMENTS_MAX_TOKENS" in manifest
     assert "BRIEF_MAX_TOKENS" in manifest
+    assert "REQUESTS_CA_BUNDLE" in manifest
+    assert "SSL_CERT_FILE" in manifest
+    assert "launchpad-model-ca-bundle" in manifest
 
 
 def test_agentops_showroom_is_native_launchpad_content():

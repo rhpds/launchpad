@@ -800,6 +800,29 @@ def test_collective_readiness_failure_prevents_workshop_ready():
     }
 
 
+def test_collective_readiness_verifies_routes_with_the_configured_ca_bundle(monkeypatch):
+    service = ProvisioningService()
+    seat = WorkshopSeat(
+        workshop_id="workshop-ca",
+        seat_number=1,
+        status=WorkshopSeatStatus.READY,
+        lab_url="https://showroom.example.com",
+    )
+    monkeypatch.setenv("LAUNCHPAD_MODE", "openshift")
+    monkeypatch.setenv("WORKSHOP_STABILITY_PASSES", "1")
+    monkeypatch.setenv("REQUESTS_CA_BUNDLE", "/etc/launchpad-ca/ca-bundle.crt")
+
+    with patch("requests.get", return_value=SimpleNamespace(status_code=200)) as get:
+        failures = service._wait_for_workshop_stability([seat])
+
+    assert failures == {}
+    get.assert_called_once_with(
+        "https://showroom.example.com",
+        timeout=10,
+        verify="/etc/launchpad-ca/ca-bundle.crt",
+    )
+
+
 def test_collective_readiness_retry_reuses_existing_session():
     service = ProvisioningService()
     workshop = Workshop(

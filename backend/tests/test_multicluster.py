@@ -63,10 +63,80 @@ def test_showroom_application_targets_selected_remote_cluster():
     assert "storageClass: nfs-storage" in app["spec"]["source"]["helm"]["values"]
 
 
-def test_repository_cluster_config_has_oberon_and_arena():
+def test_repository_cluster_config_registers_remote_targets_fail_closed():
     path = Path(__file__).resolve().parents[2] / "config" / "clusters.yaml"
+    document = __import__("yaml").safe_load(path.read_text())
     registry = ClusterRegistry.from_file(str(path))
+
+    targets = {item["cluster_id"]: item for item in document["clusters"]}
+    assert set(targets) == {"arena", "oberon", "brutus"}
     assert {c.cluster_id for c in registry.list_enabled()} == {"arena"}
+    assert targets["oberon"] == {
+        "cluster_id": "oberon",
+        "display_name": "Oberon Primary",
+        "api_url": "https://api.oberon.fm2aihpcsed.com:6443",
+        "ingress_domain": "apps.oberon.fm2aihpcsed.com",
+        "console_url": "https://console-openshift-console.apps.oberon.fm2aihpcsed.com",
+        "storage_class": "launchpad-nfs-ephemeral",
+        "credential_secret": "partner-ai-launchpad/launchpad-oberon-kubeconfig",
+        "local": False,
+        "priority": 50,
+        "enabled": False,
+        "public_access_enabled": False,
+        "public_ingress_domain": "",
+        "public_console_url": "",
+        "public_oauth_url": "",
+        "capabilities": [
+            "cpu", "gaudi", "gaudi_direct", "openshift", "operators",
+            "openshift-ai", "showroom", "model_endpoint", "vector_db",
+            "kafka", "workbench",
+        ],
+        "model_endpoints": targets["oberon"]["model_endpoints"],
+    }
+    assert targets["brutus"] == {
+        "cluster_id": "brutus",
+        "display_name": "Brutus CPU Execution",
+        "api_url": "https://api.brutus.fm2aihpcsed.com:6443",
+        "ingress_domain": "apps.brutus.fm2aihpcsed.com",
+        "console_url": "https://console-openshift-console.apps.brutus.fm2aihpcsed.com",
+        "storage_class": "launchpad-nfs-ephemeral",
+        "credential_secret": "partner-ai-launchpad/launchpad-brutus-kubeconfig",
+        "local": False,
+        "priority": 20,
+        "enabled": False,
+        "public_access_enabled": False,
+        "public_ingress_domain": "",
+        "public_console_url": "",
+        "public_oauth_url": "",
+        "capabilities": [
+            "cpu", "openshift", "operators", "showroom", "model_endpoint",
+        ],
+        "model_endpoints": {
+            "granite-3.2-8b-tools": (
+                "https://vllm-granite-3-2-8b-tools-fleet-llm-d."
+                "apps.arena.fm2aihpcsed.com/v1"
+            )
+        },
+    }
+
+
+def test_arena_overlay_carries_disabled_remote_targets():
+    root = Path(__file__).resolve().parents[2]
+    document = __import__("yaml").safe_load(
+        (root / "deploy/launchpad/overlays/arena/arena-clusters.yaml").read_text()
+    )
+    config = __import__("yaml").safe_load(document["data"]["clusters.yaml"])
+    targets = {item["cluster_id"]: item for item in config["clusters"]}
+
+    assert set(targets) == {"arena", "oberon", "brutus"}
+    assert targets["arena"].get("enabled", True) is True
+    assert targets["arena"]["local"] is True
+    for cluster_id in ("oberon", "brutus"):
+        assert targets[cluster_id]["enabled"] is False
+        assert targets[cluster_id]["local"] is False
+        assert targets[cluster_id]["credential_secret"].startswith(
+            "partner-ai-launchpad/launchpad-"
+        )
 
 
 def test_active_ai_sandbox_has_an_eligible_cluster():
@@ -202,5 +272,28 @@ def test_remote_argocd_role_can_bind_only_edit():
         "apiGroups": ["rbac.authorization.k8s.io"],
         "resources": ["clusterroles"],
         "resourceNames": ["edit"],
+        "verbs": ["bind"],
+    }]
+
+
+def test_remote_provisioner_can_bind_only_declared_participant_roles():
+    path = Path(__file__).resolve().parents[2] / "deploy" / "multicluster" / "arena-rbac.yaml"
+    documents = list(__import__("yaml").safe_load_all(path.read_text()))
+    role = next(
+        doc
+        for doc in documents
+        if doc.get("kind") == "ClusterRole"
+        and doc["metadata"]["name"] == "launchpad-remote-provisioner"
+    )
+    bind_rules = [rule for rule in role["rules"] if "bind" in rule.get("verbs", [])]
+
+    assert bind_rules == [{
+        "apiGroups": ["rbac.authorization.k8s.io"],
+        "resources": ["clusterroles"],
+        "resourceNames": [
+            "edit",
+            "system:image-puller",
+            "cluster-logging-application-view",
+        ],
         "verbs": ["bind"],
     }]

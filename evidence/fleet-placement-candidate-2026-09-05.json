@@ -1,0 +1,133 @@
+{
+  "schema": "launchpad.redhat.com/fleet-placement-readiness/v1",
+  "evidence_id": "EDD-FLEET-PLACEMENT-CANDIDATE-20260905",
+  "captured_at": "2026-09-05T16:47:48Z",
+  "result": "RED-readiness",
+  "event_target": {
+    "provisioning_mode": "staggered",
+    "concurrent_participant_seats": 75,
+    "workshops": {
+      "agentops-observability": 25,
+      "intel-llm-cpu-serving": 25,
+      "intel-xeon6-agent-201": 25
+    }
+  },
+  "participant_contract": {
+    "one_public_entrypoint": true,
+    "one_instructor_code_per_order": true,
+    "one_participant_identity": true,
+    "cluster_ref_routes_private_origins": true,
+    "quick_tunnel_is_event_ready": false
+  },
+  "clusters": {
+    "arena": {
+      "ready": true,
+      "schedulable_workers": 2,
+      "schedulable_pod_slots": 500,
+      "active_worker_pods": 220,
+      "reserved_headroom_pods": 100,
+      "additional_pods_after_headroom": 180,
+      "enabled_for_launchpad": true,
+      "observations": [
+        "AgentOps build 77 concentrated the first four seats on rhgnr1.",
+        "rhgnr1 repeatedly changed Ready state during provisioning and cleanup.",
+        "Authentication recovered and Keycloak discovery returned HTTP 200 after the failed run."
+      ]
+    },
+    "brutus": {
+      "ready": true,
+      "schedulable_workers": 1,
+      "schedulable_pod_slots": 250,
+      "active_worker_pods": 109,
+      "reserved_headroom_pods": 50,
+      "additional_pods_after_headroom": 91,
+      "allocatable_cpu_millicores": 95500,
+      "requested_cpu_millicores": 7341,
+      "allocatable_memory_kib": 1055291816,
+      "requested_memory_mib": 29888,
+      "degraded_cluster_operators": 0,
+      "enabled_for_launchpad": false,
+      "launchpad_registration": {
+        "provisioner_credential": "configured",
+        "argocd_destination": "configured",
+        "storage_class": "launchpad-nfs-ephemeral",
+        "normal_placement": "disabled"
+      },
+      "observed_model": {
+        "endpoint": "https://vllm-granite-3-2-8b-tools-fleet-llm-d.apps.arena.fm2aihpcsed.com/v1",
+        "http_status": 200,
+        "model_id": "granite-3.2-8b-tools",
+        "catalog_qualified": true,
+        "cross_cluster_tool_call": "GREEN-live"
+      },
+      "certification": {
+        "catalog_item_id": "intel-xeon6-agent-201",
+        "one_seat": "GREEN-live",
+        "five_seat": "not-run",
+        "twenty_five_seat": "not-run",
+        "capacity_preview_seats": 22,
+        "functional_http_status": 200,
+        "functional_latency_seconds": 69.061936,
+        "own_namespace_edit": true,
+        "cross_namespace_edit": false,
+        "reclaim_seconds": 43,
+        "remaining_namespaces": 0,
+        "remaining_applications": 0,
+        "public_access_certified": false
+      }
+    },
+    "oberon": {
+      "ready": true,
+      "schedulable_workers": 1,
+      "schedulable_pod_slots": 500,
+      "active_worker_pods": 361,
+      "reserved_headroom_pods": 100,
+      "additional_pods_after_headroom": 39,
+      "allocatable_cpu_millicores": 255500,
+      "requested_cpu_millicores": 90437,
+      "allocatable_memory_kib": 526391492,
+      "degraded_cluster_operators": 0,
+      "enabled_for_launchpad": false,
+      "launchpad_registration": {
+        "provisioner_credential": "configured",
+        "argocd_destination": "configured",
+        "storage_class": "launchpad-nfs-ephemeral",
+        "normal_placement": "disabled"
+      },
+      "observed_model": {
+        "endpoint": "https://ovms-granite-2b-fleet-llm-d.apps.oberon.fm2aihpcsed.com/v1",
+        "http_status": 200,
+        "model_id": "granite-2b-cpu",
+        "catalog_qualified": true
+      },
+      "reviewed_scale_down_candidates": {
+        "legacy_partner_ai_launchpad_pods": 7,
+        "rhoai_learning_pods": 13,
+        "mutation_performed": false,
+        "required_confirmation": "Confirm both workloads are unused before scaling; eleven pod slots are needed to retain 20 percent headroom for Serve LLMs."
+      }
+    }
+  },
+  "candidate_assignment": {
+    "agentops-observability": "arena",
+    "intel-llm-cpu-serving": "oberon",
+    "intel-xeon6-agent-201": "brutus"
+  },
+  "required_remediation": [
+    "Reduce AgentOps to workshop-shared infrastructure or add stable Arena worker capacity.",
+    "Add per-node admission, workload spreading, and a recent-Ready-transition circuit breaker.",
+    "Promote every workshop image to a durable external registry and pre-seed immutable digests before Brutus five-seat certification.",
+    "Automate cluster ingress CA rotation and model trust distribution before the next Brutus certification run.",
+    "Prove Console/OIDC, five-seat concurrency, twenty-five-seat concurrency, and zero-residue reclaim on Brutus.",
+    "Prove durable image pulls, storage deletion, private ingress, Showroom, terminal, Console/OIDC, and zero-residue reclaim on Oberon.",
+    "Confirm and scale only unused Oberon workloads to recover at least eleven protected pod slots.",
+    "Replace Quick Tunnels with one stable cluster-aware public front door before public event certification."
+  ],
+  "release_decision": {
+    "placement_enabled": false,
+    "brutus_status": "one-seat-certified-disabled",
+    "oberon_status": "registered-disabled",
+    "next_gate": "durable image promotion and Brutus five-seat certification"
+  },
+  "contains_plaintext_credentials": false
+}

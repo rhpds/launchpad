@@ -40,6 +40,10 @@ spec:
               value: http://solution-tools:8095
             - name: ADVISOR_MODEL
               value: granite-2b-cpu
+            - name: SSL_CERT_FILE
+              value: /etc/launchpad-ca/ca-bundle.crt
+            - name: REQUESTS_CA_BUNDLE
+              value: /etc/launchpad-ca/ca-bundle.crt
             - name: REQUIREMENTS_MAX_TOKENS
               value: "192"
             - name: BRIEF_MAX_TOKENS
@@ -49,6 +53,9 @@ spec:
           volumeMounts:
             - name: prompt
               mountPath: /etc/advisor
+            - name: model-ca-bundle
+              mountPath: /etc/launchpad-ca
+              readOnly: true
           resources:
             requests:
               cpu: 100m
@@ -66,6 +73,9 @@ spec:
         - name: prompt
           configMap:
             name: advisor-prompt
+        - name: model-ca-bundle
+          configMap:
+            name: launchpad-model-ca-bundle
 ---
 apiVersion: v1
 kind: Service

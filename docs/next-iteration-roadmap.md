@@ -30,9 +30,18 @@ object/block storage and production sizing before scale.
 The measured event envelope is 525 participant pods, so the current two-worker
 500-pod Arena ceiling cannot host the exact trio even from an empty starting
 point. The current candidate path dedicates Arena to a reduced/shared-stack
-AgentOps workshop, onboards Brutus for Building an AI Agent, and re-certifies
-Oberon for Serve LLMs. Both lightweight targets need at least nine additional
-pod slots within the standard 20 percent reserve before their live gates.
+AgentOps workshop, uses Brutus for Building an AI Agent, and re-certifies
+Oberon for Serve LLMs. Brutus is registered and GREEN-live at one seat but
+remains placement-disabled; its current capacity preview supports 22 seats at
+the four-pod contract, so it needs nine additional protected pod slots or a
+measured three-pod contract before the 25-seat gate. Oberon needs eleven
+additional protected slots before its live gate.
+
+The Brutus one-seat run also measured the fleet prerequisites that must move
+out of the ordering path: a 10m42s cold Showroom terminal-image mirror, a
+resumable registry HTTP 408 while moving the solution-agent image, execution
+cluster ingress-CA distribution, and a 300-second private model Route timeout.
+All images must be promoted and verified before the five-seat run.
 
 ## Pathway 1: provisioning performance
 

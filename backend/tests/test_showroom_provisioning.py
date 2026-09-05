@@ -1,3 +1,4 @@
+from types import SimpleNamespace
 from unittest.mock import MagicMock
 
 import pytest
@@ -300,6 +301,35 @@ def test_showroom_runtime_credentials_are_applied_only_as_a_namespaced_secret():
         "MAAS_API_URL": "https://models.example.com/v1",
         "MAAS_MODEL": "granite",
     }
+
+
+def test_https_model_seat_receives_the_control_plane_ca_bundle():
+    adapter = OpenShiftProvisioningAdapter.__new__(OpenShiftProvisioningAdapter)
+    adapter._control_core_v1 = MagicMock()
+    adapter._core_v1 = MagicMock()
+    adapter._control_core_v1.read_namespaced_config_map.return_value = SimpleNamespace(
+        data={"ca-bundle.crt": "-----BEGIN CERTIFICATE-----\ntrusted\n-----END CERTIFICATE-----\n"}
+    )
+
+    adapter._apply_model_ca_bundle(
+        "launchpad-seat-1",
+        resources={
+            "workshop_id": "workshop-1",
+            "seat_id": "seat-1",
+            "session_id": "session-1",
+            "tenant_id": "tenant-1",
+        },
+        cluster_id="brutus",
+    )
+
+    adapter._control_core_v1.read_namespaced_config_map.assert_called_once_with(
+        "launchpad-cluster-ca-bundle", "partner-ai-launchpad"
+    )
+    body = adapter._core_v1.create_namespaced_config_map.call_args.kwargs["body"]
+    assert body.metadata.name == "launchpad-model-ca-bundle"
+    assert body.metadata.namespace == "launchpad-seat-1"
+    assert body.metadata.labels["launchpad.redhat.com/cluster-id"] == "brutus"
+    assert "BEGIN CERTIFICATE" in body.data["ca-bundle.crt"]
 
 
 def test_guided_workspace_deep_links_to_the_rag_experience():
