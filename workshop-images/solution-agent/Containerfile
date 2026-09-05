@@ -7,8 +7,8 @@ USER 0
 RUN grep -F 'llm = _get_llm(max_tokens=512)' /app/graph.py \
     && grep -F 'llm = _get_llm(max_tokens=2048)' /app/graph.py \
     && sed -i \
-      -e 's/_get_llm(max_tokens=512)/_get_llm(max_tokens=int(os.environ.get("REQUIREMENTS_MAX_TOKENS", "256")))/' \
-      -e 's/_get_llm(max_tokens=2048)/_get_llm(max_tokens=int(os.environ.get("BRIEF_MAX_TOKENS", "768")))/' \
+      -e 's/_get_llm(max_tokens=512)/_get_llm(max_tokens=int(os.environ.get("REQUIREMENTS_MAX_TOKENS", "192")))/' \
+      -e 's/_get_llm(max_tokens=2048)/_get_llm(max_tokens=int(os.environ.get("BRIEF_MAX_TOKENS", "512")))/' \
       /app/graph.py \
     && grep -F 'REQUIREMENTS_MAX_TOKENS' /app/graph.py \
     && grep -F 'BRIEF_MAX_TOKENS' /app/graph.py

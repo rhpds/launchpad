@@ -18,7 +18,7 @@ spec:
         runAsNonRoot: true
       containers:
         - name: solution-agent
-          image: image-registry.openshift-image-registry.svc:5000/partner-ai-launchpad/solution-agent-workshop@sha256:6d1ece781c0f5e5360097fa81c5a209447796ca1e1a47e5df8b0c6c7afcab6aa
+          image: image-registry.openshift-image-registry.svc:5000/partner-ai-launchpad/solution-agent-workshop@sha256:6fcb7f37313fb7515aa8d6c2d5d293e5da4568be859ba971efbc56b24d2ca102
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -41,9 +41,9 @@ spec:
             - name: ADVISOR_MODEL
               value: granite-2b-cpu
             - name: REQUIREMENTS_MAX_TOKENS
-              value: "256"
+              value: "192"
             - name: BRIEF_MAX_TOKENS
-              value: "768"
+              value: "512"
             - name: PROMPT_PATH
               value: /etc/advisor/system_prompt
           volumeMounts:

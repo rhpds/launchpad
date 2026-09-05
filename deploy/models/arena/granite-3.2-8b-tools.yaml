@@ -47,7 +47,7 @@ metadata:
     app.kubernetes.io/managed-by: launchpad
     app.kubernetes.io/part-of: partner-ai-launchpad
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: vllm-granite-3-2-8b-tools
