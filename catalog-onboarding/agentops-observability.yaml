@@ -22,7 +22,7 @@ sources:
     start_path: content-agentops-observability
   workload:
     repo_url: "https://github.com/rhpds/launchpad.git"
-    revision: "3e2d3d2655400f9fc1de6577f76786ff1c24521a"
+    revision: "6ef880aabd441c39085575922fc3c14e14a83299"
     deploy_path: deploy/workloads/agentops-seat
 
 references:
@@ -191,10 +191,10 @@ certification:
       Science Pipelines, and a seven-span AgentOps trace were confirmed live on
       2026-09-05. Trusted external TLS is still RED.
     - >-
-      Enable service-ca TLS for the per-seat RHOAI pipeline MariaDB connection
-      before promotion beyond one seat. Shared MLflow metadata moved to
-      persistent PostgreSQL with verified OpenShift service-ca TLS on
-      2026-09-05.
+      Clean-live-certify the RHOAI 3.5 MLMD compatibility workaround and its
+      service-ca TLS pipeline database connection before promotion beyond one
+      seat. Shared MLflow metadata moved to persistent PostgreSQL with verified
+      OpenShift service-ca TLS on 2026-09-05.
     - >-
       Replace the one-seat 1x.demo Loki/MinIO/NFS pilot with durable
       S3-compatible object storage, dynamic block storage, and production
