@@ -1,0 +1,120 @@
+{
+  "schema": "launchpad.redhat.com/event-readiness/v1",
+  "evidence_id": "READINESS-SEPTEMBER-17-THREE-WORKSHOPS-20260905",
+  "generated_at": "2026-09-05T05:34:12Z",
+  "updated_at": "2026-09-05T06:44:00Z",
+  "source_revision_before_readiness_contract": "cf28c65",
+  "event_date": "2026-09-17",
+  "cluster_id": "arena",
+  "provisioning_mode": "staggered",
+  "concurrent_participant_seats": 75,
+  "public_access_certified": false,
+  "overall_status": "RED",
+  "certification_boundary": "This is a readiness and resource-contract artifact, not live certification of the September event trio. It preserves the exact target and the gates that must produce GREEN-live evidence.",
+  "workshops": [
+    {
+      "provision_order": 1,
+      "catalog_item_id": "agentops-observability",
+      "seat_count": 25,
+      "release_status": "RED",
+      "current_certification_stage": "implementation",
+      "current_catalog_limit": 1,
+      "cpu_millicores": 62500,
+      "memory_mib": 179200,
+      "pod_slots": 375,
+      "storage_gib_minimum": 750,
+      "required_promotion_sequence": [1, 5, 25]
+    },
+    {
+      "provision_order": 2,
+      "catalog_item_id": "intel-llm-cpu-serving",
+      "seat_count": 25,
+      "release_status": "GREEN-live-25",
+      "current_certification_stage": "twenty-five-seat",
+      "current_catalog_limit": 25,
+      "cpu_millicores": 16625,
+      "memory_mib": 37200,
+      "pod_slots": 50,
+      "storage_gib_minimum": 0
+    },
+    {
+      "provision_order": 3,
+      "catalog_item_id": "intel-xeon6-agent-201",
+      "seat_count": 25,
+      "release_status": "GREEN-live-25",
+      "current_certification_stage": "twenty-five-seat",
+      "current_catalog_limit": 25,
+      "cpu_millicores": 10375,
+      "memory_mib": 22800,
+      "pod_slots": 100,
+      "storage_gib_minimum": 0
+    }
+  ],
+  "declared_event_reservation": {
+    "cpu_millicores": 89500,
+    "memory_mib": 239200,
+    "pod_slots": 525,
+    "storage_gib_minimum": 750
+  },
+  "admission_target_with_twenty_percent_headroom": {
+    "cpu_millicores": 107400,
+    "memory_mib": 287040,
+    "pod_slots": 630,
+    "storage_gib_minimum": 900
+  },
+  "previous_pattern_evidence": "evidence/arena-staggered-three-workshops-2026-09-04.json",
+  "already_proven": [
+    "25-seat Serve LLMs workshop on Arena",
+    "25-seat Building an AI Agent workshop on Arena",
+    "three staggered 25-seat workshop orders retained together",
+    "75 concurrent internal participant journeys",
+    "75 seat-scoped terminal identities and cross-seat denial",
+    "sequential reclaim with zero residue"
+  ],
+  "remaining_release_gates": [
+    "agentops-one-seat-launchpad",
+    "agentops-five-seat",
+    "agentops-twenty-five-seat",
+    "exact-event-trio-first-run",
+    "exact-event-trio-repeat-run",
+    "browser-and-operator-rehearsal",
+    "event-day-capacity-preflight"
+  ],
+  "next_gate": "agentops-one-seat-launchpad",
+  "capacity_status": {
+    "declared_reservation_calculated": true,
+    "current_arena_free_capacity_measured": true,
+    "observed_at": "2026-09-05T06:14:36Z",
+    "schedulable_workers": 2,
+    "schedulable_pod_slots": 500,
+    "running_pods_on_workers": 193,
+    "projected_pods_without_headroom": 718,
+    "projected_pods_with_event_headroom": 823,
+    "pod_slot_shortage_without_headroom": 218,
+    "pod_slot_shortage_with_event_headroom": 323,
+    "fit_decision": "blocked-by-worker-pod-slots",
+    "recommended_additional_250_pod_workers": 2,
+    "required_checks": [
+      "requested CPU and memory by node",
+      "free pod slots by node",
+      "NFS free capacity and 25-seat I/O behavior",
+      "current shared-service footprint",
+      "scheduler headroom after temporary rollout overlap"
+    ]
+  },
+  "latest_agentops_component_evidence": "evidence/agentops-mlflow-live-2026-09-05.json",
+  "critical_agentops_checks": [
+    "Mortgage AI, Grafana, metrics, logs, evaluation, and the complete DSPA journey",
+    "Launchpad-created runtime Secret, workload Application, Showroom, and entitlement",
+    "participant workload/shared route authorization and cross-seat denial",
+    "one-seat then five-seat then twenty-five-seat promotion",
+    "Launchpad reclaim with zero residue"
+  ],
+  "release_policy": {
+    "rubric_score_required": 100,
+    "critical_cells_must_be_green_live": true,
+    "pod_readiness_alone_is_sufficient": false,
+    "silent_workshop_substitution_allowed": false,
+    "uncertified_public_access_allowed": false
+  }
+}

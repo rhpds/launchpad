@@ -71,6 +71,10 @@ spec:
             httpGet: {path: /minio/health/live, port: api}
             initialDelaySeconds: 30
             periodSeconds: 10
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh", "-c", "chmod -R a+rwx /data || true"]
           resources:
             {{- toYaml .Values.resources.minio | nindent 12 }}
           volumeMounts:

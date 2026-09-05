@@ -15,11 +15,17 @@ spec:
     pipelineStore: kubernetes
   database:
     disableHealthCheck: false
-    mariaDB:
-      deploy: true
+    # The chart-owned MariaDB is namespace-local. Add service-ca TLS before
+    # promoting AgentOps beyond the one-seat pilot gate.
+    customExtraParams: '{"tls":"false"}'
+    externalDB:
+      host: agentops-pipeline-db.{{ .Release.Namespace }}.svc.cluster.local
+      port: "3306"
       pipelineDBName: mlpipeline
-      pvcSize: {{ .Values.dspa.storage | quote }}
       username: mlpipeline
+      passwordSecret:
+        name: {{ include "agentops.runtimeSecret" . }}
+        key: MLPIPELINE_PASSWORD
   dspVersion: v2
   objectStorage:
     disableHealthCheck: false

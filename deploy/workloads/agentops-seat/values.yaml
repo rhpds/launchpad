@@ -8,7 +8,7 @@ identity:
 runtime:
   existingSecret: ""
 
-storageClass: nfs-storage
+storageClass: launchpad-nfs-ephemeral
 
 images:
   mortgageApi: quay.io/redhat-gpte/mortgage-ai-api:0.1.9-intel
@@ -16,6 +16,7 @@ images:
   postgres: docker.io/pgvector/pgvector:pg16
   minio: quay.io/minio/minio:RELEASE.2023-06-19T19-52-50Z
   minioClient: quay.io/minio/mc:RELEASE.2023-06-19T19-31-19Z
+  mariadb: registry.redhat.io/rhel9/mariadb-105@sha256:bfd7026db8d198e3ca4044ef7065ff5512913409562d5eac20f58a6ad0499937
   grafana: docker.io/grafana/grafana:11.6.0
 
 database:
@@ -25,7 +26,7 @@ minio:
   storage: 10Gi
 
 mlflow:
-  trackingUri: https://mlflow.redhat-ods-applications.svc.cluster.local:8443
+  trackingUri: https://mlflow.redhat-ods-applications.svc.cluster.local:8443/mlflow
 
 dspa:
   enabled: true
@@ -47,3 +48,6 @@ resources:
   grafana:
     requests: {cpu: 50m, memory: 128Mi}
     limits: {cpu: 500m, memory: 512Mi}
+  pipelineDatabase:
+    requests: {cpu: 300m, memory: 800Mi}
+    limits: {cpu: "1", memory: 1Gi}

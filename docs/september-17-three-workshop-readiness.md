@@ -1,0 +1,247 @@
+# September 17 three-workshop readiness gate
+
+## Event outcome
+
+On **September 17, 2026**, Arena must support these three separate workshop
+orders:
+
+| Provision order | Catalog item | Participant seats | Current release state |
+|---|---|---:|---|
+| 1 | `agentops-observability` | 25 | RED: implementation, limited to one seat |
+| 2 | `intel-llm-cpu-serving` | 25 | GREEN-live-25 |
+| 3 | `intel-xeon6-agent-201` | 25 | GREEN-live-25 |
+
+Provisioning is deliberately staggered. Request the next workshop only after
+the previous workshop is collectively Ready, but retain all three so 75
+participants can use their seats concurrently. This is not a requirement to
+create all 75 seats at the same instant.
+
+The event provisioning order is **AgentOps first**, Serve LLMs second, and
+Building an AI Agent third. AgentOps has the largest footprint and the longest
+initialization path, so it must fail early enough to preserve recovery time.
+
+## What is already proven
+
+Arena has already passed the platform-level pattern needed for this event.
+`evidence/arena-staggered-three-workshops-2026-09-04.json` records three
+different 25-seat workshops provisioned one at a time, held together, exercised
+by 75 concurrent participant journeys, and reclaimed with zero residue. The
+run included the exact Serve LLMs and Building an AI Agent catalog items.
+
+That evidence does not include AgentOps. Its third workshop was LLM Tool
+Calling. It also does not certify public access or simultaneous provisioning.
+Therefore the previous run proves the Launchpad orchestration pattern, not the
+September 17 release candidate.
+
+## Declared capacity envelope
+
+The reservation below comes from the catalog contracts and the measured
+AgentOps one-seat footprint. It excludes shared model and Launchpad control
+plane services that are already running.
+
+| Workshop | CPU | Memory | Pod slots | Declared seat storage |
+|---|---:|---:|---:|---:|
+| AgentOps, 25 seats | 62,500m | 179,200 MiB | 375 | 750 GiB |
+| Serve LLMs, 25 seats | 16,625m | 37,200 MiB | 50 | not declared by catalog |
+| Building an AI Agent, 25 seats | 10,375m | 22,800 MiB | 100 | not declared by catalog |
+| **Event total** | **89,500m** | **239,200 MiB** | **525** | **at least 750 GiB** |
+
+Admission must retain at least 20 percent additional headroom for scheduling,
+operator activity, model services, temporary rollout overlap, and measurement
+error. The protected target is therefore 107,400m CPU, 287,040 MiB memory, 630
+pod slots, and at least 900 GiB schedulable storage.
+
+These are reservations, not a statement of current availability. **The current
+free Arena capacity must be measured live** immediately before each
+certification run and again before the event. Admission must use requested
+resources and per-node schedulability, not aggregate allocatable capacity
+alone. NFS free space, PVC binding latency, and I/O under 25 AgentOps seats are
+explicit gates.
+
+### Live Arena decision — September 5
+
+The first aggregate inventory appeared to show 1,250 pod slots, but three of
+the five nodes are control-plane nodes with a `NoSchedule` taint. Only `gnr2`
+and `rhgnr1` are schedulable workers:
+
+| Worker measurement | Live value |
+|---|---:|
+| Schedulable worker nodes | 2 |
+| Schedulable pod slots | 500 |
+| Running pods on workers | 193 |
+| Unrequested worker CPU | 336,989m |
+| Unrequested worker memory | 1,281,934 MiB |
+| NFS free space reported | 6.5 TiB |
+
+CPU, memory, and NFS fit the event reservation. Pod slots do not. The current
+193 worker pods plus 525 declared event pods would require 718 slots; applying
+the event's 20 percent protection requires 823. One additional 250-pod worker
+would provide 750 total slots and fit the unprotected estimate, but not the
+protected target, so the recommended event path is **two additional 250-pod
+workers**.
+
+A pilot-only alternative is to add targeted tolerations to Launchpad workloads
+so selected participant pods can use the three otherwise idle control-plane
+nodes. That supplies enough aggregate slots but creates control-plane
+availability risk and needs its own load, eviction, API-latency, rollback, and
+failure certification. It must not be enabled as an incidental chart change.
+
+Scaling down unrelated deployments cannot solve this constraint: even an
+otherwise empty two-worker pool cannot place all 525 declared event pods.
+Running the workshops sequentially also does not meet the
+requirement because all 75 participants must use the labs concurrently.
+
+## Critical path: AgentOps 1 -> 5 -> 25
+
+Serve LLMs and Building an AI Agent already have 25-seat live evidence. The
+release critical path is AgentOps, which stays draft and capped at one seat
+until each gate is green.
+
+### Gate A: one Launchpad-created AgentOps seat
+
+- Create the order through Launchpad on Arena, including its persisted session,
+  workload Application, runtime Secret, Showroom, and entitlement.
+- Prove all 41 seeded knowledge-base chunks receive 768-dimensional vectors
+  from the private shared Nomic endpoint and can be retrieved semantically.
+- Complete the participant journey across Mortgage AI, Grafana, MLflow,
+  OpenShift AI, Data Science Pipelines, metrics, logs, and the namespace-scoped
+  terminal/Console experience.
+- Prove participant workload and shared-service routes through the entitlement
+  gateway, including cross-seat and cross-tenant denial.
+- Reclaim through Launchpad and prove zero namespace, Route, RoleBinding,
+  Application, Secret, entitlement, or model-key residue.
+
+The September 5 integrated component rerun cleared the embedding, shared
+MLflow, DSPA, application, trace, and automatic-cleanup sub-gates. All 41
+chunks were embedded at 768 dimensions, the WebSocket agent completed, DSPA
+reported Ready, and MLflow 3.14.0 recorded one isolated seven-span trace.
+Assigned-workspace MLflow writes returned 200, cross-workspace writes returned
+403, and no named experiments leaked through cross-workspace search. The final
+chart topology reclaimed its namespace, PVs, and NFS directories in 59 seconds
+without manual repair.
+
+Gate A remains RED because this was a direct Helm component run: it did not
+create a Launchpad order, workload Application, runtime Secret, Showroom, or
+participant entitlement, and the OpenShift Logging journey was not run.
+Trusted external TLS is also RED, the pipeline MariaDB connection needs
+service-ca TLS, and shared MLflow must move from SQLite to PostgreSQL before
+the five-seat promotion. The immutable result is in
+`evidence/agentops-mlflow-live-2026-09-05.json`.
+
+### Gate B: five AgentOps seats
+
+- Provision five seats through a single workshop order.
+- Require 5/5 collective readiness and five successful concurrent participant
+  journeys, including embeddings, an agent exchange, a trace, metrics, logs,
+  an evaluation, and a pipeline check.
+- Measure NFS consumption and latency, shared embedding/model saturation,
+  operator/API throttling, pod restarts, and reclaim duration.
+- Reclaim the workshop and require zero residue.
+
+### Gate C: 25 AgentOps seats
+
+- Revalidate Arena capacity, reserve the whole workshop atomically, and reject
+  the order before creating seats if the protected envelope cannot fit.
+- Require 25/25 seats Ready and 25 simultaneous complete participant journeys.
+- Hold the workshop for at least 60 minutes while watching node pressure, NFS,
+  shared model/embedding latency, DSPA reconciliation, and route stability.
+- Reclaim all seats and require zero residue.
+
+### Gate D: exact September trio
+
+- Provision AgentOps 25, wait for collective Ready, then provision Serve LLMs
+  25, wait for Ready, then provision Building an AI Agent 25.
+- Keep all 75 seats active and validate all 75 participant journeys in one
+  bounded concurrency window.
+- Prove 75 default projects match their assigned seats, 75 own-namespace edit
+  checks succeed, and 75 cross-seat reads are denied.
+- Reclaim one workshop at a time and require zero residue across all three
+  workshop scopes.
+- Repeat the exact trio at least twice before the final rehearsal. Any defect
+  first becomes a RED regression before it is corrected.
+
+## Dated path to September 17
+
+| Date | Required outcome |
+|---|---|
+| Sep 5 | Freeze the exact trio, capacity contract, evidence schema, and stop/go criteria. |
+| Sep 6-7 | Complete AgentOps Gate A, including embeddings, shared observability, participant tabs, authorization, and reclaim. |
+| Sep 8 | Repeat Gate A from a clean state and complete Gate B with five seats. |
+| Sep 9-10 | Correct any RED results, repeat five seats if needed, then complete Gate C at 25 seats. |
+| Sep 11 | Run the first exact staggered 25 + 25 + 25 event trio. |
+| Sep 12-13 | Run a second exact trio, tune only from evidence, and repeat any failed gate. |
+| Sep 14 | Browser and operator rehearsal with representative participant identities and all lab journeys. |
+| Sep 15 | Final capacity, NFS, image-cache, shared-model, route, entitlement, and cleanup rehearsal. |
+| Sep 16 | Freeze catalog/image revisions and prepare the event orders, roster, owners, evidence directories, and rollback decisions. |
+| Sep 17 | Recheck capacity, provision in the certified staggered order, retain all 75 seats, run the event, capture evidence, then reclaim sequentially. |
+
+Sep 10 is the AgentOps 25-seat stop/go point. Sep 13 is the exact-trio stop/go
+point. Missing either gate triggers the documented event contingency; it does
+not justify silently raising the catalog limit or weakening validation.
+
+## Proof model
+
+### TDD and RED/GREEN
+
+- Every newly found failure is captured as a failing automated regression or a
+  stable live check before the fix.
+- Preserve RED, GREEN-local, GREEN-integration, and GREEN-live outcomes with
+  test IDs and evidence links.
+- Do not promote `agentops-observability` from 1 to 5 or from 5 to 25 based on
+  pod readiness alone.
+
+### CDD and CBT
+
+- Contract-test the catalog seat limit, whole-workshop Arena affinity,
+  aggregate reservation, generated runtime inputs, workload/Showroom
+  Applications, participant URLs, reclaim target, and zero-residue response.
+- Component-test embeddings, Mortgage AI, database, MinIO, Grafana, MLflow,
+  logging, DSPA, inference, Showroom, terminal, Console, entitlement gateway,
+  and cleanup independently before the integrated participant journey.
+
+### BDD
+
+Given the exact three event workshops are requested on Arena only after the
+previous order is Ready, when 75 participants concurrently complete their
+assigned lab journeys, then every functional and isolation check succeeds and
+sequential reclaim leaves no managed resource in any event workshop scope.
+
+### EDD and release rubric
+
+Each run records commit SHA, image digests, catalog/content revisions, capacity
+previews, order/workshop/session/namespace IDs, timestamps, collective
+readiness, functional results, latency percentiles, node/NFS observations,
+authorization checks, screenshots, audit events, and post-reclaim inventory.
+
+The exact-trio release requires 100/100:
+
+| Area | Points |
+|---|---:|
+| Exact catalog/content/image revisions | 10 |
+| Capacity reservation and retained headroom | 15 |
+| 75/75 collective readiness | 15 |
+| All three participant journeys | 20 |
+| Showroom, terminal, Console, and route behavior | 10 |
+| Namespace and entitlement isolation | 10 |
+| Shared models, embeddings, and observability stability | 10 |
+| Sequential reclaim and zero residue | 10 |
+
+Any critical row that is not GREEN-live scores zero and blocks release.
+
+## Public-access boundary
+
+The internal Arena workshop path is the release baseline. Public access is not
+certified by the existing 3x25 evidence. A temporary quick tunnel and a
+changing hostname are not an event-grade dependency. Public participation can
+be added only if the named ingress/tunnel, TLS, login/code claim, resume,
+Showroom, WebSocket terminal, embedded Console, 25-participant burst, expiry,
+and reclaim matrix is independently GREEN-live by Sep 15. Otherwise the event
+must use the certified internal/VPN access path.
+
+## Event contingency
+
+The target remains 25 AgentOps + 25 Serve LLMs + 25 Building an AI Agent. If
+AgentOps misses its stop/go gate, do not represent a shared instructor demo or
+a lighter substitute as a certified 25-seat AgentOps workshop. The organizer
+may explicitly choose a reduced AgentOps format, but it must be labeled as a
+contingency and retain the two already certified 25-seat workshops.

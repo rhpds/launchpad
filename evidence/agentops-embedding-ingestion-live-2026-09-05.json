@@ -1,0 +1,166 @@
+{
+  "schema": "launchpad.redhat.com/agentops-live-seat-evidence/v2",
+  "evidence_id": "LIVE-AGENTOPS-017",
+  "observed_at": {
+    "capacity_snapshot": "2026-09-05T06:14:36Z",
+    "seat_created": "2026-09-05T05:46:55Z",
+    "seat_ready": "2026-09-05T05:48:45Z",
+    "evidence_completed": "2026-09-05T06:14:13Z"
+  },
+  "source_revision_before_live_run": "cf28c65",
+  "cluster_id": "arena",
+  "namespace": "launchpad-cert-agentops-sep17a",
+  "result": "partial",
+  "deployment": {
+    "method": "direct Helm certification deployment",
+    "release": "agentops",
+    "launchpad_order_created": false,
+    "showroom_created": false,
+    "purpose": "Re-run the namespace-scoped AgentOps component with the shared Arena embedding endpoint before enabling its Launchpad GitOps path"
+  },
+  "workload": {
+    "ready_seconds": 110,
+    "steady_ready_pods": 12,
+    "completed_jobs": 1,
+    "container_restarts": 0,
+    "requested_cpu_millicores": 1730,
+    "requested_memory_mib": 4964,
+    "pvc_count": 3,
+    "requested_storage_gib": 30
+  },
+  "checks": {
+    "application_health": {
+      "status": "pass",
+      "http_status": 200,
+      "components": [
+        "API",
+        "PostgreSQL"
+      ]
+    },
+    "embedding_ingestion": {
+      "status": "pass",
+      "documents": 8,
+      "chunks": 41,
+      "embedded_chunks": 41,
+      "missing_embeddings": 0,
+      "dimensions_min": 768,
+      "dimensions_max": 768
+    },
+    "semantic_retrieval": {
+      "status": "pass",
+      "query": "FHA borrower eligibility requirements and mortgage insurance",
+      "top_results": [
+        {
+          "section_ref": "Minimum Credit Score",
+          "similarity": 0.7788
+        },
+        {
+          "section_ref": "Mortgage Insurance Premium",
+          "similarity": 0.7673
+        },
+        {
+          "section_ref": "DTI Limits",
+          "similarity": 0.7365
+        }
+      ]
+    },
+    "agent_websocket": {
+      "status": "pass",
+      "terminal_event": "done",
+      "seconds": 30.394,
+      "answer_characters": 928,
+      "answer_mentions_fha": true
+    },
+    "data_science_pipelines": {
+      "status": "pass",
+      "ready_condition": true,
+      "generated_running_pods": 7
+    },
+    "mlflow_tracking": {
+      "status": "fail",
+      "reason": "The expected mlflow.redhat-ods-applications service does not exist on Arena, so application tracing initialization cannot resolve the host."
+    },
+    "launchpad_order_showroom_and_entitlement": {
+      "status": "not-run",
+      "reason": "The draft catalog remains fail closed until the shared observability capabilities and GitOps activation gate are ready."
+    }
+  },
+  "arena_capacity": {
+    "observed_at": "2026-09-05T06:14:36Z",
+    "ready_nodes_total": 5,
+    "control_plane_nodes_noschedule": 3,
+    "schedulable_workers": 2,
+    "schedulable_cpu_millicores": 568000,
+    "requested_cpu_millicores": 231011,
+    "unrequested_cpu_millicores": 336989,
+    "schedulable_memory_mib": 1501778,
+    "requested_memory_mib": 219844,
+    "unrequested_memory_mib": 1281934,
+    "schedulable_pod_slots": 500,
+    "running_pods_on_workers": 193,
+    "nfs_reported_capacity_tib": 7.0,
+    "nfs_reported_free_tib": 6.5,
+    "event_declared_pods": 500,
+    "event_headroom_pods": 600,
+    "projected_pods_without_headroom": 693,
+    "projected_pods_with_event_headroom": 793,
+    "pod_slot_shortage_without_headroom": 193,
+    "pod_slot_shortage_with_event_headroom": 293,
+    "event_fits_current_workers": false,
+    "recommended_additional_250_pod_workers": 2,
+    "pilot_alternative": "Add targeted Launchpad tolerations for the three control-plane nodes only after explicit control-plane risk certification."
+  },
+  "cleanup": {
+    "namespace_deleted": true,
+    "namespace_delete_seconds": 58,
+    "storage_defect_discovered": "nfs-storage uses Retain",
+    "released_pvs_discovered": 3,
+    "released_nfs_directories_discovered": 3,
+    "exact_legacy_directories_permanently_removed": 3,
+    "corrective_storage_class": "launchpad-nfs-ephemeral",
+    "corrective_storage_class_reclaim_policy": "Delete",
+    "corrective_storage_class_archive_on_delete": false,
+    "corrective_storage_class_live_probe": "pass",
+    "remaining_pvs": 0,
+    "remaining_nfs_directories": 0,
+    "remaining_labeled_objects": 0
+  },
+  "red_green": {
+    "embedding_ingestion": {
+      "red": "The previous live AgentOps seat stored all 41 chunks without vectors because no compatible shared embedding endpoint was available.",
+      "green": "The shared Nomic service embedded all 41 chunks at 768 dimensions and semantic search returned the expected FHA sections."
+    },
+    "disposable_storage": {
+      "red": "Reclaim through Arena's general nfs-storage class left three Released Retain PVs and three backing directories.",
+      "green": "A Launchpad-only Delete/no-archive StorageClass passed a live PVC, PV, and backing-directory deletion probe."
+    },
+    "event_capacity": {
+      "red": "Only two worker nodes are schedulable, so 193 current worker pods plus 500 event pods exceed the 500-slot ceiling.",
+      "green": "not-achieved"
+    }
+  },
+  "test_strategy": {
+    "TDD": "Failing storage-class and immutable evidence contracts preceded the cleanup correction and this evidence artifact.",
+    "EDD": "This artifact records live capacity, readiness, database vector counts, semantic similarity results, WebSocket behavior, storage leakage, correction, and zero-residue checks.",
+    "CDD": "The AgentOps catalog, intake contract, chart defaults, and Arena StorageClass now agree on launchpad-nfs-ephemeral.",
+    "BDD": "Given a disposable AgentOps seat using the shared Nomic endpoint, all seeded chunks receive vectors, an FHA query retrieves the expected sections, the agent completes, and exact reclaim leaves no session data.",
+    "CBT": "Application health, PostgreSQL vector state, TEI retrieval, WebSocket generation, DSPA, MLflow failure, PVC reclaim, PV reclaim, and NFS-directory deletion were checked independently."
+  },
+  "remaining_release_gates": [
+    "shared MLflow tracking server and participant route",
+    "OpenShift Logging/Loki participant experience",
+    "Launchpad-created runtime Secret, workload Application, Showroom, entitlement, and reclaim",
+    "trusted and authorized participant routes",
+    "one-seat integrated journey",
+    "five-seat AgentOps workshop",
+    "twenty-five-seat AgentOps workshop",
+    "at least two additional 250-pod workers or separately approved control-plane scheduling",
+    "exact staggered September event trio"
+  ],
+  "security": {
+    "secrets_included": false,
+    "credential_values_logged": false,
+    "certification_namespace_removed": true,
+    "legacy_data_deletion_scope": "Only the three exact PV directories created by launchpad-cert-agentops-sep17a were removed."
+  }
+}

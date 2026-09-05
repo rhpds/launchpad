@@ -8,7 +8,9 @@ clusters:
     local: true
     priority: 10
     public_access_enabled: false
-    capabilities: [cpu, openshift, operators, openshift-ai, showroom, model_endpoint, embedding_endpoint, control-plane]
+    capabilities: [cpu, openshift, operators, openshift-ai, showroom, model_endpoint, embedding_endpoint, mlflow, control-plane]
+    service_urls:
+      mlflow: https://rh-ai.apps.arena.fm2aihpcsed.com/mlflow
     model_endpoints:
       granite-2b-cpu: https://ovms-granite-2b-fleet-llm-d.apps.arena.fm2aihpcsed.com/v1
       granite-3.2-8b-tools: http://vllm-granite-3-2-8b-tools.fleet-llm-d.svc:8080/v1

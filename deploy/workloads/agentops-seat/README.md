@@ -21,6 +21,14 @@ therefore never enter an Argo CD Application or Git history. The runtime
 Secret and every rendered resource carry session, workshop, seat, tenant, and
 cluster ownership labels so cleanup can remain deterministic.
 
+Disposable seat PVCs use Arena's `launchpad-nfs-ephemeral` StorageClass. Its
+`Delete` reclaim policy and disabled NFS archive behavior are part of the
+cleanup contract: reclaim must delete both the PV object and its NFS subdirectory.
+Do not use Arena's general `nfs-storage` class for participant seat data because
+its `Retain` policy leaves Released PVs and their data behind.
+
 The upstream source and revision from which this chart was derived are pinned
-in `Chart.yaml`. Activation still requires image digest pinning, the shared
-Arena services, external route authorization, and one-seat live evidence.
+in `Chart.yaml`. The direct chart, shared embeddings, MLflow trace, DSPA, and
+automatic reclaim have live component evidence. Activation still requires
+image digest pinning, trusted and entitlement-protected participant routes,
+OpenShift Logging, and a complete Launchpad-created one-seat journey.

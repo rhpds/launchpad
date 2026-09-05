@@ -68,9 +68,9 @@ def test_agentops_intake_captures_the_large_lab_runtime_contract():
 
     assert runtime["deployment_type"] == "helm"
     assert runtime["seat_resources"] == {
-        "cpu_millicores": 2000,
-        "memory_mib": 6144,
-        "pods": 14,
+        "cpu_millicores": 2500,
+        "memory_mib": 7168,
+        "pods": 15,
         "storage_gib": 30,
     }
     assert set(runtime["required_capabilities"]) >= {

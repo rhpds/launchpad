@@ -1,0 +1,15 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: launchpad-nfs-ephemeral
+  labels:
+    app.kubernetes.io/managed-by: launchpad
+    app.kubernetes.io/part-of: partner-ai-launchpad
+  annotations:
+    launchpad.redhat.com/purpose: disposable-participant-storage
+provisioner: cluster.local/nfs-subdir-external-provisioner
+parameters:
+  archiveOnDelete: "false"
+reclaimPolicy: Delete
+allowVolumeExpansion: true
+volumeBindingMode: Immediate

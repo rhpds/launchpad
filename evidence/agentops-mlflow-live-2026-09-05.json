@@ -1,0 +1,146 @@
+{
+  "schema": "launchpad.redhat.com/agentops-live-seat-evidence/v3",
+  "evidence_id": "LIVE-AGENTOPS-018",
+  "observed_at": {
+    "shared_mlflow_ready": "2026-09-05T06:24:26Z",
+    "integrated_component_run": "2026-09-05"
+  },
+  "source_revision_before_live_run": "cf28c65",
+  "cluster_id": "arena",
+  "result": "partial",
+  "certification_boundary": "The shared MLflow service and the integrated AgentOps Helm component were proven live on Arena. This was not a Launchpad-created order and did not include Showroom, participant entitlement, OpenShift Logging, or trusted public TLS, so the catalog remains draft and capped at one seat.",
+  "deployment": {
+    "method": "direct Helm component certification deployment",
+    "release": "agentops",
+    "namespace": "launchpad-cert-agentops-final-0905",
+    "launchpad_order_created": false,
+    "showroom_created": false,
+    "entitlement_created": false
+  },
+  "workload": {
+    "running_pods": 13,
+    "completed_jobs": 1,
+    "container_restarts": 0,
+    "requested_cpu_millicores": 2080,
+    "requested_memory_mib": 5720,
+    "pvc_count": 3,
+    "requested_storage_gib": 30,
+    "reservation_with_showroom": {
+      "cpu_millicores": 2500,
+      "memory_mib": 7168,
+      "pods": 15,
+      "storage_gib": 30
+    }
+  },
+  "checks": {
+    "shared_mlflow": {
+      "status": "pass",
+      "version": "3.14.0",
+      "available": true,
+      "internal_url": "https://mlflow.redhat-ods-applications.svc:8443/mlflow",
+      "workspace_selector": "launchpad.redhat.com/session-id Exists",
+      "assigned_workspace_write_http_status": 200,
+      "cross_workspace_write_http_status": 403,
+      "cross_workspace_search_http_status": 200,
+      "cross_workspace_names_leaked": 0,
+      "backend_store": "SQLite",
+      "scale_boundary": "Replace SQLite with PostgreSQL before five-seat or twenty-five-seat certification."
+    },
+    "embedding_ingestion": {
+      "status": "pass",
+      "documents": 8,
+      "chunks": 41,
+      "embedded_chunks": 41,
+      "missing_embeddings": 0,
+      "dimensions_min": 768,
+      "dimensions_max": 768
+    },
+    "data_science_pipelines": {
+      "status": "pass",
+      "ready": true,
+      "database_available": true,
+      "object_store_available": true
+    },
+    "agent_websocket": {
+      "status": "pass",
+      "terminal_event": "done",
+      "seconds": 23.153,
+      "answer_characters": 599,
+      "answer_mentions_fha": true,
+      "answer_mentions_credit": true,
+      "answer_mentions_insurance": true
+    },
+    "mlflow_trace": {
+      "status": "pass",
+      "trace_count": 1,
+      "state": "OK",
+      "execution_duration_ms": 20731,
+      "span_count": 7
+    },
+    "trusted_external_tls": {
+      "status": "fail",
+      "reason": "The Arena MLflow route presents a certificate chain that the external trusted client reports as self-signed; an insecure client reaches the OpenShift OAuth redirect."
+    },
+    "pipeline_database_tls": {
+      "status": "fail",
+      "reason": "The supported per-seat RHOAI pipeline MariaDB connection is internal but currently uses tls=false. Add OpenShift service-ca TLS before scale promotion."
+    },
+    "launchpad_showroom_entitlement": {
+      "status": "not-run",
+      "reason": "This component run used direct Helm and did not create a Launchpad order, runtime Secret, Argo CD workload Application, Showroom, participant identity, or entitlement."
+    },
+    "openshift_logging": {
+      "status": "not-run",
+      "reason": "The namespace-scoped OpenShift Logging and Loki participant journey has not been installed and certified on Arena."
+    }
+  },
+  "cleanup": {
+    "automatic": true,
+    "namespace_delete_seconds": 59,
+    "remaining_namespaces": 0,
+    "remaining_pvs": 0,
+    "remaining_nfs_directories": 0,
+    "remaining_applications": 0,
+    "manual_repair_required": false,
+    "verification": "The final topology used only launchpad-nfs-ephemeral PVCs and reclaimed the namespace, PVs, and exact backing directories without manual permission repair."
+  },
+  "red_green": {
+    "mlflow": {
+      "red": "Arena had the MLflow operator but no functional tracking server or workspace authorization path.",
+      "green": "The supported MLflow CR became Available, served version 3.14.0, accepted assigned-workspace writes, denied cross-workspace writes, and recorded one seven-span AgentOps trace."
+    },
+    "dspa_database_cleanup": {
+      "red": "The operator-created database PVC used the general Retain storage class and restrictive NFS permissions could leave released PV data.",
+      "green": "A chart-owned MariaDB using the pinned RHOAI image, launchpad-nfs-ephemeral, and shutdown permission normalization passed automatic zero-residue reclaim."
+    },
+    "launchpad_one_seat": {
+      "red": "No Launchpad order, Showroom, participant entitlement, or logging journey was created in this run.",
+      "green": "not-achieved"
+    }
+  },
+  "test_strategy": {
+    "TDD": "Failing immutable evidence, chart topology, workspace RBAC, and reclaim contracts preceded the implementation changes.",
+    "EDD": "This artifact records live MLflow health and isolation, workload resources, embeddings, DSPA readiness, WebSocket behavior, trace data, TLS gaps, and exact post-reclaim inventory.",
+    "CDD": "The Arena registry, AgentOps catalog and intake contracts, shared MLflow CR, runtime Secret sources, DSPA database topology, and reservation envelope use the same declared interfaces.",
+    "BDD": "Given an Arena AgentOps component with shared Nomic and MLflow, the application embeds all content, completes an FHA agent answer, records an isolated trace, brings DSPA Ready, and reclaims automatically without residue.",
+    "CBT": "Shared MLflow, workspace authorization, embedding ingestion, DSPA, WebSocket generation, trace persistence, storage lifecycle, TLS, and logging were evaluated as independent components."
+  },
+  "remaining_release_gates": [
+    "Launchpad-created runtime Secret, workload Application, Showroom, entitlement, and reclaim",
+    "OpenShift Logging and Loki participant experience",
+    "trusted external TLS for shared participant services",
+    "service-ca TLS for the per-seat RHOAI pipeline database",
+    "PostgreSQL backend for shared MLflow before scale",
+    "clean one-seat Launchpad repeat",
+    "five-seat AgentOps workshop",
+    "twenty-five-seat AgentOps workshop",
+    "additional Arena pod capacity",
+    "exact staggered September event trio"
+  ],
+  "security": {
+    "secrets_included": false,
+    "credential_values_logged": false,
+    "certification_namespace_removed": true,
+    "temporary_authorization_namespaces_removed": true
+  }
+}

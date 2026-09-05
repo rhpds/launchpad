@@ -46,9 +46,9 @@ metadata:
   - 25
   activation_blockers:
   - Repeat the one-seat run through the Launchpad provisioner. The pinned chart, application
-    agent path, DSPA, Grafana, and zero-residue Helm reclaim were proven live on Arena,
-    but the test did not create a persisted Launchpad order, workload Application,
-    or Showroom.
+    agent path, embeddings, shared MLflow trace, DSPA, Grafana, and automatic zero-residue
+    Helm reclaim were proven live on Arena, but the test did not create a persisted
+    Launchpad order, workload Application, or Showroom.
   - Prove generated runtime Secret creation, retry preservation, model-key revocation,
     and Launchpad-driven reclaim live. The direct chart reclaim left zero residue,
     and unit tests confirm that no credentials are serialized into the Argo CD Application.
@@ -59,13 +59,12 @@ metadata:
     workload and shared-service route, including cross-seat and cross-tenant denial.
     Local contracts prove catalog-only allowlisting, Showroom tab rewriting, WebSocket
     support, and origin escape rejection.
-  - Install and certify an Arena participant route for shared MLflow, per-seat Grafana,
-    and OpenShift Logging/Loki. OpenShift AI 3.5, a Ready DataScienceCluster, user
-    workload monitoring, and Data Science Pipelines were confirmed live on 2026-09-04.
-  - Re-run the AgentOps seat through Launchpad with the shared Arena Nomic endpoint
-    and prove all seeded knowledge-base chunks receive vectors. The private cached
-    endpoint and cluster-specific runtime injection are live, but the application
-    ingestion path has not yet been re-certified.
+  - Certify the Arena participant route for shared MLflow and per-seat Grafana, and
+    install and certify OpenShift Logging/Loki. Shared MLflow 3.14.0, workspace-scoped
+    write authorization, OpenShift AI 3.5, Data Science Pipelines, and a seven-span
+    AgentOps trace were confirmed live on 2026-09-05. Trusted external TLS is still RED.
+  - Replace shared MLflow SQLite with PostgreSQL and enable service-ca TLS for the
+    per-seat RHOAI pipeline MariaDB connection before promotion beyond one seat.
   - Complete one-seat functional certification, including app, trace, metrics, logs,
     evaluation, Showroom, access isolation, and full reclaim.
   showroom_journey: agentops-observability
@@ -102,9 +101,9 @@ metadata:
   required_models:
   - granite-3.2-8b-tools
   inference_endpoint: litellm
-  seat_cpu_millicores: 2000
-  seat_memory_mib: 6144
-  seat_pods: 14
+  seat_cpu_millicores: 2500
+  seat_memory_mib: 7168
+  seat_pods: 15
   seat_storage_gib: 30
   workload_repo: https://github.com/rhpds/launchpad.git
   workload_revision: 6936ee6b9d64df8ccda8902279b8cc3a1e4c0545
@@ -115,7 +114,7 @@ metadata:
   workload_gitops_ready: false
   workload_release_name: agentops
   workload_helm_values:
-    storageClass: nfs-storage
+    storageClass: launchpad-nfs-ephemeral
   workload_runtime_secret_name: agentops-runtime
   workload_runtime_secret_sources:
     POSTGRES_DB:
@@ -129,6 +128,9 @@ metadata:
       source: generated_password
       length: 32
     COMPLIANCE_DB_PASSWORD:
+      source: generated_password
+      length: 32
+    MLPIPELINE_PASSWORD:
       source: generated_password
       length: 32
     MIGRATION_DATABASE_URL:
@@ -179,7 +181,7 @@ metadata:
       source: model_endpoint
       model: nomic-embed-text-v1.5
     MLFLOW_TRACKING_URI:
-      value: https://mlflow.redhat-ods-applications.svc.cluster.local:8443
+      value: https://mlflow.redhat-ods-applications.svc.cluster.local:8443/mlflow
     MLFLOW_EXPERIMENT_NAME:
       value: mortgage-ai
     MLFLOW_WORKSPACE:

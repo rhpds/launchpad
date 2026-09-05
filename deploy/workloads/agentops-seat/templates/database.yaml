@@ -72,6 +72,10 @@ spec:
               command: ["/bin/sh", "-c", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"]
             initialDelaySeconds: 30
             periodSeconds: 10
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh", "-c", "chmod -R a+rwx /var/lib/postgresql/data || true"]
           resources:
             {{- toYaml .Values.resources.database | nindent 12 }}
           volumeMounts:

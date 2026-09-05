@@ -1,0 +1,36 @@
+apiVersion: mlflow.opendatahub.io/v1
+kind: MLflow
+metadata:
+  name: mlflow
+  namespace: redhat-ods-applications
+  labels:
+    app.kubernetes.io/name: mlflow
+    app.kubernetes.io/part-of: partner-ai-launchpad
+    launchpad.redhat.com/cluster-id: arena
+    launchpad.redhat.com/shared-service: "true"
+spec:
+  # Pilot configuration for the AgentOps one-seat gate. PostgreSQL must replace
+  # SQLite before the 25-seat AgentOps scale gate is allowed to run.
+  backendStoreUri: sqlite:////mlflow/mlflow.db
+  serveArtifacts: true
+  artifactsDestination: file:///mlflow/artifacts
+  replicas: 1
+  workers: 2
+  storage:
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 20Gi
+    storageClassName: launchpad-nfs-ephemeral
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      cpu: "2"
+      memory: 4Gi
+  workspaceLabelSelector:
+    matchExpressions:
+      - key: launchpad.redhat.com/session-id
+        operator: Exists

@@ -73,12 +73,12 @@ runtime:
   required_models:
     - granite-3.2-8b-tools
   seat_resources:
-    # Rounded reservation envelope measured from the Arena one-seat chart
-    # (1.73 CPU, 4.96 GiB, 13 pods, 30 GiB) plus one Showroom pod
-    # (0.115 CPU, 336 MiB). Re-measure after shared embedding is enabled.
-    cpu_millicores: 2000
-    memory_mib: 6144
-    pods: 14
+    # Rounded reservation envelope measured from the final Arena one-seat chart
+    # (2.08 CPU, 5.59 GiB, 14 workload pods including one completed job) plus
+    # one Showroom pod and scheduling margin. Re-measure at the five-seat gate.
+    cpu_millicores: 2500
+    memory_mib: 7168
+    pods: 15
     storage_gib: 30
   tabs:
     - id: openshift-console
@@ -118,6 +118,7 @@ runtime:
       POSTGRES_PASSWORD: {source: generated_password, length: 32}
       LENDING_DB_PASSWORD: {source: generated_password, length: 32}
       COMPLIANCE_DB_PASSWORD: {source: generated_password, length: 32}
+      MLPIPELINE_PASSWORD: {source: generated_password, length: 32}
       MIGRATION_DATABASE_URL:
         template: >-
           postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@mortgage-ai-db:5432/mortgage-ai
@@ -149,13 +150,13 @@ runtime:
         source: model_endpoint
         model: nomic-embed-text-v1.5
       MLFLOW_TRACKING_URI:
-        value: "https://mlflow.redhat-ods-applications.svc.cluster.local:8443"
+        value: "https://mlflow.redhat-ods-applications.svc.cluster.local:8443/mlflow"
       MLFLOW_EXPERIMENT_NAME: {value: mortgage-ai}
       MLFLOW_WORKSPACE: {source: namespace}
       MLFLOW_TRACKING_AUTH: {value: kubernetes}
       MLFLOW_TRACKING_INSECURE_TLS: {value: "true"}
     helm_values:
-      storageClass: nfs-storage
+      storageClass: launchpad-nfs-ephemeral
     routes:
       ui: mortgage-ai-ui-route
       grafana: grafana-route
@@ -170,9 +171,10 @@ certification:
   activation_blockers:
     - >-
       Repeat the one-seat run through the Launchpad provisioner. The pinned
-      chart, application agent path, DSPA, Grafana, and zero-residue Helm
-      reclaim were proven live on Arena, but the test did not create a
-      persisted Launchpad order, workload Application, or Showroom.
+      chart, application agent path, embeddings, shared MLflow trace, DSPA,
+      Grafana, and automatic zero-residue Helm reclaim were proven live on
+      Arena, but the test did not create a persisted Launchpad order, workload
+      Application, or Showroom.
     - >-
       Prove generated runtime Secret creation, retry preservation, model-key
       revocation, and Launchpad-driven reclaim live. The direct chart reclaim
@@ -189,15 +191,15 @@ certification:
       allowlisting, Showroom tab rewriting, WebSocket support, and origin
       escape rejection.
     - >-
-      Install and certify an Arena participant route for shared MLflow,
-      per-seat Grafana, and OpenShift Logging/Loki. OpenShift AI 3.5, a Ready
-      DataScienceCluster, user workload monitoring, and Data Science Pipelines
-      were confirmed live on 2026-09-04.
+      Certify the Arena participant route for shared MLflow and per-seat
+      Grafana, and install and certify OpenShift Logging/Loki. Shared MLflow
+      3.14.0, workspace-scoped write authorization, OpenShift AI 3.5, Data
+      Science Pipelines, and a seven-span AgentOps trace were confirmed live on
+      2026-09-05. Trusted external TLS is still RED.
     - >-
-      Re-run the AgentOps seat through Launchpad with the shared Arena Nomic
-      endpoint and prove all seeded knowledge-base chunks receive vectors.
-      The private cached endpoint and cluster-specific runtime injection are
-      live, but the application ingestion path has not yet been re-certified.
+      Replace shared MLflow SQLite with PostgreSQL and enable service-ca TLS
+      for the per-seat RHOAI pipeline MariaDB connection before promotion
+      beyond one seat.
     - >-
       Complete one-seat functional certification, including app, trace,
       metrics, logs, evaluation, Showroom, access isolation, and full reclaim.

@@ -6,14 +6,27 @@ Showroom-scale release gate. They are not blockers for completing the present
 
 ## Immediate release gate
 
-Visually certify one complete 25-seat operator workshop. Follow the matrix in
-`docs/oberon-workshop-readiness.md`, including representative browser journeys,
-terminal exercises, cluster Console/Topology, cross-seat isolation, and clean
-bulk reclaim.
+The dated release gate is now the September 17 Arena event candidate: 25
+AgentOps seats, 25 Serve LLMs seats, and 25 Building an AI Agent seats. Orders
+are staggered but all 75 participant environments remain active concurrently.
+The capacity contract, AgentOps 1 -> 5 -> 25 promotion path, exact-trio proof
+matrix, stop/go dates, and access boundary are defined in
+`docs/september-17-three-workshop-readiness.md`.
 
-Arena needs a browser-trusted wildcard certificate before it can satisfy this
-gate. The certificate and private key are infrastructure inputs and must be
-installed as Arena's default ingress certificate by a cluster administrator.
+The earlier three-workshop pilot proved the orchestration shape and both Intel
+guided labs at 25 seats. AgentOps is the critical path and must not be promoted
+past its measured live evidence. Public access remains a separate certification
+gate; internal Arena access is the September release baseline unless the public
+matrix is independently GREEN-live by Sep 15.
+
+As of September 5, the direct AgentOps component is GREEN for shared Nomic
+embeddings, MLflow workspace isolation and tracing, DSPA, the application
+journey, and automatic zero-residue reclaim. It remains RED as a Launchpad lab
+because order creation, Showroom, entitlement, participant routes, logging,
+and trusted TLS have not passed together. Shared MLflow must move from SQLite
+to PostgreSQL and the pipeline database must use service-ca TLS before scale.
+The measured event envelope is 525 participant pods, so the current two-worker
+500-pod ceiling cannot host the exact trio even from an empty starting point.
 
 ## Pathway 1: provisioning performance
 

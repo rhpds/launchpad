@@ -148,16 +148,18 @@ available:
 - OpenShift GitOps 1.21.4;
 - OpenShift AI 3.5.0 with a Ready `default-dsc`;
 - Data Science Pipelines support;
-- a managed MLflow operator and UI deployment, but no tracking server;
+- a supported shared MLflow 3.14.0 tracking server with workspace-scoped
+  authorization (installed and certified on 2026-09-05);
 - user workload monitoring; and
 - the Launchpad Keycloak route and embedded-console webhook.
 
 The live check and render/dry-run gates established the remaining blockers:
 
-- there is no shared `rh-ai`/MLflow participant route matching the Showroom
-  contract;
-- the shared Nomic embedding endpoint is live, but AgentOps knowledge-base
-  ingestion has not yet been re-run through a Launchpad-created seat;
+- the shared `rh-ai`/MLflow API and OAuth route are live, but the route's TLS
+  chain is not trusted by the external test client and its participant gateway
+  journey has not been certified;
+- the shared Nomic embedding endpoint and direct AgentOps ingestion are live,
+  but they have not yet been exercised through a Launchpad-created seat;
 - Arena participant routes present a certificate chain that the external test
   client does not trust;
 - OpenShift Logging/Loki is not installed;
@@ -205,19 +207,19 @@ these functional results:
 - both participant workload Routes returned 200 when tested with the Arena CA
   bypassed.
 
-The measured chart footprint was 1.73 CPU, 4,964 MiB memory, 13 pods including
-the completed bootstrap Job, and 30 GiB storage. Adding the measured Showroom
-pod and rounding for reservation gives 2 CPU, 6 GiB, 14 pods, and 30 GiB per
-seat. A 25-seat order therefore reserves about 50 CPU, 150 GiB memory, 350 pod
-slots, and 750 GiB storage before safety headroom.
+The first measured chart footprint was 1.73 CPU, 4,964 MiB memory, 13 pods
+including the completed bootstrap Job, and 30 GiB storage. The final integrated
+topology with its supported per-seat RHOAI pipeline MariaDB measured 2.08 CPU,
+5,720 MiB memory, 14 workload pods including one completed Job, and three PVCs.
+Adding one Showroom pod and scheduling margin gives a reservation of 2.5 CPU,
+7 GiB, 15 pods, and 30 GiB per seat. A 25-seat order therefore reserves 62.5
+CPU, 175 GiB memory, 375 pod slots, and 750 GiB storage before safety headroom.
 
-This run is not a completed participant certification. No shared embedding
-service was available, so all 41 KB chunks were stored without vectors. There
-was no MLflow tracking server, the route TLS chain was not trusted by the test
-client, and the workload was deployed directly rather than through a Launchpad
-Showroom/entitlement order. The disposable release and its 123 namespaced
-resources were reclaimed in 64 seconds, leaving zero namespace, labeled
-resource, or Argo Application residue.
+The initial run was not a completed participant certification. Its missing
+embedding and MLflow components were subsequently corrected and re-tested as
+described below. The route TLS chain remains untrusted by the external test
+client, and all component runs were deployed directly rather than through a
+Launchpad Showroom/entitlement order.
 
 ## Shared embedding endpoint result
 
@@ -252,3 +254,37 @@ are GREEN-live.
 The shared embedding component, including the RED/GREEN failures, persistent
 cache restart, 25-request burst, and isolation result, is captured in
 `evidence/agentops-shared-embedding-live-2026-09-05.json`.
+
+The follow-up seat successfully embedded all 41 seeded chunks at 768
+dimensions, returned the expected FHA sections from pgvector semantic search,
+and completed a real WebSocket agent request. That run also found that Arena's
+general `nfs-storage` class retains PVs and backing directories. AgentOps now
+uses the dedicated `launchpad-nfs-ephemeral` StorageClass, whose Delete/no-
+archive behavior passed a live PVC, PV, and NFS-directory cleanup probe. The
+run and the corrected schedulable-worker capacity boundary are recorded in
+`evidence/agentops-embedding-ingestion-live-2026-09-05.json`.
+
+The next integrated component run installed the supported MLflow CR in
+`redhat-ods-applications`. MLflow 3.14.0 became Available, accepted a write from
+an assigned Launchpad namespace, rejected a cross-workspace write with 403,
+and leaked no named experiments through a cross-workspace search. The AgentOps
+application recorded one successful seven-span trace while DSPA was Ready,
+41/41 embeddings remained present, and a real agent exchange completed. The
+final chart topology also reclaimed automatically in 59 seconds with zero
+namespace, PV, NFS-directory, or Application residue and no manual repair.
+
+This evidence is still `partial`, not a one-seat release certificate. Shared
+MLflow uses SQLite and must move to PostgreSQL before scale; the per-seat RHOAI
+pipeline MariaDB connection needs service-ca TLS; OpenShift Logging is not
+installed; and the Launchpad order, Showroom, runtime Secret, entitlement,
+participant routes, and Launchpad reclaim were not run. The exact result is in
+`evidence/agentops-mlflow-live-2026-09-05.json`.
+
+The capacity snapshot is RED for the September 17 exact trio. Arena has 1,250
+aggregate pod slots, but only 500 are on the two schedulable workers; the other
+750 belong to three `NoSchedule` control-plane nodes. With 193 pods already on
+the workers, the three event workshops would require 718 slots before the
+required safety margin and 823 with the 20 percent event protection. The
+recommended path is two additional 250-pod workers.
+Targeted Launchpad scheduling on control-plane nodes remains a pilot-only
+alternative that requires explicit risk certification.

@@ -221,6 +221,52 @@ def test_agentops_database_initializes_runtime_roles_before_migration():
     assert migration_database["valueFrom"]["secretKeyRef"]["key"] == "MIGRATION_DATABASE_URL"
 
 
+def test_agentops_owns_a_supported_dspa_mariadb_and_normalizes_nfs_permissions():
+    _, documents = _render()
+    resources = {(document["kind"], document["metadata"]["name"]): document for document in documents}
+
+    dspa = resources[("DataSciencePipelinesApplication", "dspa")]
+    assert "mariaDB" not in dspa["spec"]["database"]
+    assert dspa["spec"]["database"]["customExtraParams"] == '{"tls":"false"}'
+    assert dspa["spec"]["database"]["externalDB"] == {
+        "host": "agentops-pipeline-db.launchpad-agentops-seat-1.svc.cluster.local",
+        "port": "3306",
+        "pipelineDBName": "mlpipeline",
+        "username": "mlpipeline",
+        "passwordSecret": {
+            "name": "agentops-runtime",
+            "key": "MLPIPELINE_PASSWORD",
+        },
+    }
+
+    postgres = resources[("StatefulSet", "mortgage-ai-db")]
+    postgres_container = postgres["spec"]["template"]["spec"]["containers"][0]
+    assert postgres_container["lifecycle"]["preStop"]["exec"]["command"] == [
+        "/bin/sh",
+        "-c",
+        "chmod -R a+rwx /var/lib/postgresql/data || true",
+    ]
+
+    minio = resources[("Deployment", "minio")]
+    minio_container = minio["spec"]["template"]["spec"]["containers"][0]
+    assert minio_container["lifecycle"]["preStop"]["exec"]["command"] == [
+        "/bin/sh",
+        "-c",
+        "chmod -R a+rwx /data || true",
+    ]
+
+    pipeline_db = resources[("Deployment", "agentops-pipeline-db")]
+    pipeline_container = pipeline_db["spec"]["template"]["spec"]["containers"][0]
+    assert pipeline_container["image"].startswith("registry.redhat.io/rhel9/mariadb-105@sha256:")
+    assert pipeline_container["lifecycle"]["preStop"]["exec"]["command"] == [
+        "/bin/sh",
+        "-c",
+        "chmod -R a+rwx /var/lib/mysql || true",
+    ]
+    pipeline_pvc = resources[("PersistentVolumeClaim", "pipeline-db-data")]
+    assert pipeline_pvc["spec"]["storageClassName"] == "launchpad-nfs-ephemeral"
+
+
 def test_agentops_grafana_can_read_only_its_seat_metrics():
     _, documents = _render()
     bindings = [document for document in documents if document["kind"] == "RoleBinding"]
@@ -237,6 +283,43 @@ def test_agentops_grafana_can_read_only_its_seat_metrics():
         {
             "kind": "ServiceAccount",
             "name": "agentops-grafana",
+            "namespace": "launchpad-agentops-seat-1",
+        }
+    ]
+
+
+def test_agentops_api_has_only_namespace_scoped_mlflow_permissions():
+    _, documents = _render()
+    roles = {
+        document["metadata"]["name"]: document
+        for document in documents
+        if document["kind"] == "Role"
+    }
+    bindings = {
+        document["metadata"]["name"]: document
+        for document in documents
+        if document["kind"] == "RoleBinding"
+    }
+
+    role = roles["agentops-mlflow-client"]
+    assert role["rules"] == [
+        {
+            "apiGroups": ["mlflow.kubeflow.org"],
+            "resources": ["experiments", "datasets", "registeredmodels"],
+            "verbs": ["get", "list", "create", "update", "delete"],
+        }
+    ]
+
+    binding = bindings["agentops-mlflow-client"]
+    assert binding["roleRef"] == {
+        "apiGroup": "rbac.authorization.k8s.io",
+        "kind": "Role",
+        "name": "agentops-mlflow-client",
+    }
+    assert binding["subjects"] == [
+        {
+            "kind": "ServiceAccount",
+            "name": "agentops-seat",
             "namespace": "launchpad-agentops-seat-1",
         }
     ]
