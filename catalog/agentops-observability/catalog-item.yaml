@@ -114,7 +114,7 @@ metadata:
   workshop_provision_concurrency: 4
   seat_storage_gib: 30
   workload_repo: https://github.com/rhpds/launchpad.git
-  workload_revision: e177a2fa92533d23b7e7846c93efe08a9a63493b
+  workload_revision: 6b1be6261cf2e5a0d1ec4340d4b4d5bffd9d40d4
   workload_deploy_type: helm
   workload_deployment_scope: seat
   workload_deploy_path: deploy/workloads/agentops-seat

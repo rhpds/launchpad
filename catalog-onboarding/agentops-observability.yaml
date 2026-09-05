@@ -22,7 +22,7 @@ sources:
     start_path: content-agentops-observability
   workload:
     repo_url: "https://github.com/rhpds/launchpad.git"
-    revision: "e177a2fa92533d23b7e7846c93efe08a9a63493b"
+    revision: "6b1be6261cf2e5a0d1ec4340d4b4d5bffd9d40d4"
     deploy_path: deploy/workloads/agentops-seat
 
 references:
