@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import os
 from unittest.mock import MagicMock, patch
+from types import SimpleNamespace
 
 import pytest
 
@@ -193,9 +194,18 @@ class TestWorkshopPreflight:
 
 class TestCapacityGuard:
     @staticmethod
-    def _node(cpu="10", memory="20Gi", pods="100"):
+    def _node(
+        cpu="10", memory="20Gi", pods="100", *, name="worker-1",
+        ready=True, taints=None,
+    ):
         node = MagicMock()
+        node.metadata.name = name
         node.status.allocatable = {"cpu": cpu, "memory": memory, "pods": pods}
+        node.status.conditions = [
+            SimpleNamespace(type="Ready", status="True" if ready else "False")
+        ]
+        node.spec.unschedulable = False
+        node.spec.taints = taints or []
         return node
 
     @staticmethod
@@ -205,7 +215,44 @@ class TestCapacityGuard:
         container = MagicMock()
         container.resources.requests = {"cpu": cpu, "memory": memory}
         pod.spec.containers = [container]
+        pod.spec.node_name = "worker-1"
         return pod
+
+    def test_control_plane_and_unhealthy_nodes_do_not_inflate_capacity(self):
+        item = _make_catalog_item()
+        item.metadata = {
+            "seat_cpu_millicores": 100,
+            "seat_memory_mib": 100,
+            "seat_pods": 1,
+        }
+        svc = _make_service(catalog_item=item)
+        workshop = Workshop(
+            tenant_id="test-tenant", catalog_item_id="demo-a",
+            num_users=10, ttl="4h",
+        )
+        master_taint = SimpleNamespace(
+            key="node-role.kubernetes.io/master", effect="NoSchedule"
+        )
+        with (
+            patch.dict(os.environ, {
+                "LAUNCHPAD_MODE": "openshift",
+                "WORKSHOP_CAPACITY_HEADROOM_PCT": "10",
+            }, clear=False),
+            patch("kubernetes.config.load_incluster_config"),
+            patch("kubernetes.client.CoreV1Api") as core_api,
+        ):
+            core_api.return_value.list_node.return_value.items = [
+                self._node(pods="10", name="worker-1"),
+                self._node(pods="1000", name="master-1", taints=[master_taint]),
+                self._node(pods="1000", name="worker-down", ready=False),
+            ]
+            core_api.return_value.list_pod_for_all_namespaces.return_value.items = []
+
+            can, reason = svc.check_workshop_capacity(workshop)
+
+        assert can is False
+        assert "supports 9" in reason
+        assert "Pods: 9" in reason
 
     def test_workshop_checks_capacity(self):
         svc = _make_service()

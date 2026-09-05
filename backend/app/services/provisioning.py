@@ -1585,9 +1585,12 @@ class ProvisioningService:
             pending_indexes.append(i)
         self._save_workshop(workshop)
 
-        concurrency = max(
-            1, int(os.environ.get("WORKSHOP_PROVISION_CONCURRENCY", "5"))
-        )
+        catalog_item = self.catalog.get_item(workshop.catalog_item_id)
+        catalog_metadata = catalog_item.metadata if catalog_item else {}
+        concurrency = max(1, int(catalog_metadata.get(
+            "workshop_provision_concurrency",
+            os.environ.get("WORKSHOP_PROVISION_CONCURRENCY", "5"),
+        )))
         with ThreadPoolExecutor(max_workers=concurrency) as executor:
             futures = {
                 executor.submit(self._provision_workshop_seat, workshop, i): i
@@ -1779,6 +1782,48 @@ class ProvisioningService:
             })
         return users
 
+    @staticmethod
+    def _workshop_schedulable_nodes(nodes: list) -> list:
+        """Return nodes that ordinary, untolerated workshop pods can use.
+
+        Control-plane allocatable resources are not workshop capacity, and a
+        NotReady or cordoned worker must stop contributing immediately.
+        """
+        eligible = []
+        for node in nodes:
+            spec = getattr(node, "spec", None)
+            if bool(getattr(spec, "unschedulable", False)):
+                continue
+            taints = list(getattr(spec, "taints", None) or [])
+            if any(
+                str(getattr(taint, "effect", "")) in {"NoSchedule", "NoExecute"}
+                for taint in taints
+            ):
+                continue
+            conditions = list(getattr(getattr(node, "status", None), "conditions", None) or [])
+            ready = next(
+                (
+                    str(getattr(condition, "status", "")) == "True"
+                    for condition in conditions
+                    if str(getattr(condition, "type", "")) == "Ready"
+                ),
+                True,
+            )
+            if not ready:
+                continue
+            eligible.append(node)
+        return eligible
+
+    @staticmethod
+    def _pods_using_nodes(pods: list, node_names: set[str]) -> list:
+        """Count demand on eligible nodes plus pending unscheduled demand."""
+        selected = []
+        for pod in pods:
+            node_name = getattr(getattr(pod, "spec", None), "node_name", None)
+            if not node_name or str(node_name) in node_names:
+                selected.append(pod)
+        return selected
+
     def get_cluster_fleet_health(self) -> list[dict]:
         if not self.cluster_registry or not self.cluster_client_factory:
             return []
@@ -1789,8 +1834,15 @@ class ProvisioningService:
             workshops = [w for w in self._workshops.values() if w.cluster_ref == target.cluster_id and w.status.value not in {"completed", "completed_with_errors", "failed"}]
             try:
                 core = self._target_clients(target.cluster_id).core
-                nodes = core.list_node().items
-                pods = [p for p in core.list_pod_for_all_namespaces().items if p.status.phase not in ("Succeeded", "Failed")]
+                nodes = self._workshop_schedulable_nodes(core.list_node().items)
+                node_names = {str(node.metadata.name) for node in nodes}
+                pods = self._pods_using_nodes(
+                    [
+                        p for p in core.list_pod_for_all_namespaces().items
+                        if p.status.phase not in ("Succeeded", "Failed")
+                    ],
+                    node_names,
+                )
                 cpu = sum(self._cpu_millicores((n.status.allocatable or {}).get("cpu")) for n in nodes)
                 memory = sum(self._memory_mib((n.status.allocatable or {}).get("memory")) for n in nodes)
                 pod_slots = sum(int((n.status.allocatable or {}).get("pods", 0)) for n in nodes)
@@ -1803,10 +1855,10 @@ class ProvisioningService:
                 results.append({
                     "cluster_id": target.cluster_id,
                     "cluster_name": target.display_name,
-                    "health_status": "healthy",
-                    "healthy": True,
-                    "eligible": True,
-                    "reason": "eligible",
+                    "health_status": "healthy" if nodes else "degraded",
+                    "healthy": bool(nodes),
+                    "eligible": bool(nodes),
+                    "reason": "eligible" if nodes else "no schedulable Ready worker nodes",
                     "available_cpu_millicores": max(0, cpu - used_cpu),
                     "available_memory_mib": max(0, memory - used_memory),
                     "available_pods": max(0, pod_slots - len(pods)),
@@ -1906,16 +1958,20 @@ class ProvisioningService:
 
     def _workshop_capacity(self, v1, workshop: Workshop) -> dict:
         total_cpu_m = total_mem_mi = total_pods = 0
-        for node in v1.list_node().items:
+        nodes = self._workshop_schedulable_nodes(v1.list_node().items)
+        node_names = {str(node.metadata.name) for node in nodes}
+        for node in nodes:
             alloc = node.status.allocatable or {}
             total_cpu_m += self._cpu_millicores(alloc.get("cpu"))
             total_mem_mi += self._memory_mib(alloc.get("memory"))
             total_pods += int(alloc.get("pods", 0))
 
         requested_cpu_m = requested_mem_mi = active_pods = 0
-        for pod in v1.list_pod_for_all_namespaces().items:
-            if pod.status.phase in ("Succeeded", "Failed"):
-                continue
+        active = [
+            pod for pod in v1.list_pod_for_all_namespaces().items
+            if pod.status.phase not in ("Succeeded", "Failed")
+        ]
+        for pod in self._pods_using_nodes(active, node_names):
             active_pods += 1
             for container in pod.spec.containers or []:
                 requests = container.resources.requests or {}

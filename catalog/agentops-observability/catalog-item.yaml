@@ -74,6 +74,7 @@ metadata:
   showroom_content_ref: 59563b0a77252e8b91077c30c23ab524a8402bce
   showroom_content_playbook: site-agentops-observability.yml
   showroom_content_start_path: content-agentops-observability
+  showroom_terminal_storage: false
   showroom_tabs:
   - id: openshift-console
     title: OpenShift Console
@@ -104,7 +105,13 @@ metadata:
   inference_endpoint: litellm
   seat_cpu_millicores: 2500
   seat_memory_mib: 7168
-  seat_pods: 15
+  # Includes transient Argo/RHOAI rollout and bootstrap Job headroom. The
+  # steady-state seat uses 13 running pods, but capacity must protect startup.
+  seat_pods: 17
+  # Arena's scheduler favors rhgnr1 because the LLM replicas reserve most of
+  # gnr2's CPU. Limit each provisioning wave so rollout surge stays below the
+  # worker pod ceiling while later seats naturally spill to gnr2.
+  workshop_provision_concurrency: 4
   seat_storage_gib: 30
   workload_repo: https://github.com/rhpds/launchpad.git
   workload_revision: e177a2fa92533d23b7e7846c93efe08a9a63493b

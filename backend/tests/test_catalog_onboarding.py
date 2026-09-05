@@ -91,9 +91,10 @@ def test_agentops_intake_captures_the_large_lab_runtime_contract():
     assert runtime["seat_resources"] == {
         "cpu_millicores": 2500,
         "memory_mib": 7168,
-        "pods": 15,
+        "pods": 17,
         "storage_gib": 30,
     }
+    assert runtime["workshop_provision_concurrency"] == 4
     assert set(runtime["required_capabilities"]) >= {
         "openshift",
         "showroom",
@@ -279,3 +280,16 @@ def test_validator_rejects_incomplete_runtime_secret_and_identity_contract():
     assert report["validation_status"] == "fail"
     assert any("identity_value_path" in error for error in report["errors"])
     assert any("runtime Secret name and value path" in error for error in report["errors"])
+
+
+def test_validator_rejects_invalid_workshop_provision_concurrency():
+    intake = load_intake(INTAKE_PATH)
+    intake["runtime"]["workshop_provision_concurrency"] = 0
+
+    report = validate_intake(intake)
+
+    assert report["validation_status"] == "fail"
+    assert any(
+        "workshop_provision_concurrency" in error
+        for error in report["errors"]
+    )

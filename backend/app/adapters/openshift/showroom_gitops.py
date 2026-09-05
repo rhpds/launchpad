@@ -91,6 +91,7 @@ class ShowroomSeat:
     tool_tabs: tuple[ShowroomToolTab, ...] = ()
     session_id: str = ""
     tenant_id: str = ""
+    terminal_storage_enabled: bool = True
 
     def __post_init__(self) -> None:
         if not self.content_ref.strip():
@@ -180,6 +181,8 @@ def build_showroom_application(
         },
         "git_cloner": {"image": SHOWROOM_GIT_CLONER_IMAGE},
     }
+    if not seat.terminal_storage_enabled:
+        values["terminal"]["storage"] = {"setup": "false"}
     if seat.journey == "openshift-operators" or seat.content_only:
         # Operator workshops need an oc terminal, not a heavyweight development
         # workstation. Keep each seat ephemeral and small enough for cohorts.

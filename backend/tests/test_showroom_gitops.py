@@ -139,6 +139,26 @@ def test_launchpad_terminal_relaxes_home_permissions_before_persistent_volume_re
     assert "trap cleanup_home_for_reclaim EXIT" in entrypoint
 
 
+def test_ephemeral_showroom_terminal_does_not_allocate_nfs_storage():
+    app = build_showroom_application(
+        ShowroomSeat(
+            namespace="launchpad-agentops-seat-1",
+            workshop_id="workshop-1",
+            seat_id="seat-1",
+            participant_id="participant-1",
+            workspace_url="https://app.example.com",
+            content_repo_url="https://github.com/rhpds/launchpad.git",
+            content_ref="a" * 40,
+            apps_domain="apps.arena.example.com",
+            terminal_storage_enabled=False,
+        )
+    )
+
+    values = yaml.safe_load(app["spec"]["source"]["helm"]["values"])
+
+    assert values["terminal"]["storage"] == {"setup": "false"}
+
+
 def test_content_lab_receives_launchpad_runtime_values_and_named_workspace_tab():
     app = build_showroom_application(
         ShowroomSeat(

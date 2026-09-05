@@ -84,6 +84,23 @@ spec:
             - name: init-scripts
               mountPath: /docker-entrypoint-initdb.d
               readOnly: true
+        - name: nfs-permissions-keeper
+          image: {{ .Values.images.postgres | quote }}
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh", "-c"]
+          args:
+            - >-
+              while true; do
+                chmod -R a+rwX /var/lib/postgresql/data 2>/dev/null || true;
+                sleep 15;
+              done
+          securityContext:
+            {{- include "agentops.containerSecurityContext" . | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources.permissionKeeper | nindent 12 }}
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
       volumes:
         - name: init-scripts
           configMap:

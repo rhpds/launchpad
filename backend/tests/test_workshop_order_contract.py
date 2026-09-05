@@ -711,6 +711,39 @@ def test_workshop_provisioning_respects_bounded_concurrency():
     assert peak == 2
 
 
+def test_workshop_provisioning_uses_catalog_specific_concurrency():
+    service = ProvisioningService()
+    item = service.catalog.get_item("inference-overdrive-quickstart")
+    item.metadata = {**item.metadata, "workshop_provision_concurrency": 2}
+    workshop = Workshop(
+        tenant_id="catalog-concurrency-tenant",
+        catalog_item_id=item.catalog_item_id,
+        num_users=4,
+    )
+    original = service._provision_workshop_seat
+    lock = threading.Lock()
+    active = 0
+    peak = 0
+
+    def tracked(target_workshop, index):
+        nonlocal active, peak
+        with lock:
+            active += 1
+            peak = max(peak, active)
+        try:
+            time.sleep(0.03)
+            return original(target_workshop, index)
+        finally:
+            with lock:
+                active -= 1
+
+    with patch.object(service, "_provision_workshop_seat", side_effect=tracked):
+        provisioned = service.provision_workshop(workshop)
+
+    assert provisioned.status == WorkshopStatus.READY
+    assert peak == 2
+
+
 def test_workshop_reclaim_respects_bounded_concurrency():
     service = ProvisioningService()
     workshop = service.provision_workshop(Workshop(

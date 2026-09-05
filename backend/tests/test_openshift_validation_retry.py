@@ -1,4 +1,6 @@
 from unittest.mock import Mock
+from types import SimpleNamespace
+from unittest.mock import patch
 
 from app.adapters.openshift.validation import OpenShiftValidationAdapter
 from app.domain.enums import ValidationResultStatus
@@ -45,3 +47,53 @@ def test_does_not_retry_non_transient_validation_failure():
 
     assert results[0].result == ValidationResultStatus.FAIL
     adapter._validate_once.assert_called_once()
+
+
+def test_successfully_completed_pod_is_valid():
+    """Finite bootstrap Jobs must not make an otherwise ready lab fail."""
+    adapter = OpenShiftValidationAdapter.__new__(OpenShiftValidationAdapter)
+    adapter._core_v1 = Mock()
+    adapter._core_v1.list_namespaced_pod.return_value.items = [
+        SimpleNamespace(
+            metadata=SimpleNamespace(name="minio-bootstrap-abc12"),
+            status=SimpleNamespace(phase="Succeeded", container_statuses=[]),
+        )
+    ]
+
+    results = adapter._check_pod_status("s1", "lab-ns")
+
+    assert len(results) == 1
+    assert results[0].result == ValidationResultStatus.PASS
+    assert "completed successfully" in results[0].message
+
+
+def test_running_unready_pod_is_a_transient_failure():
+    adapter = OpenShiftValidationAdapter.__new__(OpenShiftValidationAdapter)
+    adapter._sleep = Mock()
+    adapter._validation_attempts = 2
+    adapter._validation_interval = 0
+    adapter._validate_once = Mock(side_effect=[
+        [_result(ValidationResultStatus.FAIL, "Pod api is running but not all containers ready")],
+        [_result(ValidationResultStatus.PASS, "Pod api is running and all containers ready")],
+    ])
+
+    results = adapter.validate(_session())
+
+    assert results[0].result == ValidationResultStatus.PASS
+    assert adapter._validate_once.call_count == 2
+
+
+def test_live_validation_window_is_configurable_for_scaled_workshops():
+    clients = SimpleNamespace(core=Mock())
+
+    with patch.dict(
+        "os.environ",
+        {
+            "OPENSHIFT_VALIDATION_ATTEMPTS": "61",
+            "OPENSHIFT_VALIDATION_INTERVAL_SECONDS": "5",
+        },
+    ):
+        adapter = OpenShiftValidationAdapter(clients=clients)
+
+    assert adapter._validation_attempts == 61
+    assert adapter._validation_interval == 5

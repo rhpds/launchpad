@@ -47,6 +47,7 @@ runtime:
   namespace_slug: agentops
   deployment_type: helm
   deployment_scope: seat
+  showroom_terminal_storage: false
   provisioner_refs:
     - helm-workload
     - showroom
@@ -75,12 +76,13 @@ runtime:
     - granite-3.2-8b-tools
   seat_resources:
     # Rounded reservation envelope measured from the final Arena one-seat chart
-    # (2.08 CPU, 5.59 GiB, 14 workload pods including one completed job) plus
-    # one Showroom pod and scheduling margin. Re-measure at the five-seat gate.
+    # (2.08 CPU, 5.59 GiB, 13 steady running pods) plus transient RHOAI rollout
+    # and bootstrap Job headroom. Re-measure at the five-seat gate.
     cpu_millicores: 2500
     memory_mib: 7168
-    pods: 15
+    pods: 17
     storage_gib: 30
+  workshop_provision_concurrency: 4
   tabs:
     - id: openshift-console
       title: OpenShift Console

@@ -83,6 +83,9 @@ def build_catalog_item(intake: dict[str, Any]) -> dict[str, Any]:
             "showroom_content_ref": showroom["revision"],
             "showroom_content_playbook": showroom["playbook"],
             "showroom_content_start_path": showroom["start_path"],
+            "showroom_terminal_storage": bool(
+                runtime.get("showroom_terminal_storage", True)
+            ),
             "showroom_tabs": runtime["tabs"],
             "required_models": runtime["required_models"],
             "inference_endpoint": runtime.get("inference_endpoint", "litellm"),
@@ -90,6 +93,9 @@ def build_catalog_item(intake: dict[str, Any]) -> dict[str, Any]:
             "seat_memory_mib": resources["memory_mib"],
             "seat_pods": resources["pods"],
             "seat_storage_gib": resources["storage_gib"],
+            "workshop_provision_concurrency": int(
+                runtime.get("workshop_provision_concurrency", 5)
+            ),
             "workload_repo": workload["repo_url"],
             "workload_revision": workload["revision"],
             "workload_deploy_type": runtime["deployment_type"],
@@ -179,6 +185,9 @@ def _validate_contract(intake: dict[str, Any], errors: list[str]) -> None:
         errors.append("runtime.required_models must be a list")
     if runtime.get("deployment_scope", "seat") not in {"seat", "workshop"}:
         errors.append("runtime.deployment_scope must be seat or workshop")
+    concurrency = runtime.get("workshop_provision_concurrency", 5)
+    if not isinstance(concurrency, int) or concurrency < 1:
+        errors.append("runtime.workshop_provision_concurrency must be a positive integer")
     workload_contract = runtime.get("workload", {})
     if workload_contract and not isinstance(workload_contract, dict):
         errors.append("runtime.workload must be a mapping")

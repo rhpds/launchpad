@@ -1,0 +1,105 @@
+{
+  "evidence_id": "EDD-AGENTOPS-FIVE-SEAT-RED-LIVE-20260905",
+  "captured_at": "2026-09-05T12:20:30Z",
+  "result": "RED-live",
+  "cluster": "arena",
+  "catalog_item_id": "agentops-observability",
+  "workshop_id": "7955da19-d03b-4c88-9d4a-dfaa38a06237",
+  "deployed_source_commit": "9289ca81542e429e2ddef52d14ae153a7964e713",
+  "deployed_backend_digest": "sha256:326e75a5b03e92b4b81a9f98daf35aa15a1a1ddcbd036803fdc16a4f1e68497c",
+  "workload_revision": "e177a2fa92533d23b7e7846c93efe08a9a63493b",
+  "timeline": {
+    "requested_at": "2026-09-05T11:46:21Z",
+    "provisioning_started_at": "2026-09-05T11:46:22Z",
+    "last_seat_failed_at": "2026-09-05T11:55:36Z",
+    "reclaim_requested_at": "2026-09-05T12:04:30Z",
+    "zero_residue_verified_at": "2026-09-05T12:20:30Z"
+  },
+  "outcome": {
+    "seats_requested": 5,
+    "seats_ready": 0,
+    "seats_failed": 5,
+    "workshop_status_after_provisioning": "failed",
+    "workshop_status_after_reclaim": "completed",
+    "promotion_gate_passed": false
+  },
+  "observations": {
+    "reported_capacity_before_fix": 40,
+    "reported_capacity_was_valid": false,
+    "rhgnr1_peak_active_pods": 250,
+    "gnr2_observed_active_pods": 47,
+    "rhgnr1_became_not_ready": true,
+    "node_and_dns_connectivity_outages_observed": true,
+    "seat_restart_counts_at_failure": [11, 9, 7, 5, 5],
+    "workload_applications_synced": 5,
+    "showroom_applications_synced": 5,
+    "eventual_healthy_workload_applications": 5,
+    "eventual_healthy_showroom_applications": 4,
+    "successful_bootstrap_jobs_were_present": true,
+    "nfs_permission_failures_during_reclaim": true
+  },
+  "root_causes": [
+    {
+      "id": "AGENTOPS-5-RED-001",
+      "finding": "Capacity summed allocatable resources from three NoSchedule control-plane nodes and therefore overstated participant pod capacity."
+    },
+    {
+      "id": "AGENTOPS-5-RED-002",
+      "finding": "Five simultaneous heavy-seat rollouts were packed onto rhgnr1 until its 250-pod limit, coinciding with probe failures, restarts, and a node/network outage."
+    },
+    {
+      "id": "AGENTOPS-5-RED-003",
+      "finding": "The pod validator failed successful completed Jobs and allowed Running-but-unready pods as warnings."
+    },
+    {
+      "id": "AGENTOPS-5-RED-004",
+      "finding": "NFS reclaim could not traverse restrictive Showroom cache and PostgreSQL data directories after the node interruption."
+    }
+  ],
+  "red_green_matrix": [
+    {
+      "id": "AGENTOPS-5-CAPACITY",
+      "red": "NoSchedule and NotReady nodes contributed to workshop capacity.",
+      "green_local": "Capacity and fleet-health calculations include only Ready, schedulable, untainted nodes and demand assigned to those nodes.",
+      "green_live": "pending rerun"
+    },
+    {
+      "id": "AGENTOPS-5-VALIDATION",
+      "red": "Succeeded bootstrap Jobs failed validation and Running unready pods did not fail it.",
+      "green_local": "Succeeded pods pass; Running unready pods fail transiently and retry through a configurable live window.",
+      "green_live": "pending rerun"
+    },
+    {
+      "id": "AGENTOPS-5-BURST",
+      "red": "Five simultaneous seats exhausted one worker's pod slots.",
+      "green_local": "AgentOps declares 17 peak pods per seat and a workload-specific provisioning concurrency of four.",
+      "green_live": "pending rerun"
+    },
+    {
+      "id": "AGENTOPS-5-CLEANUP",
+      "red": "Five Released NFS volumes required ownership-aware permission normalization and cleanup exceeded ten minutes.",
+      "green_local": "AgentOps Showroom home storage is ephemeral and PostgreSQL continuously normalizes persistent directory permissions.",
+      "green_live": "pending rerun"
+    }
+  ],
+  "cleanup": {
+    "normal_workshop_reclaim_linked_all_five_persisted_sessions": true,
+    "remaining_namespaces": 0,
+    "remaining_argocd_applications": 0,
+    "remaining_persistent_volumes": 0,
+    "remaining_temporary_cleanup_pods": 0,
+    "within_ten_minute_slo": false
+  },
+  "test_evidence": {
+    "red_tests_observed_before_implementation": true,
+    "focused_green_tests": 20,
+    "applicable_regression_tests_passed": 986,
+    "local_runtime_tests_deselected": 13
+  },
+  "release_decision": {
+    "catalog_max_workshop_seats": 1,
+    "five_seat_gate": "not certified",
+    "next_action": "Deploy remediations and repeat the controlled five-seat Arena certification."
+  },
+  "contains_plaintext_credentials": false
+}

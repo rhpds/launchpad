@@ -268,6 +268,12 @@ def test_agentops_owns_a_supported_dspa_mariadb_and_normalizes_nfs_permissions()
         "-c",
         "chmod -R a+rwx /var/lib/postgresql/data || true",
     ]
+    permission_keeper = postgres["spec"]["template"]["spec"]["containers"][1]
+    assert permission_keeper["name"] == "nfs-permissions-keeper"
+    assert permission_keeper["volumeMounts"] == [
+        {"name": "postgres-data", "mountPath": "/var/lib/postgresql/data"}
+    ]
+    assert "chmod -R a+rwX /var/lib/postgresql/data" in permission_keeper["args"][0]
 
     minio = resources[("Deployment", "minio")]
     minio_container = minio["spec"]["template"]["spec"]["containers"][0]

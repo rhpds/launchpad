@@ -9,6 +9,14 @@ spec:
     spec:
       containers:
         - name: backend
+          env:
+            # Scaled operator workshops can queue transient rollout pods while
+            # RHOAI reconciles. Retry only transient readiness failures for up
+            # to five minutes; hard failures still return immediately.
+            - name: OPENSHIFT_VALIDATION_ATTEMPTS
+              value: "61"
+            - name: OPENSHIFT_VALIDATION_INTERVAL_SECONDS
+              value: "5"
           volumeMounts:
             - name: cluster-targets
               mountPath: /etc/launchpad

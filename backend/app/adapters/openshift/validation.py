@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import List
+import os
 import time
 
 import httpx
@@ -40,8 +41,12 @@ class OpenShiftValidationAdapter:
           self._core_v1 = client.CoreV1Api()
         else:
           self._core_v1 = clients.core
-        self._validation_attempts = 13
-        self._validation_interval = 5
+        self._validation_attempts = max(
+            1, int(os.environ.get("OPENSHIFT_VALIDATION_ATTEMPTS", "13"))
+        )
+        self._validation_interval = max(
+            0, int(os.environ.get("OPENSHIFT_VALIDATION_INTERVAL_SECONDS", "5"))
+        )
         self._sleep = time.sleep
 
     def validate(self, session: LabSession) -> List[ValidationResult]:
@@ -52,6 +57,7 @@ class OpenShiftValidationAdapter:
                 result.result == ValidationResultStatus.FAIL
                 and (
                     "phase Pending" in result.message
+                    or "running but not all containers ready" in result.message
                     or "returned 502" in result.message
                     or "returned 503" in result.message
                     or "returned 504" in result.message
@@ -120,11 +126,14 @@ class OpenShiftValidationAdapter:
                     else False
                 )
 
-                if phase == "Running" and all_ready:
+                if phase == "Succeeded":
+                    status = ValidationResultStatus.PASS
+                    message = f"Pod {pod_name} completed successfully"
+                elif phase == "Running" and all_ready:
                     status = ValidationResultStatus.PASS
                     message = f"Pod {pod_name} is running and all containers ready"
                 elif phase == "Running":
-                    status = ValidationResultStatus.WARN
+                    status = ValidationResultStatus.FAIL
                     message = (
                         f"Pod {pod_name} is running but not all containers ready"
                     )

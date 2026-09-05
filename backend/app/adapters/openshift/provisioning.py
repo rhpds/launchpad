@@ -392,6 +392,9 @@ class OpenShiftProvisioningAdapter:
                     content_playbook=str(res.get("showroom_content_playbook", "site.yml")),
                     journey=str(res.get("showroom_journey", "guided-rag")),
                     content_only=bool(res.get("content_only", False)),
+                    terminal_storage_enabled=bool(
+                        res.get("showroom_terminal_storage", True)
+                    ),
                     tool_tabs=tool_tabs,
                 ),
                 argocd_namespace=os.environ.get("SHOWROOM_ARGOCD_NAMESPACE", "argocd"),
