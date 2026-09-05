@@ -386,6 +386,25 @@ def test_wait_for_showroom_route_accepts_chart_proxy_route(monkeypatch):
     assert routes["showroom-proxy"] == "https://showroom.example.test"
 
 
+def test_wait_for_showroom_route_uses_configured_ca_bundle(monkeypatch):
+    adapter = OpenShiftProvisioningAdapter.__new__(OpenShiftProvisioningAdapter)
+    adapter._get_routes = lambda _namespace: {
+        "showroom": "https://showroom.example.test"
+    }
+    request = MagicMock(return_value=MagicMock(status_code=200))
+    monkeypatch.setenv("REQUESTS_CA_BUNDLE", "/etc/launchpad-ca/ca-bundle.crt")
+    monkeypatch.setattr("app.adapters.openshift.provisioning.requests.get", request)
+
+    adapter._wait_for_showroom_route("lab-namespace")
+
+    request.assert_called_once_with(
+        "https://showroom.example.test",
+        timeout=5,
+        verify="/etc/launchpad-ca/ca-bundle.crt",
+        allow_redirects=True,
+    )
+
+
 def test_wait_for_showroom_route_requires_http_200(monkeypatch):
     adapter = OpenShiftProvisioningAdapter.__new__(OpenShiftProvisioningAdapter)
     adapter._get_routes = lambda _namespace: {"showroom": "https://showroom.example.test"}

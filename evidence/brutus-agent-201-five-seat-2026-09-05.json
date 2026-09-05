@@ -1,0 +1,148 @@
+{
+  "schema": "launchpad.redhat.com/workshop-certification/v1",
+  "evidence_id": "EDD-BRUTUS-AGENT201-FIVE-SEAT-20260905",
+  "captured_at": "2026-09-05T17:43:37Z",
+  "source_commit": "88095d1c1906dfc8fd0a00ad097cb47216adb3fe",
+  "backend_image_digest": "sha256:5174c0e0af94574bf6d4470f80b88cb99feca0119f6d5afe04e266c5cb52900d",
+  "catalog_item_id": "intel-xeon6-agent-201",
+  "showroom_content_ref": "55e8521132c99fb90b16e44c4131114ab54d36a6",
+  "cluster_ref": "brutus",
+  "workshop_id": "9b8fd3b9-3059-47a5-b616-5c1886dd9768",
+  "exposure_policy": "internal",
+  "result": "GREEN-live-five-seat-internal",
+  "promotion_eligible": false,
+  "normal_placement_enabled_after_run": false,
+  "capacity_preview": {
+    "can_provision": true,
+    "safe_seats": 22,
+    "requested_seats": 5,
+    "seat_cpu_millicores": 415,
+    "seat_memory_mib": 912,
+    "seat_pods": 4,
+    "reserved_cpu_millicores": 2075,
+    "reserved_memory_mib": 4560,
+    "reserved_pods": 20,
+    "headroom_percent": 20
+  },
+  "sessions": [
+    {
+      "seat_number": 1,
+      "session_id": "f370a659-02ca-47ca-a1e9-7b77061124fe",
+      "namespace": "launchpad-smoke-test-tenant-intel-xeon6-agent-dbdd5b"
+    },
+    {
+      "seat_number": 2,
+      "session_id": "7f5ccd3f-40fc-44cc-af01-f80cfe4ec2e1",
+      "namespace": "launchpad-smoke-test-tenant-intel-xeon6-agent-1a5ba8"
+    },
+    {
+      "seat_number": 3,
+      "session_id": "98574f04-474c-487e-97d7-058d148f39e7",
+      "namespace": "launchpad-smoke-test-tenant-intel-xeon6-agent-1420a0"
+    },
+    {
+      "seat_number": 4,
+      "session_id": "2c2af84b-6b7e-4976-b685-34b92bd786a2",
+      "namespace": "launchpad-smoke-test-tenant-intel-xeon6-agent-e837f4"
+    },
+    {
+      "seat_number": 5,
+      "session_id": "6701aa0a-0dcb-4501-bf2c-c71953fa7741",
+      "namespace": "launchpad-smoke-test-tenant-intel-xeon6-agent-7cb2f0"
+    }
+  ],
+  "performance": {
+    "confirmation_accepted_at": "2026-09-05T17:32:26.797Z",
+    "collectively_ready_observed_at": "2026-09-05T17:33:14.229Z",
+    "provisioning_seconds": 48,
+    "solution_stack_deploy_seconds": 27,
+    "functional_journey_seconds": [
+      74.541749,
+      74.740588,
+      77.722759,
+      77.983447,
+      78.221507
+    ],
+    "functional_journey_mean_seconds": 76.64201,
+    "functional_journey_p95_seconds": 78.221507,
+    "reclaim_seconds": 39
+  },
+  "functional_validation": {
+    "seats_ready": 5,
+    "showroom_routes_http_200": 5,
+    "showroom_argocd_synced_healthy": 5,
+    "full_stack_ready_pods_per_seat": 4,
+    "simultaneous_agent_calls_http_200": 5,
+    "model_id": "granite-3.2-8b-tools",
+    "required_tools": [
+      "intel_hardware_lookup",
+      "openshift_capabilities",
+      "reference_architectures"
+    ],
+    "inference_errors": 0,
+    "model_ca_bundles_labeled_for_brutus": 5
+  },
+  "authorization": {
+    "terminal_current_project_matches_seat": 5,
+    "terminal_own_namespace_edit_allowed": 5,
+    "terminal_cross_seat_get_denied": 5,
+    "terminal_list_nodes_denied": 5
+  },
+  "cleanup": {
+    "workshop_status": "completed",
+    "reclaimed_sessions": 5,
+    "remaining_namespaces": 0,
+    "remaining_showroom_applications": 0,
+    "remaining_persistent_volumes": 0,
+    "active_pods_before_run": 109,
+    "active_pods_after_reclaim": 109
+  },
+  "image_supply": {
+    "integrated_registry_storage": "emptyDir",
+    "tested_digests_present_before_run": 3,
+    "warm_pull_result": "GREEN-live",
+    "durable_registry_result": "RED",
+    "promotion_blocker": "Brutus integrated-registry data is lost if its registry pod is recreated."
+  },
+  "route_tls": {
+    "collective_readiness_uses_verified_ca": true,
+    "early_seat_readiness_observed": "RED-live-verify-false",
+    "regression_tests": "GREEN-local",
+    "live_rerun_required": true
+  },
+  "red_green_matrix": [
+    {
+      "id": "BRUTUS5-SCALE-001",
+      "red": "No Brutus five-seat workshop had completed the full participant workload concurrently.",
+      "green": "Five seats reached ready, ran five simultaneous three-tool advisor calls, and returned HTTP 200."
+    },
+    {
+      "id": "BRUTUS5-ISOLATION-001",
+      "red": "Cross-seat authorization at Brutus five-seat scale was unproven.",
+      "green": "Every terminal started in its seat namespace, retained edit there, and was denied cross-seat pod access and node listing."
+    },
+    {
+      "id": "BRUTUS5-CLEANUP-001",
+      "red": "Five-seat bulk reclaim and storage cleanup on Brutus were unproven.",
+      "green": "Bulk reclaim completed in 39 seconds with zero namespaces, Argo applications, or persistent volumes and restored the 109-pod baseline."
+    },
+    {
+      "id": "BRUTUS5-TLS-001",
+      "red": "The early Showroom route wait still disabled TLS verification.",
+      "green": "Failing tests now require the configured CA bundle in provisioning and validation; a deployed live rerun remains required."
+    },
+    {
+      "id": "BRUTUS5-IMAGE-001",
+      "red": "The tested Brutus integrated registry uses emptyDir storage.",
+      "green": "Not green: promote or persist immutable images before the 25-seat gate."
+    }
+  ],
+  "not_certified": [
+    "durable image pulls after registry recreation",
+    "twenty-five-seat workshop",
+    "Brutus public access",
+    "Brutus OpenShift Console OIDC participant flow"
+  ],
+  "next_gate": "Deploy the CA-verification fix, establish durable immutable image supply, recover nine protected pod slots or prove a lower pod contract, then run twenty-five seats.",
+  "contains_plaintext_credentials": false
+}

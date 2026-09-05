@@ -97,3 +97,27 @@ def test_live_validation_window_is_configurable_for_scaled_workshops():
 
     assert adapter._validation_attempts == 61
     assert adapter._validation_interval == 5
+
+
+def test_route_validation_uses_configured_ca_bundle():
+    adapter = OpenShiftValidationAdapter.__new__(OpenShiftValidationAdapter)
+
+    with (
+        patch.dict(
+            "os.environ",
+            {"REQUESTS_CA_BUNDLE": "/etc/launchpad-ca/ca-bundle.crt"},
+        ),
+        patch("app.adapters.openshift.validation.httpx.get") as request,
+    ):
+        request.return_value.status_code = 200
+        result = adapter._check_route_accessible(
+            "s1", "showroom", "https://showroom.example.test"
+        )
+
+    assert result.result == ValidationResultStatus.PASS
+    request.assert_called_once_with(
+        "https://showroom.example.test",
+        timeout=10,
+        follow_redirects=True,
+        verify="/etc/launchpad-ca/ca-bundle.crt",
+    )

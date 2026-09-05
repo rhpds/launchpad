@@ -34,13 +34,18 @@ def test_fleet_candidate_preserves_headroom_and_fail_closed_targets():
     assert clusters["oberon"]["enabled_for_launchpad"] is False
     brutus_certification = clusters["brutus"]["certification"]
     assert brutus_certification["one_seat"] == "GREEN-live"
-    assert brutus_certification["five_seat"] == "not-run"
+    assert brutus_certification["five_seat"] == "GREEN-live-warm-functional"
     assert brutus_certification["twenty_five_seat"] == "not-run"
     assert brutus_certification["capacity_preview_seats"] == 22
     assert brutus_certification["own_namespace_edit"] is True
     assert brutus_certification["cross_namespace_edit"] is False
     assert brutus_certification["remaining_namespaces"] == 0
     assert brutus_certification["remaining_applications"] == 0
+    assert brutus_certification["five_seat_provisioning_seconds"] == 48
+    assert brutus_certification["five_seat_functional_p95_seconds"] < 80
+    assert brutus_certification["five_seat_reclaim_seconds"] == 39
+    assert brutus_certification["integrated_registry_storage"] == "emptyDir"
+    assert brutus_certification["promotion_eligible"] is False
     assert brutus_certification["public_access_certified"] is False
     assert evidence["candidate_assignment"] == {
         "agentops-observability": "arena",
@@ -48,5 +53,7 @@ def test_fleet_candidate_preserves_headroom_and_fail_closed_targets():
         "intel-xeon6-agent-201": "brutus",
     }
     assert evidence["release_decision"]["placement_enabled"] is False
-    assert evidence["release_decision"]["brutus_status"] == "one-seat-certified-disabled"
+    assert evidence["release_decision"]["brutus_status"] == (
+        "five-seat-functional-disabled"
+    )
     assert evidence["contains_plaintext_credentials"] is False

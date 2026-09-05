@@ -5,11 +5,13 @@ registered in the Arena cluster-target ConfigMap as disabled remote targets.
 They must remain disabled until the complete procedure below and the catalog's
 1 -> 5 -> 25 live certification are green.
 
-As of 2026-09-05, Brutus has passed the one-seat infrastructure, Showroom,
-terminal, Build-an-Agent tool-calling, namespace-isolation, and zero-residue
-reclaim gate. It remains disabled for normal placement until durable image
-promotion replaces the certification-only local mirror and the five- and
-twenty-five-seat gates pass. Oberon remains at the infrastructure probe gate.
+As of 2026-09-05, Brutus has passed the one-seat gate and a warm five-seat
+functional run covering Showroom, terminals, simultaneous Build-an-Agent tool
+calling, namespace isolation, and zero-residue bulk reclaim. It remains
+disabled for normal placement because its integrated registry uses `emptyDir`,
+the CA-verification regression still needs a deployed live rerun, and the
+twenty-five-seat gate has not passed. Oberon remains at the infrastructure
+probe gate.
 
 Apply `arena-rbac.yaml` to the remote cluster, create a bound service-account
 token, and build a kubeconfig for that identity. Despite the historical
@@ -67,7 +69,8 @@ control plane:
 3. Durable external images pull without relying on another cluster's internal
    image registry. Pre-seed and verify every immutable digest before opening an
    order; the Brutus one-seat run measured a 10m42s cold terminal-image mirror
-   and one resumable HTTP 408 while moving the agent image.
+   and one resumable HTTP 408 while moving the agent image. The subsequent
+   five-seat warm run passed but did not satisfy this durability requirement.
 4. Every required model endpoint is reachable from the remote workload network
    and is explicitly registered; do not substitute Brutus's Granite 3.1 GPU
    endpoint for a Xeon CPU or Granite tools contract without a content and

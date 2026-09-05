@@ -180,9 +180,17 @@ class OpenShiftValidationAdapter:
         route_name: str,
         route_url: str,
     ) -> ValidationResult:
+        tls_verify: bool | str = (
+            os.environ.get("REQUESTS_CA_BUNDLE")
+            or os.environ.get("SSL_CERT_FILE")
+            or True
+        )
         try:
             resp = httpx.get(
-                route_url, timeout=10, follow_redirects=True, verify=False
+                route_url,
+                timeout=10,
+                follow_redirects=True,
+                verify=tls_verify,
             )
             if resp.status_code < 500:
                 return ValidationResult(

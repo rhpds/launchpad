@@ -63,7 +63,7 @@
       "certification": {
         "catalog_item_id": "intel-xeon6-agent-201",
         "one_seat": "GREEN-live",
-        "five_seat": "not-run",
+        "five_seat": "GREEN-live-warm-functional",
         "twenty_five_seat": "not-run",
         "capacity_preview_seats": 22,
         "functional_http_status": 200,
@@ -73,6 +73,11 @@
         "reclaim_seconds": 43,
         "remaining_namespaces": 0,
         "remaining_applications": 0,
+        "five_seat_provisioning_seconds": 48,
+        "five_seat_functional_p95_seconds": 78.221507,
+        "five_seat_reclaim_seconds": 39,
+        "integrated_registry_storage": "emptyDir",
+        "promotion_eligible": false,
         "public_access_certified": false
       }
     },
@@ -116,18 +121,18 @@
   "required_remediation": [
     "Reduce AgentOps to workshop-shared infrastructure or add stable Arena worker capacity.",
     "Add per-node admission, workload spreading, and a recent-Ready-transition circuit breaker.",
-    "Promote every workshop image to a durable external registry and pre-seed immutable digests before Brutus five-seat certification.",
+    "Promote every workshop image to a durable external registry and cold-pull immutable digests before Brutus twenty-five-seat certification.",
     "Automate cluster ingress CA rotation and model trust distribution before the next Brutus certification run.",
-    "Prove Console/OIDC, five-seat concurrency, twenty-five-seat concurrency, and zero-residue reclaim on Brutus.",
+    "Deploy and live-rerun verified route readiness, then prove Console/OIDC and twenty-five-seat concurrency with zero-residue reclaim on Brutus.",
     "Prove durable image pulls, storage deletion, private ingress, Showroom, terminal, Console/OIDC, and zero-residue reclaim on Oberon.",
     "Confirm and scale only unused Oberon workloads to recover at least eleven protected pod slots.",
     "Replace Quick Tunnels with one stable cluster-aware public front door before public event certification."
   ],
   "release_decision": {
     "placement_enabled": false,
-    "brutus_status": "one-seat-certified-disabled",
+    "brutus_status": "five-seat-functional-disabled",
     "oberon_status": "registered-disabled",
-    "next_gate": "durable image promotion and Brutus five-seat certification"
+    "next_gate": "durable image promotion, deployed CA-verification rerun, pod-headroom remediation, and Brutus twenty-five-seat certification"
   },
   "contains_plaintext_credentials": false
 }

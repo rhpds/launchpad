@@ -1011,6 +1011,11 @@ http {{
         # wave even though every Application subsequently became healthy.
         timeout = int(os.environ.get("SHOWROOM_ROUTE_TIMEOUT", "600"))
         deadline = time.time() + timeout
+        tls_verify: bool | str = (
+            os.environ.get("REQUESTS_CA_BUNDLE")
+            or os.environ.get("SSL_CERT_FILE")
+            or True
+        )
         routes: dict[str, str] = {}
         while time.time() < deadline:
             routes = self._get_routes(namespace)
@@ -1020,7 +1025,7 @@ http {{
                     response = requests.get(
                         showroom_url,
                         timeout=5,
-                        verify=False,
+                        verify=tls_verify,
                         allow_redirects=True,
                     )
                     if response.status_code == 200:

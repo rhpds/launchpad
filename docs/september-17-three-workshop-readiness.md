@@ -114,23 +114,24 @@ candidate fleet assignment:
 | Oberon | 500 | 361 | 39 | Serve LLMs; currently eleven slots short of its 50-slot peak contract |
 
 Brutus and Oberon are now registered with separate least-privilege Launchpad
-and Argo credentials but remain disabled for normal placement. Brutus passed a
-one-seat Build-an-Agent certification on September 5: the Launchpad order was
-pinned to Brutus, Showroom and terminal worked, the real three-tool advisor
-journey returned HTTP 200 in 69.1 seconds, own-namespace edit succeeded,
-cross-namespace access was denied, and reclaim removed the namespace and Argo
-applications in 43 seconds. The run also exposed and corrected remote RBAC,
-same-seat retry, model CA trust, and model Route timeout defects. It does not
-certify Brutus at five or twenty-five seats. Oberon is disabled for placement
+and Argo credentials but remain disabled for normal placement. After its
+one-seat gate, Brutus completed a warm five-seat Build-an-Agent run on September
+5. All seats were collectively ready 48 seconds after confirmation, five
+simultaneous three-tool advisor journeys returned HTTP 200 in 74.5–78.2
+seconds, each terminal retained only its seat namespace, and bulk reclaim
+restored the 109-pod baseline with zero namespaces, Argo applications, or PVs
+in 39 seconds. The run is not promotion-eligible: the Brutus integrated
+registry uses `emptyDir`, the CA-verification regression needs a deployed live
+rerun, and twenty-five seats remain unproven. Oberon is disabled for placement
 and must be re-certified before it hosts event seats. The preferred
 three-cluster path is therefore:
 
 1. Keep Arena dedicated to AgentOps and reduce the per-seat topology by moving
    DSPA, pipeline database, MinIO, Grafana, and other safe components to one
    workshop-scoped shared stack, or add stable worker capacity.
-2. Pre-seed Brutus from a durable external registry, automate the verified
-   model CA bundle, and remove at least nine baseline pod slots (or prove a
-   lower per-seat pod contract) before its 5 -> 25 certification.
+2. Promote Brutus images to a durable registry, deploy and rerun the verified
+   route-CA path, and remove at least nine baseline pod slots (or prove a lower
+   per-seat pod contract) before its 25-seat certification.
 3. Re-enable Oberon only after removing at least eleven baseline pod slots and
    passing Serve LLMs 1 -> 5 -> 25 plus full reclaim.
 
