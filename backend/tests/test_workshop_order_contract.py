@@ -7,8 +7,8 @@ from unittest.mock import patch
 
 import pytest
 from app.domain.clusters import ClusterTarget
-from app.domain.enums import WorkshopSeatStatus, WorkshopStatus
-from app.domain.models import Workshop, WorkshopSeat
+from app.domain.enums import CatalogCategory, WorkshopSeatStatus, WorkshopStatus
+from app.domain.models import LabRequest, LabSession, Workshop, WorkshopSeat
 from app.main import app
 from app.services.cluster_registry import ClusterRegistry
 from app.services.provisioning import ProvisioningService
@@ -370,6 +370,59 @@ def test_interrupted_workshop_is_automatically_recovered():
     assert completed.status == WorkshopStatus.READY
     assert len(completed.session_ids) == 3
     assert all(seat.status == WorkshopSeatStatus.READY for seat in completed.seats)
+
+
+def test_interrupted_reclaim_recovers_session_created_before_seat_link():
+    service = ProvisioningService()
+    order = service.create_workshop_order(
+        Workshop(
+            tenant_id="reclaim-recovery-tenant",
+            catalog_item_id="inference-overdrive-quickstart",
+            num_users=1,
+        )
+    )
+    seat = order.seats[0]
+    request = LabRequest(
+        tenant_id=order.tenant_id,
+        requester_id=seat.participant_id,
+        catalog_item_id=order.catalog_item_id,
+        requested_mode=CatalogCategory.QUICK_START,
+        metadata={"workshop_id": order.workshop_id, "seat_id": seat.seat_id},
+    )
+    session = LabSession(
+        request_id=request.request_id,
+        tenant_id=order.tenant_id,
+        catalog_item_id=order.catalog_item_id,
+        namespace="launchpad-interrupted-reclaim",
+        cluster_ref="arena",
+    )
+    service._save_request(request)
+    service._save_session(session)
+    service._save_workshop(
+        order.model_copy(
+            update={
+                "status": WorkshopStatus.RECLAIMING,
+                "seats": [
+                    seat.model_copy(update={"status": WorkshopSeatStatus.PROVISIONING})
+                ],
+            }
+        )
+    )
+
+    def reclaim(workshop_id):
+        current = service.get_workshop(workshop_id)
+        assert current.session_ids == [session.session_id]
+        assert current.seats[0].session_id == session.session_id
+        assert current.seats[0].request_id == request.request_id
+        completed = current.model_copy(update={"status": WorkshopStatus.COMPLETED})
+        service._save_workshop(completed)
+        return completed
+
+    with patch.object(service, "reclaim_workshop", side_effect=reclaim) as cleanup:
+        recovered = service.recover_interrupted_workshops()
+
+    assert recovered == [order.workshop_id]
+    cleanup.assert_called_once_with(order.workshop_id)
 
 
 def test_workshop_order_rejects_more_than_supported_seat_limit():

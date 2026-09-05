@@ -1300,14 +1300,22 @@ class ProvisioningService:
         return queued
 
     def recover_interrupted_workshops(self) -> list[str]:
-        """Resume workshop jobs whose in-process worker was interrupted.
+        """Resume workshop provision or reclaim jobs interrupted with the process.
 
         Workshop and seat state is persisted, but the worker thread is not. On
         process startup, reset only incomplete seats and reuse every completed
         seat/session. Resource reconciliation runs while the service loads and
         removes any unlinked partial session before this method creates a
-        replacement, preventing duplicate live namespaces for one seat.
+        replacement, preventing duplicate live namespaces for one seat. A
+        reclaim can be requested while a seat is still provisioning, before
+        the worker has copied its persisted session ID onto the seat. Recover
+        that link from the persisted request metadata before resuming cleanup.
         """
+        reclaiming = [
+            workshop.workshop_id
+            for workshop in list(self._workshops.values())
+            if workshop.status == WorkshopStatus.RECLAIMING
+        ]
         interrupted = [
             workshop.workshop_id
             for workshop in list(self._workshops.values())
@@ -1317,6 +1325,41 @@ class ProvisioningService:
             }
         ]
         recovered: list[str] = []
+        for workshop_id in reclaiming:
+            try:
+                workshop = self._workshops[workshop_id]
+                session_ids = list(workshop.session_ids)
+                seats = list(workshop.seats)
+                seats_by_id = {seat.seat_id: index for index, seat in enumerate(seats)}
+                for session in self._sessions.values():
+                    request = self._requests.get(session.request_id)
+                    request_metadata = request.metadata if request else {}
+                    if request_metadata.get("workshop_id") != workshop_id:
+                        continue
+                    if session.session_id not in session_ids:
+                        session_ids.append(session.session_id)
+                    seat_index = seats_by_id.get(request_metadata.get("seat_id"))
+                    if seat_index is not None:
+                        seats[seat_index] = seats[seat_index].model_copy(
+                            update={
+                                "status": WorkshopSeatStatus.RECLAIMING,
+                                "session_id": session.session_id,
+                                "request_id": request.request_id,
+                                "updated_at": datetime.utcnow(),
+                            }
+                        )
+                self._save_workshop(
+                    workshop.model_copy(
+                        update={"session_ids": session_ids, "seats": seats}
+                    )
+                )
+                self.reclaim_workshop(workshop_id)
+                recovered.append(workshop_id)
+            except Exception:
+                logger.exception(
+                    "Automatic reclaim recovery failed for workshop %s",
+                    workshop_id,
+                )
         for workshop_id in interrupted:
             try:
                 workshop = self._workshops[workshop_id]
