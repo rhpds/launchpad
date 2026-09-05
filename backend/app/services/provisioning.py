@@ -1840,6 +1840,52 @@ class ProvisioningService:
             eligible.append(node)
         return eligible
 
+    @classmethod
+    def _workshop_catalog_nodes(cls, nodes: list, metadata: dict) -> list:
+        """Apply the catalog's placement boundary to capacity accounting.
+
+        Capacity preview and reservation must count the same nodes the
+        OpenShift provisioner may select for a seat. Otherwise an unqualified
+        or recently recovered worker can make an aggregate preview pass before
+        seat provisioning fails closed.
+        """
+        required_labels = {
+            str(key): str(value)
+            for key, value in (
+                metadata.get("workshop_node_required_labels", {}) or {}
+            ).items()
+        }
+        min_ready_seconds = max(
+            0, int(metadata.get("workshop_node_min_ready_seconds", 0))
+        )
+        eligible = []
+        for node in cls._workshop_schedulable_nodes(nodes):
+            labels = getattr(getattr(node, "metadata", None), "labels", None) or {}
+            if any(labels.get(key) != value for key, value in required_labels.items()):
+                continue
+
+            conditions = {
+                str(getattr(condition, "type", "")): condition
+                for condition in (
+                    getattr(getattr(node, "status", None), "conditions", None) or []
+                )
+            }
+            if any(
+                str(getattr(conditions.get(kind), "status", "False")) == "True"
+                for kind in ("MemoryPressure", "DiskPressure", "PIDPressure")
+            ):
+                continue
+            ready = conditions.get("Ready")
+            transition = getattr(ready, "last_transition_time", None)
+            if (
+                min_ready_seconds
+                and transition is not None
+                and time.time() - transition.timestamp() < min_ready_seconds
+            ):
+                continue
+            eligible.append(node)
+        return eligible
+
     @staticmethod
     def _pods_using_nodes(pods: list, node_names: set[str]) -> list:
         """Count demand on eligible nodes plus pending unscheduled demand."""
@@ -1935,13 +1981,15 @@ class ProvisioningService:
                 return True, (
                     f"Cluster can support {max_seats} seats "
                     f"(CPU: {capacity['max_by_cpu']}, Memory: {capacity['max_by_mem']}, "
-                    f"Pods: {capacity['max_by_pods']}; {capacity['headroom_pct']}% headroom)"
+                    f"Pods: {capacity['max_by_pods']}; Eligible nodes: "
+                    f"{capacity['eligible_nodes']}; {capacity['headroom_pct']}% headroom)"
                 )
             else:
                 return False, (
                     f"Requested {workshop.num_users} seats but cluster supports {max_seats} "
                     f"(CPU: {capacity['max_by_cpu']}, Memory: {capacity['max_by_mem']}, "
-                    f"Pods: {capacity['max_by_pods']})"
+                    f"Pods: {capacity['max_by_pods']}; Eligible nodes: "
+                    f"{capacity['eligible_nodes']})"
                 )
         except ImportError:
             return False, "kubernetes package not available — capacity cannot be verified"
@@ -1984,7 +2032,9 @@ class ProvisioningService:
 
     def _workshop_capacity(self, v1, workshop: Workshop) -> dict:
         total_cpu_m = total_mem_mi = total_pods = 0
-        nodes = self._workshop_schedulable_nodes(v1.list_node().items)
+        item = self.catalog.get_item(workshop.catalog_item_id)
+        metadata = item.metadata if item else {}
+        nodes = self._workshop_catalog_nodes(v1.list_node().items, metadata)
         node_names = {str(node.metadata.name) for node in nodes}
         for node in nodes:
             alloc = node.status.allocatable or {}
@@ -2004,8 +2054,6 @@ class ProvisioningService:
                 requested_cpu_m += self._cpu_millicores(requests.get("cpu"))
                 requested_mem_mi += self._memory_mib(requests.get("memory"))
 
-        item = self.catalog.get_item(workshop.catalog_item_id)
-        metadata = item.metadata if item else {}
         per_seat_cpu_m = int(metadata.get(
             "seat_cpu_millicores", os.environ.get("WORKSHOP_SEAT_CPU_MILLICORES", "1000")
         ))
@@ -2026,6 +2074,7 @@ class ProvisioningService:
             "max_by_cpu": max_by_cpu,
             "max_by_mem": max_by_mem,
             "max_by_pods": max_by_pods,
+            "eligible_nodes": len(nodes),
             "headroom_pct": headroom_pct,
         }
 

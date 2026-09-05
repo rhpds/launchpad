@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import os
+from datetime import datetime, timedelta, timezone
 from unittest.mock import MagicMock, patch
 from types import SimpleNamespace
 
@@ -196,27 +197,103 @@ class TestCapacityGuard:
     @staticmethod
     def _node(
         cpu="10", memory="20Gi", pods="100", *, name="worker-1",
-        ready=True, taints=None,
+        ready=True, taints=None, labels=None, ready_for_seconds=3600,
     ):
         node = MagicMock()
         node.metadata.name = name
+        node.metadata.labels = labels or {}
         node.status.allocatable = {"cpu": cpu, "memory": memory, "pods": pods}
         node.status.conditions = [
-            SimpleNamespace(type="Ready", status="True" if ready else "False")
+            SimpleNamespace(
+                type="Ready",
+                status="True" if ready else "False",
+                last_transition_time=(
+                    datetime.now(timezone.utc)
+                    - timedelta(seconds=ready_for_seconds)
+                ),
+            ),
+            SimpleNamespace(type="MemoryPressure", status="False"),
+            SimpleNamespace(type="DiskPressure", status="False"),
+            SimpleNamespace(type="PIDPressure", status="False"),
         ]
         node.spec.unschedulable = False
         node.spec.taints = taints or []
         return node
 
     @staticmethod
-    def _pod(phase="Running", cpu="0", memory="0"):
+    def _pod(phase="Running", cpu="0", memory="0", node="worker-1"):
         pod = MagicMock()
         pod.status.phase = phase
         container = MagicMock()
         container.resources.requests = {"cpu": cpu, "memory": memory}
         pod.spec.containers = [container]
-        pod.spec.node_name = "worker-1"
+        pod.spec.node_name = node
         return pod
+
+    def test_capacity_counts_only_catalog_qualified_stable_workers(self):
+        required_labels = {"launchpad.redhat.com/agentops-certified": "true"}
+        item = _make_catalog_item()
+        item.metadata = {
+            "seat_cpu_millicores": 2500,
+            "seat_memory_mib": 7168,
+            "seat_pods": 17,
+            "workshop_node_min_ready_seconds": 900,
+            "workshop_node_required_labels": required_labels,
+        }
+        svc = _make_service(catalog_item=item)
+        workshop = Workshop(
+            tenant_id="test-tenant",
+            catalog_item_id="demo-a",
+            num_users=10,
+            ttl="4h",
+        )
+        nodes = [
+            self._node(
+                cpu="284",
+                memory="768Gi",
+                pods="250",
+                name="qualified-stable",
+                labels=required_labels,
+            ),
+            self._node(
+                cpu="284",
+                memory="768Gi",
+                pods="250",
+                name="qualified-recent",
+                labels=required_labels,
+                ready_for_seconds=60,
+            ),
+            self._node(
+                cpu="284",
+                memory="768Gi",
+                pods="250",
+                name="unqualified",
+            ),
+        ]
+        pods = [self._pod(node="qualified-stable") for _ in range(41)]
+        pods += [self._pod(node="qualified-recent") for _ in range(25)]
+        pods += [self._pod(node="unqualified") for _ in range(177)]
+
+        with (
+            patch.dict(
+                os.environ,
+                {
+                    "LAUNCHPAD_MODE": "openshift",
+                    "WORKSHOP_CAPACITY_HEADROOM_PCT": "20",
+                },
+                clear=False,
+            ),
+            patch("kubernetes.config.load_incluster_config"),
+            patch("kubernetes.client.CoreV1Api") as core_api,
+        ):
+            core_api.return_value.list_node.return_value.items = nodes
+            core_api.return_value.list_pod_for_all_namespaces.return_value.items = pods
+            can, reason = svc.check_workshop_capacity(workshop)
+
+        assert can is False
+        assert "supports 9" in reason
+        assert "Pods: 9" in reason
+        assert "Eligible nodes: 1" in reason
 
     def test_control_plane_and_unhealthy_nodes_do_not_inflate_capacity(self):
         item = _make_catalog_item()
