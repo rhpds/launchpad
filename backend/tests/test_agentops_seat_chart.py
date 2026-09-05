@@ -273,6 +273,7 @@ def test_agentops_owns_a_supported_dspa_mariadb_and_normalizes_nfs_permissions()
     assert pipeline_service["metadata"]["annotations"] == {
         "service.beta.openshift.io/serving-cert-secret-name": "agentops-pipeline-db-tls"
     }
+    assert pipeline_service["spec"]["publishNotReadyAddresses"] is True
 
     pipeline_pod = pipeline_db["spec"]["template"]["spec"]
     tls_init = pipeline_pod["initContainers"][0]

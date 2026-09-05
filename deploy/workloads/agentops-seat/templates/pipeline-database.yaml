@@ -20,6 +20,9 @@ metadata:
   labels:
     {{- include "agentops.labels" . | nindent 4 }}
 spec:
+  # The MariaDB readiness probe verifies the service-ca certificate by Service
+  # DNS name. Publish the endpoint during bootstrap to avoid a readiness cycle.
+  publishNotReadyAddresses: true
   selector:
     app.kubernetes.io/component: pipeline-database
     app.kubernetes.io/instance: {{ .Release.Name }}
