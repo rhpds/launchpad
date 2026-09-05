@@ -1,0 +1,102 @@
+{
+  "schema_version": "1.0",
+  "evidence_id": "EDD-ARENA-CLEANUP-LIVE-20260905",
+  "captured_at": "2026-09-05T23:24:13Z",
+  "cluster": "arena",
+  "source_commit": "ae0aa2a5811b9c1f329ce029f0f535d18e310b79",
+  "scope": {
+    "mutated": [
+      "completed llm-d-sc-scaleout Jobs from the 2026-08-28 corpus run",
+      "Released PVs whose deleted claim namespace began with launchpad-",
+      "Released Quay Clair ephemeral indexer PVs",
+      "Quay Clair ephemeral storage-class override"
+    ],
+    "preserved": [
+      "two ready Launchpad OpenShift operator sessions",
+      "two healthy Showroom Argo CD Applications",
+      "active Quay object storage and database volumes",
+      "389ds and retagentmgr Released PVs",
+      "all non-target test and platform workloads"
+    ]
+  },
+  "before": {
+    "pods": {
+      "running": 387,
+      "pending": 3,
+      "succeeded": 149,
+      "failed": 4,
+      "qualified_gnr2_active": 41
+    },
+    "finished_jobs_without_ttl": 125,
+    "scaleout_corpus_jobs": 35,
+    "released_pvs": 97,
+    "released_launchpad_pvs": 5,
+    "released_quay_clair_pvs": 87,
+    "quay_clair_storage_class": "default nfs-storage with Retain",
+    "quay_clair_replicas": 2
+  },
+  "actions": {
+    "scaleout_jobs_deleted": 35,
+    "launchpad_pv_objects_deleted": 5,
+    "launchpad_backing_directories_deleted": 4,
+    "launchpad_backing_directory_delete_failures": 1,
+    "launchpad_failed_directory": "launchpad-smoke-test-tenant-agentops-a34ed8-postgres-data-mortgage-ai-db-0-pvc-6ee523d9-5b82-456c-9c44-69af6276ae34",
+    "launchpad_failed_directory_reason": "NFS permission denied on PostgreSQL data owned by a deleted namespace UID; directory left quarantined",
+    "quay_clair_override": {
+      "storage_class": "launchpad-nfs-ephemeral",
+      "reclaim_policy": "Delete",
+      "archive_on_delete": false
+    },
+    "quay_clair_pv_objects_and_directories_deleted": 89,
+    "note": "Two additional old-class Clair PVCs became Released during the storage-class migration and were included in the validated cleanup set."
+  },
+  "logical_storage": {
+    "pv_capacity_objects_removed_gib": 1840,
+    "provisioner_confirmed_backing_directories_removed_gib": 1830,
+    "known_quarantined_backing_directory_gib": 10,
+    "measurement_note": "These are declared PV capacities, not measured physical bytes used on NFS."
+  },
+  "after": {
+    "pods": {
+      "running": 393,
+      "pending": 3,
+      "succeeded": 148,
+      "failed": 4,
+      "qualified_gnr2_active": 44,
+      "worker_active": {
+        "gnr2.fm2aihpcsed.com": 44,
+        "rhgnr1": 180
+      }
+    },
+    "finished_jobs_without_ttl": 89,
+    "scaleout_corpus_jobs": 0,
+    "released_pvs": 5,
+    "released_launchpad_pvs": 0,
+    "released_quay_clair_pvs": 0,
+    "remaining_released_pvs": {
+      "389ds": 3,
+      "retagentmgr": 2
+    },
+    "quay_clair": {
+      "ready_replicas": 8,
+      "desired_replicas": 8,
+      "storage_class": "launchpad-nfs-ephemeral",
+      "available_condition": true,
+      "component_ready_condition": true
+    },
+    "live_launchpad_namespaces": 2,
+    "healthy_synced_showroom_applications": 2
+  },
+  "capacity_effect": {
+    "agentops_supported_seats_before": 9,
+    "agentops_supported_seats_after": 9,
+    "reason": "Cleanup removed terminal API objects and stale storage. Quay Clair HPA settled at eight replicas, leaving 44 active pods on qualified gnr2; this does not change the floor of the 17-pod-per-seat capacity calculation."
+  },
+  "remaining_findings": [
+    "One exact 10 Gi orphan PostgreSQL NFS directory requires storage-server administration because root-squash blocks the provisioner.",
+    "Three 389ds and two retagentmgr Retain-policy PVs remain owner-dependent and were not changed.",
+    "The fleet-agent, llm-d-sc-gremlins classifier, and retagentmgr migration pods remain Pending due image-pull failures.",
+    "The launchpad-arena Argo CD Application is Healthy but OutOfSync and requires drift reconciliation rather than cleanup."
+  ],
+  "contains_plaintext_credentials": false
+}
