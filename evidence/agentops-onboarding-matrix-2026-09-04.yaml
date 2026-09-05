@@ -1,6 +1,6 @@
 schema: launchpad.redhat.com/evidence-matrix/v1
 iteration: agentops-onboarding-foundation
-date: 2026-09-04
+date: 2026-09-05
 release_threshold: 100
 status: blocked
 
@@ -135,11 +135,14 @@ matrix:
   - id: LIVE-AGENTOPS-014
     requirement: Shared cached embedding service completes KB vector ingestion
     red: Local initialization exceeded 14 minutes and the generation endpoint returned 404
-    green_local: not-run
-    green_integration: not-run
-    green_live: fail-zero-of-41-kb-chunks-embedded
+    green_local: pass-manifest-registry-and-runtime-injection-contracts
+    green_integration: pass-live-backend-injection-health-cache-restart-and-25-request-burst
+    green_live: partial-shared-endpoint-ready-kb-ingestion-not-run
     evidence:
       - evidence/agentops-one-seat-live-2026-09-04.json
+      - evidence/agentops-shared-embedding-live-2026-09-05.json
+      - backend/tests/test_agentops_embedding_live_evidence.py
+      - backend/tests/test_arena_embedding_serving.py
   - id: LIVE-AGENTOPS-015
     requirement: Shared MLflow tracking server records participant traces
     red: Arena exposes an MLflow UI component but no tracking server service or participant route
@@ -161,15 +164,16 @@ rubric:
   source_and_contract: {earned: 15, possible: 15}
   secret_boundary: {earned: 15, possible: 15}
   namespace_and_rbac_isolation: {earned: 10, possible: 15}
-  shared_service_readiness: {earned: 5, possible: 15}
+  shared_service_readiness: {earned: 8, possible: 15}
   participant_tabs_and_journey: {earned: 10, possible: 15}
   cleanup_and_repeatability: {earned: 10, possible: 10}
   five_seat_certification: {earned: 0, possible: 5}
   twenty_five_seat_certification: {earned: 0, possible: 10}
-  total: {earned: 65, possible: 100}
+  total: {earned: 68, possible: 100}
 
 decision: >-
   Keep the catalog item draft. Source intake is valid, but the AgentOps
-  experience is not orderable until the missing shared Arena services,
-  protected participant routes, adapted eight-tab journey, and complete
-  reclaim are GREEN-live.
+  experience is not orderable until AgentOps ingestion uses the now-live
+  shared embedding endpoint and the remaining shared services, protected
+  participant routes, adapted eight-tab journey, and complete reclaim are
+  GREEN-live.

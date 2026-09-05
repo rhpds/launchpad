@@ -1,0 +1,138 @@
+{
+  "schema": "launchpad.redhat.com/shared-model-live-evidence/v1",
+  "evidence_id": "LIVE-AGENTOPS-014",
+  "observed_at": {
+    "started": "2026-09-05T04:49:32Z",
+    "first_ready": "2026-09-05T05:01:55Z",
+    "completed": "2026-09-05T05:13:48Z"
+  },
+  "repository_revision": "b8dbb769127a82d6d8568f4d93f8dbb5b4084476",
+  "cluster_id": "arena",
+  "namespace": "fleet-llm-d",
+  "service": {
+    "name": "tei-nomic-embed",
+    "visibility": "private ClusterIP",
+    "endpoint": "http://tei-nomic-embed.fleet-llm-d.svc:8080/v1",
+    "model": "nomic-embed-text-v1.5",
+    "model_source": "nomic-ai/nomic-embed-text-v1.5",
+    "model_revision": "e5cf08aadaa33385f5990def41f7a23405aec398",
+    "image": "ghcr.io/huggingface/text-embeddings-inference@sha256:c26a226262ad4ff3330fb30b76653c1bb65da2fcf413b92284545a010e0a8a48",
+    "replicas": 1,
+    "cpu_request": "4",
+    "memory_request": "4Gi",
+    "persistent_cache": {
+      "storage_class": "nfs-storage",
+      "capacity": "10Gi",
+      "observed_usage_mib": 523
+    }
+  },
+  "artifacts": {
+    "arena_backend": {
+      "build": "launchpad-backend-59",
+      "source_revision": "b8dbb769127a82d6d8568f4d93f8dbb5b4084476",
+      "image_digest": "sha256:a4ba04a5050f4b85b5a2576fcd2f30d31c6584a052ceeda71872ae3e2640e5b6",
+      "rollout": "pass",
+      "health_http_status": 200,
+      "container_restarts": 0
+    },
+    "model_manifest": {
+      "path": "deploy/models/arena/nomic-embed-text-v1.5.yaml",
+      "sha256": "a78b68a9c14353b84e1a1f486fc3393f01ef5f501869497d1c1ed5412955bb7d"
+    },
+    "model_bundle": {
+      "path": "deploy/models/arena/kustomization.yaml",
+      "sha256": "86329617b4f3be5a05e7213ed1ee49c4246f9734bc73e0e08bd97b236b75fd20",
+      "rendered_resources": 8,
+      "arena_server_side_dry_run": "pass"
+    }
+  },
+  "red_green": {
+    "network_egress": {
+      "red": "The fleet-llm-d default-deny NetworkPolicy blocked pod DNS and HTTPS, so model artifact resolution timed out on both Arena workers.",
+      "green": "The embedding pod now has explicit egress only to cluster DNS on ports 53/5353 and HTTPS on port 443. Model artifacts downloaded successfully."
+    },
+    "model_config_compatibility": {
+      "red": "The newest Nomic Transformers v5 revision exposed both legacy and new position fields and TEI rejected config.json as a duplicate max_position_embeddings field.",
+      "green": "The immediately preceding immutable Nomic revision uses the compatible Transformers v4 config and started without parser errors."
+    },
+    "restart_behavior": {
+      "red": "No durable shared embedding cache had been proven.",
+      "green": "A deliberate Deployment restart reused the ReadWriteMany cache, downloaded model metadata in 4.5 ms, resolved ONNX weights from cache in 2.6 ms, and returned to Ready without a container restart."
+    }
+  },
+  "checks": {
+    "health": {
+      "status": "pass",
+      "http_status": 200,
+      "probe_source": "partner-ai-launchpad/backend"
+    },
+    "embedding": {
+      "status": "pass",
+      "http_status": 200,
+      "input_count": 1,
+      "output_count": 1,
+      "dimensions": 768,
+      "first_request_seconds": 0.288,
+      "post_restart_request_seconds": 0.164
+    },
+    "first_cache_fill": {
+      "status": "pass",
+      "ready_seconds": 58,
+      "onnx_download_seconds": 28.929,
+      "cache_usage_mib": 523
+    },
+    "restart_from_cache": {
+      "status": "pass",
+      "ready_seconds": 40,
+      "container_restarts": 0
+    },
+    "concurrent_burst": {
+      "status": "pass",
+      "requested": 25,
+      "successful_requests": 25,
+      "dimensions_per_response": 768,
+      "total_seconds": 2.61,
+      "completion_p50_seconds": 1.569,
+      "completion_p95_seconds": 2.609,
+      "container_restarts": 0
+    },
+    "network_isolation": {
+      "status": "pass",
+      "public_route_created": false,
+      "allowed_callers": [
+        "partner-ai-launchpad backend",
+        "Launchpad-managed namespaces"
+      ]
+    },
+    "runtime_injection": {
+      "status": "pass-live",
+      "source": "model_endpoint",
+      "live_registry": "launchpad-cluster-targets-public-pilot",
+      "live_backend_build": "launchpad-backend-59",
+      "missing_endpoint_behavior": "fail closed",
+      "secret_value_in_catalog_or_argocd_application": false
+    },
+    "agentops_knowledge_base_ingestion": {
+      "status": "not-run",
+      "reason": "The earlier direct seat was reclaimed before the shared endpoint was available; ingestion must be repeated through a Launchpad-created seat."
+    }
+  },
+  "test_strategy": {
+    "TDD": "A failing manifest contract preceded the compatible model revision and rollout-deadline changes; endpoint-source and missing-endpoint tests guard runtime injection.",
+    "EDD": "This artifact records immutable source hashes, live HTTP behavior, cache timing, restart timing, concurrency, and isolation observations.",
+    "CDD": "Catalog intake, generated catalog, cluster registry, runtime Secret resolver, and Arena model bundle agree on the named endpoint contract.",
+    "BDD": "Given 25 simultaneous Launchpad-side callers, every request received a 768-dimensional embedding and the server remained Ready.",
+    "CBT": "Manifest rendering, Arena admission, health, inference, persistent-cache restart, egress policy, and runtime injection were tested independently."
+  },
+  "result": "partial",
+  "remaining_checks": [
+    "AgentOps knowledge-base ingestion and semantic retrieval through a Launchpad-created seat",
+    "five-seat AgentOps application certification",
+    "twenty-five-seat AgentOps application certification"
+  ],
+  "security": {
+    "secrets_included": false,
+    "credential_values_logged": false,
+    "public_model_route_created": false
+  }
+}

@@ -248,3 +248,7 @@ first live workload and reclaim result is captured in
 `evidence/agentops-one-seat-live-2026-09-04.json`. The catalog remains draft
 until shared services, route authorization, and the complete one-seat journey
 are GREEN-live.
+
+The shared embedding component, including the RED/GREEN failures, persistent
+cache restart, 25-request burst, and isolation result, is captured in
+`evidence/agentops-shared-embedding-live-2026-09-05.json`.
