@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ovms-granite-2b
+  namespace: fleet-llm-d
+spec:
+  template:
+    spec:
+      containers:
+        - name: ovms
+          readinessProbe:
+            httpGet:
+              path: /v2/health/ready
+              port: 8080
+              scheme: HTTP
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+            successThreshold: 1
+        - name: tls-proxy
+          readinessProbe:
+            httpGet:
+              path: /v2/health/ready
+              port: https
+              scheme: HTTPS
+            periodSeconds: 5
+            timeoutSeconds: 5
+            failureThreshold: 6
+            successThreshold: 1

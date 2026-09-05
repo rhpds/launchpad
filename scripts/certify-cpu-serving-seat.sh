@@ -13,7 +13,14 @@ case "$KUBECONFIG" in
 esac
 
 host="$(oc get route showroom -n "$namespace" -o jsonpath='{.spec.host}')"
-page="$(curl -fsSk "https://${host}/www/modules/02-explore-maas.html")"
+curl_options=(-fsSk)
+if [[ -n "${ARENA_CURL_INTERFACE:-}" ]]; then
+  curl_options+=(--interface "$ARENA_CURL_INTERFACE")
+fi
+if [[ -n "${ARENA_INGRESS_IP:-}" ]]; then
+  curl_options+=(--resolve "${host}:443:${ARENA_INGRESS_IP}")
+fi
+page="$(curl "${curl_options[@]}" "https://${host}/www/modules/02-explore-maas.html")"
 endpoint="$(printf '%s' "$page" | sed -n 's/.*export MAAS_ENDPOINT="\([^"]*\)".*/\1/p' | head -1)"
 model="$(printf '%s' "$page" | sed -n 's/.*export MAAS_MODEL="\([^"]*\)".*/\1/p' | head -1)"
 api_key="$(printf '%s' "$page" | sed -n 's/.*export MAAS_API_KEY="\([^"]*\)".*/\1/p' | head -1)"
@@ -99,7 +106,10 @@ jq -nc \
       {
         apiVersion: "route.openshift.io/v1",
         kind: "Route",
-        metadata: {name: "rag"},
+        metadata: {
+          name: "rag",
+          annotations: {"haproxy.router.openshift.io/timeout": "120s"}
+        },
         spec: {
           to: {kind: "Service", name: "anythingllm", weight: 100},
           port: {targetPort: "3001"},

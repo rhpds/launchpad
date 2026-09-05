@@ -71,8 +71,14 @@ def test_cpu_serving_certification_driver_uses_the_participant_boundary():
     assert "deploy/showroom -c terminal" in script
     assert "anythingllm-openshift@sha256:" in script
     assert 'name: "rag"' in script
+    assert 'haproxy.router.openshift.io/timeout' in script
     assert "GENERIC_OPEN_AI_BASE_PATH" in script
+    assert "ARENA_CURL_INTERFACE" in script
+    assert "ARENA_INGRESS_IP" in script
     assert "*config-arena*" in rag_script
+    assert "ARENA_CURL_INTERFACE" in rag_script
+    assert "ARENA_INGRESS_IP" in rag_script
+    assert "CERTIFICATION_RUN_ID" in rag_script
     assert "orion-leave-policy.txt" in rag_script
     assert 'contains("17")' in rag_script
     assert 'title == "orion-leave-policy.txt"' in rag_script

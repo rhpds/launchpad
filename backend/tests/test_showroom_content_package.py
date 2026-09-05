@@ -28,7 +28,7 @@ INTEL_GUIDED_LABS = [
         "title": "Serve LLMs on Intel Xeon CPUs",
         "model": "granite-2b-cpu",
         "workspace_route": "rag",
-        "content_ref": "intel-guided-content-v1.0.5",
+        "content_ref": "intel-guided-content-v1.0.8",
         "max_workshop_seats": 25,
         "certification_stage": "twenty-five-seat-candidate",
     },
@@ -246,6 +246,7 @@ def test_cpu_serving_content_uses_route_name_that_fits_launchpad_namespace():
     content = "\n".join(path.read_text() for path in sorted(pages.glob("*.adoc")))
 
     assert "oc create route edge rag --service=anythingllm" in content
+    assert "haproxy.router.openshift.io/timeout=120s" in content
     assert "oc get route rag" in content
     assert "oc get route anythingllm" not in content
 

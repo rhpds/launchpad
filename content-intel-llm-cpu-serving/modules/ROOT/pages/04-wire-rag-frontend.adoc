@@ -150,6 +150,7 @@ Expose AnythingLLM so you can access it from your browser:
 ----
 oc expose deployment anythingllm --port=3001 -n {project_name}
 oc create route edge rag --service=anythingllm --port=3001 -n {project_name}
+oc annotate route rag haproxy.router.openshift.io/timeout=120s --overwrite -n {project_name}
 ----
 
 == Wait for the Pod

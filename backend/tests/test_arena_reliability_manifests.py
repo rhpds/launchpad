@@ -85,3 +85,22 @@ def test_backend_single_replica_limit_is_explicit():
     assert annotations["launchpad.redhat.com/ha-blocker"] == (
         "in-memory-session-cache-must-be-externalized-before-replicas-exceed-one"
     )
+
+
+def test_cpu_model_readiness_does_not_flap_during_a_participant_burst():
+    patch = yaml.safe_load(
+        (OVERLAY / "operational-patches/ovms-granite-2b-readiness.yaml").read_text()
+    )
+    containers = {
+        container["name"]: container
+        for container in patch["spec"]["template"]["spec"]["containers"]
+    }
+    for name in ("ovms", "tls-proxy"):
+        probe = containers[name]["readinessProbe"]
+        assert probe["timeoutSeconds"] == 5
+        assert probe["failureThreshold"] == 6
+
+    driver = (ROOT / "scripts/apply-arena-model-readiness.sh").read_text()
+    assert "*config-arena*" in driver
+    assert "refusing to mutate a non-Arena cluster" in driver
+    assert "ovms-granite-2b-readiness.yaml" in driver

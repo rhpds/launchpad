@@ -14,8 +14,18 @@ esac
 
 host="$(oc get route rag -n "$namespace" -o jsonpath='{.spec.host}')"
 base_url="https://${host}"
+run_id="${CERTIFICATION_RUN_ID:-$(date -u +%Y%m%d%H%M%S)-$$}"
+run_id="$(printf '%s' "$run_id" | tr -cd '[:alnum:]-' | tr '[:upper:]' '[:lower:]')"
+workspace_slug="hr-assistant-${run_id}"
+curl_options=(-fsSk)
+if [[ -n "${ARENA_CURL_INTERFACE:-}" ]]; then
+  curl_options+=(--interface "$ARENA_CURL_INTERFACE")
+fi
+if [[ -n "${ARENA_INGRESS_IP:-}" ]]; then
+  curl_options+=(--resolve "${host}:443:${ARENA_INGRESS_IP}")
+fi
 api_token="$({
-  curl -fsSk \
+  curl "${curl_options[@]}" \
     -H 'Content-Type: application/json' \
     -X POST "${base_url}/api/system/generate-api-key" \
     --data '{"name":"launchpad-rag-certification"}'
@@ -26,30 +36,30 @@ if [[ -z "$api_token" || "$api_token" == "null" ]]; then
   exit 3
 fi
 
-auth_ok="$(curl -fsSk -H "Authorization: Bearer ${api_token}" \
+auth_ok="$(curl "${curl_options[@]}" -H "Authorization: Bearer ${api_token}" \
   "${base_url}/api/v1/auth" | jq -r '.authenticated')"
 [[ "$auth_ok" == "true" ]]
 
-curl -fsSk \
+curl "${curl_options[@]}" \
   -H "Authorization: Bearer ${api_token}" \
   -H 'Content-Type: application/json' \
   -X POST "${base_url}/api/v1/workspace/new" \
-  --data '{"name":"HR Assistant","chatMode":"query","openAiTemp":0,"openAiHistory":10,"topN":4}' \
-  | jq -e '.workspace.slug == "hr-assistant"' >/dev/null
+  --data "$(jq -nc --arg name "$workspace_slug" '{name:$name,chatMode:"query",openAiTemp:0,openAiHistory:10,topN:4}')" \
+  | jq -e --arg slug "$workspace_slug" '.workspace.slug == $slug' >/dev/null
 
-curl -fsSk \
+curl "${curl_options[@]}" \
   -H "Authorization: Bearer ${api_token}" \
   -H 'Content-Type: application/json' \
   -X POST "${base_url}/api/v1/document/raw-text" \
-  --data '{"textContent":"Launchpad Orion Leave Policy. Every employee receives exactly 17 days of Orion leave per calendar year. This policy fact is unique to this certification document.","addToWorkspaces":"hr-assistant","metadata":{"title":"orion-leave-policy.txt","docSource":"launchpad-certification"}}' \
+  --data "$(jq -nc --arg workspace "$workspace_slug" '{textContent:"Launchpad Orion Leave Policy. Every employee receives exactly 17 days of Orion leave per calendar year. This policy fact is unique to this certification document.",addToWorkspaces:$workspace,metadata:{title:"orion-leave-policy.txt",docSource:"launchpad-certification"}}')" \
   | jq -e '.success == true and .documents[0].title == "orion-leave-policy.txt"' \
   >/dev/null
 
-result="$(curl -fsSk \
+result="$(curl "${curl_options[@]}" \
   -w $'\n%{http_code}\t%{time_total}\n' \
   -H "Authorization: Bearer ${api_token}" \
   -H 'Content-Type: application/json' \
-  -X POST "${base_url}/api/v1/workspace/hr-assistant/chat" \
+  -X POST "${base_url}/api/v1/workspace/${workspace_slug}/chat" \
   --data '{"message":"According to the supplied policy, exactly how many days of Orion leave does every employee receive per calendar year?","mode":"query"}')"
 response="$(printf '%s\n' "$result" | head -1)"
 metadata="$(printf '%s\n' "$result" | tail -1)"
