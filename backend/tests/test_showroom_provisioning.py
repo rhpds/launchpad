@@ -91,6 +91,14 @@ def test_helm_workload_plan_carries_only_declarative_non_secret_contract():
             "workload_runtime_secret_value_path": "runtime.existingSecret",
             "workload_identity_value_path": "identity",
             "workload_helm_values": {"keycloak": {"enabled": False}},
+            "workload_ignore_differences": [
+                {
+                    "group": "",
+                    "kind": "ConfigMap",
+                    "name": "service-ca",
+                    "jsonPointers": ["/data"],
+                }
+            ],
             "workload_routes": {"ui": "example-ui"},
             "workload_readiness": [
                 {
@@ -122,6 +130,7 @@ def test_helm_workload_plan_carries_only_declarative_non_secret_contract():
     assert plan.required_resources["workload_gitops_ready"] is False
     assert plan.required_resources["workload_revision"] == "a" * 40
     assert plan.required_resources["workload_helm_values"] == {"keycloak": {"enabled": False}}
+    assert plan.required_resources["workload_ignore_differences"][0]["name"] == "service-ca"
     assert plan.required_resources["workload_identity_value_path"] == "identity"
     assert plan.required_resources["workload_readiness"][0]["condition_type"] == "Ready"
     assert "maas_api_key" not in plan.required_resources

@@ -71,6 +71,7 @@ class WorkloadSeat:
     runtime_secret_name: str = ""
     runtime_secret_value_path: str = ""
     identity_value_path: str = ""
+    ignore_differences: tuple[dict[str, Any], ...] = ()
 
     def __post_init__(self) -> None:
         if not IMMUTABLE_GIT_SHA.fullmatch(self.revision):
@@ -100,6 +101,19 @@ class WorkloadSeat:
             for part in self.identity_value_path.split(".")
         ):
             raise ValueError("Workload identity Helm value path is invalid")
+        for rule in self.ignore_differences:
+            if set(rule) - {"group", "kind", "name", "namespace", "jsonPointers"}:
+                raise ValueError("Workload ignore-differences rule contains unsupported fields")
+            if not rule.get("kind") or not rule.get("name"):
+                raise ValueError("Workload ignore-differences rule must name one resource")
+            pointers = rule.get("jsonPointers")
+            if not isinstance(pointers, list) or not pointers or any(
+                not isinstance(pointer, str) or not pointer.startswith("/")
+                for pointer in pointers
+            ):
+                raise ValueError(
+                    "Workload ignore-differences rule requires explicit JSON pointers"
+                )
 
 
 def _set_value_path(values: dict[str, Any], path: str, value: Any) -> None:
@@ -173,6 +187,9 @@ def build_workload_application(
             "syncOptions": ["CreateNamespace=true"],
         },
     }
+    if seat.ignore_differences:
+        spec["ignoreDifferences"] = copy.deepcopy(list(seat.ignore_differences))
+        spec["syncPolicy"]["syncOptions"].append("RespectIgnoreDifferences=true")
 
     return {
         "apiVersion": f"{ARGO_GROUP}/{ARGO_VERSION}",

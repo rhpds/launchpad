@@ -101,6 +101,9 @@ def build_catalog_item(intake: dict[str, Any]) -> dict[str, Any]:
                 "release_name", catalog["catalog_item_id"]
             ),
             "workload_helm_values": workload_contract.get("helm_values", {}),
+            "workload_ignore_differences": workload_contract.get(
+                "ignore_differences", []
+            ),
             "workload_runtime_secret_name": workload_contract.get("runtime_secret_name", ""),
             "workload_runtime_secret_sources": workload_contract.get("runtime_secret_sources", {}),
             "workload_runtime_secret_value_path": workload_contract.get(

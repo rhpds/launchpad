@@ -172,6 +172,9 @@ class OpenShiftProvisioningAdapter:
                 "workload_deploy_path": meta.get("workload_deploy_path", ""),
                 "workload_release_name": meta.get("workload_release_name", "workload"),
                 "workload_helm_values": meta.get("workload_helm_values", {}),
+                "workload_ignore_differences": meta.get(
+                    "workload_ignore_differences", []
+                ),
                 "workload_runtime_secret_name": meta.get("workload_runtime_secret_name", ""),
                 "workload_runtime_secret_sources": meta.get("workload_runtime_secret_sources", {}),
                 "workload_runtime_secret_value_path": meta.get(
@@ -309,6 +312,9 @@ class OpenShiftProvisioningAdapter:
                         res.get("workload_runtime_secret_value_path", "")
                     ),
                     identity_value_path=str(res.get("workload_identity_value_path", "")),
+                    ignore_differences=tuple(
+                        res.get("workload_ignore_differences", [])
+                    ),
                 ),
                 argocd_namespace=os.environ.get("SHOWROOM_ARGOCD_NAMESPACE", "argocd"),
                 argocd_project=os.environ.get("SHOWROOM_ARGOCD_PROJECT", "default"),

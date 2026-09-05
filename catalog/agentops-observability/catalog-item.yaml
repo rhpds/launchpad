@@ -112,6 +112,12 @@ metadata:
   workload_release_name: agentops
   workload_helm_values:
     storageClass: launchpad-nfs-ephemeral
+  workload_ignore_differences:
+  - group: ''
+    kind: ConfigMap
+    name: agentops-pipeline-service-ca
+    jsonPointers:
+    - /data
   workload_runtime_secret_name: agentops-runtime
   workload_runtime_secret_sources:
     POSTGRES_DB:

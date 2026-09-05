@@ -43,6 +43,14 @@ def test_agentops_is_registered_as_a_fail_closed_draft():
     assert catalog["metadata"]["workload_deployment_scope"] == "seat"
     assert catalog["metadata"]["workload_source_kind"] == "launchpad-seat-chart"
     assert catalog["metadata"]["workload_gitops_ready"] is True
+    assert catalog["metadata"]["workload_ignore_differences"] == [
+        {
+            "group": "",
+            "kind": "ConfigMap",
+            "name": "agentops-pipeline-service-ca",
+            "jsonPointers": ["/data"],
+        }
+    ]
     assert catalog["metadata"]["workload_identity_value_path"] == "identity"
     assert catalog["metadata"]["workload_runtime_secret_name"] == "agentops-runtime"
     assert catalog["metadata"]["workload_readiness"] == [

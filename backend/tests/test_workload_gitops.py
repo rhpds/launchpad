@@ -79,6 +79,20 @@ def test_references_precreated_runtime_secret_without_argocd_owning_its_data():
     assert "ignoreDifferences" not in app["spec"]
 
 
+def test_supports_narrow_catalog_declared_ignore_differences():
+    rule = {
+        "group": "",
+        "kind": "ConfigMap",
+        "name": "agentops-pipeline-service-ca",
+        "jsonPointers": ["/data"],
+    }
+
+    app = build_workload_application(_seat(ignore_differences=(rule,)))
+
+    assert app["spec"]["ignoreDifferences"] == [rule]
+    assert "RespectIgnoreDifferences=true" in app["spec"]["syncPolicy"]["syncOptions"]
+
+
 def test_rejects_mutable_revision_and_sensitive_helm_values():
     with pytest.raises(ValueError, match="immutable"):
         _seat(revision="main")

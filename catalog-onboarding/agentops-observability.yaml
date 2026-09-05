@@ -158,6 +158,12 @@ runtime:
       MLFLOW_TRACKING_INSECURE_TLS: {value: "true"}
     helm_values:
       storageClass: launchpad-nfs-ephemeral
+    ignore_differences:
+      - group: ""
+        kind: ConfigMap
+        name: agentops-pipeline-service-ca
+        jsonPointers:
+          - /data
     routes:
       ui: app
       grafana: obs
