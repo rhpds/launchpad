@@ -107,6 +107,7 @@ class OpenShiftProvisioningAdapter:
         demo_source = meta.get("demo_source", "launchpad")
         deploy_method = meta.get("deploy_method", "kustomize-dir")
         deploy_path = meta.get("deploy_path", str(DEMO_DEPLOY_ROOT))
+        workshop_node_name = self._select_workshop_node_name(request, meta)
         seat_ref = str(request.metadata.get("seat_id") or request.request_id)
         suffix = re.sub(r"[^a-z0-9]", "", seat_ref.lower())[:6]
         namespace = self._demo_namespace(
@@ -151,6 +152,7 @@ class OpenShiftProvisioningAdapter:
                 "showroom_steps": meta.get("showroom_steps", []),
                 "showroom_journey": meta.get("showroom_journey", "guided-rag"),
                 "operator_workshop": bool(meta.get("operator_workshop", False)),
+                "workshop_node_name": workshop_node_name,
                 "content_only": bool(meta.get("content_only", False)),
                 "workshop_id": request.metadata.get("workshop_id", request.request_id),
                 "seat_id": request.metadata.get("seat_id", request.request_id),
@@ -249,6 +251,15 @@ class OpenShiftProvisioningAdapter:
                 "launchpad.redhat.com/tenant": tenant_id,
                 "launchpad.redhat.com/cluster-id": plan.target_cluster or "oberon",
             },
+            (
+                {
+                    "openshift.io/node-selector": (
+                        f"kubernetes.io/hostname={res['workshop_node_name']}"
+                    )
+                }
+                if res.get("workshop_node_name")
+                else None
+            ),
         )
         self._grant_image_pull(demo_namespace)
         self._grant_participant_access(
@@ -454,6 +465,7 @@ class OpenShiftProvisioningAdapter:
                 "workspace_url": workspace_url,
                 "gateway_url": gateway_url,
                 "cluster_id": plan.target_cluster,
+                "workshop_node_name": res.get("workshop_node_name"),
             },
             cluster_ref=plan.target_cluster,
         )
@@ -1173,7 +1185,88 @@ http {{
             if exc.status != 409:
                 pass
 
-    def _create_namespace(self, namespace: str, extra_labels: dict = None) -> None:
+    def _select_workshop_node_name(self, request: LabRequest, metadata: dict) -> str:
+        """Shard a workshop by seat while rejecting unstable or saturated workers.
+
+        OpenShift's project node selector applies to operator-generated pods as
+        well as chart-owned pods, which keeps each AgentOps seat together while
+        preventing every DSPA from concentrating on the same worker.
+        """
+        if not metadata.get("workshop_node_spread", False):
+            return ""
+
+        min_ready_seconds = max(
+            0, int(metadata.get("workshop_node_min_ready_seconds", 900))
+        )
+        protected_pods = max(
+            1,
+            int(metadata.get("seat_pods", 1))
+            + int(metadata.get("workshop_node_headroom_pods", 0)),
+        )
+        active_by_node: dict[str, int] = {}
+        for pod in self._core_v1.list_pod_for_all_namespaces().items:
+            if getattr(getattr(pod, "status", None), "phase", "") in {
+                "Succeeded",
+                "Failed",
+            }:
+                continue
+            node_name = getattr(getattr(pod, "spec", None), "node_name", None)
+            if node_name:
+                active_by_node[node_name] = active_by_node.get(node_name, 0) + 1
+
+        eligible: list[str] = []
+        for node in self._core_v1.list_node().items:
+            name = str(getattr(getattr(node, "metadata", None), "name", ""))
+            spec = getattr(node, "spec", None)
+            status = getattr(node, "status", None)
+            if not name or getattr(spec, "unschedulable", False):
+                continue
+            if any(
+                getattr(taint, "effect", "") in {"NoSchedule", "NoExecute"}
+                for taint in (getattr(spec, "taints", None) or [])
+            ):
+                continue
+
+            conditions = {
+                getattr(condition, "type", ""): condition
+                for condition in (getattr(status, "conditions", None) or [])
+            }
+            ready = conditions.get("Ready")
+            if ready is None or getattr(ready, "status", "") != "True":
+                continue
+            if any(
+                getattr(conditions.get(kind), "status", "False") == "True"
+                for kind in ("MemoryPressure", "DiskPressure", "PIDPressure")
+            ):
+                continue
+            transition = getattr(ready, "last_transition_time", None)
+            if (
+                transition is not None
+                and time.time() - transition.timestamp() < min_ready_seconds
+            ):
+                continue
+
+            allocatable = getattr(status, "allocatable", None) or {}
+            pod_limit = int(allocatable.get("pods", 0))
+            if pod_limit - active_by_node.get(name, 0) < protected_pods:
+                continue
+            eligible.append(name)
+
+        if not eligible:
+            raise ValueError(
+                "No stable schedulable worker has the protected pod capacity "
+                "required for this workshop seat"
+            )
+
+        seat_number = max(1, int(request.metadata.get("seat_number", 1)))
+        return sorted(eligible)[(seat_number - 1) % len(eligible)]
+
+    def _create_namespace(
+        self,
+        namespace: str,
+        extra_labels: dict = None,
+        extra_annotations: dict = None,
+    ) -> None:
         labels = {
             "app.kubernetes.io/part-of": "launchpad",
             "app.kubernetes.io/managed-by": "launchpad",
@@ -1182,7 +1275,13 @@ http {{
         }
         if extra_labels:
             labels.update(extra_labels)
-        body = client.V1Namespace(metadata=client.V1ObjectMeta(name=namespace, labels=labels))
+        body = client.V1Namespace(
+            metadata=client.V1ObjectMeta(
+                name=namespace,
+                labels=labels,
+                annotations=extra_annotations or {},
+            )
+        )
         try:
             self._core_v1.create_namespace(body=body)
         except ApiException as exc:

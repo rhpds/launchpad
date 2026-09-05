@@ -24,7 +24,7 @@ def test_agentops_is_registered_as_a_fail_closed_draft():
     assert catalog == build_catalog_item(intake)
     assert catalog["catalog_item_id"] == "agentops-observability"
     assert catalog["status"] == "draft"
-    assert catalog["metadata"]["certification_stage"] == "implementation"
+    assert catalog["metadata"]["certification_stage"] == "five-seat-remediation"
     assert catalog["metadata"]["max_workshop_seats"] == 1
     assert catalog["metadata"]["activation_blockers"]
     assert catalog["metadata"]["showroom_content_repo_url"] == (
@@ -94,7 +94,10 @@ def test_agentops_intake_captures_the_large_lab_runtime_contract():
         "pods": 17,
         "storage_gib": 30,
     }
-    assert runtime["workshop_provision_concurrency"] == 4
+    assert runtime["workshop_node_spread"] is True
+    assert runtime["workshop_node_min_ready_seconds"] == 900
+    assert runtime["workshop_node_headroom_pods"] == 10
+    assert runtime["workshop_provision_concurrency"] == 2
     assert set(runtime["required_capabilities"]) >= {
         "openshift",
         "showroom",

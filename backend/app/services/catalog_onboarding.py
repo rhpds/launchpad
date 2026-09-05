@@ -96,6 +96,15 @@ def build_catalog_item(intake: dict[str, Any]) -> dict[str, Any]:
             "workshop_provision_concurrency": int(
                 runtime.get("workshop_provision_concurrency", 5)
             ),
+            "workshop_node_spread": bool(
+                runtime.get("workshop_node_spread", False)
+            ),
+            "workshop_node_min_ready_seconds": int(
+                runtime.get("workshop_node_min_ready_seconds", 900)
+            ),
+            "workshop_node_headroom_pods": int(
+                runtime.get("workshop_node_headroom_pods", 0)
+            ),
             "workload_repo": workload["repo_url"],
             "workload_revision": workload["revision"],
             "workload_deploy_type": runtime["deployment_type"],
@@ -188,6 +197,19 @@ def _validate_contract(intake: dict[str, Any], errors: list[str]) -> None:
     concurrency = runtime.get("workshop_provision_concurrency", 5)
     if not isinstance(concurrency, int) or concurrency < 1:
         errors.append("runtime.workshop_provision_concurrency must be a positive integer")
+    node_spread = runtime.get("workshop_node_spread", False)
+    if not isinstance(node_spread, bool):
+        errors.append("runtime.workshop_node_spread must be a boolean")
+    min_ready_seconds = runtime.get("workshop_node_min_ready_seconds", 900)
+    if not isinstance(min_ready_seconds, int) or min_ready_seconds < 0:
+        errors.append(
+            "runtime.workshop_node_min_ready_seconds must be a non-negative integer"
+        )
+    headroom_pods = runtime.get("workshop_node_headroom_pods", 0)
+    if not isinstance(headroom_pods, int) or headroom_pods < 0:
+        errors.append(
+            "runtime.workshop_node_headroom_pods must be a non-negative integer"
+        )
     workload_contract = runtime.get("workload", {})
     if workload_contract and not isinstance(workload_contract, dict):
         errors.append("runtime.workload must be a mapping")

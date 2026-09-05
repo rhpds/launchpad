@@ -9,7 +9,7 @@ catalog:
     OpenShift metrics and logs, Grafana dashboards, MLflow tracing and
     evaluation, and Red Hat OpenShift AI pipelines on Intel infrastructure.
   category: guided_build
-  version: "0.1.0"
+  version: "0.1.1"
   supported_branding:
     - redhat-intel-default
     - intel-internal
@@ -82,7 +82,13 @@ runtime:
     memory_mib: 7168
     pods: 17
     storage_gib: 30
-  workshop_provision_concurrency: 4
+  # Alternate seats across stable workers and admit one seat per worker in
+  # each provisioning wave. The project node selector also constrains pods
+  # created later by the OpenShift AI pipeline operator.
+  workshop_node_spread: true
+  workshop_node_min_ready_seconds: 900
+  workshop_node_headroom_pods: 10
+  workshop_provision_concurrency: 2
   tabs:
     - id: openshift-console
       title: OpenShift Console
@@ -179,7 +185,7 @@ runtime:
         timeout_seconds: 300
 
 certification:
-  stage: implementation
+  stage: five-seat-remediation
   max_workshop_seats: 1
   promotion_sequence:
     - 1
