@@ -7,7 +7,7 @@ status: blocked
 source_pins:
   showroom: 0d697f3ddd1e5008dfd9bb32c3e3bdd0398383a9
   upstream_showroom: f1881c61de55ebf5640c27e76469f4efe458edaf
-  launchpad_seat_chart: 6fc278ec8200802a5dd536a1e76656bd160d697e
+  launchpad_seat_chart: 63456b6684737a5936c27c9496e45dc2fd1b06c0
   agnosticv: 48fc6eebedb295bddf1b915a230e5e90f89db0af
   automation: 6ea100531ac869fa66abe69ae223d6b56dbce9a2
   application: 1e50e51c334c1b6ed854d81a3f28fd324792f481
