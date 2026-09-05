@@ -92,6 +92,17 @@ def test_helm_workload_plan_carries_only_declarative_non_secret_contract():
             "workload_identity_value_path": "identity",
             "workload_helm_values": {"keycloak": {"enabled": False}},
             "workload_routes": {"ui": "example-ui"},
+            "workload_readiness": [
+                {
+                    "group": "example.io",
+                    "version": "v1",
+                    "plural": "examples",
+                    "name": "example",
+                    "condition_type": "Ready",
+                    "expected_status": "True",
+                    "timeout_seconds": 120,
+                }
+            ],
             "showroom_tabs": [
                 {"id": "terminal", "title": "Terminal", "source": "showroom.terminal"},
                 {"id": "app", "title": "App", "source": "workload.route.ui"},
@@ -112,6 +123,7 @@ def test_helm_workload_plan_carries_only_declarative_non_secret_contract():
     assert plan.required_resources["workload_revision"] == "a" * 40
     assert plan.required_resources["workload_helm_values"] == {"keycloak": {"enabled": False}}
     assert plan.required_resources["workload_identity_value_path"] == "identity"
+    assert plan.required_resources["workload_readiness"][0]["condition_type"] == "Ready"
     assert "maas_api_key" not in plan.required_resources
 
     with pytest.raises(ValueError, match="not activation-ready"):
@@ -249,6 +261,36 @@ def test_runtime_secret_resolver_rejects_literal_sensitive_fields_and_unknown_te
         OpenShiftProvisioningAdapter._resolve_workload_runtime_secret(
             {"DATABASE_URL": {"template": "postgres://{MISSING}"}}, {}
         )
+
+
+def test_showroom_runtime_credentials_are_applied_only_as_a_namespaced_secret():
+    adapter = OpenShiftProvisioningAdapter.__new__(OpenShiftProvisioningAdapter)
+    adapter._apply_workload_runtime_secret = MagicMock()
+
+    adapter._apply_showroom_runtime_secret(
+        namespace="launchpad-seat-1",
+        resources={
+            "workshop_id": "workshop-1",
+            "seat_id": "seat-1",
+            "session_id": "session-1",
+            "tenant_id": "tenant-1",
+            "maas_api_key": "sk-seat-secret",
+            "maas_endpoint": "https://models.example.com/v1",
+            "requested_models": ["granite"],
+        },
+        cluster_id="arena",
+    )
+
+    secret = adapter._apply_workload_runtime_secret.call_args.args[0]
+    assert secret["metadata"]["name"] == "launchpad-participant-runtime"
+    assert secret["metadata"]["namespace"] == "launchpad-seat-1"
+    assert secret["metadata"]["labels"]["launchpad.redhat.com/session-id"] == "session-1"
+    assert secret["stringData"] == {
+        "MAAS_API_KEY": "sk-seat-secret",
+        "MAAS_ENDPOINT": "https://models.example.com",
+        "MAAS_API_URL": "https://models.example.com/v1",
+        "MAAS_MODEL": "granite",
+    }
 
 
 def test_guided_workspace_deep_links_to_the_rag_experience():
@@ -396,9 +438,7 @@ def test_create_plan_persists_exact_namespace_used_for_the_workshop_seat():
 
     plan = adapter.create_plan(request, item)
 
-    assert plan.target_namespace == (
-        "launchpad-smoke-test-tenant-guided-rag-on-xeon-003606"
-    )
+    assert plan.target_namespace == ("launchpad-smoke-test-tenant-guided-rag-on-xeon-003606")
     assert plan.required_resources["tenant_id"] == "smoke-test-tenant"
 
 
@@ -424,6 +464,62 @@ def test_catalog_namespace_slug_leaves_room_for_operator_generated_routes():
 
     assert "-agentops-" in plan.target_namespace
     assert len(f"ds-pipeline-dspa-{plan.target_namespace}") <= 63
+
+
+def test_wait_for_workload_readiness_retries_until_declared_condition_is_true(
+    monkeypatch,
+):
+    adapter = OpenShiftProvisioningAdapter.__new__(OpenShiftProvisioningAdapter)
+    adapter._custom_objects = MagicMock()
+    adapter._custom_objects.get_namespaced_custom_object.side_effect = [
+        {"status": {"conditions": [{"type": "Ready", "status": "False"}]}},
+        {"status": {"conditions": [{"type": "Ready", "status": "True"}]}},
+    ]
+    monkeypatch.setattr("app.adapters.openshift.provisioning.time.sleep", lambda _seconds: None)
+
+    adapter._wait_for_workload_readiness(
+        "launchpad-agentops-seat-1",
+        [
+            {
+                "group": "datasciencepipelinesapplications.opendatahub.io",
+                "version": "v1",
+                "plural": "datasciencepipelinesapplications",
+                "name": "dspa",
+                "condition_type": "Ready",
+                "expected_status": "True",
+                "timeout_seconds": 60,
+            }
+        ],
+    )
+
+    assert adapter._custom_objects.get_namespaced_custom_object.call_count == 2
+
+
+def test_wait_for_workload_readiness_fails_closed_when_condition_never_matches(
+    monkeypatch,
+):
+    adapter = OpenShiftProvisioningAdapter.__new__(OpenShiftProvisioningAdapter)
+    adapter._custom_objects = MagicMock()
+    adapter._custom_objects.get_namespaced_custom_object.return_value = {
+        "status": {"conditions": [{"type": "Ready", "status": "False"}]}
+    }
+    monkeypatch.setattr("app.adapters.openshift.provisioning.time.sleep", lambda _seconds: None)
+
+    with pytest.raises(ValueError, match="dspa.*Ready=True"):
+        adapter._wait_for_workload_readiness(
+            "launchpad-agentops-seat-1",
+            [
+                {
+                    "group": "datasciencepipelinesapplications.opendatahub.io",
+                    "version": "v1",
+                    "plural": "datasciencepipelinesapplications",
+                    "name": "dspa",
+                    "condition_type": "Ready",
+                    "expected_status": "True",
+                    "timeout_seconds": 0,
+                }
+            ],
+        )
 
 
 def test_gateway_pvc_uses_configured_storage_class():

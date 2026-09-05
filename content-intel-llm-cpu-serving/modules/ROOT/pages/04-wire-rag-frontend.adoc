@@ -77,7 +77,7 @@ stringData:
   LLM_PROVIDER: generic-openai
   GENERIC_OPEN_AI_BASE_PATH: "{maas_endpoint}/v1"
   GENERIC_OPEN_AI_MODEL_PREF: "{maas_model}"
-  GENERIC_OPEN_AI_API_KEY: "{maas_api_key}"
+  GENERIC_OPEN_AI_API_KEY: "$MAAS_API_KEY"
   GENERIC_OPEN_AI_MAX_TOKENS: "512"
   EMBEDDING_ENGINE: native
   VECTOR_DB: lancedb

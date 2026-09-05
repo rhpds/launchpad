@@ -36,15 +36,24 @@ def test_agentops_is_registered_as_a_fail_closed_draft():
     assert catalog["metadata"]["showroom_content_playbook"] == ("site-agentops-observability.yml")
     assert catalog["metadata"]["showroom_content_start_path"] == ("content-agentops-observability")
     assert catalog["metadata"]["workload_repo"] == "https://github.com/rhpds/launchpad.git"
-    assert catalog["metadata"]["workload_revision"] == (
-        "63456b6684737a5936c27c9496e45dc2fd1b06c0"
-    )
+    assert catalog["metadata"]["workload_revision"] == ("63456b6684737a5936c27c9496e45dc2fd1b06c0")
     assert catalog["metadata"]["workload_deploy_path"] == "deploy/workloads/agentops-seat"
     assert catalog["metadata"]["workload_deployment_scope"] == "seat"
     assert catalog["metadata"]["workload_source_kind"] == "launchpad-seat-chart"
     assert catalog["metadata"]["workload_gitops_ready"] is True
     assert catalog["metadata"]["workload_identity_value_path"] == "identity"
     assert catalog["metadata"]["workload_runtime_secret_name"] == "agentops-runtime"
+    assert catalog["metadata"]["workload_readiness"] == [
+        {
+            "group": "datasciencepipelinesapplications.opendatahub.io",
+            "version": "v1",
+            "plural": "datasciencepipelinesapplications",
+            "name": "dspa",
+            "condition_type": "Ready",
+            "expected_status": "True",
+            "timeout_seconds": 300,
+        }
+    ]
     assert catalog["metadata"]["source_references"]["automation"]["revision"] == (
         "6ea100531ac869fa66abe69ae223d6b56dbce9a2"
     )

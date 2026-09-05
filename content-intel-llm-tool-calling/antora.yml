@@ -16,6 +16,5 @@ asciidoc:
     project_name: '%namespace%'
     quickstart_repo: 'https://github.com/rhpds/vllm-tool-calling.git'
     maas_api_url: '%maas_api_url%'
-    maas_api_key: '%maas_api_key%'
     maas_model: '%maas_model%'
     intel_platform: 'Intel Xeon'

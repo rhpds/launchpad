@@ -60,9 +60,9 @@ Set the variables that the remaining modules will use:
 [source,bash,role="execute",subs="attributes+"]
 ----
 export PROJECT={project_name}
-export MODEL_URL={maas_api_url}
-export MODEL_NAME={maas_model}
-export MODEL_API_KEY={maas_api_key}
+export MODEL_URL="$MAAS_API_URL"
+export MODEL_NAME="$MAAS_MODEL"
+export MODEL_API_KEY="$MAAS_API_KEY"
 echo "Project: $\{PROJECT\}"
 echo "Model URL: $\{MODEL_URL\}"
 echo "Model Name: $\{MODEL_NAME\}"

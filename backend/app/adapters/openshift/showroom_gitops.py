@@ -25,6 +25,7 @@ SHOWROOM_GIT_CLONER_IMAGE = (
     "launchpad-showroom-git-cloner@sha256:"
     "3ae8e259f03888ee90526fd7d76375c4a6340df31242ede6be423604c3fdc26d"
 )
+SHOWROOM_RUNTIME_SECRET_NAME = "launchpad-participant-runtime"
 
 
 def application_name(namespace: str) -> str:
@@ -133,8 +134,6 @@ def build_showroom_application(
         "maas_endpoint": seat.maas_endpoint,
         "maas_url": seat.maas_endpoint,
         "maas_api_url": f"{seat.maas_endpoint.rstrip('/')}/v1" if seat.maas_endpoint else "",
-        "maas_api_key": seat.maas_api_key,
-        "litellm_api_key": seat.maas_api_key,
         "maas_model": seat.maas_model,
     }
     # Antora content is Showroom's primary guide pane, so it must not also be

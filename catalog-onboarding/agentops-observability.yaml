@@ -161,6 +161,14 @@ runtime:
     routes:
       ui: app
       grafana: obs
+    readiness:
+      - group: datasciencepipelinesapplications.opendatahub.io
+        version: v1
+        plural: datasciencepipelinesapplications
+        name: dspa
+        condition_type: Ready
+        expected_status: "True"
+        timeout_seconds: 300
 
 certification:
   stage: implementation

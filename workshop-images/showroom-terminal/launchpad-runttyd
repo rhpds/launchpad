@@ -30,4 +30,35 @@ contexts:
 current-context: seat
 EOF
 
-exec /usr/bin/runttyd
+RUNTIME_SECRET=launchpad-participant-runtime
+
+read_runtime_value() {
+  oc get secret "${RUNTIME_SECRET}" -n "${NAMESPACE}" \
+    -o "jsonpath={.data.$1}" 2>/dev/null | base64 --decode 2>/dev/null || true
+}
+
+# The Showroom RoleBinding and pod can become ready in either order. Wait
+# briefly for the service account to receive namespace access, then expose the
+# seat-scoped model contract to terminal shells without placing it in Argo CD.
+for _attempt in $(seq 1 30); do
+  if oc get secret "${RUNTIME_SECRET}" -n "${NAMESPACE}" >/dev/null 2>&1; then
+    break
+  fi
+  sleep 1
+done
+export MAAS_API_KEY="$(read_runtime_value MAAS_API_KEY)"
+export MAAS_ENDPOINT="$(read_runtime_value MAAS_ENDPOINT)"
+export MAAS_API_URL="$(read_runtime_value MAAS_API_URL)"
+export MAAS_MODEL="$(read_runtime_value MAAS_MODEL)"
+
+cleanup_home_for_reclaim() {
+  # nfs-subdir-external-provisioner is root-squashed. It needs write access to
+  # participant-created subdirectories in order to honor reclaimPolicy=Delete.
+  chmod -R a+rwX "${HOME}" 2>/dev/null || true
+}
+
+trap cleanup_home_for_reclaim EXIT
+/usr/bin/runttyd &
+runttyd_pid=$!
+trap 'kill -TERM "${runttyd_pid}" 2>/dev/null || true' TERM INT HUP
+wait "${runttyd_pid}"

@@ -15,6 +15,5 @@ asciidoc:
     openshift_cluster_ingress_domain: "%openshift_cluster_ingress_domain%"
     cluster_display_name: "%cluster_display_name%"
     maas_endpoint: "%maas_endpoint%"
-    maas_api_key: "%maas_api_key%"
     maas_model: "%maas_model%"
     project_name: "%namespace%"

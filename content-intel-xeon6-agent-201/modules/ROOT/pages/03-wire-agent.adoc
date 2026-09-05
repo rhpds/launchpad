@@ -46,7 +46,7 @@ oc create configmap racmaas-connection \
   --dry-run=client -o yaml | oc apply -f -
 
 oc create secret generic litellm-api-key \
-  --from-literal=api-key='{maas_api_key}' \
+  --from-literal=api-key="$MAAS_API_KEY" \
   --dry-run=client -o yaml | oc apply -f -
 ----
 

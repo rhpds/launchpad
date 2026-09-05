@@ -20,7 +20,6 @@ asciidoc:
     openshift_cluster_ingress_domain: "%openshift_cluster_ingress_domain%"
     workspace_url: "%workspace_url%"
     maas_endpoint: "%maas_endpoint%"
-    maas_api_key: "%maas_api_key%"
     maas_model: "%maas_model%"
     ocp_version: "4.22"
     rhoai_version: "3.5"

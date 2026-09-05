@@ -16,5 +16,4 @@ asciidoc:
     project_name: '%namespace%'
     maas_endpoint: '%maas_endpoint%'
     maas_model: '%maas_model%'
-    maas_api_key: '%maas_api_key%'
     intel_platform: 'Intel Xeon'

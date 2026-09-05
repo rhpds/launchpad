@@ -126,7 +126,16 @@ def test_launchpad_terminal_defaults_oc_to_its_rotating_seat_identity():
     assert "tokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token" in entrypoint
     assert "namespace: ${NAMESPACE}" in entrypoint
     assert 'KUBECONFIG="${HOME}/.kube/config"' in entrypoint
-    assert "exec /usr/bin/runttyd" in entrypoint
+    assert "launchpad-participant-runtime" in entrypoint
+    assert 'export MAAS_API_KEY="$(read_runtime_value MAAS_API_KEY)"' in entrypoint
+
+
+def test_launchpad_terminal_relaxes_home_permissions_before_persistent_volume_reclaim():
+    entrypoint = (ROOT / "workshop-images/showroom-terminal/launchpad-runttyd").read_text()
+
+    assert "cleanup_home_for_reclaim" in entrypoint
+    assert 'chmod -R a+rwX "${HOME}"' in entrypoint
+    assert "trap cleanup_home_for_reclaim EXIT" in entrypoint
 
 
 def test_content_lab_receives_launchpad_runtime_values_and_named_workspace_tab():
@@ -167,8 +176,9 @@ def test_content_lab_receives_launchpad_runtime_values_and_named_workspace_tab()
     assert user_data["maas_endpoint"] == "https://models.example.com"
     assert user_data["maas_url"] == "https://models.example.com"
     assert user_data["maas_api_url"] == "https://models.example.com/v1"
-    assert user_data["maas_api_key"] == "sk-seat-1"
-    assert user_data["litellm_api_key"] == "sk-seat-1"
+    assert "maas_api_key" not in user_data
+    assert "litellm_api_key" not in user_data
+    assert "sk-seat-1" not in app["spec"]["source"]["helm"]["values"]
     assert user_data["maas_model"] == "granite-2b-cpu"
     assert values["terminal"]["storage"]["setup"] == "false"
 

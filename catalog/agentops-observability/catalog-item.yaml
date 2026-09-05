@@ -196,6 +196,14 @@ metadata:
   workload_routes:
     ui: app
     grafana: obs
+  workload_readiness:
+  - group: datasciencepipelinesapplications.opendatahub.io
+    version: v1
+    plural: datasciencepipelinesapplications
+    name: dspa
+    condition_type: Ready
+    expected_status: 'True'
+    timeout_seconds: 300
   source_content_repo: https://github.com/rhpds/launchpad.git
   source_content_revision: 0d697f3ddd1e5008dfd9bb32c3e3bdd0398383a9
   source_references:

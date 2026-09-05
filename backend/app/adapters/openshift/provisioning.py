@@ -25,6 +25,7 @@ except ImportError:  # pragma: no cover
 
 from app.adapters.interfaces import ProvisionResult
 from app.adapters.openshift.showroom_gitops import (
+    SHOWROOM_RUNTIME_SECRET_NAME,
     ShowroomGitOpsAdapter,
     ShowroomSeat,
     ShowroomToolTab,
@@ -178,6 +179,7 @@ class OpenShiftProvisioningAdapter:
                 ),
                 "workload_identity_value_path": meta.get("workload_identity_value_path", ""),
                 "workload_routes": meta.get("workload_routes", {}),
+                "workload_readiness": meta.get("workload_readiness", []),
             },
         )
 
@@ -247,9 +249,19 @@ class OpenShiftProvisioningAdapter:
         self._grant_participant_access(
             demo_namespace,
             str(res.get("participant_id", "")),
-            grant_application_logs="openshift_logging"
-            in set(res.get("required_capabilities", [])),
+            grant_application_logs="openshift_logging" in set(res.get("required_capabilities", [])),
         )
+        requested_models = list(res.get("requested_models", []))
+        maas_endpoint = self._showroom_maas_endpoint(res)
+        if showroom_enabled:
+            # Participant credentials are written directly to a namespaced
+            # Secret. They must never be serialized into the Argo CD
+            # Application that deploys Showroom.
+            self._apply_showroom_runtime_secret(
+                namespace=demo_namespace,
+                resources={**res, "tenant_id": tenant_id},
+                cluster_id=plan.target_cluster or "oberon",
+            )
         # The official Showroom chart clones Git content and builds Antora at
         # startup. Keep the restricted egress policy for ordinary demos, but
         # do not attach it to guided Showroom namespaces.
@@ -329,8 +341,6 @@ class OpenShiftProvisioningAdapter:
             routes = self._wait_for_named_routes(demo_namespace, set(workload_routes.values()))
 
         if showroom_enabled:
-            maas_endpoint = self._showroom_maas_endpoint(res)
-            requested_models = list(res.get("requested_models", []))
             console_url = (
                 self._target.console_url.rstrip("/")
                 if self._target and self._target.console_url
@@ -384,6 +394,12 @@ class OpenShiftProvisioningAdapter:
             )
             self._showroom_gitops.apply(showroom_app)
             routes = self._wait_for_showroom_route(demo_namespace)
+
+        if workload_enabled:
+            self._wait_for_workload_readiness(
+                demo_namespace,
+                list(res.get("workload_readiness", [])),
+            )
 
         route_names = list(routes.keys())
         fallback_url = f"https://{demo_namespace}.apps.cluster.local"
@@ -775,6 +791,34 @@ http {{
                 name,
             )
 
+    def _apply_showroom_runtime_secret(
+        self,
+        *,
+        namespace: str,
+        resources: dict,
+        cluster_id: str,
+    ) -> None:
+        """Write Showroom's seat model contract without exposing it to Argo CD."""
+        maas_endpoint = self._showroom_maas_endpoint(resources)
+        requested_models = list(resources.get("requested_models", []))
+        self._apply_workload_runtime_secret(
+            build_runtime_secret(
+                name=SHOWROOM_RUNTIME_SECRET_NAME,
+                namespace=namespace,
+                workshop_id=str(resources.get("workshop_id", "")),
+                seat_id=str(resources.get("seat_id", "")),
+                session_id=str(resources.get("session_id", "")),
+                tenant_id=str(resources.get("tenant_id", "default")),
+                cluster_id=cluster_id,
+                string_data={
+                    "MAAS_API_KEY": str(resources.get("maas_api_key", "")),
+                    "MAAS_ENDPOINT": maas_endpoint,
+                    "MAAS_API_URL": (f"{maas_endpoint.rstrip('/')}/v1" if maas_endpoint else ""),
+                    "MAAS_MODEL": requested_models[0] if requested_models else "",
+                },
+            )
+        )
+
     def _wait_for_named_routes(self, namespace: str, route_names: set[str]) -> dict[str, str]:
         timeout = int(os.environ.get("WORKLOAD_ROUTE_TIMEOUT", "600"))
         deadline = time.time() + timeout
@@ -789,6 +833,63 @@ http {{
             f"Workload routes were not ready in namespace '{namespace}' "
             f"within {timeout}s: {', '.join(missing)}"
         )
+
+    def _wait_for_workload_readiness(self, namespace: str, checks: list[dict]) -> None:
+        """Wait for declarative workload custom-resource conditions.
+
+        Routes and Running pods are not sufficient evidence for operators that
+        reconcile additional resources asynchronously. Every declared check
+        must reach its expected condition before provisioning can report
+        success.
+        """
+        for check in checks:
+            group = str(check.get("group", ""))
+            version = str(check.get("version", ""))
+            plural = str(check.get("plural", ""))
+            name = str(check.get("name", ""))
+            condition_type = str(check.get("condition_type", "Ready"))
+            expected_status = str(check.get("expected_status", "True"))
+            timeout = max(0, int(check.get("timeout_seconds", WAIT_TIMEOUT)))
+            interval = max(0, int(check.get("poll_interval_seconds", HEALTH_INTERVAL)))
+            deadline = time.time() + timeout
+            last_status = "missing"
+
+            while True:
+                try:
+                    resource = self._custom_objects.get_namespaced_custom_object(
+                        group,
+                        version,
+                        namespace,
+                        plural,
+                        name,
+                    )
+                    conditions = (resource.get("status") or {}).get("conditions") or []
+                    observed = next(
+                        (
+                            condition
+                            for condition in conditions
+                            if str(condition.get("type")) == condition_type
+                        ),
+                        None,
+                    )
+                    if observed is not None:
+                        last_status = str(observed.get("status", ""))
+                        if last_status.casefold() == expected_status.casefold():
+                            break
+                except ApiException as exc:
+                    if exc.status not in {404, 503}:
+                        raise ValueError(
+                            f"Cannot read workload readiness for {name} in namespace "
+                            f"'{namespace}': {exc.status} {exc.reason}"
+                        ) from exc
+
+                if time.time() >= deadline:
+                    raise ValueError(
+                        f"Workload {name} did not reach "
+                        f"{condition_type}={expected_status} in namespace '{namespace}' "
+                        f"within {timeout}s (last status: {last_status})"
+                    )
+                time.sleep(interval)
 
     def _wait_for_showroom_route(self, namespace: str) -> dict[str, str]:
         """Wait for Argo CD to sync far enough for the chart route to exist."""
@@ -913,8 +1014,7 @@ http {{
         except ApiException as exc:
             if exc.status != 409:
                 raise ValueError(
-                    f"Failed to grant application log access to {participant_id}: "
-                    f"{exc.reason}"
+                    f"Failed to grant application log access to {participant_id}: {exc.reason}"
                 ) from exc
 
     def _create_demo_secrets(self, namespace: str, session_maas_key: str = "") -> None:

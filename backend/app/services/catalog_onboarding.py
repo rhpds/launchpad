@@ -108,6 +108,7 @@ def build_catalog_item(intake: dict[str, Any]) -> dict[str, Any]:
             ),
             "workload_identity_value_path": workload_contract.get("identity_value_path", ""),
             "workload_routes": workload_contract.get("routes", {}),
+            "workload_readiness": workload_contract.get("readiness", []),
             "source_content_repo": showroom["repo_url"],
             "source_content_revision": showroom["revision"],
             "source_references": references,
@@ -193,6 +194,25 @@ def _validate_contract(intake: dict[str, Any], errors: list[str]) -> None:
             errors.append(
                 "runtime.workload.runtime_secret_value_path must be a dotted Helm value path"
             )
+
+        readiness = workload_contract.get("readiness", [])
+        if not isinstance(readiness, list):
+            errors.append("runtime.workload.readiness must be a list")
+        else:
+            for index, check in enumerate(readiness):
+                location = f"runtime.workload.readiness[{index}]"
+                if not isinstance(check, dict):
+                    errors.append(f"{location} must be a mapping")
+                    continue
+                for key in ("group", "version", "plural", "name", "condition_type"):
+                    if not str(check.get(key, "")).strip():
+                        errors.append(f"{location}.{key} is required")
+                expected_status = str(check.get("expected_status", "True"))
+                if expected_status not in {"True", "False", "Unknown"}:
+                    errors.append(f"{location}.expected_status must be True, False, or Unknown")
+                timeout = check.get("timeout_seconds", 300)
+                if not isinstance(timeout, int) or timeout < 0:
+                    errors.append(f"{location}.timeout_seconds must be a non-negative integer")
 
         secret_sources = workload_contract.get("runtime_secret_sources", {})
         if secret_sources and not isinstance(secret_sources, dict):

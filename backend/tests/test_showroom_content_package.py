@@ -183,11 +183,12 @@ def test_agent_content_uses_launchpad_safe_workload_manifests():
     assert "{litellm_api_endpoint}" not in content
     assert "{litellm_virtual_key}" not in content
     assert "{maas_endpoint}" in content
-    assert "{maas_api_key}" in content
+    assert "{maas_api_key}" not in content
+    assert "$MAAS_API_KEY" in content
     component = yaml.safe_load((content_root / "antora.yml").read_text())
     attributes = component["asciidoc"]["attributes"]
     assert attributes["maas_endpoint"] == "%maas_endpoint%"
-    assert attributes["maas_api_key"] == "%maas_api_key%"
+    assert "maas_api_key" not in attributes
     assert "raw.githubusercontent.com/rhpds/triforce" not in content
     assert "phi3-mini-cpu" not in content
     assert "qwen25-3b-cpu" not in content

@@ -36,22 +36,15 @@ The key insight: all of these components exist, but they are managed centrally. 
 
 == Set Up Your Environment
 
-Store your MaaS connection details as environment variables:
-
-[source,bash,role="execute",subs="attributes+"]
-----
-export MAAS_ENDPOINT="{maas_endpoint}"
-export MAAS_MODEL="{maas_model}"
-export MAAS_API_KEY="{maas_api_key}"
-----
-
-Verify the variables are set:
+Launchpad has already loaded this seat's short-lived MaaS connection into the
+terminal environment. Verify that the non-secret endpoint and model are present
+and that the key is configured without printing it:
 
 [source,bash,role="execute"]
 ----
 echo "Endpoint: ${MAAS_ENDPOINT}"
 echo "Model: ${MAAS_MODEL}"
-echo "API Key: ${MAAS_API_KEY:0:8}..."
+test -n "${MAAS_API_KEY}" && echo "API key: configured"
 ----
 
 == List Available Models
