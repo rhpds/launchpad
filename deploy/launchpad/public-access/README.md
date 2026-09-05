@@ -51,3 +51,17 @@ OpenShift Console cannot send that cookie, the form can recover the unique
 active order from the instructor code through the private
 `validate-by-code` contract. Namespace RBAC must succeed before either path
 returns a usable identity.
+
+## Participant tool isolation
+
+The public gateway resolves a participant's active entitlement before every
+HTTP or WebSocket request. Its upstream allowlist contains only catalog-declared
+workload Routes and registered cluster services for that persisted seat. An
+undeclared Route in the same namespace is not exposed automatically.
+
+Showroom `ui-config.yml` is rewritten per request so entitled tool tabs use
+`/proxy/tool/<tool-id>/...`. External documentation remains external. The proxy
+rejects traversal and cross-origin escapes, removes upstream cookie headers,
+and rewrites same-origin redirects back through the gateway. These contracts
+must still pass a deployed browser journey for every workload before a catalog
+item is promoted from draft.

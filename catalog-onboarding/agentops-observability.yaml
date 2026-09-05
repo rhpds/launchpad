@@ -173,10 +173,11 @@ certification:
       Terminal, shared MLflow, per-seat Mortgage AI, per-seat Grafana, shared
       RHOAI, MLflow Docs, and RHOAI Docs.
     - >-
-      Protect every participant workload and shared-service route through the
-      Launchpad entitlement gateway and prove cross-seat and cross-tenant
-      denial. The adapted Showroom already uses participant SSO and the
-      generated seat namespace.
+      Deploy and live-certify the Launchpad entitlement gateway proxy for
+      every participant workload and shared-service route, including
+      cross-seat and cross-tenant denial. Local contracts prove catalog-only
+      allowlisting, Showroom tab rewriting, WebSocket support, and origin
+      escape rejection.
     - >-
       Install and certify an Arena participant route for shared MLflow,
       per-seat Grafana, and OpenShift Logging/Loki. OpenShift AI 3.5, a Ready

@@ -3,17 +3,50 @@ from datetime import datetime, timedelta
 from types import SimpleNamespace
 
 import pytest
-from fastapi import HTTPException
-
+from app.api.routers import public_access as public_access_router
+from app.api.routers.public_access import _participant_tool_urls
 from app.domain.access import EntitlementStatus, ExposurePolicy
 from app.domain.clusters import ClusterTarget
 from app.services.cluster_registry import ClusterRegistry
 from app.services.public_access import PublicAccessService
-from app.api.routers import public_access as public_access_router
+from fastapi import HTTPException
 
 
 def service():
     return PublicAccessService(public_domain="labs.example.io", enabled=True)
+
+
+def test_public_gateway_receives_only_catalog_declared_tool_urls():
+    session = SimpleNamespace(
+        resources={
+            "routes": {
+                "mortgage-ai-ui-route": "https://mortgage-seat.apps.arena.example",
+                "grafana-route": "https://grafana-seat.apps.arena.example",
+                "undeclared-route": "https://undeclared.apps.arena.example",
+            }
+        }
+    )
+    catalog_item = SimpleNamespace(
+        metadata={
+            "showroom_tabs": [
+                {"id": "mortgage-ai", "source": "workload.route.ui"},
+                {"id": "grafana", "source": "workload.route.grafana"},
+                {"id": "mlflow", "source": "cluster.mlflow_url"},
+                {"id": "docs", "source": "https://docs.example.test"},
+            ],
+            "workload_routes": {
+                "ui": "mortgage-ai-ui-route",
+                "grafana": "grafana-route",
+            },
+        }
+    )
+    cluster = SimpleNamespace(service_urls={"mlflow": "https://mlflow.apps.arena.example"})
+
+    assert _participant_tool_urls(session, catalog_item, cluster) == {
+        "mortgage-ai": "https://mortgage-seat.apps.arena.example",
+        "grafana": "https://grafana-seat.apps.arena.example",
+        "mlflow": "https://mlflow.apps.arena.example",
+    }
 
 
 def test_public_access_defaults_to_internal():
@@ -23,8 +56,11 @@ def test_public_access_defaults_to_internal():
 def test_code_is_one_time_plaintext_and_argon2id_hashed():
     access = service()
     policy, plaintext = access.create_policy(
-        order_id="workshop-1", order_type="workshop", catalog_slug="operator-lab",
-        seat_refs=["seat-1", "seat-2"], expires_at=datetime.utcnow() + timedelta(hours=4),
+        order_id="workshop-1",
+        order_type="workshop",
+        catalog_slug="operator-lab",
+        seat_refs=["seat-1", "seat-2"],
+        expires_at=datetime.utcnow() + timedelta(hours=4),
     )
     assert plaintext not in policy.code_hash
     assert policy.code_hash.startswith("$argon2id$")
@@ -36,8 +72,11 @@ def test_code_is_one_time_plaintext_and_argon2id_hashed():
 def test_claim_normalizes_email_and_recovers_same_seat():
     access = service()
     _, code = access.create_policy(
-        order_id="workshop-12345678", order_type="workshop", catalog_slug="operator-lab",
-        seat_refs=["seat-1", "seat-2"], expires_at=datetime.utcnow() + timedelta(hours=4),
+        order_id="workshop-12345678",
+        order_type="workshop",
+        catalog_slug="operator-lab",
+        seat_refs=["seat-1", "seat-2"],
+        expires_at=datetime.utcnow() + timedelta(hours=4),
     )
     first = access.claim("workshop-12345678", " Person@Example.COM ", code, "192.0.2.1")
     recovered = access.claim("workshop-12345678", "person@example.com", code, "192.0.2.1")
@@ -49,38 +88,57 @@ def test_claim_normalizes_email_and_recovers_same_seat():
 def test_same_identity_can_claim_multiple_labs():
     access = service()
     _, code_a = access.create_policy(
-        order_id="workshop-a", order_type="workshop", catalog_slug="lab-a",
-        seat_refs=["a-1"], expires_at=datetime.utcnow() + timedelta(hours=4),
+        order_id="workshop-a",
+        order_type="workshop",
+        catalog_slug="lab-a",
+        seat_refs=["a-1"],
+        expires_at=datetime.utcnow() + timedelta(hours=4),
     )
     _, code_b = access.create_policy(
-        order_id="workshop-b", order_type="workshop", catalog_slug="lab-b",
-        seat_refs=["b-1"], expires_at=datetime.utcnow() + timedelta(hours=4),
+        order_id="workshop-b",
+        order_type="workshop",
+        catalog_slug="lab-b",
+        seat_refs=["b-1"],
+        expires_at=datetime.utcnow() + timedelta(hours=4),
     )
     a = access.claim("workshop-a", "person@example.com", code_a, "192.0.2.1")
     b = access.claim("workshop-b", "person@example.com", code_b, "192.0.2.1")
     assert a.identity.participant_id == b.identity.participant_id
-    assert {e.order_id for e in access.entitlements_for(a.identity.participant_id)} == {"workshop-a", "workshop-b"}
+    assert {e.order_id for e in access.entitlements_for(a.identity.participant_id)} == {
+        "workshop-a",
+        "workshop-b",
+    }
 
 
 def test_concurrent_claims_never_duplicate_a_seat():
     access = service()
     _, code = access.create_policy(
-        order_id="burst-order", order_type="workshop", catalog_slug="burst",
-        seat_refs=[f"seat-{i}" for i in range(1, 26)], expires_at=datetime.utcnow() + timedelta(hours=4),
+        order_id="burst-order",
+        order_type="workshop",
+        catalog_slug="burst",
+        seat_refs=[f"seat-{i}" for i in range(1, 26)],
+        expires_at=datetime.utcnow() + timedelta(hours=4),
     )
     with ThreadPoolExecutor(max_workers=25) as pool:
-        claims = list(pool.map(
-            lambda i: access.claim("burst-order", f"user-{i}@example.com", code, f"192.0.2.{i}"),
-            range(1, 26),
-        ))
+        claims = list(
+            pool.map(
+                lambda i: access.claim(
+                    "burst-order", f"user-{i}@example.com", code, f"192.0.2.{i}"
+                ),
+                range(1, 26),
+            )
+        )
     assert len({claim.entitlement.seat_ref for claim in claims}) == 25
 
 
 def test_full_order_rejects_without_leaking_participants():
     access = service()
     _, code = access.create_policy(
-        order_id="full", order_type="individual", catalog_slug="lab",
-        seat_refs=["only"], expires_at=datetime.utcnow() + timedelta(hours=1),
+        order_id="full",
+        order_type="individual",
+        catalog_slug="lab",
+        seat_refs=["only"],
+        expires_at=datetime.utcnow() + timedelta(hours=1),
     )
     access.claim("full", "first@example.com", code, "192.0.2.1")
     with pytest.raises(ValueError, match="Access request cannot be completed"):
@@ -90,8 +148,11 @@ def test_full_order_rejects_without_leaking_participants():
 def test_rotation_requires_reauthentication_and_new_code_restores_seat():
     access = service()
     _, code = access.create_policy(
-        order_id="rotate", order_type="workshop", catalog_slug="lab",
-        seat_refs=["seat-1"], expires_at=datetime.utcnow() + timedelta(hours=1),
+        order_id="rotate",
+        order_type="workshop",
+        catalog_slug="lab",
+        seat_refs=["seat-1"],
+        expires_at=datetime.utcnow() + timedelta(hours=1),
     )
     claim = access.claim("rotate", "person@example.com", code, "192.0.2.1")
     session = access.validate_session(claim.session_token, "rotate")
@@ -107,8 +168,11 @@ def test_rotation_requires_reauthentication_and_new_code_restores_seat():
 def test_expired_policy_denies_claim_and_session():
     access = service()
     _, code = access.create_policy(
-        order_id="expired", order_type="individual", catalog_slug="lab",
-        seat_refs=["seat"], expires_at=datetime.utcnow() + timedelta(seconds=1),
+        order_id="expired",
+        order_type="individual",
+        catalog_slug="lab",
+        seat_refs=["seat"],
+        expires_at=datetime.utcnow() + timedelta(seconds=1),
     )
     claim = access.claim("expired", "person@example.com", code, "192.0.2.1")
     access.expire_order("expired")
@@ -119,16 +183,24 @@ def test_expired_policy_denies_claim_and_session():
 def test_shared_pilot_host_selects_only_current_active_policy():
     access = service()
     old, _ = access.create_policy(
-        order_id="old", order_type="individual", catalog_slug="lab",
-        seat_refs=["old-seat"], expires_at=datetime.utcnow() + timedelta(hours=1),
+        order_id="old",
+        order_type="individual",
+        catalog_slug="lab",
+        seat_refs=["old-seat"],
+        expires_at=datetime.utcnow() + timedelta(hours=1),
     )
     access._policies["old"] = old.model_copy(update={"public_url": "https://pilot.example.io"})
     access.expire_order("old")
     current, _ = access.create_policy(
-        order_id="current", order_type="individual", catalog_slug="lab",
-        seat_refs=["current-seat"], expires_at=datetime.utcnow() + timedelta(hours=2),
+        order_id="current",
+        order_type="individual",
+        catalog_slug="lab",
+        seat_refs=["current-seat"],
+        expires_at=datetime.utcnow() + timedelta(hours=2),
     )
-    access._policies["current"] = current.model_copy(update={"public_url": "https://pilot.example.io"})
+    access._policies["current"] = current.model_copy(
+        update={"public_url": "https://pilot.example.io"}
+    )
     assert access.get_policy_by_host("pilot.example.io").order_id == "current"
 
 
@@ -173,28 +245,44 @@ def test_shared_pilot_origin_rejects_a_second_active_order():
 
 
 def test_public_placement_requires_public_enabled_cluster():
-    registry = ClusterRegistry([
-        ClusterTarget(cluster_id="private", display_name="Private", ingress_domain="apps.private", capabilities=["openshift"]),
-        ClusterTarget(cluster_id="public", display_name="Public", ingress_domain="apps.public", capabilities=["openshift"], public_access_enabled=True, public_ingress_domain="labs.example.io"),
-    ])
+    registry = ClusterRegistry(
+        [
+            ClusterTarget(
+                cluster_id="private",
+                display_name="Private",
+                ingress_domain="apps.private",
+                capabilities=["openshift"],
+            ),
+            ClusterTarget(
+                cluster_id="public",
+                display_name="Public",
+                ingress_domain="apps.public",
+                capabilities=["openshift"],
+                public_access_enabled=True,
+                public_ingress_domain="labs.example.io",
+            ),
+        ]
+    )
     assert registry.select(["openshift"], require_public_access=True).cluster_id == "public"
 
 
 def test_arena_pilot_flag_does_not_make_any_other_cluster_public(monkeypatch):
-    registry = ClusterRegistry([
-        ClusterTarget(
-            cluster_id="arena",
-            display_name="Arena",
-            ingress_domain="apps.arena.example",
-            capabilities=["openshift"],
-        ),
-        ClusterTarget(
-            cluster_id="other",
-            display_name="Other",
-            ingress_domain="apps.other.example",
-            capabilities=["openshift"],
-        ),
-    ])
+    registry = ClusterRegistry(
+        [
+            ClusterTarget(
+                cluster_id="arena",
+                display_name="Arena",
+                ingress_domain="apps.arena.example",
+                capabilities=["openshift"],
+            ),
+            ClusterTarget(
+                cluster_id="other",
+                display_name="Other",
+                ingress_domain="apps.other.example",
+                capabilities=["openshift"],
+            ),
+        ]
+    )
     monkeypatch.setenv("PUBLIC_ACCESS_PILOT_CLUSTER", "arena")
 
     eligible = registry.eligible(["openshift"], require_public_access=True)
@@ -205,28 +293,44 @@ def test_arena_pilot_flag_does_not_make_any_other_cluster_public(monkeypatch):
 def test_only_failed_claims_consume_rate_limit_budget():
     access = service()
     _, code = access.create_policy(
-        order_id="order-rate", order_type="individual", catalog_slug="sandbox",
-        seat_refs=["seat"], expires_at=datetime.utcnow() + timedelta(hours=1),
+        order_id="order-rate",
+        order_type="individual",
+        catalog_slug="sandbox",
+        seat_refs=["seat"],
+        expires_at=datetime.utcnow() + timedelta(hours=1),
     )
     for _ in range(8):
-        assert access.claim("order-rate", "same@example.com", code, "192.0.2.10").entitlement.seat_ref == "seat"
+        assert (
+            access.claim("order-rate", "same@example.com", code, "192.0.2.10").entitlement.seat_ref
+            == "seat"
+        )
 
 
 def test_participant_removal_reopens_the_seat():
     access = service()
     _, code = access.create_policy(
-        order_id="order-remove", order_type="workshop", catalog_slug="operators",
-        seat_refs=["seat"], expires_at=datetime.utcnow() + timedelta(hours=1),
+        order_id="order-remove",
+        order_type="workshop",
+        catalog_slug="operators",
+        seat_refs=["seat"],
+        expires_at=datetime.utcnow() + timedelta(hours=1),
     )
     first = access.claim("order-remove", "first@example.com", code, "192.0.2.11")
     access.remove_participant("order-remove", first.identity.participant_id)
-    assert access.claim("order-remove", "second@example.com", code, "192.0.2.12").entitlement.seat_ref == "seat"
+    assert (
+        access.claim("order-remove", "second@example.com", code, "192.0.2.12").entitlement.seat_ref
+        == "seat"
+    )
 
 
 def test_owner_summary_counts_only_active_claims(monkeypatch):
     policy = SimpleNamespace(
-        order_id="order-summary", public_url="https://lab.example.io", enabled=True,
-        expires_at=datetime.utcnow() + timedelta(hours=1), seat_limit=2, code_version=1,
+        order_id="order-summary",
+        public_url="https://lab.example.io",
+        enabled=True,
+        expires_at=datetime.utcnow() + timedelta(hours=1),
+        seat_limit=2,
+        code_version=1,
     )
     fake_service = SimpleNamespace(
         get_policy=lambda order_id: policy,
@@ -277,9 +381,12 @@ def test_keycloak_validation_fails_closed_when_namespace_binding_fails(monkeypat
         if entitlement.order_id == "binding-failure"
         and entitlement.status == EntitlementStatus.ACTIVE
     ]
-    assert access.claim(
-        "binding-failure", "second@example.com", code, "192.0.2.41"
-    ).entitlement.seat_ref == "seat-1"
+    assert (
+        access.claim(
+            "binding-failure", "second@example.com", code, "192.0.2.41"
+        ).entitlement.seat_ref
+        == "seat-1"
+    )
 
 
 def test_keycloak_can_recover_order_from_unique_active_code(monkeypatch):
@@ -327,9 +434,7 @@ def test_admin_can_change_only_the_https_origin_for_a_pilot_order():
         expires_at=datetime.utcnow() + timedelta(hours=1),
     )
 
-    updated = access.set_public_url(
-        "pilot-url", "https://public-pilot.trycloudflare.com"
-    )
+    updated = access.set_public_url("pilot-url", "https://public-pilot.trycloudflare.com")
 
     assert updated.public_url == "https://public-pilot.trycloudflare.com"
     assert access.get_policy_by_host("public-pilot.trycloudflare.com").order_id == "pilot-url"
@@ -349,9 +454,7 @@ def test_admin_can_change_only_the_https_origin_for_a_pilot_order():
         expires_at=datetime.utcnow() + timedelta(hours=1),
     )
     with pytest.raises(ValueError, match="already belongs to an active order"):
-        access.set_public_url(
-            "second-pilot-url", "https://public-pilot.trycloudflare.com"
-        )
+        access.set_public_url("second-pilot-url", "https://public-pilot.trycloudflare.com")
 
 
 def test_public_access_never_uses_placeholder_workspace_url():
@@ -368,32 +471,60 @@ def test_public_access_never_uses_placeholder_workspace_url():
 def test_backend_restart_recovers_policy_identity_entitlement_and_session():
     class Store:
         def __init__(self):
-            self.policies = {}; self.identities = {}; self.entitlements = {}; self.sessions = {}
-        def save_policy(self, value): self.policies[value.order_id] = value
-        def save_identity(self, value): self.identities[value.participant_id] = value
-        def save_entitlement(self, value): self.entitlements[value.entitlement_id] = value
-        def save_session(self, value): self.sessions[value.session_id] = value
-        def list_policies(self): return list(self.policies.values())
-        def list_identities(self): return list(self.identities.values())
-        def list_entitlements(self): return list(self.entitlements.values())
-        def list_sessions(self): return list(self.sessions.values())
+            self.policies = {}
+            self.identities = {}
+            self.entitlements = {}
+            self.sessions = {}
+
+        def save_policy(self, value):
+            self.policies[value.order_id] = value
+
+        def save_identity(self, value):
+            self.identities[value.participant_id] = value
+
+        def save_entitlement(self, value):
+            self.entitlements[value.entitlement_id] = value
+
+        def save_session(self, value):
+            self.sessions[value.session_id] = value
+
+        def list_policies(self):
+            return list(self.policies.values())
+
+        def list_identities(self):
+            return list(self.identities.values())
+
+        def list_entitlements(self):
+            return list(self.entitlements.values())
+
+        def list_sessions(self):
+            return list(self.sessions.values())
 
     store = Store()
     first = PublicAccessService(public_domain="labs.example.io", enabled=True, store=store)
     _, code = first.create_policy(
-        order_id="restart", order_type="individual", catalog_slug="sandbox",
-        seat_refs=["seat"], expires_at=datetime.utcnow() + timedelta(hours=1),
+        order_id="restart",
+        order_type="individual",
+        catalog_slug="sandbox",
+        seat_refs=["seat"],
+        expires_at=datetime.utcnow() + timedelta(hours=1),
     )
     claim = first.claim("restart", "person@example.com", code, "192.0.2.20")
     restarted = PublicAccessService(public_domain="labs.example.io", enabled=True, store=store)
-    assert restarted.validate_session(claim.session_token, "restart").participant_id == claim.identity.participant_id
+    assert (
+        restarted.validate_session(claim.session_token, "restart").participant_id
+        == claim.identity.participant_id
+    )
 
 
 def test_final_entitlement_expiry_disables_identity_and_revokes_session():
     access = service()
     _, code = access.create_policy(
-        order_id="final", order_type="individual", catalog_slug="sandbox",
-        seat_refs=["seat"], expires_at=datetime.utcnow() + timedelta(hours=1),
+        order_id="final",
+        order_type="individual",
+        catalog_slug="sandbox",
+        seat_refs=["seat"],
+        expires_at=datetime.utcnow() + timedelta(hours=1),
     )
     claim = access.claim("final", "person@example.com", code, "192.0.2.21")
     access.expire_order("final")
@@ -405,15 +536,21 @@ def test_final_entitlement_expiry_disables_identity_and_revokes_session():
 def test_claiming_a_later_lab_reactivates_the_ephemeral_identity():
     access = service()
     _, first_code = access.create_policy(
-        order_id="first", order_type="individual", catalog_slug="sandbox",
-        seat_refs=["first-seat"], expires_at=datetime.utcnow() + timedelta(hours=1),
+        order_id="first",
+        order_type="individual",
+        catalog_slug="sandbox",
+        seat_refs=["first-seat"],
+        expires_at=datetime.utcnow() + timedelta(hours=1),
     )
     first = access.claim("first", "person@example.com", first_code, "192.0.2.30")
     access.expire_order("first")
     assert access._identities["person@example.com"].disabled_at is not None
     _, next_code = access.create_policy(
-        order_id="next", order_type="individual", catalog_slug="operators",
-        seat_refs=["next-seat"], expires_at=datetime.utcnow() + timedelta(hours=2),
+        order_id="next",
+        order_type="individual",
+        catalog_slug="operators",
+        seat_refs=["next-seat"],
+        expires_at=datetime.utcnow() + timedelta(hours=2),
     )
     resumed = access.claim("next", "person@example.com", next_code, "192.0.2.30")
     assert resumed.identity.participant_id == first.identity.participant_id

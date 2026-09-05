@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import logging
 import os
+import re
 from datetime import datetime
+from urllib.parse import urlsplit
 
 from fastapi import APIRouter, Cookie, Depends, Header, HTTPException, Request, Response
 from pydantic import BaseModel
@@ -46,6 +48,49 @@ def _require_broker(key: str) -> None:
         raise HTTPException(403, "Forbidden")
 
 
+def _participant_tool_urls(lab_session, catalog_item, cluster) -> dict[str, str]:
+    """Return only catalog-declared tool endpoints for one persisted seat.
+
+    The public gateway treats this mapping as its upstream allowlist. Route
+    discovery alone is never enough: an undeclared Route in the namespace must
+    not become reachable through a participant's public URL.
+    """
+    if not lab_session or not catalog_item:
+        return {}
+    metadata = catalog_item.metadata or {}
+    route_names = metadata.get("workload_routes", {})
+    route_urls = (lab_session.resources or {}).get("routes", {})
+    service_urls = getattr(cluster, "service_urls", {}) if cluster else {}
+    tools: dict[str, str] = {}
+    for tab in metadata.get("showroom_tabs", []):
+        tool_id = str(tab.get("id", ""))
+        source = str(tab.get("source", ""))
+        if not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", tool_id):
+            continue
+        url = ""
+        if source.startswith("workload.route."):
+            route_id = source.removeprefix("workload.route.")
+            route_name = str(route_names.get(route_id, ""))
+            url = str(route_urls.get(route_name, ""))
+        elif source.startswith("cluster.") and source.endswith("_url"):
+            service = source.removeprefix("cluster.").removesuffix("_url")
+            url = str(service_urls.get(service, ""))
+        parsed = urlsplit(url)
+        if parsed.scheme == "https" and parsed.netloc and not parsed.username:
+            tools[tool_id] = url.rstrip("/")
+    return tools
+
+
+def _session_tool_urls(lab_session) -> dict[str, str]:
+    if not lab_session:
+        return {}
+    catalog_item = provisioning_service.catalog.get_item(lab_session.catalog_item_id)
+    cluster = None
+    if lab_session.cluster_ref and provisioning_service.cluster_registry:
+        cluster = provisioning_service.cluster_registry.get(lab_session.cluster_ref)
+    return _participant_tool_urls(lab_session, catalog_item, cluster)
+
+
 def _bind_claim_or_fail_closed(order_id: str, result) -> None:
     """Finish a claim only after Arena grants the participant's RBAC.
 
@@ -62,9 +107,7 @@ def _bind_claim_or_fail_closed(order_id: str, result) -> None:
         )
     except Exception as exc:
         try:
-            public_access_service.remove_participant(
-                order_id, result.identity.participant_id
-            )
+            public_access_service.remove_participant(order_id, result.identity.participant_id)
         except Exception:
             logger.exception(
                 "Failed to compensate participant claim after RBAC failure: "
@@ -99,22 +142,31 @@ def _owner_summary(order_id: str) -> dict:
 @router.get("/orders/{order_id}")
 def public_order(order_id: str):
     summary = _owner_summary(order_id)
-    return {key: summary[key] for key in ("order_id", "enabled", "expires_at", "seat_limit", "claim_count")}
+    return {
+        key: summary[key]
+        for key in ("order_id", "enabled", "expires_at", "seat_limit", "claim_count")
+    }
 
 
 @router.post("/claim")
 def claim(body: ClaimRequest, request: Request, response: Response):
     try:
         result = public_access_service.claim(
-            body.order_id, body.email, body.code,
+            body.order_id,
+            body.email,
+            body.code,
             request.client.host if request.client else "unknown",
         )
     except ValueError as exc:
         raise HTTPException(403, str(exc))
     _bind_claim_or_fail_closed(body.order_id, result)
     response.set_cookie(
-        "launchpad_access", result.session_token, httponly=True, secure=True,
-        samesite="lax", path="/",
+        "launchpad_access",
+        result.session_token,
+        httponly=True,
+        secure=True,
+        samesite="lax",
+        path="/",
         max_age=max(1, int((result.session_expires_at - datetime.utcnow()).total_seconds())),
     )
     return {
@@ -131,7 +183,11 @@ def authorize(order_id: str, launchpad_access: str | None = Cookie(default=None)
     try:
         session = public_access_service.validate_session(launchpad_access or "", order_id)
         entitlement = public_access_service._entitlements[(order_id, session.participant_id)]
-        return {"authorized": True, "participant_id": session.participant_id, "seat_ref": entitlement.seat_ref}
+        return {
+            "authorized": True,
+            "participant_id": session.participant_id,
+            "seat_ref": entitlement.seat_ref,
+        }
     except ValueError:
         raise HTTPException(403, "Access denied")
 
@@ -146,10 +202,22 @@ def rotate(order_id: str, _user: User = Depends(require_admin)):
     try:
         for entitlement in public_access_service._entitlements.values():
             if entitlement.order_id == order_id and entitlement.status.value == "active":
-                identity = next((item for item in public_access_service._identities.values() if item.participant_id == entitlement.participant_id), None)
+                identity = next(
+                    (
+                        item
+                        for item in public_access_service._identities.values()
+                        if item.participant_id == entitlement.participant_id
+                    ),
+                    None,
+                )
                 if identity:
-                    provisioning_service.unbind_public_participant(order_id, entitlement.seat_ref, identity.keycloak_username)
-        return {"one_time_access_code": public_access_service.rotate_code(order_id), **_owner_summary(order_id)}
+                    provisioning_service.unbind_public_participant(
+                        order_id, entitlement.seat_ref, identity.keycloak_username
+                    )
+        return {
+            "one_time_access_code": public_access_service.rotate_code(order_id),
+            **_owner_summary(order_id),
+        }
     except ValueError as exc:
         raise HTTPException(404, str(exc))
 
@@ -171,19 +239,35 @@ def update_public_url(
 def remove_participant(order_id: str, participant_id: str, _user: User = Depends(require_admin)):
     try:
         entitlement = public_access_service._entitlements.get((order_id, participant_id))
-        identity = next((item for item in public_access_service._identities.values() if item.participant_id == participant_id), None)
+        identity = next(
+            (
+                item
+                for item in public_access_service._identities.values()
+                if item.participant_id == participant_id
+            ),
+            None,
+        )
         if entitlement and identity:
-            provisioning_service.unbind_public_participant(order_id, entitlement.seat_ref, identity.keycloak_username)
+            provisioning_service.unbind_public_participant(
+                order_id, entitlement.seat_ref, identity.keycloak_username
+            )
         public_access_service.remove_participant(order_id, participant_id)
     except ValueError as exc:
         raise HTTPException(404, str(exc))
 
 
 @router.post("/private/validate")
-def keycloak_validate(body: ClaimRequest, request: Request, x_access_broker_key: str = Header(default="")):
+def keycloak_validate(
+    body: ClaimRequest, request: Request, x_access_broker_key: str = Header(default="")
+):
     _require_broker(x_access_broker_key)
     try:
-        result = public_access_service.claim(body.order_id, body.email, body.code, request.client.host if request.client else "keycloak")
+        result = public_access_service.claim(
+            body.order_id,
+            body.email,
+            body.code,
+            request.client.host if request.client else "keycloak",
+        )
     except ValueError:
         raise HTTPException(403, "Access request cannot be completed")
     _bind_claim_or_fail_closed(body.order_id, result)
@@ -259,7 +343,14 @@ def resolve_gateway_target(
     showroom_url = workspace_url = console_url = None
     if policy.order_type == "workshop":
         workshop = provisioning_service.get_workshop(policy.order_id)
-        seat = next((item for item in (workshop.seats if workshop else []) if item.seat_id == entitlement.seat_ref), None)
+        seat = next(
+            (
+                item
+                for item in (workshop.seats if workshop else [])
+                if item.seat_id == entitlement.seat_ref
+            ),
+            None,
+        )
         if seat:
             showroom_url = seat.showroom_url
             workspace_url = seat.lab_url
@@ -267,7 +358,14 @@ def resolve_gateway_target(
         else:
             lab_session = None
     else:
-        lab_session = next((item for item in provisioning_service._sessions.values() if item.request_id == policy.order_id), None)
+        lab_session = next(
+            (
+                item
+                for item in provisioning_service._sessions.values()
+                if item.request_id == policy.order_id
+            ),
+            None,
+        )
         if lab_session:
             showroom_url = lab_session.lab_url
             workspace_url = lab_session.metadata.get("workspace_url") or lab_session.dashboard_url
@@ -276,7 +374,9 @@ def resolve_gateway_target(
         console_url = target.public_console_url or target.console_url
         if console_url and lab_session.namespace:
             console_url = f"{console_url.rstrip('/')}/k8s/ns/{lab_session.namespace}/core~v1~Pod"
-        if workspace_url and ("example.com" in workspace_url or ".apps.cluster.local" in workspace_url):
+        if workspace_url and (
+            "example.com" in workspace_url or ".apps.cluster.local" in workspace_url
+        ):
             workspace_url = None
     return {
         "order_id": policy.order_id,
@@ -285,6 +385,7 @@ def resolve_gateway_target(
         "showroom_url": showroom_url,
         "workspace_url": workspace_url,
         "console_url": console_url,
+        "tool_urls": _session_tool_urls(lab_session),
     }
 
 
@@ -301,23 +402,43 @@ def order_by_host(host: str, x_access_broker_key: str = Header(default="")):
 def resolve_oidc_identity(host: str, username: str, x_access_broker_key: str = Header(default="")):
     _require_broker(x_access_broker_key)
     policy = public_access_service.get_policy_by_host(host)
-    identity = next((item for item in public_access_service._identities.values() if item.keycloak_username == username), None)
+    identity = next(
+        (
+            item
+            for item in public_access_service._identities.values()
+            if item.keycloak_username == username
+        ),
+        None,
+    )
     if not policy or not policy.enabled or not identity or identity.disabled_at:
         raise HTTPException(403, "Access denied")
-    entitlement = public_access_service._entitlements.get((policy.order_id, identity.participant_id))
+    entitlement = public_access_service._entitlements.get(
+        (policy.order_id, identity.participant_id)
+    )
     if not entitlement:
         raise HTTPException(403, "Access denied")
     # Reuse the target resolver's mapping without trusting a browser-provided
     # identity. The username comes from the localhost OIDC proxy and this
     # endpoint is protected by the broker secret.
     now = datetime.utcnow()
-    if entitlement.status.value != "active" or entitlement.expires_at <= now or entitlement.code_version != policy.code_version:
+    if (
+        entitlement.status.value != "active"
+        or entitlement.expires_at <= now
+        or entitlement.code_version != policy.code_version
+    ):
         raise HTTPException(403, "Access denied")
     showroom_url = workspace_url = console_url = None
     lab_session = provisioning_service._public_access_session(policy.order_id, entitlement.seat_ref)
     if policy.order_type == "workshop":
         workshop = provisioning_service.get_workshop(policy.order_id)
-        seat = next((item for item in (workshop.seats if workshop else []) if item.seat_id == entitlement.seat_ref), None)
+        seat = next(
+            (
+                item
+                for item in (workshop.seats if workshop else [])
+                if item.seat_id == entitlement.seat_ref
+            ),
+            None,
+        )
         if seat:
             showroom_url, workspace_url = seat.showroom_url, seat.lab_url
     elif lab_session:
@@ -328,10 +449,20 @@ def resolve_oidc_identity(host: str, username: str, x_access_broker_key: str = H
         console_url = cluster.public_console_url or cluster.console_url
         if console_url and lab_session.namespace:
             console_url = f"{console_url.rstrip('/')}/k8s/ns/{lab_session.namespace}/core~v1~Pod"
-        if workspace_url and ("example.com" in workspace_url or ".apps.cluster.local" in workspace_url):
+        if workspace_url and (
+            "example.com" in workspace_url or ".apps.cluster.local" in workspace_url
+        ):
             workspace_url = None
     public_access_service._audit("authorize", policy.order_id, "granted", identity.participant_id)
-    return {"order_id": policy.order_id, "seat_ref": entitlement.seat_ref, "expires_at": entitlement.expires_at, "showroom_url": showroom_url, "workspace_url": workspace_url, "console_url": console_url}
+    return {
+        "order_id": policy.order_id,
+        "seat_ref": entitlement.seat_ref,
+        "expires_at": entitlement.expires_at,
+        "showroom_url": showroom_url,
+        "workspace_url": workspace_url,
+        "console_url": console_url,
+        "tool_urls": _session_tool_urls(lab_session),
+    }
 
 
 @router.get("/private/identity-entitlements")
@@ -339,7 +470,11 @@ def identity_entitlements(username: str, x_access_broker_key: str = Header(defau
     """Return every currently usable lab for one trusted OIDC identity."""
     _require_broker(x_access_broker_key)
     identity = next(
-        (item for item in public_access_service._identities.values() if item.keycloak_username == username),
+        (
+            item
+            for item in public_access_service._identities.values()
+            if item.keycloak_username == username
+        ),
         None,
     )
     if not identity or identity.disabled_at:
@@ -357,7 +492,9 @@ def identity_entitlements(username: str, x_access_broker_key: str = Header(defau
             )
         except HTTPException:
             continue
-        labs.append({**target, "public_url": policy.public_url, "catalog_slug": policy.catalog_slug})
+        labs.append(
+            {**target, "public_url": policy.public_url, "catalog_slug": policy.catalog_slug}
+        )
     return {"username": username, "labs": sorted(labs, key=lambda item: str(item["expires_at"]))}
 
 
@@ -367,7 +504,11 @@ def claim_oidc_identity(body: IdentityClaimRequest, x_access_broker_key: str = H
     _require_broker(x_access_broker_key)
     policy = public_access_service.get_policy_by_host(body.host)
     identity = next(
-        (item for item in public_access_service._identities.values() if item.keycloak_username == body.username),
+        (
+            item
+            for item in public_access_service._identities.values()
+            if item.keycloak_username == body.username
+        ),
         None,
     )
     if not policy or not policy.enabled or not identity or identity.disabled_at:
@@ -390,15 +531,22 @@ def claim_oidc_identity_by_code(
     """Add an active lab by its instructor code from the participant hub."""
     _require_broker(x_access_broker_key)
     identity = next(
-        (item for item in public_access_service._identities.values() if item.keycloak_username == body.username),
+        (
+            item
+            for item in public_access_service._identities.values()
+            if item.keycloak_username == body.username
+        ),
         None,
     )
     if not identity or identity.disabled_at:
         raise HTTPException(403, "Access request cannot be completed")
     now = datetime.utcnow()
     matches = [
-        policy for policy in public_access_service._policies.values()
-        if policy.enabled and policy.expires_at > now and public_access_service._verify(policy, body.code)
+        policy
+        for policy in public_access_service._policies.values()
+        if policy.enabled
+        and policy.expires_at > now
+        and public_access_service._verify(policy, body.code)
     ]
     if len(matches) != 1:
         raise HTTPException(403, "Access request cannot be completed")

@@ -1,0 +1,31 @@
+{
+  "schema": "launchpad.redhat.com/evidence/v1",
+  "date": "2026-09-04",
+  "catalog_id": "agentops-observability",
+  "scope": "public participant tool route isolation",
+  "red": {
+    "result": "fail",
+    "observation": "The public access and gateway test modules failed collection because the participant tool allowlist and secure proxy contracts did not exist."
+  },
+  "green": {
+    "component_tests": "37 passed",
+    "integration_tests": "112 passed",
+    "full_backend_regression": "917 passed, 13 deselected",
+    "checks": [
+      "catalog-declared workload and cluster endpoints are allowlisted",
+      "undeclared namespace Routes are excluded",
+      "Showroom tool tabs are rewritten through the participant gateway",
+      "HTTP and WebSocket requests revalidate the active entitlement",
+      "path traversal and cross-origin escapes are rejected",
+      "upstream cookies are stripped",
+      "same-origin redirects are rewritten through the gateway"
+    ]
+  },
+  "live_status": "not-run",
+  "remaining_gates": [
+    "deploy the backend and public gateway changes on Arena",
+    "verify Mortgage AI path-prefixed assets, APIs, and WebSockets in a real browser",
+    "verify Grafana and shared-service path behavior",
+    "prove cross-seat, cross-tenant, rotation, expiration, and reclaim behavior live"
+  ]
+}

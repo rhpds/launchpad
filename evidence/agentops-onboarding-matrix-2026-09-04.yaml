@@ -112,17 +112,27 @@ matrix:
       - content-agentops-observability/UPSTREAM.md
       - site-agentops-observability.yml
       - test-receipts/catalog-onboarding-agentops-observability.json
+  - id: CDD-AGENTOPS-012
+    requirement: Public AgentOps tools are reachable only through the entitled seat allowlist
+    red: Two test modules failed collection because no tool allowlist or secure proxy contract existed
+    green_local: pass-37-public-component-tests
+    green_integration: pass-112-public-showroom-agentops-tests
+    green_live: not-run
+    evidence:
+      - backend/tests/test_public_access.py
+      - backend/tests/test_public_gateway.py
+      - evidence/agentops-public-tool-proxy-2026-09-04.json
 
 rubric:
   source_and_contract: {earned: 15, possible: 15}
   secret_boundary: {earned: 15, possible: 15}
   namespace_and_rbac_isolation: {earned: 10, possible: 15}
   shared_service_readiness: {earned: 5, possible: 15}
-  participant_tabs_and_journey: {earned: 8, possible: 15}
+  participant_tabs_and_journey: {earned: 10, possible: 15}
   cleanup_and_repeatability: {earned: 7, possible: 10}
   five_seat_certification: {earned: 0, possible: 5}
   twenty_five_seat_certification: {earned: 0, possible: 10}
-  total: {earned: 60, possible: 100}
+  total: {earned: 62, possible: 100}
 
 decision: >-
   Keep the catalog item draft. Source intake is valid, but the AgentOps
