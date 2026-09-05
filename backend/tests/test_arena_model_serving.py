@@ -19,7 +19,7 @@ def test_tool_calling_model_is_private_shared_arena_infrastructure():
     network_policy = next(doc for doc in documents if doc["kind"] == "NetworkPolicy")
 
     assert deployment["metadata"]["namespace"] == "fleet-llm-d"
-    assert deployment["spec"]["replicas"] == 1
+    assert deployment["spec"]["replicas"] == 2
     container = deployment["spec"]["template"]["spec"]["containers"][0]
     assert container["image"].startswith("registry.redhat.io/rhaii/vllm-cpu-rhel9@sha256:")
     assert "--enable-auto-tool-choice" in container["args"]

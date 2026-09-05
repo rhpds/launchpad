@@ -1,0 +1,273 @@
+{
+  "schema_version": "1.0",
+  "evidence_id": "EDD-ARENA-STAGGERED-THREE-BY-TWENTY-FIVE-20260904",
+  "generated_at": "2026-09-05T01:40:35Z",
+  "outcome": "pass",
+  "scope": "internal-staggered-three-workshop-pilot",
+  "cluster": "arena",
+  "source_commit": "eab82b727b29b0d5bcaa0f760839f4cd6a983ab6",
+  "public_access_certified": false,
+  "simultaneous_provisioning_certified": false,
+  "certification_boundary": "This pilot proves that three different 25-seat workshops can be provisioned one workshop at a time on Arena, retained together, and used by 75 participants concurrently. It does not certify provisioning 75 seats simultaneously, public ingress, production high availability, or Arena as a general production service.",
+  "workshops": [
+    {
+      "catalog_item_id": "intel-llm-cpu-serving",
+      "workshop_id": "767617ae-f552-4de0-9efc-53d0a1a09562",
+      "idempotency_key": "arena-cpu-serving-25-20260904-final",
+      "content_ref": "intel-guided-content-v1.0.8",
+      "seat_count": 25,
+      "cluster_ref": "arena",
+      "requested_at": "2026-09-05T00:18:42.946111Z",
+      "ready_at": "2026-09-05T00:26:02Z",
+      "observed_ready_seconds": 439,
+      "all_seats_ready": true,
+      "failed_seats": 0,
+      "capacity_preview": {
+        "can_provision": true,
+        "catalog_seat_limit": 25,
+        "estimated_cpu_millicores": 16625,
+        "estimated_memory_mib": 37200,
+        "estimated_pods": 50
+      }
+    },
+    {
+      "catalog_item_id": "intel-xeon6-agent-201",
+      "workshop_id": "609a5527-4539-459c-97f6-5286ee2ff37c",
+      "idempotency_key": "arena-agent-201-25-20260904-final",
+      "content_ref": "intel-guided-content-v1.0.10",
+      "seat_count": 25,
+      "cluster_ref": "arena",
+      "requested_at": "2026-09-05T01:00:02.651970Z",
+      "ready_at": "2026-09-05T01:04:47Z",
+      "observed_ready_seconds": 284,
+      "all_seats_ready": true,
+      "failed_seats": 0,
+      "capacity_preview": {
+        "can_provision": true,
+        "catalog_seat_limit": 25,
+        "estimated_cpu_millicores": 10375,
+        "estimated_memory_mib": 22800,
+        "estimated_pods": 100
+      }
+    },
+    {
+      "catalog_item_id": "intel-llm-tool-calling",
+      "workshop_id": "68666c5c-035b-416a-b59e-21cfba58ad14",
+      "idempotency_key": "arena-tool-calling-25-20260904-final-retained",
+      "content_ref": "intel-guided-content-v1.0.4",
+      "seat_count": 25,
+      "cluster_ref": "arena",
+      "requested_at": "2026-09-05T01:15:36.499264Z",
+      "ready_at": "2026-09-05T01:18:52Z",
+      "observed_ready_seconds": 196,
+      "all_seats_ready": true,
+      "failed_seats": 0,
+      "capacity_preview": {
+        "can_provision": true,
+        "catalog_seat_limit": 25,
+        "estimated_cpu_millicores": 4125,
+        "estimated_memory_mib": 11600,
+        "estimated_pods": 25
+      }
+    }
+  ],
+  "staggering": {
+    "workshop_provision_order": [
+      "intel-llm-cpu-serving",
+      "intel-xeon6-agent-201",
+      "intel-llm-tool-calling"
+    ],
+    "next_workshop_requested_only_after_previous_ready": true,
+    "all_three_retained_before_concurrent_use": true,
+    "peak_ready_seats": 75
+  },
+  "pre_concurrency_state": {
+    "scoped_namespaces": 75,
+    "showroom_applications_synced_healthy": 75,
+    "showroom_pods_ready": 75,
+    "participant_workload_pods_ready": 100,
+    "participant_workload_restarts": 0,
+    "showroom_container_restarts": 43,
+    "showroom_restart_note": "The 43 Showroom-sidecar restarts accumulated during an earlier rhgnr1 probe-latency incident. All 75 Showrooms were Ready and all participant workflows passed during this gate; the restart history is retained rather than hidden."
+  },
+  "participant_isolation": {
+    "default_project_matches_seat": 75,
+    "own_namespace_edit_allowed": 75,
+    "cross_seat_read_denied": 75,
+    "method": "Live oc project and oc auth can-i checks executed from each Showroom terminal identity."
+  },
+  "concurrent_participant_use": {
+    "started_together": true,
+    "participants_started": 75,
+    "participants_successful": 75,
+    "batch_seconds": 95,
+    "cpu_serving": {
+      "successful": 25,
+      "grounded_answers": 25,
+      "min_seconds": 5.3121,
+      "p95_seconds": 33.661337,
+      "max_seconds": 33.935824
+    },
+    "agent_201": {
+      "successful": 25,
+      "structured_briefs": 25,
+      "fallback_free": 25,
+      "all_three_mcp_tools_used": 25,
+      "min_seconds": 81.039291,
+      "p95_seconds": 83.847779,
+      "max_seconds": 83.886698
+    },
+    "tool_calling": {
+      "successful": 25,
+      "structured_tool_calls": 25,
+      "complete_tool_result_protocols": 25,
+      "min_seconds": 8.367559,
+      "p95_seconds": 9.958852,
+      "max_seconds": 9.959805
+    }
+  },
+  "shared_models": {
+    "granite_2b_cpu": {
+      "deployment": "ovms-granite-2b",
+      "ready_replicas": 1,
+      "expected_replicas": 1,
+      "image": "docker.io/openvino/model_server@sha256:069a1c1191995e2b1338879137efc9551829e47f1d2e97049004453a6076d898"
+    },
+    "granite_3_2_8b_tools": {
+      "deployment": "vllm-granite-3-2-8b-tools",
+      "ready_replicas": 2,
+      "expected_replicas": 2,
+      "image": "registry.redhat.io/rhaii/vllm-cpu-rhel9@sha256:cf6577f6d526561651df5390aad916c53820a18a1659e3fb39c1c5a62aef0e3c"
+    }
+  },
+  "images": {
+    "backend": "sha256:5b8d2ba78c20b58252da17b0863cf8ba653558dbcc8f800ac897a4e6a79c46bb",
+    "solution_agent": "sha256:6fcb7f37313fb7515aa8d6c2d5d293e5da4568be859ba971efbc56b24d2ca102",
+    "anythingllm": "sha256:1eee2162bed8ab643133dd9420ea086566f7c778849e9ff3eddc71a6a6cd8f98"
+  },
+  "sequential_cleanup": {
+    "workshop_order": [
+      "intel-llm-cpu-serving",
+      "intel-xeon6-agent-201",
+      "intel-llm-tool-calling"
+    ],
+    "workshops": [
+      {
+        "catalog_item_id": "intel-llm-cpu-serving",
+        "completed_seconds": 193,
+        "final_status": "completed"
+      },
+      {
+        "catalog_item_id": "intel-xeon6-agent-201",
+        "completed_seconds": 163,
+        "final_status": "completed"
+      },
+      {
+        "catalog_item_id": "intel-llm-tool-calling",
+        "completed_seconds": 116,
+        "final_status": "completed"
+      }
+    ],
+    "completed_workshops": 3,
+    "remaining_scoped_namespaces": 0,
+    "remaining_scoped_routes": 0,
+    "remaining_scoped_applications": 0,
+    "remaining_scoped_rolebindings": 0,
+    "preserved_out_of_scope_namespaces": [
+      "launchpad-smoke-test-tenant-openshift-operator-1445b9",
+      "launchpad-smoke-test-tenant-openshift-operator-c8c5fe"
+    ]
+  },
+  "tdd": {
+    "red": [
+      "The Agent runtime contract first failed because no bounded workshop image existed.",
+      "The Agent concurrency contract first failed with one shared model replica and the previous 256/768 token defaults.",
+      "The Tool Calling journey contract first failed because no repeatable complete-protocol driver existed.",
+      "The staggered 3x25 evidence contract first failed because this immutable evidence artifact did not exist."
+    ],
+    "green": [
+      "Agent generation is bounded to 192 requirement tokens plus 512 brief tokens and its runtime image is digest-pinned.",
+      "Two healthy shared tool-model replicas served the Agent and Tool Calling workshops.",
+      "The Tool Calling driver validates both structured selection and the returned tool-result answer from the participant terminal.",
+      "This manifest satisfies the staggered provisioning, concurrent use, isolation, and zero-residue cleanup contract."
+    ]
+  },
+  "edd": {
+    "status": "pass",
+    "live_identifiers_recorded": true,
+    "latencies_recorded": true,
+    "cleanup_observed_beyond_database_completion": true
+  },
+  "cdd": {
+    "contracts": [
+      "capacity preview before each workshop order",
+      "whole-workshop Arena affinity",
+      "25 unique seat, session, and namespace identities per order",
+      "digest-pinned participant runtimes",
+      "participant-terminal namespace authorization",
+      "grounded RAG response",
+      "structured Agent 201 response with three MCP tools",
+      "complete tool-call and tool-result protocol",
+      "idempotent workshop reclaim with cluster-resource convergence"
+    ],
+    "status": "pass"
+  },
+  "bdd": {
+    "scenario": "Given three different 25-seat Arena workshops ordered only after the previous workshop is ready, when all 75 participants use their assigned environments at the same time, then every RAG, agent, and tool-calling journey succeeds within its latency gate and sequential reclaim leaves no resource in the three workshop scopes.",
+    "status": "pass"
+  },
+  "cbt": {
+    "components": {
+      "capacity_and_placement": "pass",
+      "workshop_orchestration": "pass",
+      "showroom_and_antora": "pass",
+      "terminal_identity_and_rbac": "pass",
+      "cpu_rag_runtime": "pass",
+      "agent_runtime_and_mcp": "pass",
+      "tool_calling_protocol": "pass",
+      "shared_model_services": "pass",
+      "sequential_cleanup": "pass"
+    }
+  },
+  "artifact_hashes": {
+    "catalog/intel-llm-cpu-serving/catalog-item.yaml": "90ef028c758e59851da28680ffd6e5526e33fe365fc59033d2817f7b433127eb",
+    "catalog/intel-xeon6-agent-201/catalog-item.yaml": "f015a8565968ff5ea2071367049aa8544b30f00345d86cc4843fc97386daed5e",
+    "catalog/intel-llm-tool-calling/catalog-item.yaml": "dc0b2ace5898a6c0aaf7380644dc5fc069dab4002b7249a168fe25e13df202fa",
+    "scripts/certify-cpu-serving-rag.sh": "843120b325ea9caecd5ecfc5119e1c8f740d882b0bf0d828f490441b8ef69238",
+    "scripts/certify-agent-201-journey.sh": "a4d5ba9392c08027cbebcea5be9d4a3e5aca25a7828467665d5b3a353bacd3dc",
+    "scripts/certify-tool-calling-journey.sh": "b9eeee6272833f9936b7e818c3322a89596e4b00320b408faedf3cf534578c74",
+    "deploy/models/arena/granite-3.2-8b-tools.yaml": "5783f63993f41e10329c477156d7b789703a00be19a1cbf036aa648239219072",
+    "workshop-images/solution-agent/Containerfile": "1315a213c0ba83de82454182d508ebb3daea735f975364cbc3bf9777241230de"
+  },
+  "test_runs": {
+    "pilot_focused_contracts": "28 passed",
+    "backend_non_local_regression_suite": "857 passed, 13 deselected",
+    "full_suite_environment_limit": "The unfiltered suite additionally invokes local Podman and sandbox tests. Those require podman-compose and a clean local Podman proxy; they are outside this Arena-only pilot and were not counted as green."
+  },
+  "red_green_matrix": [
+    {"requirement": "workshops are provisioned sequentially rather than as one 75-seat burst", "critical": true, "status": "GREEN-live"},
+    {"requirement": "CPU Serving reaches 25 of 25 ready and remains running", "critical": true, "status": "GREEN-live"},
+    {"requirement": "Agent 201 reaches 25 of 25 ready while CPU Serving remains running", "critical": true, "status": "GREEN-live"},
+    {"requirement": "Tool Calling reaches 25 of 25 ready while the first 50 seats remain running", "critical": true, "status": "GREEN-live"},
+    {"requirement": "all 75 Showroom applications are Synced and Healthy before participant load", "critical": true, "status": "GREEN-live"},
+    {"requirement": "75 participant terminal identities are namespace scoped", "critical": true, "status": "GREEN-live"},
+    {"requirement": "25 concurrent grounded CPU RAG journeys", "critical": true, "status": "GREEN-live"},
+    {"requirement": "25 concurrent structured Agent 201 journeys", "critical": true, "status": "GREEN-live"},
+    {"requirement": "25 concurrent complete Tool Calling protocols", "critical": true, "status": "GREEN-live"},
+    {"requirement": "all 75 participant workflows succeed within a two-minute combined window", "critical": true, "status": "GREEN-live"},
+    {"requirement": "sequential reclaim converges beyond database completion", "critical": true, "status": "GREEN-live"},
+    {"requirement": "zero namespace, Route, RoleBinding, or Argo Application residue in the three workshop scopes", "critical": true, "status": "GREEN-live"}
+  ],
+  "gate_rubric": {
+    "staggered_ordering_and_capacity": 20,
+    "seat_readiness_and_retention": 15,
+    "participant_namespace_isolation": 15,
+    "cpu_rag_functionality": 10,
+    "agent_and_mcp_functionality": 10,
+    "tool_calling_functionality": 10,
+    "combined_75_participant_concurrency": 10,
+    "sequential_cleanup_and_zero_residue": 10,
+    "score": 100,
+    "required": 100
+  }
+}
