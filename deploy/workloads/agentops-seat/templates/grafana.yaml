@@ -1,0 +1,167 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: agentops-grafana-provisioning
+  labels:
+    {{- include "agentops.labels" . | nindent 4 }}
+data:
+  datasource.yaml: |
+    apiVersion: 1
+    datasources:
+      - name: OpenShift User Workload Monitoring
+        uid: uwm
+        type: prometheus
+        access: proxy
+        url: https://thanos-querier.openshift-monitoring.svc:9091
+        isDefault: true
+        jsonData:
+          httpHeaderName1: Authorization
+          tlsSkipVerify: true
+          timeInterval: 15s
+        secureJsonData:
+          httpHeaderValue1: "Bearer __SERVICE_ACCOUNT_TOKEN__"
+  dashboard-provider.yaml: |
+    apiVersion: 1
+    providers:
+      - name: AgentOps
+        folder: AgentOps
+        type: file
+        disableDeletion: true
+        options:
+          path: /var/lib/grafana/dashboards
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: agentops-grafana-dashboard
+  labels:
+    {{- include "agentops.labels" . | nindent 4 }}
+data:
+  agentops.json: |
+    {
+      "title": "AgentOps Seat Overview",
+      "uid": "agentops-seat",
+      "schemaVersion": 39,
+      "refresh": "15s",
+      "time": {"from": "now-1h", "to": "now"},
+      "panels": [
+        {
+          "type": "timeseries",
+          "title": "Mortgage API request rate",
+          "gridPos": {"h": 9, "w": 24, "x": 0, "y": 0},
+          "targets": [
+            {
+              "datasource": {"type": "prometheus", "uid": "uwm"},
+              "expr": "sum(rate(http_requests_total{namespace=\"{{ .Release.Namespace }}\"}[5m]))",
+              "legendFormat": "requests/s",
+              "refId": "A"
+            }
+          ]
+        }
+      ]
+    }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: agentops-grafana
+  labels:
+    {{- include "agentops.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana
+spec:
+  selector:
+    app.kubernetes.io/component: grafana
+    app.kubernetes.io/instance: {{ .Release.Name }}
+  ports:
+    - {name: http, port: 3000, targetPort: http}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agentops-grafana
+  labels:
+    {{- include "agentops.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: grafana
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        {{- include "agentops.labels" . | nindent 8 }}
+        app.kubernetes.io/component: grafana
+    spec:
+      serviceAccountName: agentops-grafana
+      automountServiceAccountToken: true
+      securityContext:
+        {{- include "agentops.podSecurityContext" . | nindent 8 }}
+      initContainers:
+        - name: inject-monitoring-token
+          image: {{ .Values.images.grafana | quote }}
+          securityContext:
+            {{- include "agentops.containerSecurityContext" . | nindent 12 }}
+          command: ["/bin/sh", "-c"]
+          args:
+            - >-
+              sed "s|__SERVICE_ACCOUNT_TOKEN__|$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)|"
+              /source/datasource.yaml > /generated/datasource.yaml;
+              cp /source/dashboard-provider.yaml /generated/dashboard-provider.yaml
+          volumeMounts:
+            - {name: provisioning-source, mountPath: /source, readOnly: true}
+            - {name: provisioning-generated, mountPath: /generated}
+      containers:
+        - name: grafana
+          image: {{ .Values.images.grafana | quote }}
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            {{- include "agentops.containerSecurityContext" . | nindent 12 }}
+          env:
+            - {name: GF_AUTH_ANONYMOUS_ENABLED, value: "true"}
+            - {name: GF_AUTH_ANONYMOUS_ORG_ROLE, value: Viewer}
+            - {name: GF_AUTH_BASIC_ENABLED, value: "false"}
+            - {name: GF_ANALYTICS_REPORTING_ENABLED, value: "false"}
+            - {name: GF_ANALYTICS_CHECK_FOR_UPDATES, value: "false"}
+          ports:
+            - {name: http, containerPort: 3000}
+          readinessProbe:
+            httpGet: {path: /api/health, port: http}
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: {path: /api/health, port: http}
+            initialDelaySeconds: 30
+            periodSeconds: 15
+          resources:
+            {{- toYaml .Values.resources.grafana | nindent 12 }}
+          volumeMounts:
+            - {name: provisioning-generated, mountPath: /etc/grafana/provisioning/datasources/datasource.yaml, subPath: datasource.yaml, readOnly: true}
+            - {name: provisioning-generated, mountPath: /etc/grafana/provisioning/dashboards/provider.yaml, subPath: dashboard-provider.yaml, readOnly: true}
+            - {name: dashboard, mountPath: /var/lib/grafana/dashboards, readOnly: true}
+            - {name: data, mountPath: /var/lib/grafana}
+      volumes:
+        - name: provisioning-source
+          configMap: {name: agentops-grafana-provisioning}
+        - name: provisioning-generated
+          emptyDir: {}
+        - name: dashboard
+          configMap: {name: agentops-grafana-dashboard}
+        - name: data
+          emptyDir: {}
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: grafana-route
+  labels:
+    {{- include "agentops.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana
+spec:
+  to: {kind: Service, name: agentops-grafana, weight: 100}
+  port: {targetPort: http}
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None

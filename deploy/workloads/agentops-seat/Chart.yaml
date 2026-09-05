@@ -1,0 +1,9 @@
+apiVersion: v2
+name: agentops-seat
+description: Namespace-scoped AgentOps participant runtime for Launchpad
+type: application
+version: 0.1.0
+appVersion: "0.1.9-intel"
+annotations:
+  launchpad.redhat.com/upstream-repository: https://github.com/rhpds/agentops-in-prod-automation
+  launchpad.redhat.com/upstream-revision: 6ea100531ac869fa66abe69ae223d6b56dbce9a2

@@ -1,7 +1,9 @@
+from types import SimpleNamespace
 from unittest.mock import MagicMock
 
 import pytest
 import yaml
+from kubernetes.client.exceptions import ApiException
 from app.adapters.openshift.workload_gitops import (
     WorkloadGitOpsAdapter,
     WorkloadSeat,
@@ -115,3 +117,62 @@ def test_cleanup_deletes_deterministic_workload_application():
 
     args = custom_objects.delete_namespaced_custom_object.call_args.args
     assert args[-1] == workload_application_name("launchpad-seat-1")
+
+
+def test_runtime_secret_retry_preserves_existing_owned_credentials():
+    from app.adapters.openshift.provisioning import OpenShiftProvisioningAdapter
+
+    adapter = OpenShiftProvisioningAdapter.__new__(OpenShiftProvisioningAdapter)
+    adapter._core_v1 = MagicMock()
+    adapter._core_v1.create_namespaced_secret.side_effect = ApiException(status=409)
+    adapter._core_v1.read_namespaced_secret.return_value = SimpleNamespace(
+        metadata=SimpleNamespace(
+            labels={
+                "app.kubernetes.io/managed-by": "launchpad",
+                "launchpad.redhat.com/session-id": "session-1",
+            }
+        )
+    )
+    secret = build_runtime_secret(
+        name="example-runtime",
+        namespace="launchpad-seat-1",
+        workshop_id="workshop-1",
+        seat_id="seat-1",
+        session_id="session-1",
+        tenant_id="tenant-1",
+        cluster_id="arena",
+        string_data={"POSTGRES_PASSWORD": "new-random-value"},
+    )
+
+    adapter._apply_workload_runtime_secret(secret)
+
+    adapter._core_v1.patch_namespaced_secret.assert_not_called()
+
+
+def test_runtime_secret_retry_rejects_a_secret_owned_by_another_session():
+    from app.adapters.openshift.provisioning import OpenShiftProvisioningAdapter
+
+    adapter = OpenShiftProvisioningAdapter.__new__(OpenShiftProvisioningAdapter)
+    adapter._core_v1 = MagicMock()
+    adapter._core_v1.create_namespaced_secret.side_effect = ApiException(status=409)
+    adapter._core_v1.read_namespaced_secret.return_value = SimpleNamespace(
+        metadata=SimpleNamespace(
+            labels={
+                "app.kubernetes.io/managed-by": "launchpad",
+                "launchpad.redhat.com/session-id": "different-session",
+            }
+        )
+    )
+    secret = build_runtime_secret(
+        name="example-runtime",
+        namespace="launchpad-seat-1",
+        workshop_id="workshop-1",
+        seat_id="seat-1",
+        session_id="session-1",
+        tenant_id="tenant-1",
+        cluster_id="arena",
+        string_data={"POSTGRES_PASSWORD": "new-random-value"},
+    )
+
+    with pytest.raises(ValueError, match="owned by another session"):
+        adapter._apply_workload_runtime_secret(secret)

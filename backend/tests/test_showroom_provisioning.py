@@ -175,6 +175,53 @@ def test_runtime_secret_resolver_accepts_only_explicit_dynamic_sources():
         )
 
 
+def test_runtime_secret_resolver_generates_and_composes_credentials_without_catalog_secrets():
+    resolved = OpenShiftProvisioningAdapter._resolve_workload_runtime_secret(
+        {
+            "POSTGRES_USER": {"value": "agentops"},
+            "POSTGRES_PASSWORD": {"source": "generated_password", "length": 32},
+            "DATABASE_URL": {
+                "template": (
+                    "postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}"
+                    "@mortgage-ai-db:5432/mortgage-ai"
+                )
+            },
+            "S3_ACCESS_KEY": {"source": "generated_password", "length": 24},
+            "AUTH_DISABLED": {"value": "true"},
+            "LLM_API_KEY": {"source": "maas_api_key"},
+            "LLM_MODEL": {"source": "requested_model"},
+            "MLFLOW_WORKSPACE": {"source": "namespace"},
+        },
+        {
+            "maas_api_key": "sk-seat-secret",
+            "requested_models": ["granite"],
+            "namespace": "launchpad-agentops-seat-1",
+        },
+    )
+
+    assert resolved["POSTGRES_USER"] == "agentops"
+    assert len(resolved["POSTGRES_PASSWORD"]) >= 32
+    assert resolved["POSTGRES_PASSWORD"] in resolved["DATABASE_URL"]
+    assert len(resolved["S3_ACCESS_KEY"]) >= 24
+    assert resolved["S3_ACCESS_KEY"] != resolved["POSTGRES_PASSWORD"]
+    assert resolved["AUTH_DISABLED"] == "true"
+    assert resolved["LLM_API_KEY"] == "sk-seat-secret"
+    assert resolved["LLM_MODEL"] == "granite"
+    assert resolved["MLFLOW_WORKSPACE"] == "launchpad-agentops-seat-1"
+
+
+def test_runtime_secret_resolver_rejects_literal_sensitive_fields_and_unknown_templates():
+    with pytest.raises(ValueError, match="Sensitive runtime field"):
+        OpenShiftProvisioningAdapter._resolve_workload_runtime_secret(
+            {"LLM_API_KEY": {"value": "embedded-key"}}, {}
+        )
+
+    with pytest.raises(ValueError, match="unknown field"):
+        OpenShiftProvisioningAdapter._resolve_workload_runtime_secret(
+            {"DATABASE_URL": {"template": "postgres://{MISSING}"}}, {}
+        )
+
+
 def test_guided_workspace_deep_links_to_the_rag_experience():
     url = OpenShiftProvisioningAdapter._workspace_url("https://workspace.example.test", "/try-it")
 

@@ -1,0 +1,49 @@
+identity:
+  sessionId: ""
+  workshopId: ""
+  seatId: ""
+  tenantId: ""
+  clusterId: ""
+
+runtime:
+  existingSecret: ""
+
+storageClass: nfs-storage
+
+images:
+  mortgageApi: quay.io/redhat-gpte/mortgage-ai-api:0.1.9-intel
+  mortgageUi: quay.io/redhat-gpte/mortgage-ai-ui:0.1.9-intel
+  postgres: docker.io/pgvector/pgvector:pg16
+  minio: quay.io/minio/minio:RELEASE.2023-06-19T19-52-50Z
+  minioClient: quay.io/minio/mc:RELEASE.2023-06-19T20-24-19Z
+  grafana: docker.io/grafana/grafana:11.6.0
+
+database:
+  storage: 10Gi
+
+minio:
+  storage: 10Gi
+
+mlflow:
+  trackingUri: https://mlflow.redhat-ods-applications.svc.cluster.local:8443
+
+dspa:
+  enabled: true
+  storage: 10Gi
+
+resources:
+  api:
+    requests: {cpu: 200m, memory: 1Gi}
+    limits: {cpu: "2", memory: 4Gi}
+  ui:
+    requests: {cpu: 50m, memory: 32Mi}
+    limits: {cpu: 250m, memory: 128Mi}
+  database:
+    requests: {cpu: 100m, memory: 256Mi}
+    limits: {cpu: 500m, memory: 1Gi}
+  minio:
+    requests: {cpu: 20m, memory: 100Mi}
+    limits: {cpu: 250m, memory: 1Gi}
+  grafana:
+    requests: {cpu: 50m, memory: 128Mi}
+    limits: {cpu: 500m, memory: 512Mi}

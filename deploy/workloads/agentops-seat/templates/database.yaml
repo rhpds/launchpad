@@ -1,0 +1,84 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mortgage-ai-db
+  labels:
+    {{- include "agentops.labels" . | nindent 4 }}
+spec:
+  selector:
+    app.kubernetes.io/component: database
+    app.kubernetes.io/instance: {{ .Release.Name }}
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: postgres
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mortgage-ai-db
+  labels:
+    {{- include "agentops.labels" . | nindent 4 }}
+spec:
+  serviceName: mortgage-ai-db
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: database
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        {{- include "agentops.labels" . | nindent 8 }}
+        app.kubernetes.io/component: database
+    spec:
+      serviceAccountName: agentops-seat
+      securityContext:
+        {{- include "agentops.podSecurityContext" . | nindent 8 }}
+      containers:
+        - name: postgres
+          image: {{ .Values.images.postgres | quote }}
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            {{- include "agentops.containerSecurityContext" . | nindent 12 }}
+          ports:
+            - name: postgres
+              containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef: {name: {{ include "agentops.runtimeSecret" . }}, key: POSTGRES_DB}
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef: {name: {{ include "agentops.runtimeSecret" . }}, key: POSTGRES_USER}
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef: {name: {{ include "agentops.runtimeSecret" . }}, key: POSTGRES_PASSWORD}
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          readinessProbe:
+            exec:
+              command: ["/bin/sh", "-c", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            exec:
+              command: ["/bin/sh", "-c", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"]
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          resources:
+            {{- toYaml .Values.resources.database | nindent 12 }}
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-data
+        labels:
+          {{- include "agentops.labels" . | nindent 10 }}
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: {{ .Values.storageClass | quote }}
+        resources:
+          requests:
+            storage: {{ .Values.database.storage | quote }}

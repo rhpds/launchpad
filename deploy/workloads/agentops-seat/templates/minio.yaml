@@ -1,0 +1,123 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: minio-data
+  labels:
+    {{- include "agentops.labels" . | nindent 4 }}
+spec:
+  accessModes: ["ReadWriteOnce"]
+  storageClassName: {{ .Values.storageClass | quote }}
+  resources:
+    requests:
+      storage: {{ .Values.minio.storage | quote }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio-service
+  labels:
+    {{- include "agentops.labels" . | nindent 4 }}
+spec:
+  selector:
+    app.kubernetes.io/component: object-storage
+    app.kubernetes.io/instance: {{ .Release.Name }}
+  ports:
+    - {name: api, port: 9000, targetPort: api}
+    - {name: console, port: 9090, targetPort: console}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio
+  labels:
+    {{- include "agentops.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: object-storage
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        {{- include "agentops.labels" . | nindent 8 }}
+        app.kubernetes.io/component: object-storage
+    spec:
+      serviceAccountName: agentops-seat
+      securityContext:
+        {{- include "agentops.podSecurityContext" . | nindent 8 }}
+      containers:
+        - name: minio
+          image: {{ .Values.images.minio | quote }}
+          imagePullPolicy: IfNotPresent
+          args: ["server", "/data", "--console-address", ":9090"]
+          securityContext:
+            {{- include "agentops.containerSecurityContext" . | nindent 12 }}
+          env:
+            - name: MINIO_ROOT_USER
+              valueFrom:
+                secretKeyRef: {name: {{ include "agentops.runtimeSecret" . }}, key: S3_ACCESS_KEY}
+            - name: MINIO_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef: {name: {{ include "agentops.runtimeSecret" . }}, key: S3_SECRET_KEY}
+          ports:
+            - {name: api, containerPort: 9000}
+            - {name: console, containerPort: 9090}
+          readinessProbe:
+            httpGet: {path: /minio/health/ready, port: api}
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            httpGet: {path: /minio/health/live, port: api}
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          resources:
+            {{- toYaml .Values.resources.minio | nindent 12 }}
+          volumeMounts:
+            - {name: data, mountPath: /data}
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: minio-data
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: minio-bootstrap
+  labels:
+    {{- include "agentops.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  backoffLimit: 5
+  template:
+    metadata:
+      labels:
+        {{- include "agentops.labels" . | nindent 8 }}
+        app.kubernetes.io/component: object-storage-bootstrap
+    spec:
+      restartPolicy: Never
+      serviceAccountName: agentops-seat
+      securityContext:
+        {{- include "agentops.podSecurityContext" . | nindent 8 }}
+      containers:
+        - name: create-buckets
+          image: {{ .Values.images.minioClient | quote }}
+          securityContext:
+            {{- include "agentops.containerSecurityContext" . | nindent 12 }}
+          env:
+            - name: S3_ACCESS_KEY
+              valueFrom:
+                secretKeyRef: {name: {{ include "agentops.runtimeSecret" . }}, key: S3_ACCESS_KEY}
+            - name: S3_SECRET_KEY
+              valueFrom:
+                secretKeyRef: {name: {{ include "agentops.runtimeSecret" . }}, key: S3_SECRET_KEY}
+          command: ["/bin/sh", "-c"]
+          args:
+            - >-
+              until mc alias set seat http://minio-service:9000 "$S3_ACCESS_KEY" "$S3_SECRET_KEY";
+              do sleep 3; done;
+              mc mb --ignore-existing seat/documents;
+              mc mb --ignore-existing seat/pipeline

@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import re
+import secrets
 import shutil
 import subprocess
 import threading
@@ -255,7 +256,8 @@ class OpenShiftProvisioningAdapter:
             runtime_secret_name = str(res.get("workload_runtime_secret_name", "")).strip()
             if runtime_secret_name:
                 runtime_data = self._resolve_workload_runtime_secret(
-                    res.get("workload_runtime_secret_sources", {}), res
+                    res.get("workload_runtime_secret_sources", {}),
+                    {**res, "namespace": demo_namespace},
                 )
                 self._apply_workload_runtime_secret(
                     build_runtime_secret(
@@ -644,22 +646,80 @@ http {{
 
     @staticmethod
     def _resolve_workload_runtime_secret(
-        source_map: dict[str, str], resources: dict
+        source_map: dict[str, object], resources: dict
     ) -> dict[str, str]:
-        """Resolve only approved runtime sources into a directly-applied Secret."""
+        """Resolve approved dynamic, generated, and composed runtime fields."""
         requested_models = list(resources.get("requested_models", []))
         available = {
             "maas_api_key": str(resources.get("maas_api_key", "")),
             "maas_endpoint": str(resources.get("maas_endpoint", "")),
             "requested_model": requested_models[0] if requested_models else "",
+            "namespace": str(resources.get("namespace", "")),
         }
         result: dict[str, str] = {}
-        for key, source in source_map.items():
+        templates: dict[str, str] = {}
+        sensitive_markers = ("PASSWORD", "TOKEN", "SECRET", "API_KEY", "PRIVATE_KEY")
+
+        for raw_key, contract in source_map.items():
+            key = str(raw_key)
+            if isinstance(contract, str):
+                source = contract
+                if source not in available:
+                    raise ValueError(f"Unsupported workload runtime Secret source '{source}'")
+                if not available[source]:
+                    raise ValueError(f"Workload runtime Secret source '{source}' is unavailable")
+                result[key] = available[source]
+                continue
+            if not isinstance(contract, dict):
+                raise ValueError(f"Runtime Secret field '{key}' must be a source mapping")
+
+            declared = [name for name in ("source", "value", "template") if name in contract]
+            if len(declared) != 1:
+                raise ValueError(
+                    f"Runtime Secret field '{key}' must declare exactly one of source, value, or template"
+                )
+            if "value" in contract:
+                if any(marker in key.upper() for marker in sensitive_markers):
+                    raise ValueError(
+                        f"Sensitive runtime field '{key}' cannot contain a catalog literal"
+                    )
+                result[key] = str(contract["value"])
+                continue
+            if "template" in contract:
+                templates[key] = str(contract["template"])
+                continue
+
+            source = str(contract["source"])
+            if source == "generated_password":
+                length = contract.get("length", 32)
+                if not isinstance(length, int) or not 24 <= length <= 128:
+                    raise ValueError(
+                        f"Generated runtime field '{key}' length must be between 24 and 128"
+                    )
+                result[key] = secrets.token_urlsafe(length)
+                continue
             if source not in available:
                 raise ValueError(f"Unsupported workload runtime Secret source '{source}'")
             if not available[source]:
                 raise ValueError(f"Workload runtime Secret source '{source}' is unavailable")
-            result[str(key)] = available[source]
+            result[key] = available[source]
+
+        placeholder = re.compile(r"\{([A-Z][A-Z0-9_]*)\}")
+        for key, template in templates.items():
+            fields = placeholder.findall(template)
+            if (
+                not fields
+                or placeholder.sub("", template).count("{")
+                or "}" in placeholder.sub("", template)
+            ):
+                raise ValueError(f"Runtime Secret template for '{key}' is invalid")
+            unknown = sorted(set(fields).difference(result))
+            if unknown:
+                raise ValueError(
+                    f"Runtime Secret template for '{key}' references unknown field(s): "
+                    f"{', '.join(unknown)}"
+                )
+            result[key] = placeholder.sub(lambda match: result[match.group(1)], template)
         if source_map and not result:
             raise ValueError("Workload runtime Secret contract resolved no values")
         return result
@@ -674,7 +734,26 @@ http {{
                 raise ValueError(
                     f"Failed to create workload runtime Secret '{name}': {exc.reason}"
                 ) from exc
-            self._core_v1.patch_namespaced_secret(name, namespace, body=secret)
+            existing = self._core_v1.read_namespaced_secret(name, namespace)
+            metadata = (
+                existing.get("metadata", {}) if isinstance(existing, dict) else existing.metadata
+            )
+            labels = (
+                metadata.get("labels", {}) if isinstance(metadata, dict) else metadata.labels or {}
+            )
+            expected_session = secret["metadata"]["labels"]["launchpad.redhat.com/session-id"]
+            if (
+                labels.get("app.kubernetes.io/managed-by") != "launchpad"
+                or labels.get("launchpad.redhat.com/session-id") != expected_session
+            ):
+                raise ValueError(
+                    f"Workload runtime Secret '{name}' is owned by another session"
+                ) from exc
+            logger.info(
+                "Preserving existing runtime Secret %s/%s during idempotent retry",
+                namespace,
+                name,
+            )
 
     def _wait_for_named_routes(self, namespace: str, route_names: set[str]) -> dict[str, str]:
         timeout = int(os.environ.get("WORKLOAD_ROUTE_TIMEOUT", "600"))

@@ -1,0 +1,45 @@
+{{- if .Values.dspa.enabled }}
+apiVersion: datasciencepipelinesapplications.opendatahub.io/v1
+kind: DataSciencePipelinesApplication
+metadata:
+  name: dspa
+  labels:
+    {{- include "agentops.labels" . | nindent 4 }}
+spec:
+  apiServer:
+    deploy: true
+    enableOauth: true
+    enableSamplePipeline: false
+    artifactSignedURLExpirySeconds: 60
+    cacheEnabled: true
+    pipelineStore: kubernetes
+  database:
+    disableHealthCheck: false
+    mariaDB:
+      deploy: true
+      pipelineDBName: mlpipeline
+      pvcSize: {{ .Values.dspa.storage | quote }}
+      username: mlpipeline
+  dspVersion: v2
+  objectStorage:
+    disableHealthCheck: false
+    enableExternalRoute: false
+    externalStorage:
+      basePath: ""
+      bucket: pipeline
+      host: minio-service.{{ .Release.Namespace }}.svc.cluster.local:9000
+      port: ""
+      region: us-east-1
+      scheme: http
+      s3CredentialsSecret:
+        accessKey: S3_ACCESS_KEY
+        secretKey: S3_SECRET_KEY
+        secretName: {{ include "agentops.runtimeSecret" . }}
+  persistenceAgent:
+    deploy: true
+    numWorkers: 2
+  podToPodTLS: true
+  scheduledWorkflow:
+    cronScheduleTimezone: UTC
+    deploy: true
+{{- end }}
