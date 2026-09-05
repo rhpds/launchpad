@@ -6,7 +6,11 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[2]
 MANIFEST = ROOT / "deploy/multicluster/arena-shared-mlflow.yaml"
-CLUSTERS = ROOT / "config/clusters.yaml"
+CLUSTER_REGISTRIES = (
+    ROOT / "config/clusters.yaml",
+    ROOT / "config/clusters-arena-cert.yaml",
+    ROOT / "deploy/launchpad/overlays/arena/arena-clusters.yaml",
+)
 VALUES = ROOT / "deploy/workloads/agentops-seat/values.yaml"
 CATALOG = ROOT / "catalog/agentops-observability/catalog-item.yaml"
 INTAKE = ROOT / "catalog-onboarding/agentops-observability.yaml"
@@ -39,11 +43,24 @@ def test_shared_mlflow_uses_the_installed_rhoai_operator_and_disposable_storage(
 
 
 def test_arena_registry_publishes_the_rhoai_mlflow_service():
-    clusters = yaml.safe_load(CLUSTERS.read_text())["clusters"]
-    arena = next(cluster for cluster in clusters if cluster["cluster_id"] == "arena")
+    for path in CLUSTER_REGISTRIES:
+        document = yaml.safe_load(path.read_text())
+        registry = document.get("data", {}).get("clusters.yaml", document)
+        if isinstance(registry, str):
+            registry = yaml.safe_load(registry)
+        arena = next(
+            cluster for cluster in registry["clusters"] if cluster["cluster_id"] == "arena"
+        )
 
-    assert "mlflow" in arena["capabilities"]
-    assert arena["service_urls"]["mlflow"] == "https://rh-ai.apps.arena.fm2aihpcsed.com/mlflow"
+        assert set(arena["capabilities"]) >= {
+            "mlflow",
+            "rhoai",
+            "user_workload_monitoring",
+            "data_science_pipelines",
+        }
+        assert arena["service_urls"]["mlflow"] == (
+            "https://rh-ai.apps.arena.fm2aihpcsed.com/mlflow"
+        )
 
 
 def test_agentops_uses_the_operator_published_internal_mlflow_path():
