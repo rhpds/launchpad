@@ -21,6 +21,8 @@ metadata:
     app.kubernetes.io/component: api
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app.kubernetes.io/component: api
@@ -51,10 +53,12 @@ spec:
             {{- include "agentops.containerSecurityContext" . | nindent 12 }}
           command: ["/bin/sh", "-c"]
           args: ["cd /app/packages/db && alembic upgrade head"]
-          envFrom:
-            - secretRef:
-                name: {{ include "agentops.runtimeSecret" . }}
           env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "agentops.runtimeSecret" . }}
+                  key: MIGRATION_DATABASE_URL
             - {name: PYTHONPATH, value: /app/packages/db/src:/app/packages/api/src}
       containers:
         - name: api
@@ -67,6 +71,10 @@ spec:
                 name: {{ include "agentops.runtimeSecret" . }}
           ports:
             - {name: http, containerPort: 8000}
+          startupProbe:
+            httpGet: {path: /health/, port: http}
+            periodSeconds: 10
+            failureThreshold: 90
           readinessProbe:
             httpGet: {path: /health/, port: http}
             initialDelaySeconds: 20
@@ -116,6 +124,22 @@ spec:
       serviceAccountName: agentops-seat
       securityContext:
         {{- include "agentops.podSecurityContext" . | nindent 8 }}
+      initContainers:
+        - name: configure-nginx-workers
+          image: {{ .Values.images.mortgageUi | quote }}
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            {{- include "agentops.containerSecurityContext" . | nindent 12 }}
+          command: ["/bin/sh", "-c"]
+          args:
+            - >-
+              sed 's/worker_processes[[:space:]]*auto;/worker_processes  1;/'
+              /etc/nginx/nginx.conf > /generated/nginx.conf
+          resources:
+            requests: {cpu: 5m, memory: 8Mi}
+            limits: {cpu: 50m, memory: 32Mi}
+          volumeMounts:
+            - {name: nginx-config, mountPath: /generated}
       containers:
         - name: ui
           image: {{ .Values.images.mortgageUi | quote }}
@@ -142,6 +166,11 @@ spec:
             periodSeconds: 15
           resources:
             {{- toYaml .Values.resources.ui | nindent 12 }}
+          volumeMounts:
+            - {name: nginx-config, mountPath: /etc/nginx/nginx.conf, subPath: nginx.conf, readOnly: true}
+      volumes:
+        - name: nginx-config
+          emptyDir: {}
 ---
 apiVersion: route.openshift.io/v1
 kind: Route

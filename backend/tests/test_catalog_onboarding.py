@@ -68,10 +68,10 @@ def test_agentops_intake_captures_the_large_lab_runtime_contract():
 
     assert runtime["deployment_type"] == "helm"
     assert runtime["seat_resources"] == {
-        "cpu_millicores": 1250,
-        "memory_mib": 3072,
-        "pods": 11,
-        "storage_gib": 25,
+        "cpu_millicores": 2000,
+        "memory_mib": 6144,
+        "pods": 14,
+        "storage_gib": 30,
     }
     assert set(runtime["required_capabilities"]) >= {
         "openshift",
@@ -99,6 +99,16 @@ def test_agentops_intake_captures_the_large_lab_runtime_contract():
     assert runtime["workload"]["source_kind"] == "launchpad-seat-chart"
     assert runtime["workload"]["identity_value_path"] == "identity"
     assert runtime["workload"]["runtime_secret_value_path"] == "runtime.existingSecret"
+    secret_sources = runtime["workload"]["runtime_secret_sources"]
+    assert secret_sources["LENDING_DB_PASSWORD"]["source"] == "generated_password"
+    assert secret_sources["COMPLIANCE_DB_PASSWORD"]["source"] == "generated_password"
+    migration_url = secret_sources["MIGRATION_DATABASE_URL"]["template"]
+    assert migration_url.startswith("postgresql+asyncpg://")
+    assert "{POSTGRES_PASSWORD}" in migration_url
+    assert "{LENDING_DB_PASSWORD}" in secret_sources["DATABASE_URL"]["template"]
+    assert "{COMPLIANCE_DB_PASSWORD}" in secret_sources["COMPLIANCE_DATABASE_URL"][
+        "template"
+    ]
     assert certification["promotion_sequence"] == [1, 5, 25]
     blockers = "\n".join(certification["activation_blockers"])
     assert "mutable latest UI bundle" not in blockers

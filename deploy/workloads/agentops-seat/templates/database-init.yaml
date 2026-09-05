@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mortgage-ai-db-init
+  labels:
+    {{- include "agentops.labels" . | nindent 4 }}
+data:
+  10-create-runtime-roles.sh: |
+    #!/bin/sh
+    set -eu
+    psql -v ON_ERROR_STOP=1 \
+      --username "$POSTGRES_USER" \
+      --dbname "$POSTGRES_DB" \
+      --set=database="$POSTGRES_DB" \
+      --set=lending_password="$LENDING_DB_PASSWORD" \
+      --set=compliance_password="$COMPLIANCE_DB_PASSWORD" <<-'EOSQL'
+    CREATE EXTENSION IF NOT EXISTS vector;
+
+    SELECT format('CREATE ROLE lending_app LOGIN PASSWORD %L', :'lending_password')
+    WHERE NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'lending_app')
+    \gexec
+
+    SELECT format('CREATE ROLE compliance_app LOGIN PASSWORD %L', :'compliance_password')
+    WHERE NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'compliance_app')
+    \gexec
+
+    GRANT CONNECT ON DATABASE :"database" TO lending_app;
+    GRANT CONNECT ON DATABASE :"database" TO compliance_app;
+    GRANT USAGE, CREATE ON SCHEMA public TO lending_app;
+    EOSQL

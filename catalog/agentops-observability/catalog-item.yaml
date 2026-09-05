@@ -61,6 +61,9 @@ metadata:
   - Install and certify an Arena participant route for shared MLflow, per-seat Grafana,
     and OpenShift Logging/Loki. OpenShift AI 3.5, a Ready DataScienceCluster, user
     workload monitoring, and Data Science Pipelines were confirmed live on 2026-09-04.
+  - Deploy a shared, cached Arena embedding endpoint and inject it through a cluster-specific
+    runtime source. Local per-seat Nomic model loading did not finish within 14 minutes;
+    the generation-only endpoint does not implement the OpenAI embeddings route.
   - Complete one-seat functional certification, including app, trace, metrics, logs,
     evaluation, Showroom, access isolation, and full reclaim.
   showroom_journey: agentops-observability
@@ -97,10 +100,10 @@ metadata:
   required_models:
   - granite-3.2-8b-tools
   inference_endpoint: litellm
-  seat_cpu_millicores: 1250
-  seat_memory_mib: 3072
-  seat_pods: 11
-  seat_storage_gib: 25
+  seat_cpu_millicores: 2000
+  seat_memory_mib: 6144
+  seat_pods: 14
+  seat_storage_gib: 30
   workload_repo: https://github.com/rhpds/launchpad.git
   workload_revision: 2fcf40b74387046b657e0050513144afead09892
   workload_deploy_type: helm
@@ -120,10 +123,18 @@ metadata:
     POSTGRES_PASSWORD:
       source: generated_password
       length: 32
+    LENDING_DB_PASSWORD:
+      source: generated_password
+      length: 32
+    COMPLIANCE_DB_PASSWORD:
+      source: generated_password
+      length: 32
+    MIGRATION_DATABASE_URL:
+      template: postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@mortgage-ai-db:5432/mortgage-ai
     DATABASE_URL:
-      template: postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@mortgage-ai-db:5432/mortgage-ai
+      template: postgresql+asyncpg://lending_app:{LENDING_DB_PASSWORD}@mortgage-ai-db:5432/mortgage-ai
     COMPLIANCE_DATABASE_URL:
-      template: postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@mortgage-ai-db:5432/mortgage-ai
+      template: postgresql+asyncpg://compliance_app:{COMPLIANCE_DB_PASSWORD}@mortgage-ai-db:5432/mortgage-ai
     DEBUG:
       value: 'false'
     ALLOWED_HOSTS:

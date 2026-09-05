@@ -145,6 +145,80 @@ def test_agentops_seat_chart_contains_the_participant_runtime_and_routes():
     assert {source["secretRef"]["name"] for source in api_container["envFrom"]} == {
         "agentops-runtime"
     }
+    assert api["spec"]["strategy"] == {"type": "Recreate"}
+    assert api_container["startupProbe"] == {
+        "httpGet": {"path": "/health/", "port": "http"},
+        "periodSeconds": 10,
+        "failureThreshold": 90,
+    }
+
+
+def test_agentops_runtime_images_start_with_certified_resource_behavior():
+    values = yaml.safe_load((CHART / "values.yaml").read_text())
+    assert values["images"]["minioClient"] == (
+        "quay.io/minio/mc:RELEASE.2023-06-19T19-31-19Z"
+    )
+
+    _, documents = _render()
+    ui = next(
+        document
+        for document in documents
+        if document["kind"] == "Deployment"
+        and document["metadata"]["name"] == "mortgage-ai-ui"
+    )
+    ui_spec = ui["spec"]["template"]["spec"]
+    nginx_init = next(
+        container
+        for container in ui_spec["initContainers"]
+        if container["name"] == "configure-nginx-workers"
+    )
+    assert "worker_processes  1" in nginx_init["args"][0]
+    assert {
+        "name": "nginx-config",
+        "mountPath": "/etc/nginx/nginx.conf",
+        "subPath": "nginx.conf",
+        "readOnly": True,
+    } in ui_spec["containers"][0]["volumeMounts"]
+
+    bootstrap = next(
+        document
+        for document in documents
+        if document["kind"] == "Job" and document["metadata"]["name"] == "minio-bootstrap"
+    )
+    bootstrap_env = {
+        item["name"]: item.get("value")
+        for item in bootstrap["spec"]["template"]["spec"]["containers"][0]["env"]
+    }
+    assert bootstrap_env["MC_CONFIG_DIR"] == "/tmp/.mc"
+
+
+def test_agentops_database_initializes_runtime_roles_before_migration():
+    _, documents = _render()
+    resources = {(document["kind"], document["metadata"]["name"]): document for document in documents}
+
+    init_config = resources[("ConfigMap", "mortgage-ai-db-init")]
+    init_script = init_config["data"]["10-create-runtime-roles.sh"]
+    assert "LENDING_DB_PASSWORD" in init_script
+    assert "COMPLIANCE_DB_PASSWORD" in init_script
+    assert "CREATE ROLE lending_app" in init_script
+    assert "CREATE ROLE compliance_app" in init_script
+    assert "GRANT USAGE, CREATE ON SCHEMA public TO lending_app" in init_script
+
+    database = resources[("StatefulSet", "mortgage-ai-db")]
+    database_spec = database["spec"]["template"]["spec"]
+    assert {
+        "name": "init-scripts",
+        "configMap": {"name": "mortgage-ai-db-init", "defaultMode": 365},
+    } in database_spec["volumes"]
+
+    api = resources[("Deployment", "mortgage-ai-api")]
+    migration = next(
+        container
+        for container in api["spec"]["template"]["spec"]["initContainers"]
+        if container["name"] == "migrate-database"
+    )
+    migration_database = next(item for item in migration["env"] if item["name"] == "DATABASE_URL")
+    assert migration_database["valueFrom"]["secretKeyRef"]["key"] == "MIGRATION_DATABASE_URL"
 
 
 def test_agentops_grafana_can_read_only_its_seat_metrics():

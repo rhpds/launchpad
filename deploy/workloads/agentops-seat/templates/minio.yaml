@@ -108,6 +108,8 @@ spec:
           securityContext:
             {{- include "agentops.containerSecurityContext" . | nindent 12 }}
           env:
+            - {name: HOME, value: /tmp}
+            - {name: MC_CONFIG_DIR, value: /tmp/.mc}
             - name: S3_ACCESS_KEY
               valueFrom:
                 secretKeyRef: {name: {{ include "agentops.runtimeSecret" . }}, key: S3_ACCESS_KEY}

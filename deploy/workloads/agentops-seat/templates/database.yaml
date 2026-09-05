@@ -54,6 +54,12 @@ spec:
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef: {name: {{ include "agentops.runtimeSecret" . }}, key: POSTGRES_PASSWORD}
+            - name: LENDING_DB_PASSWORD
+              valueFrom:
+                secretKeyRef: {name: {{ include "agentops.runtimeSecret" . }}, key: LENDING_DB_PASSWORD}
+            - name: COMPLIANCE_DB_PASSWORD
+              valueFrom:
+                secretKeyRef: {name: {{ include "agentops.runtimeSecret" . }}, key: COMPLIANCE_DB_PASSWORD}
             - name: PGDATA
               value: /var/lib/postgresql/data/pgdata
           readinessProbe:
@@ -71,6 +77,14 @@ spec:
           volumeMounts:
             - name: postgres-data
               mountPath: /var/lib/postgresql/data
+            - name: init-scripts
+              mountPath: /docker-entrypoint-initdb.d
+              readOnly: true
+      volumes:
+        - name: init-scripts
+          configMap:
+            name: mortgage-ai-db-init
+            defaultMode: 0555
   volumeClaimTemplates:
     - metadata:
         name: postgres-data

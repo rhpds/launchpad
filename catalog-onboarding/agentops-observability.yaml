@@ -72,12 +72,13 @@ runtime:
   required_models:
     - granite-3.2-8b-tools
   seat_resources:
-    # Conservative intake envelope derived from the upstream Helm defaults,
-    # plus the Showroom pod. Replace with measured requests after one-seat E2E.
-    cpu_millicores: 1250
-    memory_mib: 3072
-    pods: 11
-    storage_gib: 25
+    # Rounded reservation envelope measured from the Arena one-seat chart
+    # (1.73 CPU, 4.96 GiB, 13 pods, 30 GiB) plus one Showroom pod
+    # (0.115 CPU, 336 MiB). Re-measure after shared embedding is enabled.
+    cpu_millicores: 2000
+    memory_mib: 6144
+    pods: 14
+    storage_gib: 30
   tabs:
     - id: openshift-console
       title: OpenShift Console
@@ -114,12 +115,17 @@ runtime:
       POSTGRES_DB: {value: mortgage-ai}
       POSTGRES_USER: {value: agentops}
       POSTGRES_PASSWORD: {source: generated_password, length: 32}
+      LENDING_DB_PASSWORD: {source: generated_password, length: 32}
+      COMPLIANCE_DB_PASSWORD: {source: generated_password, length: 32}
+      MIGRATION_DATABASE_URL:
+        template: >-
+          postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@mortgage-ai-db:5432/mortgage-ai
       DATABASE_URL:
         template: >-
-          postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@mortgage-ai-db:5432/mortgage-ai
+          postgresql+asyncpg://lending_app:{LENDING_DB_PASSWORD}@mortgage-ai-db:5432/mortgage-ai
       COMPLIANCE_DATABASE_URL:
         template: >-
-          postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@mortgage-ai-db:5432/mortgage-ai
+          postgresql+asyncpg://compliance_app:{COMPLIANCE_DB_PASSWORD}@mortgage-ai-db:5432/mortgage-ai
       DEBUG: {value: "false"}
       ALLOWED_HOSTS: {value: '["*"]'}
       COMPANY_NAME: {value: "Fed Aura Capital"}
@@ -183,6 +189,11 @@ certification:
       per-seat Grafana, and OpenShift Logging/Loki. OpenShift AI 3.5, a Ready
       DataScienceCluster, user workload monitoring, and Data Science Pipelines
       were confirmed live on 2026-09-04.
+    - >-
+      Deploy a shared, cached Arena embedding endpoint and inject it through a
+      cluster-specific runtime source. Local per-seat Nomic model loading did
+      not finish within 14 minutes; the generation-only endpoint does not
+      implement the OpenAI embeddings route.
     - >-
       Complete one-seat functional certification, including app, trace,
       metrics, logs, evaluation, Showroom, access isolation, and full reclaim.
