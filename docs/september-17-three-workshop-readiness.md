@@ -133,10 +133,12 @@ absent from Argo CD and cleared from the reclaimed session. Evidence is in
 `evidence/agentops-launchpad-one-seat-2026-09-05.json`.
 
 Public-code access and trusted external TLS remain RED and are not implied by
-the internal Gate A result. Before Gate B, the pipeline MariaDB needs service-ca
-TLS, shared MLflow must move from SQLite to PostgreSQL, and logging must move
-from the `1x.demo` NFS/MinIO pilot to durable S3-compatible object storage,
-dynamic block storage, and production sizing.
+the internal Gate A result. Shared MLflow metadata moved to persistent
+PostgreSQL with verified OpenShift service-ca TLS on September 5. Before Gate
+B, the pipeline MariaDB still needs service-ca TLS, and logging must move from
+the `1x.demo` NFS/MinIO pilot to durable S3-compatible object storage, dynamic
+block storage, and production sizing. Evidence is in
+`evidence/agentops-mlflow-postgres-live-2026-09-05.json`.
 
 ### Gate B: five AgentOps seats
 

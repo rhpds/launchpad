@@ -171,10 +171,13 @@ therefore uses the same immutable Git-first path as the other Launchpad labs.
 
 The namespace-scoped workload is now `gitops_ready: true`, while the catalog
 item remains `draft` and capped at one seat. Arena now provides a functional
-shared MLflow service and a supported OpenShift Logging 6.6 one-seat pilot.
-The participant can query application logs in the assigned namespace and is
-denied access to another namespace. The next gate is a Launchpad-created order
-that proves the runtime Secret, workload Application, protected routes,
-Showroom, complete participant journey, and zero-residue reclaim together.
-Five- and 25-seat promotion also require durable S3-compatible object storage,
-dynamic block storage, and a production-sized Loki topology.
+shared MLflow service backed by persistent PostgreSQL with verified OpenShift
+service-ca TLS, plus a supported OpenShift Logging 6.6 one-seat pilot. The
+participant can query application logs in the assigned namespace and is denied
+access to another namespace. A Launchpad-created internal order has proven the
+runtime Secret, workload Application, protected routes, Showroom, complete
+participant journey, and zero-residue reclaim together. The next gate is
+pipeline database TLS and production Logging storage, followed by the five-seat
+functional and cleanup run. Five- and 25-seat promotion require durable
+S3-compatible object storage, dynamic block storage, and a production-sized
+Loki topology.

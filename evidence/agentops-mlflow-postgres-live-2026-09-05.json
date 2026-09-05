@@ -1,0 +1,84 @@
+{
+  "schema": "launchpad.redhat.com/evidence/v1",
+  "evidence_id": "EDD-AGENTOPS-MLFLOW-POSTGRES-2026-09-05",
+  "captured_at": "2026-09-05T10:21:52Z",
+  "commit_sha": "fdf62ef514d5eed5c515ebf8f119c0df8f2501a8",
+  "cluster": {
+    "cluster_id": "arena",
+    "api": "https://api.arena.fm2aihpcsed.com:6443",
+    "openshift_version": "4.22.3"
+  },
+  "scope": "shared-agentops-mlflow-metadata-backend",
+  "result": "pass-internal-shared-service",
+  "red": {
+    "local": "Two component tests failed before service-CA TLS and current-generation readiness were implemented.",
+    "live": [
+      "MLflow rejected the initial plaintext PostgreSQL service because SSL was required.",
+      "MLflow rejected the first TLS endpoint because its trusted bundle did not contain the OpenShift service CA."
+    ]
+  },
+  "green": {
+    "local": {
+      "command": ".venv/bin/pytest -q backend/tests/test_arena_shared_mlflow.py",
+      "result": "6 passed"
+    },
+    "integration": {
+      "server_side_dry_run": "pass-6-resources",
+      "bootstrap_script": "pass-current-generation-and-availability-gate"
+    },
+    "live": {
+      "mlflow_generation": 3,
+      "mlflow_operator_observed_generation": 3,
+      "mlflow_available": true,
+      "mlflow_version": "3.14.0",
+      "mlflow_url": "https://rh-ai.apps.arena.fm2aihpcsed.com/mlflow",
+      "postgres_tls": true,
+      "postgres_tls_version": "TLSv1.3",
+      "mlflow_public_tables": 59,
+      "observed_encrypted_mlflow_connections": 6,
+      "postgres_pvc": {
+        "phase": "Bound",
+        "capacity": "50Gi",
+        "storage_class": "nfs-storage",
+        "access_modes": [
+          "ReadWriteOnce"
+        ]
+      },
+      "postgres_pod": {
+        "phase": "Running",
+        "ready": true,
+        "restarts_after_final_rollout": 0,
+        "tls_init_completed": true,
+        "image_digest": "sha256:8fd1bbd8d006ae5bb892c6d633c9d92fb980caed470199effaf2343099fcdb89"
+      },
+      "mlflow_pod": {
+        "phase": "Running",
+        "containers_ready": "2/2",
+        "restarts_after_final_rollout": 0,
+        "image_digest": "sha256:6e71f0db73548eb9a43ebf00f9bb538e2ec84d30f3a585c838c0926b7b892f2a"
+      }
+    }
+  },
+  "security": {
+    "backend_uri_source": "Secret/mlflow-postgres",
+    "backend_uri_present_in_git": false,
+    "service_certificate": "OpenShift service-ca",
+    "client_verification": "verify-full through MLflow caBundleConfigMap",
+    "minimum_server_protocol": "TLSv1.2",
+    "network_policy": "only pods labeled app=mlflow may reach TCP 5432",
+    "pod_disruption_budget": "minAvailable=1",
+    "credential_rotation": "completed after diagnostic exposure; replacement value was neither printed nor committed"
+  },
+  "proof_model": {
+    "TDD": "The service-CA and observed-generation contracts were captured RED before implementation and pass GREEN.",
+    "EDD": "This manifest records the commit, cluster, versions, digests, database state, TLS session, and operator conditions.",
+    "CDD": "The MLflow CR consumes both its backend URI and CA bundle through named Kubernetes objects.",
+    "BDD": "Given the shared MLflow service uses the PostgreSQL Secret, MLflow starts only after verified TLS succeeds and serves healthy requests.",
+    "CBT": "PostgreSQL TLS, CA injection, persistence, network isolation, disruption budget, MLflow readiness, and schema creation were checked independently."
+  },
+  "limitations": [
+    "MLflow artifacts remain on a single ReadWriteOnce file-backed PVC; an external object store is required before HA replicas.",
+    "This shared-service proof does not promote AgentOps beyond its one-seat cap.",
+    "Pipeline database TLS, production Logging storage, five-seat load, twenty-five-seat load, public access, and external trusted TLS remain separate gates."
+  ]
+}

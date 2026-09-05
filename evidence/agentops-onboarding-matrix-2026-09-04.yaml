@@ -193,23 +193,34 @@ matrix:
       - backend/tests/test_showroom_provisioning.py
       - catalog-onboarding/agentops-observability.yaml
       - evidence/agentops-launchpad-one-seat-2026-09-05.json
+  - id: LIVE-AGENTOPS-020
+    requirement: Shared MLflow metadata uses persistent PostgreSQL with verified service-ca TLS
+    red: Plaintext PostgreSQL was rejected, then TLS was rejected until the service CA entered the MLflow trusted bundle
+    green_local: pass-6-component-contracts
+    green_integration: pass-secret-ca-and-current-generation-bootstrap
+    green_live: pass-tls13-59-tables-6-encrypted-connections
+    evidence:
+      - backend/tests/test_arena_shared_mlflow.py
+      - backend/tests/test_agentops_mlflow_postgres_evidence.py
+      - evidence/agentops-mlflow-postgres-live-2026-09-05.json
 
 rubric:
   source_and_contract: {earned: 15, possible: 15}
   secret_boundary: {earned: 15, possible: 15}
   namespace_and_rbac_isolation: {earned: 15, possible: 15}
-  shared_service_readiness: {earned: 13, possible: 15}
+  shared_service_readiness: {earned: 14, possible: 15}
   participant_tabs_and_journey: {earned: 14, possible: 15}
   cleanup_and_repeatability: {earned: 10, possible: 10}
   five_seat_certification: {earned: 0, possible: 5}
   twenty_five_seat_certification: {earned: 0, possible: 10}
-  total: {earned: 82, possible: 100}
+  total: {earned: 83, possible: 100}
 
 decision: >-
   Keep the catalog item draft. Source intake is valid, but the AgentOps
   experience passed one internal Launchpad-created seat, including the
   namespaced runtime Secret, operator-aware readiness, participant journey,
   logging isolation, and automatic zero-residue reclaim. Keep the item capped
-  at one seat until MLflow, pipeline TLS, and logging storage are suitable for
-  five-seat testing; public-code access and trusted public TLS remain separate
+  at one seat until pipeline TLS and logging storage are suitable for five-seat
+  testing. Shared MLflow is now backed by persistent PostgreSQL over verified
+  service-ca TLS. Public-code access and trusted public TLS remain separate
   certification gates.

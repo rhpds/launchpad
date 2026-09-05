@@ -179,21 +179,6 @@ certification:
     - 25
   activation_blockers:
     - >-
-      Repeat the one-seat run through the Launchpad provisioner. The pinned
-      chart, application agent path, embeddings, shared MLflow trace, DSPA,
-      Grafana, and automatic zero-residue Helm reclaim were proven live on
-      Arena, but the test did not create a persisted Launchpad order, workload
-      Application, or Showroom.
-    - >-
-      Prove generated runtime Secret creation, retry preservation, model-key
-      revocation, and Launchpad-driven reclaim live. The direct chart reclaim
-      left zero residue, and unit tests confirm that no credentials are
-      serialized into the Argo CD Application.
-    - >-
-      Validate generated URLs for all eight RHDP tabs: OpenShift Console,
-      Terminal, shared MLflow, per-seat Mortgage AI, per-seat Grafana, shared
-      RHOAI, MLflow Docs, and RHOAI Docs.
-    - >-
       Deploy and live-certify the Launchpad entitlement gateway proxy for
       every participant workload and shared-service route, including
       cross-seat and cross-tenant denial. Local contracts prove catalog-only
@@ -206,9 +191,14 @@ certification:
       Science Pipelines, and a seven-span AgentOps trace were confirmed live on
       2026-09-05. Trusted external TLS is still RED.
     - >-
-      Replace shared MLflow SQLite with PostgreSQL and enable service-ca TLS
-      for the per-seat RHOAI pipeline MariaDB connection before promotion
-      beyond one seat.
+      Enable service-ca TLS for the per-seat RHOAI pipeline MariaDB connection
+      before promotion beyond one seat. Shared MLflow metadata moved to
+      persistent PostgreSQL with verified OpenShift service-ca TLS on
+      2026-09-05.
     - >-
-      Complete one-seat functional certification, including app, trace,
-      metrics, logs, evaluation, Showroom, access isolation, and full reclaim.
+      Replace the one-seat 1x.demo Loki/MinIO/NFS pilot with durable
+      S3-compatible object storage, dynamic block storage, and production
+      sizing before the five-seat load gate.
+    - >-
+      Complete the five-seat functional and zero-residue certification before
+      raising the catalog maximum above one seat.

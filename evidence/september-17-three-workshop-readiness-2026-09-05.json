@@ -70,7 +70,8 @@
     "75 concurrent internal participant journeys",
     "75 seat-scoped terminal identities and cross-seat denial",
     "sequential reclaim with zero residue",
-    "one internal Launchpad-created AgentOps seat with operator-aware readiness and zero-residue reclaim"
+    "one internal Launchpad-created AgentOps seat with operator-aware readiness and zero-residue reclaim",
+    "shared MLflow metadata on persistent PostgreSQL with verified OpenShift service-ca TLS"
   ],
   "remaining_release_gates": [
     "agentops-five-seat-prerequisites",
@@ -105,8 +106,8 @@
     ]
   },
   "latest_agentops_component_evidence": "evidence/agentops-launchpad-one-seat-2026-09-05.json",
+  "latest_agentops_shared_service_evidence": "evidence/agentops-mlflow-postgres-live-2026-09-05.json",
   "critical_agentops_checks": [
-    "PostgreSQL-backed shared MLflow",
     "service-ca TLS for the RHOAI pipeline database",
     "durable production-sized OpenShift Logging storage",
     "public-code participant authorization and trusted TLS",

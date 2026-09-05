@@ -33,7 +33,6 @@ supported_branding:
 - redhat-intel-default
 - intel-internal
 metadata:
-  namespace_slug: agentops
   showroom: true
   operator_workshop: true
   content_only: false
@@ -46,16 +45,6 @@ metadata:
   - 5
   - 25
   activation_blockers:
-  - Repeat the one-seat run through the Launchpad provisioner. The pinned chart, application
-    agent path, embeddings, shared MLflow trace, DSPA, Grafana, and automatic zero-residue
-    Helm reclaim were proven live on Arena, but the test did not create a persisted
-    Launchpad order, workload Application, or Showroom.
-  - Prove generated runtime Secret creation, retry preservation, model-key revocation,
-    and Launchpad-driven reclaim live. The direct chart reclaim left zero residue,
-    and unit tests confirm that no credentials are serialized into the Argo CD Application.
-  - 'Validate generated URLs for all eight RHDP tabs: OpenShift Console, Terminal,
-    shared MLflow, per-seat Mortgage AI, per-seat Grafana, shared RHOAI, MLflow Docs,
-    and RHOAI Docs.'
   - Deploy and live-certify the Launchpad entitlement gateway proxy for every participant
     workload and shared-service route, including cross-seat and cross-tenant denial.
     Local contracts prove catalog-only allowlisting, Showroom tab rewriting, WebSocket
@@ -63,13 +52,19 @@ metadata:
   - Certify the Arena participant route for shared MLflow and per-seat Grafana, and
     install and certify OpenShift Logging/Loki. Shared MLflow 3.14.0, workspace-scoped
     write authorization, OpenShift AI 3.5, Data Science Pipelines, and a seven-span
-    AgentOps trace were confirmed live on 2026-09-05. Trusted external TLS is still RED.
-  - Replace shared MLflow SQLite with PostgreSQL and enable service-ca TLS for the
-    per-seat RHOAI pipeline MariaDB connection before promotion beyond one seat.
-  - Complete one-seat functional certification, including app, trace, metrics, logs,
-    evaluation, Showroom, access isolation, and full reclaim.
+    AgentOps trace were confirmed live on 2026-09-05. Trusted external TLS is still
+    RED.
+  - Enable service-ca TLS for the per-seat RHOAI pipeline MariaDB connection before
+    promotion beyond one seat. Shared MLflow metadata moved to persistent PostgreSQL
+    with verified OpenShift service-ca TLS on 2026-09-05.
+  - Replace the one-seat 1x.demo Loki/MinIO/NFS pilot with durable S3-compatible object
+    storage, dynamic block storage, and production sizing before the five-seat load
+    gate.
+  - Complete the five-seat functional and zero-residue certification before raising
+    the catalog maximum above one seat.
   showroom_journey: agentops-observability
   showroom_title: 'AgentOps in Production: End-to-End Observability with Red Hat AI'
+  namespace_slug: agentops
   showroom_content_repo_url: https://github.com/rhpds/launchpad.git
   showroom_content_ref: 59563b0a77252e8b91077c30c23ab524a8402bce
   showroom_content_playbook: site-agentops-observability.yml
