@@ -9,6 +9,11 @@ STORAGE_CLASS = ROOT / "deploy/multicluster/arena-launchpad-ephemeral-storagecla
 CATALOG = ROOT / "catalog/agentops-observability/catalog-item.yaml"
 INTAKE = ROOT / "catalog-onboarding/agentops-observability.yaml"
 VALUES = ROOT / "deploy/workloads/agentops-seat/values.yaml"
+CLUSTER_REGISTRIES = (
+    ROOT / "config/clusters.yaml",
+    ROOT / "config/clusters-arena-cert.yaml",
+    ROOT / "deploy/launchpad/overlays/arena/arena-clusters.yaml",
+)
 
 
 def test_arena_launchpad_storage_class_deletes_pvs_and_nfs_directories():
@@ -31,3 +36,14 @@ def test_agentops_uses_only_the_cleanup_certified_storage_class():
     assert values["storageClass"] == expected
     assert catalog["metadata"]["workload_helm_values"]["storageClass"] == expected
     assert intake["runtime"]["workload"]["helm_values"]["storageClass"] == expected
+
+
+def test_arena_showroom_uses_cleanup_certified_ephemeral_storage_class():
+    for registry_path in CLUSTER_REGISTRIES:
+        registry = yaml.safe_load(registry_path.read_text())
+        if registry.get("kind") == "ConfigMap":
+            registry = yaml.safe_load(registry["data"]["clusters.yaml"])
+        arena = next(
+            cluster for cluster in registry["clusters"] if cluster["cluster_id"] == "arena"
+        )
+        assert arena["storage_class"] == "launchpad-nfs-ephemeral"

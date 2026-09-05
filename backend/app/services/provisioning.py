@@ -1323,6 +1323,55 @@ class ProvisioningService:
                 )
         return workshop.model_copy(update={"session_ids": session_ids, "seats": seats})
 
+    def _cleanup_interrupted_workshop_sessions(self, workshop: Workshop) -> Workshop:
+        """Remove every partial seat session before retrying an interrupted order.
+
+        A worker can stop after persisting the session and mutating the target
+        cluster but before copying the session ID onto its workshop seat. A new
+        session for that same seat would then conflict with ownership labels on
+        the surviving resources. Reclaim all persisted, non-ready seat sessions
+        first and fail closed if any cleanup cannot be proved successful.
+        """
+        seats = list(workshop.seats)
+        seats_by_id = {seat.seat_id: index for index, seat in enumerate(seats)}
+        session_ids = list(workshop.session_ids)
+        partial_sessions: list[tuple[int, LabSession]] = []
+        for session in self._sessions.values():
+            request = self._requests.get(session.request_id)
+            metadata = request.metadata if request else {}
+            if metadata.get("workshop_id") != workshop.workshop_id:
+                continue
+            seat_index = seats_by_id.get(metadata.get("seat_id"))
+            if seat_index is None or seats[seat_index].status == WorkshopSeatStatus.READY:
+                continue
+            partial_sessions.append((seat_index, session))
+
+        for seat_index, session in partial_sessions:
+            if session.status != SessionStatus.RECLAIMED:
+                cleanup_error = self._reclaim_workshop_session(session.session_id)
+                if cleanup_error:
+                    raise ValueError(
+                        f"Interrupted seat cleanup failed for {session.session_id}: "
+                        f"{cleanup_error}"
+                    )
+            if session.session_id in session_ids:
+                session_ids.remove(session.session_id)
+            seats[seat_index] = seats[seat_index].model_copy(
+                update={
+                    "status": WorkshopSeatStatus.PENDING,
+                    "session_id": None,
+                    "request_id": None,
+                    "lab_url": None,
+                    "showroom_url": None,
+                    "error": None,
+                    "updated_at": datetime.utcnow(),
+                }
+            )
+
+        recovered = workshop.model_copy(update={"session_ids": session_ids, "seats": seats})
+        self._save_workshop(recovered)
+        return recovered
+
     def recover_interrupted_workshops(self) -> list[str]:
         """Resume workshop provision or reclaim jobs interrupted with the process.
 
@@ -1366,6 +1415,7 @@ class ProvisioningService:
             try:
                 workshop = self._workshops[workshop_id]
                 if workshop.status == WorkshopStatus.PROVISIONING:
+                    workshop = self._cleanup_interrupted_workshop_sessions(workshop)
                     self.queue_failed_workshop_seats(workshop_id)
                 self.run_queued_workshop(workshop_id)
                 recovered.append(workshop_id)

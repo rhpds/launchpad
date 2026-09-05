@@ -4,7 +4,7 @@ clusters:
     api_url: https://kubernetes.default.svc
     ingress_domain: apps.arena.fm2aihpcsed.com
     console_url: https://console-openshift-console.apps.arena.fm2aihpcsed.com
-    storage_class: nfs-storage
+    storage_class: launchpad-nfs-ephemeral
     local: true
     priority: 10
     public_access_enabled: true
