@@ -175,7 +175,9 @@ spec:
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
-  name: mortgage-ai-ui-route
+  # Keep the Route name short: OpenShift's generated host prepends this name
+  # to the Launchpad namespace and each DNS label is limited to 63 characters.
+  name: app
   labels:
     {{- include "agentops.labels" . | nindent 4 }}
     app.kubernetes.io/component: ui

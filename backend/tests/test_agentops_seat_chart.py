@@ -42,7 +42,9 @@ IDENTITY_ARGS = [
 ]
 
 
-def _render() -> tuple[str, list[dict[str, Any]]]:
+def _render(
+    namespace: str = "launchpad-agentops-seat-1",
+) -> tuple[str, list[dict[str, Any]]]:
     completed = subprocess.run(
         [
             "helm",
@@ -50,7 +52,7 @@ def _render() -> tuple[str, list[dict[str, Any]]]:
             "agentops",
             str(CHART),
             "--namespace",
-            "launchpad-agentops-seat-1",
+            namespace,
             "--set",
             "runtime.existingSecret=agentops-runtime",
             *IDENTITY_ARGS,
@@ -61,6 +63,17 @@ def _render() -> tuple[str, list[dict[str, Any]]]:
     )
     documents = [document for document in yaml.safe_load_all(completed.stdout) if document]
     return completed.stdout, documents
+
+
+def test_agentops_route_names_fit_openshift_generated_host_for_launchpad_namespace():
+    namespace = "launchpad-smoke-test-tenant-agentops-observabi-4cf871"
+    _, documents = _render(namespace)
+    routes = [document for document in documents if document["kind"] == "Route"]
+
+    assert len(routes) == 2
+    for route in routes:
+        generated_host_label = f'{route["metadata"]["name"]}-{namespace}'
+        assert len(generated_host_label) <= 63, generated_host_label
 
 
 def test_agentops_seat_chart_lints_and_requires_an_existing_runtime_secret():
@@ -119,8 +132,8 @@ def test_agentops_seat_chart_contains_the_participant_runtime_and_routes():
         ("Deployment", "agentops-grafana"),
         ("StatefulSet", "mortgage-ai-db"),
         ("DataSciencePipelinesApplication", "dspa"),
-        ("Route", "mortgage-ai-ui-route"),
-        ("Route", "grafana-route"),
+        ("Route", "app"),
+        ("Route", "obs"),
         ("ServiceMonitor", "mortgage-ai-api"),
     }.issubset(resources)
 

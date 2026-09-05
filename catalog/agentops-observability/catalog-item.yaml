@@ -193,8 +193,8 @@ metadata:
   workload_runtime_secret_value_path: runtime.existingSecret
   workload_identity_value_path: identity
   workload_routes:
-    ui: mortgage-ai-ui-route
-    grafana: grafana-route
+    ui: app
+    grafana: obs
   source_content_repo: https://github.com/rhpds/launchpad.git
   source_content_revision: 0d697f3ddd1e5008dfd9bb32c3e3bdd0398383a9
   source_references:

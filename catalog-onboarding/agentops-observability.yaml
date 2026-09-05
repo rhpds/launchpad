@@ -158,8 +158,8 @@ runtime:
     helm_values:
       storageClass: launchpad-nfs-ephemeral
     routes:
-      ui: mortgage-ai-ui-route
-      grafana: grafana-route
+      ui: app
+      grafana: obs
 
 certification:
   stage: implementation

@@ -154,7 +154,9 @@ spec:
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
-  name: grafana-route
+  # Keep the Route name short enough for generated hosts in Launchpad's
+  # deliberately descriptive per-seat namespaces.
+  name: obs
   labels:
     {{- include "agentops.labels" . | nindent 4 }}
     app.kubernetes.io/component: grafana
