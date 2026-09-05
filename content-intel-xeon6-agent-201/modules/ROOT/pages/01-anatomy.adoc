@@ -38,7 +38,10 @@ The model provides reasoning. The tools provide data. The prompt provides struct
 
 == Exercise 3: Preview the Components
 
-You will deploy three pods in the next modules:
+You will deploy three components in two workload pods in the next modules. The
+agent and its tightly coupled MCP tools share one pod, while the browser UI
+runs independently. This preserves the component boundaries while reducing
+workshop pod pressure.
 
 Confirm that the terminal is still using the tenant project assigned to this lab. Do not deploy lab workloads into the `showroom-{guid}` namespace, which only hosts the guide and terminal:
 
@@ -53,9 +56,8 @@ oc project -q
 ----
 echo "=== Components you will deploy ==="
 echo ""
-echo "1. solution-tools    — MCP server with 3 Intel/OpenShift data tools"
-echo "2. solution-agent    — LangGraph agent that calls the model + tools"
-echo "3. solution-ui       — Web chat interface for the agent"
+echo "1. solution-agent pod — agent + MCP tools containers"
+echo "2. solution-ui pod    — web chat interface"
 echo ""
 echo "Current namespace status:"
 oc project -q
@@ -68,7 +70,7 @@ Your namespace should still be empty. You will fill it in Modules 2 and 3.
 
 [%interactive]
 * [ ] Model-only limitations understood
-* [ ] Three components understood: tools, agent, UI
+* [ ] Three components and their two-pod layout understood: tools, agent, UI
 * [ ] `{project_name}` selected and confirmed empty
 
 == Learning Outcomes

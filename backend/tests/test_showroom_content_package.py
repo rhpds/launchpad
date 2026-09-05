@@ -179,7 +179,7 @@ def test_agent_content_uses_launchpad_safe_workload_manifests():
     pages = content_root / "modules/ROOT/pages"
     content = "\n".join(path.read_text() for path in sorted(pages.glob("*.adoc")))
 
-    assert "intel-guided-content-v1.0.11" in content
+    assert "intel-guided-content-v1.0.12" in content
     assert "{litellm_api_endpoint}" not in content
     assert "{litellm_virtual_key}" not in content
     assert "{maas_endpoint}" in content
@@ -203,9 +203,15 @@ def test_agent_content_uses_launchpad_safe_workload_manifests():
         assert manifest.exists()
         resources = list(yaml.safe_load_all(manifest.read_text()))
         route = next(resource for resource in resources if resource["kind"] == "Route")
-        deployment = next(resource for resource in resources if resource["kind"] == "Deployment")
         assert route["metadata"]["name"] == route_name
-        assert "@sha256:" in deployment["spec"]["template"]["spec"]["containers"][0]["image"]
+
+    for filename in ("solution-agent.yaml", "solution-ui.yaml"):
+        resources = list(yaml.safe_load_all((content_root / "manifests" / filename).read_text()))
+        deployment = next(resource for resource in resources if resource["kind"] == "Deployment")
+        assert all(
+            "@sha256:" in container["image"]
+            for container in deployment["spec"]["template"]["spec"]["containers"]
+        )
 
     ui_resources = list(
         yaml.safe_load_all((content_root / "manifests" / "solution-ui.yaml").read_text())
@@ -221,6 +227,39 @@ def test_agent_201_uses_the_workshop_certified_tool_model():
     catalog = yaml.safe_load((ROOT / "catalog/intel-xeon6-agent-201/catalog-item.yaml").read_text())
 
     assert catalog["metadata"]["required_models"] == ["granite-3.2-8b-tools"]
+
+
+def test_agent_201_uses_three_pods_by_colocating_agent_and_tools():
+    content_root = ROOT / "content-intel-xeon6-agent-201"
+    catalog = yaml.safe_load((ROOT / "catalog/intel-xeon6-agent-201/catalog-item.yaml").read_text())
+    agent_resources = list(
+        yaml.safe_load_all((content_root / "manifests/solution-agent.yaml").read_text())
+    )
+    tools_resources = list(
+        yaml.safe_load_all((content_root / "manifests/solution-tools.yaml").read_text())
+    )
+    agent_deployment = next(
+        resource for resource in agent_resources if resource["kind"] == "Deployment"
+    )
+    containers = agent_deployment["spec"]["template"]["spec"]["containers"]
+    tools_service = next(
+        resource for resource in tools_resources if resource["kind"] == "Service"
+    )
+    pages = content_root / "modules/ROOT/pages"
+    guide = "\n".join(path.read_text() for path in sorted(pages.glob("*.adoc")))
+
+    assert catalog["metadata"]["seat_pods"] == 3
+    assert [container["name"] for container in containers] == [
+        "solution-agent",
+        "solution-tools",
+    ]
+    assert all("@sha256:" in container["image"] for container in containers)
+    assert not any(resource["kind"] == "Deployment" for resource in tools_resources)
+    assert tools_service["spec"]["selector"] == {
+        "launchpad.redhat.com/solution-stack": "agent-201"
+    }
+    assert "oc rollout status deploy/solution-tools" not in guide
+    assert "All 2 workload pods running" in guide
 
 
 def test_agent_201_runtime_bounds_cpu_generation_for_workshop_scale():
