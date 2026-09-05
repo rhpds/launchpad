@@ -123,7 +123,7 @@ metadata:
   workshop_node_required_labels:
     launchpad.redhat.com/agentops-certified: 'true'
   workload_repo: https://github.com/rhpds/launchpad.git
-  workload_revision: 322beb64d42f692aa30058812ab7c9ea01245e55
+  workload_revision: 8596c9e979c76562b5e1239eec2c96e15305568b
   workload_deploy_type: helm
   workload_deployment_scope: seat
   workload_deploy_path: deploy/workloads/agentops-seat

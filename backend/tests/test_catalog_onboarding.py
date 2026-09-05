@@ -38,7 +38,7 @@ def test_agentops_is_registered_as_a_fail_closed_draft():
     assert catalog["metadata"]["showroom_content_start_path"] == ("content-agentops-observability")
     assert catalog["metadata"]["workload_repo"] == "https://github.com/rhpds/launchpad.git"
     assert catalog["metadata"]["workload_revision"] == (
-        "322beb64d42f692aa30058812ab7c9ea01245e55"
+        "8596c9e979c76562b5e1239eec2c96e15305568b"
     )
     assert catalog["metadata"]["workload_deploy_path"] == "deploy/workloads/agentops-seat"
     assert catalog["metadata"]["workload_deployment_scope"] == "seat"
