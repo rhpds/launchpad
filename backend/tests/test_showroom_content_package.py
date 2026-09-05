@@ -18,7 +18,7 @@ INTEL_GUIDED_LABS = [
         "title": "Intel Xeon 6 201 — Building an AI Agent",
         "model": "granite-3.2-8b-tools",
         "workspace_route": "app",
-        "content_ref": "55e8521132c99fb90b16e44c4131114ab54d36a6",
+        "content_ref": "100f89f198699371c0cc8b54d39ca17f37138591",
         "max_workshop_seats": 25,
         "certification_stage": "twenty-five-seat",
     },

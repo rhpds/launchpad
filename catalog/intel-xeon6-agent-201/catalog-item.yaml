@@ -2,7 +2,7 @@ catalog_item_id: intel-xeon6-agent-201
 display_name: "Intel Xeon 6 201: Building an AI Agent"
 description: "Build and tune a namespace-isolated AI solution advisor with LangGraph, MCP tools, and shared Intel Xeon inference."
 category: guided_build
-version: "1.0.0"
+version: "1.0.1"
 status: active
 required_capabilities:
   - openshift
@@ -32,7 +32,7 @@ metadata:
   workspace_route_name: app
   workspace_title: "Solution Architect"
   showroom_content_repo_url: "https://github.com/rhpds/launchpad.git"
-  showroom_content_ref: "55e8521132c99fb90b16e44c4131114ab54d36a6"
+  showroom_content_ref: "100f89f198699371c0cc8b54d39ca17f37138591"
   showroom_content_playbook: "site-intel-xeon6-agent-201.yml"
   required_models:
     - granite-3.2-8b-tools
