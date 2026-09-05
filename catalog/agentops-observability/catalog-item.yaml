@@ -1,0 +1,89 @@
+catalog_item_id: agentops-observability
+display_name: "AgentOps in Production: End-to-End Observability with Red Hat AI"
+description: "Investigate a production-style multi-agent mortgage application through OpenShift metrics and logs, Grafana dashboards, MLflow tracing and evaluation, and Red Hat OpenShift AI pipelines on Intel infrastructure."
+category: guided_build
+version: "0.1.0"
+status: draft
+required_capabilities:
+  - openshift
+  - showroom
+  - model_endpoint
+  - agentops_observability_stack
+  - rhoai
+  - mlflow
+  - user_workload_monitoring
+  - openshift_logging
+  - data_science_pipelines
+default_hardware_profile: xeon-basic
+default_quota_profile: large
+default_ttl: "4h"
+provisioner_refs:
+  - helm-workload
+  - showroom
+validation_refs:
+  - pod-ready
+  - route-accessible
+  - inference-health
+  - agentops-journey
+observability_profile: agentops-full-stack
+supported_branding:
+  - redhat-intel-default
+  - intel-internal
+metadata:
+  showroom: true
+  operator_workshop: true
+  content_only: false
+  onboarding_managed: true
+  onboarding_contract: catalog-onboarding/agentops-observability.yaml
+  certification_stage: intake
+  max_workshop_seats: 1
+  promotion_sequence:
+    - 1
+    - 5
+    - 25
+  activation_blockers:
+    - "Choose the production content-delivery path, retain immutable source provenance, and replace the Showroom's mutable latest UI bundle with a pinned release before mirroring or adapting content into Launchpad."
+    - "Implement a Launchpad Helm workload adapter with per-seat values, ownership labels, immutable images, readiness, retry, and cleanup."
+    - "Define and validate generated URLs for Mortgage AI, MLflow, Grafana, OpenShift Console, RHOAI, and Terminal Showroom tabs."
+    - "Reconcile the upstream username/password instructions with Launchpad participant SSO and namespace-scoped RBAC; remove or replace the chart's cluster-scoped MLflow RBAC and per-seat Keycloak deployment."
+    - "Confirm Arena provides compatible OpenShift AI, MLflow, user workload monitoring, OpenShift Logging, and data science pipeline services."
+    - "Select and load a workshop-capable model, then update the Showroom's qwen3-14b statements if a different model is certified."
+    - "Complete one-seat functional certification, including app, trace, metrics, logs, evaluation, Showroom, access isolation, and full reclaim."
+  showroom_journey: agentops-observability
+  showroom_title: "AgentOps in Production: End-to-End Observability with Red Hat AI"
+  showroom_content_repo_url: "https://github.com/rhpds/agentops-intel-showroom.git"
+  showroom_content_ref: "f1881c61de55ebf5640c27e76469f4efe458edaf"
+  showroom_content_playbook: site.yml
+  showroom_content_start_path: content
+  showroom_tabs:
+    - id: openshift-console
+      title: OpenShift Console
+      source: cluster.console_url
+    - id: terminal
+      title: Terminal
+      source: showroom.terminal
+    - id: mlflow
+      title: MLflow Console
+      source: workload.route.mlflow
+    - id: mortgage-ai
+      title: Mortgage AI App
+      source: workload.route.ui
+    - id: grafana
+      title: Grafana
+      source: workload.route.grafana
+    - id: rhoai
+      title: RHOAI Console
+      source: cluster.rhoai_url
+  required_models:
+    - qwen3-14b
+  inference_endpoint: litellm
+  seat_cpu_millicores: 1250
+  seat_memory_mib: 3072
+  seat_pods: 11
+  seat_storage_gib: 25
+  workload_repo: "https://github.com/rh-ai-quickstart/multi-agent-loan-origination.git"
+  workload_revision: "1e50e51c334c1b6ed854d81a3f28fd324792f481"
+  workload_deploy_type: helm
+  workload_deploy_path: deploy/helm/mortgage-ai
+  source_content_repo: "https://github.com/rhpds/agentops-intel-showroom.git"
+  source_content_revision: "f1881c61de55ebf5640c27e76469f4efe458edaf"

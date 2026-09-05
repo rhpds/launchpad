@@ -1,0 +1,112 @@
+api_version: launchpad.redhat.com/v1alpha1
+onboarding_contract: catalog-onboarding/agentops-observability.yaml
+
+catalog:
+  catalog_item_id: agentops-observability
+  display_name: "AgentOps in Production: End-to-End Observability with Red Hat AI"
+  description: >-
+    Investigate a production-style multi-agent mortgage application through
+    OpenShift metrics and logs, Grafana dashboards, MLflow tracing and
+    evaluation, and Red Hat OpenShift AI pipelines on Intel infrastructure.
+  category: guided_build
+  version: "0.1.0"
+  supported_branding:
+    - redhat-intel-default
+    - intel-internal
+
+sources:
+  showroom:
+    repo_url: "https://github.com/rhpds/agentops-intel-showroom.git"
+    revision: "f1881c61de55ebf5640c27e76469f4efe458edaf"
+    playbook: site.yml
+    start_path: content
+  workload:
+    repo_url: "https://github.com/rh-ai-quickstart/multi-agent-loan-origination.git"
+    revision: "1e50e51c334c1b6ed854d81a3f28fd324792f481"
+    deploy_path: deploy/helm/mortgage-ai
+
+runtime:
+  deployment_type: helm
+  provisioner_refs:
+    - helm-workload
+    - showroom
+  validation_refs:
+    - pod-ready
+    - route-accessible
+    - inference-health
+    - agentops-journey
+  observability_profile: agentops-full-stack
+  default_hardware_profile: xeon-basic
+  default_quota_profile: large
+  default_ttl: "4h"
+  inference_endpoint: litellm
+  required_capabilities:
+    - openshift
+    - showroom
+    - model_endpoint
+    - agentops_observability_stack
+    - rhoai
+    - mlflow
+    - user_workload_monitoring
+    - openshift_logging
+    - data_science_pipelines
+  required_models:
+    - qwen3-14b
+  seat_resources:
+    # Conservative intake envelope derived from the upstream Helm defaults,
+    # plus the Showroom pod. Replace with measured requests after one-seat E2E.
+    cpu_millicores: 1250
+    memory_mib: 3072
+    pods: 11
+    storage_gib: 25
+  tabs:
+    - id: openshift-console
+      title: OpenShift Console
+      source: cluster.console_url
+    - id: terminal
+      title: Terminal
+      source: showroom.terminal
+    - id: mlflow
+      title: MLflow Console
+      source: workload.route.mlflow
+    - id: mortgage-ai
+      title: Mortgage AI App
+      source: workload.route.ui
+    - id: grafana
+      title: Grafana
+      source: workload.route.grafana
+    - id: rhoai
+      title: RHOAI Console
+      source: cluster.rhoai_url
+
+certification:
+  stage: intake
+  max_workshop_seats: 1
+  promotion_sequence:
+    - 1
+    - 5
+    - 25
+  activation_blockers:
+    - >-
+      Choose the production content-delivery path, retain immutable source
+      provenance, and replace the Showroom's mutable latest UI bundle with a
+      pinned release before mirroring or adapting content into Launchpad.
+    - >-
+      Implement a Launchpad Helm workload adapter with per-seat values,
+      ownership labels, immutable images, readiness, retry, and cleanup.
+    - >-
+      Define and validate generated URLs for Mortgage AI, MLflow, Grafana,
+      OpenShift Console, RHOAI, and Terminal Showroom tabs.
+    - >-
+      Reconcile the upstream username/password instructions with Launchpad
+      participant SSO and namespace-scoped RBAC; remove or replace the chart's
+      cluster-scoped MLflow RBAC and per-seat Keycloak deployment.
+    - >-
+      Confirm Arena provides compatible OpenShift AI, MLflow, user workload
+      monitoring, OpenShift Logging, and data science pipeline services.
+    - >-
+      Select and load a workshop-capable model, then update the Showroom's
+      qwen3-14b statements if a different model is certified.
+    - >-
+      Complete one-seat functional certification, including app, trace,
+      metrics, logs, evaluation, Showroom, access isolation, and full reclaim.

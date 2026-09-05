@@ -98,6 +98,47 @@ jobs:
           name: test-receipt
           path: test-receipts/ci-latest.json
 
+  catalog-onboarding:
+    name: Catalog Onboarding Contracts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install catalog and Antora validators
+        run: |
+          pip install pyyaml
+          npm ci
+
+      - name: Validate pinned onboarding sources and generated catalog
+        run: |
+          mkdir -p test-receipts
+          for intake in catalog-onboarding/*.yaml; do
+            catalog_id="${intake##*/}"
+            catalog_id="${catalog_id%.yaml}"
+            python scripts/catalog_onboarding.py validate \
+              "$intake" \
+              --catalog "catalog/$catalog_id/catalog-item.yaml" \
+              --fetch \
+              --build-showroom \
+              --antora-bin node_modules/.bin/antora \
+              --report "test-receipts/catalog-onboarding-$catalog_id.json"
+          done
+
+      - name: Upload onboarding evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: catalog-onboarding-receipts
+          path: test-receipts/catalog-onboarding-*.json
+
   frontend-check:
     name: Frontend TypeScript
     runs-on: ubuntu-latest

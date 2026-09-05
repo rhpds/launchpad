@@ -187,9 +187,14 @@ results, screenshots of participant-facing changes, one successful session ID,
 reclaim evidence, rollback notes, and any new operational dependency. Platform
 operators perform the production promotion.
 
-The planned CI self-service flow will generate this repository-native
-scaffolding and evidence bundle from a guided intake. It will open a reviewable
-change; it will not bypass Git review or production certification.
+The CI self-service intake now generates repository-native catalog scaffolding
+and a source-validation evidence bundle. It produces a reviewable change; it
+does not bypass Git review or production certification. Follow
+[catalog-onboarding.md](catalog-onboarding.md) to declare a new experience,
+render its fail-closed draft catalog entry, build its pinned Showroom source,
+validate its workload package, and attach the resulting receipt to the pull
+request. Runtime adapter generation and live certification remain reviewed
+promotion steps.
 
 ## Tenant-owner onboarding
 

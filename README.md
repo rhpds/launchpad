@@ -20,6 +20,9 @@ platform operators, and developers should begin with the
 [persona onboarding guide](docs/persona-onboarding.md). It defines access
 boundaries, first-use workflows, the CI delivery contract, testing and
 certification expectations, and the evidence to provide when requesting help.
+New catalog experiences use the repository-native
+[catalog onboarding pipeline](docs/catalog-onboarding.md) so source validation,
+catalog generation, Antora builds, and evidence receipts are repeatable.
 
 Quick paths:
 
@@ -78,6 +81,13 @@ receives scoped API access and does not load model weights into its pod.
 
 Catalog definitions live under `catalog/*/catalog-item.yaml`. The previous `guided-rag-on-xeon` item is deprecated; new workshop orders use the operator-focused experience.
 
+Draft onboarding candidates are registered but intentionally hidden from the
+order flow until runtime and live certification gates pass:
+
+| ID | Name | Current gate |
+|---|---|---|
+| `agentops-observability` | AgentOps in Production: End-to-End Observability with Red Hat AI | Runtime adapter and one-seat certification required |
+
 ## Architecture
 
 ```text
@@ -128,7 +138,9 @@ npm run build
 New catalog experiences must include tests for their schema, request contract,
 provisioning plan, functional validation, Showroom journey, and deterministic
 cleanup. Follow the staged CI checklist in
-[docs/persona-onboarding.md](docs/persona-onboarding.md#content-integrator-ci-onboarding).
+[docs/persona-onboarding.md](docs/persona-onboarding.md#content-integrator-ci-onboarding)
+and declare new sources through
+[docs/catalog-onboarding.md](docs/catalog-onboarding.md).
 
 Use Arena's dedicated kubeconfig for every cluster command; do not change the current kubeconfig context:
 

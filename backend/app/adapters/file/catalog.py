@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 import os
-from typing import Dict, List, Optional
 
 import yaml
 
@@ -25,11 +24,11 @@ class FileCatalogAdapter:
 
     def __init__(self, catalog_dir: str) -> None:
         self._catalog_dir = catalog_dir
-        self._items: Dict[str, CatalogItem] = {}
+        self._items: dict[str, CatalogItem] = {}
         self._scan()
 
     def _scan(self) -> None:
-        items: Dict[str, CatalogItem] = {}
+        items: dict[str, CatalogItem] = {}
         if not os.path.isdir(self._catalog_dir):
             logger.warning("Catalog directory does not exist: %s", self._catalog_dir)
             self._items = items
@@ -52,7 +51,7 @@ class FileCatalogAdapter:
                 items[item.catalog_item_id] = item
             except yaml.YAMLError as e:
                 logger.warning("Skipping %s: invalid YAML: %s", yaml_path, e)
-            except Exception as e:
+            except (TypeError, ValueError) as e:
                 logger.warning("Skipping %s: validation error: %s", yaml_path, e)
 
         added = set(items) - set(self._items)
@@ -67,10 +66,10 @@ class FileCatalogAdapter:
     def reload(self) -> None:
         self._scan()
 
-    def list_items(self) -> List[CatalogItem]:
+    def list_items(self) -> list[CatalogItem]:
         return list(self._items.values())
 
-    def get_item(self, catalog_item_id: str) -> Optional[CatalogItem]:
+    def get_item(self, catalog_item_id: str) -> CatalogItem | None:
         return self._items.get(catalog_item_id)
 
     def validate_item(self, catalog_item_id: str) -> bool:
@@ -81,6 +80,16 @@ class FileCatalogAdapter:
         item = self._items.get(catalog_item_id)
         if not item:
             raise ValueError(f"Catalog item {catalog_item_id} not found")
+        blockers = (item.metadata or {}).get("activation_blockers", [])
+        if (
+            status == CatalogStatus.ACTIVE
+            and (item.metadata or {}).get("onboarding_managed") is True
+            and blockers
+        ):
+            raise ValueError(
+                f"Catalog item {catalog_item_id} has {len(blockers)} unresolved "
+                "activation blocker(s)"
+            )
         updated = item.model_copy(update={"status": status})
         self._items[catalog_item_id] = updated
         return updated
