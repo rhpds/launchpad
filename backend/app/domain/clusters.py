@@ -20,6 +20,7 @@ class ClusterTarget(BaseModel):
     priority: int = 100
     capabilities: List[str] = Field(default_factory=list)
     model_endpoints: Dict[str, str] = Field(default_factory=dict)
+    service_urls: Dict[str, str] = Field(default_factory=dict)
     public_access_enabled: bool = False
     public_ingress_domain: str = ""
     public_console_url: str = ""

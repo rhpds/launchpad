@@ -21,12 +21,23 @@ sources:
     playbook: site.yml
     start_path: content
   workload:
+    repo_url: "https://github.com/rhpds/agentops-in-prod-automation.git"
+    revision: "6ea100531ac869fa66abe69ae223d6b56dbce9a2"
+    deploy_path: bootstrap
+
+references:
+  agnosticv:
+    repo_url: "https://github.com/rhpds/agnosticv.git"
+    revision: "48fc6eebedb295bddf1b915a230e5e90f89db0af"
+    path: agd_v2/agentops-intel
+  application:
     repo_url: "https://github.com/rh-ai-quickstart/multi-agent-loan-origination.git"
     revision: "1e50e51c334c1b6ed854d81a3f28fd324792f481"
-    deploy_path: deploy/helm/mortgage-ai
+    path: deploy/helm/mortgage-ai
 
 runtime:
   deployment_type: helm
+  deployment_scope: workshop
   provisioner_refs:
     - helm-workload
     - showroom
@@ -68,7 +79,7 @@ runtime:
       source: showroom.terminal
     - id: mlflow
       title: MLflow Console
-      source: workload.route.mlflow
+      source: cluster.mlflow_url
     - id: mortgage-ai
       title: Mortgage AI App
       source: workload.route.ui
@@ -78,6 +89,23 @@ runtime:
     - id: rhoai
       title: RHOAI Console
       source: cluster.rhoai_url
+    - id: mlflow-docs
+      title: MLflow Docs
+      source: https://mlflow.org/docs/latest/genai/tracing/
+    - id: rhoai-docs
+      title: RHOAI Docs
+      source: https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/
+  workload:
+    source_kind: app-of-apps
+    gitops_ready: false
+    release_name: agentops-bootstrap
+    helm_values:
+      bootstrap:
+        repoURL: https://github.com/rhpds/agentops-in-prod-automation
+        targetRevision: "6ea100531ac869fa66abe69ae223d6b56dbce9a2"
+    routes:
+      ui: mortgage-ai-ui-route
+      grafana: grafana-route
 
 certification:
   stage: intake
@@ -92,18 +120,28 @@ certification:
       provenance, and replace the Showroom's mutable latest UI bundle with a
       pinned release before mirroring or adapting content into Launchpad.
     - >-
-      Implement a Launchpad Helm workload adapter with per-seat values,
-      ownership labels, immutable images, readiness, retry, and cleanup.
+      Adapt the RHDP app-of-apps so cluster-global RHOAI, MLflow, monitoring,
+      logging, and image-puller Applications are installed once on Arena while
+      uniquely named namespace-scoped Applications are created per workshop
+      seat. The current upstream bootstrap uses global names and cannot be
+      instantiated safely by concurrent Launchpad orders.
     - >-
-      Define and validate generated URLs for Mortgage AI, MLflow, Grafana,
-      OpenShift Console, RHOAI, and Terminal Showroom tabs.
+      Complete the AgentOps runtime Secret mapping without serializing the
+      LiteMaaS virtual key into an Argo CD Application. The upstream bootstrap
+      currently passes the token through Helm values.
     - >-
-      Reconcile the upstream username/password instructions with Launchpad
-      participant SSO and namespace-scoped RBAC; remove or replace the chart's
-      cluster-scoped MLflow RBAC and per-seat Keycloak deployment.
+      Validate generated URLs for all eight RHDP tabs: OpenShift Console,
+      Terminal, shared MLflow, per-seat Mortgage AI, per-seat Grafana, shared
+      RHOAI, MLflow Docs, and RHOAI Docs.
     - >-
-      Confirm Arena provides compatible OpenShift AI, MLflow, user workload
-      monitoring, OpenShift Logging, and data science pipeline services.
+      Reconcile the RHDP user/common-password instructions with Launchpad
+      participant SSO and namespace-scoped RBAC; review and reduce the
+      upstream MLflow and Grafana cluster-scoped bindings.
+    - >-
+      Install and certify an Arena participant route for shared MLflow,
+      per-seat Grafana, and OpenShift Logging/Loki. OpenShift AI 3.5, a Ready
+      DataScienceCluster, user workload monitoring, and Data Science Pipelines
+      were confirmed live on 2026-09-04.
     - >-
       Select and load a workshop-capable model, then update the Showroom's
       qwen3-14b statements if a different model is certified.

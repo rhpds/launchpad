@@ -26,7 +26,14 @@ from app.adapters.interfaces import ProvisionResult
 from app.adapters.openshift.showroom_gitops import (
     ShowroomGitOpsAdapter,
     ShowroomSeat,
+    ShowroomToolTab,
     build_showroom_application,
+)
+from app.adapters.openshift.workload_gitops import (
+    WorkloadGitOpsAdapter,
+    WorkloadSeat,
+    build_runtime_secret,
+    build_workload_application,
 )
 from app.domain.models import CatalogItem, LabRequest, ProvisioningPlan, ProvisioningStep
 
@@ -44,7 +51,14 @@ logger = logging.getLogger("launchpad.openshift.provisioning")
 
 
 class OpenShiftProvisioningAdapter:
-    def __init__(self, overlay_path: Path | None = None, *, clients=None, target=None, argocd_custom_objects=None):
+    def __init__(
+        self,
+        overlay_path: Path | None = None,
+        *,
+        clients=None,
+        target=None,
+        argocd_custom_objects=None,
+    ):
         self._overlay_path = overlay_path or DEMO_DEPLOY_ROOT
         self._active_namespaces: dict[str, str] = {}
         self._gateway_bootstrap_lock = threading.Lock()
@@ -77,7 +91,11 @@ class OpenShiftProvisioningAdapter:
             self._rbac_v1 = clients.rbac
         self._showroom_gitops = ShowroomGitOpsAdapter(
             argocd_custom_objects or self._custom_objects,
-            os.environ.get("SHOWROOM_ARGOCD_NAMESPACE", "argocd")
+            os.environ.get("SHOWROOM_ARGOCD_NAMESPACE", "argocd"),
+        )
+        self._workload_gitops = WorkloadGitOpsAdapter(
+            argocd_custom_objects or self._custom_objects,
+            os.environ.get("SHOWROOM_ARGOCD_NAMESPACE", "argocd"),
         )
 
     def create_plan(self, request: LabRequest, catalog_item: CatalogItem) -> ProvisioningPlan:
@@ -96,9 +114,13 @@ class OpenShiftProvisioningAdapter:
                 else request.metadata.get("target_cluster")
             ),
             steps=[
-                ProvisioningStep(name="create-project", adapter="openshift", action="create_namespace", order=1),
+                ProvisioningStep(
+                    name="create-project", adapter="openshift", action="create_namespace", order=1
+                ),
                 ProvisioningStep(name="deploy", adapter="openshift", action="deploy", order=2),
-                ProvisioningStep(name="get-routes", adapter="openshift", action="get_routes", order=3),
+                ProvisioningStep(
+                    name="get-routes", adapter="openshift", action="get_routes", order=3
+                ),
             ],
             adapters_required=["openshift"],
             validation_steps=["pod-status", "route-accessible"],
@@ -124,12 +146,28 @@ class OpenShiftProvisioningAdapter:
                 "participant_id": request.metadata.get("participant_id", request.requester_id),
                 "showroom_content_repo_url": meta.get(
                     "showroom_content_repo_url",
-                    os.environ.get("SHOWROOM_CONTENT_REPO_URL", "https://github.com/rhpds/launchpad.git"),
+                    os.environ.get(
+                        "SHOWROOM_CONTENT_REPO_URL", "https://github.com/rhpds/launchpad.git"
+                    ),
                 ),
                 "showroom_content_ref": meta.get(
                     "showroom_content_ref", os.environ.get("SHOWROOM_CONTENT_REF", "main")
                 ),
                 "showroom_content_playbook": meta.get("showroom_content_playbook", "site.yml"),
+                "showroom_tabs": meta.get("showroom_tabs", []),
+                "workload_enabled": "helm-workload" in catalog_item.provisioner_refs,
+                "workload_gitops_ready": bool(meta.get("workload_gitops_ready", False)),
+                "workload_repo": meta.get("workload_repo", ""),
+                "workload_revision": meta.get("workload_revision", ""),
+                "workload_deploy_path": meta.get("workload_deploy_path", ""),
+                "workload_release_name": meta.get("workload_release_name", "workload"),
+                "workload_helm_values": meta.get("workload_helm_values", {}),
+                "workload_runtime_secret_name": meta.get("workload_runtime_secret_name", ""),
+                "workload_runtime_secret_sources": meta.get("workload_runtime_secret_sources", {}),
+                "workload_runtime_secret_value_path": meta.get(
+                    "workload_runtime_secret_value_path", ""
+                ),
+                "workload_routes": meta.get("workload_routes", {}),
             },
         )
 
@@ -137,8 +175,7 @@ class OpenShiftProvisioningAdapter:
     def _showroom_maas_endpoint(resources: dict) -> str:
         """Return the selected cluster model base without the OpenAI `/v1` suffix."""
         endpoint = str(
-            resources.get("maas_endpoint")
-            or os.environ.get("LITELLM_API_BASE", "")
+            resources.get("maas_endpoint") or os.environ.get("LITELLM_API_BASE", "")
         ).rstrip("/")
         return endpoint.removesuffix("/v1")
 
@@ -150,7 +187,18 @@ class OpenShiftProvisioningAdapter:
         catalog_item_id = res.get("catalog_item_id", "demo")
         showroom_enabled = bool(res.get("showroom_enabled", False))
         operator_workshop = bool(res.get("operator_workshop", False))
+        workload_enabled = bool(res.get("workload_enabled", False))
         session_maas_key = res.get("maas_api_key", "")
+
+        # Intake-managed workloads remain fail closed until their application-
+        # specific Secret, route, RBAC, readiness, and cleanup contract has
+        # passed certification. This check intentionally happens before the
+        # first cluster mutation.
+        if workload_enabled and not res.get("workload_gitops_ready", False):
+            raise ValueError(
+                "Catalog workload is not activation-ready; complete its GitOps "
+                "runtime contract and certification first"
+            )
 
         # Extract tenant from namespace name
         namespace = plan.target_namespace or f"launchpad-demo-{uuid.uuid4().hex[:8]}"
@@ -161,8 +209,14 @@ class OpenShiftProvisioningAdapter:
         seat_id = str(res.get("seat_id", ""))
         # Keep the deterministic suffix at six characters so the generated
         # OpenShift Route host label remains within the 63-character limit.
-        suffix = re.sub(r"[^a-z0-9]", "", seat_id.lower())[:6] if showroom_enabled and seat_id else uuid.uuid4().hex[:6]
-        demo_namespace = self._demo_namespace(tenant_id, catalog_item_id, suffix or uuid.uuid4().hex[:6])
+        suffix = (
+            re.sub(r"[^a-z0-9]", "", seat_id.lower())[:6]
+            if showroom_enabled and seat_id
+            else uuid.uuid4().hex[:6]
+        )
+        demo_namespace = self._demo_namespace(
+            tenant_id, catalog_item_id, suffix or uuid.uuid4().hex[:6]
+        )
 
         # --- Step 1: Ensure tenant gateway exists ---
         if not operator_workshop:
@@ -173,9 +227,7 @@ class OpenShiftProvisioningAdapter:
                     self._grant_image_pull(gw_namespace)
                     self._create_demo_secrets(gw_namespace, session_maas_key)
                     self._apply_kustomize(str(DEMO_DEPLOY_ROOT), gw_namespace)
-                    self._wait_for_deployments(
-                        gw_namespace, deployments={"postgres", "gateway"}
-                    )
+                    self._wait_for_deployments(gw_namespace, deployments={"postgres", "gateway"})
 
         # --- Step 2: Create demo namespace ---
         self._create_namespace(
@@ -191,14 +243,57 @@ class OpenShiftProvisioningAdapter:
             },
         )
         self._grant_image_pull(demo_namespace)
-        self._grant_participant_access(
-            demo_namespace, str(res.get("participant_id", ""))
-        )
+        self._grant_participant_access(demo_namespace, str(res.get("participant_id", "")))
         # The official Showroom chart clones Git content and builds Antora at
         # startup. Keep the restricted egress policy for ordinary demos, but
         # do not attach it to guided Showroom namespaces.
         if not showroom_enabled:
             self._apply_network_policy(demo_namespace)
+
+        workload_app = None
+        if workload_enabled:
+            runtime_secret_name = str(res.get("workload_runtime_secret_name", "")).strip()
+            if runtime_secret_name:
+                runtime_data = self._resolve_workload_runtime_secret(
+                    res.get("workload_runtime_secret_sources", {}), res
+                )
+                self._apply_workload_runtime_secret(
+                    build_runtime_secret(
+                        name=runtime_secret_name,
+                        namespace=demo_namespace,
+                        workshop_id=str(res.get("workshop_id", plan.request_id)),
+                        seat_id=str(res.get("seat_id", plan.request_id)),
+                        session_id=str(res.get("session_id", plan.request_id)),
+                        tenant_id=tenant_id,
+                        cluster_id=plan.target_cluster or "oberon",
+                        string_data=runtime_data,
+                    )
+                )
+            workload_app = build_workload_application(
+                WorkloadSeat(
+                    namespace=demo_namespace,
+                    workshop_id=str(res.get("workshop_id", plan.request_id)),
+                    seat_id=str(res.get("seat_id", plan.request_id)),
+                    session_id=str(res.get("session_id", plan.request_id)),
+                    tenant_id=tenant_id,
+                    cluster_id=plan.target_cluster or "oberon",
+                    destination_server=(
+                        self._target.api_url if self._target else "https://kubernetes.default.svc"
+                    ),
+                    repo_url=str(res.get("workload_repo", "")),
+                    revision=str(res.get("workload_revision", "")),
+                    deploy_path=str(res.get("workload_deploy_path", "")),
+                    release_name=str(res.get("workload_release_name", "workload")),
+                    helm_values=dict(res.get("workload_helm_values", {})),
+                    runtime_secret_name=runtime_secret_name,
+                    runtime_secret_value_path=str(
+                        res.get("workload_runtime_secret_value_path", "")
+                    ),
+                ),
+                argocd_namespace=os.environ.get("SHOWROOM_ARGOCD_NAMESPACE", "argocd"),
+                argocd_project=os.environ.get("SHOWROOM_ARGOCD_PROJECT", "default"),
+            )
+            self._workload_gitops.apply(workload_app)
 
         # --- Step 3: Deploy filtered frontend in demo namespace ---
         gateway_url = ""
@@ -212,58 +307,68 @@ class OpenShiftProvisioningAdapter:
         apps_domain = (
             self._target.ingress_domain
             if self._target
-            else os.environ.get(
-                "OPENSHIFT_APPS_DOMAIN", "apps.oberon.fm2aihpcsed.com"
-            )
+            else os.environ.get("OPENSHIFT_APPS_DOMAIN", "apps.oberon.fm2aihpcsed.com")
         )
         workspace_route_name = str(res.get("workspace_route_name", "")).strip()
         workspace_url = (
-            self._content_workspace_url(
-                workspace_route_name, demo_namespace, apps_domain
-            )
+            self._content_workspace_url(workspace_route_name, demo_namespace, apps_domain)
             if workspace_route_name
-            else self._workspace_url(
-                routes.get("demo", ""), res.get("workspace_path", "")
-            )
+            else self._workspace_url(routes.get("demo", ""), res.get("workspace_path", ""))
         )
+
+        workload_routes = dict(res.get("workload_routes", {}))
+        if workload_enabled and workload_routes:
+            routes = self._wait_for_named_routes(demo_namespace, set(workload_routes.values()))
 
         if showroom_enabled:
             maas_endpoint = self._showroom_maas_endpoint(res)
             requested_models = list(res.get("requested_models", []))
+            console_url = (
+                self._target.console_url.rstrip("/")
+                if self._target and self._target.console_url
+                else os.environ.get("OPENSHIFT_CONSOLE_URL", "").rstrip("/")
+            )
+            tool_tabs = self._resolve_showroom_tabs(
+                res.get("showroom_tabs", []),
+                namespace=demo_namespace,
+                apps_domain=apps_domain,
+                console_url=console_url,
+                workload_routes=workload_routes,
+                cluster_service_urls=(self._target.service_urls if self._target else {}),
+                route_urls=routes,
+            )
             showroom_app = build_showroom_application(
                 ShowroomSeat(
                     namespace=demo_namespace,
                     workshop_id=str(res.get("workshop_id", plan.request_id)),
                     seat_id=str(res.get("seat_id", plan.request_id)),
+                    session_id=str(res.get("session_id", plan.request_id)),
+                    tenant_id=tenant_id,
                     participant_id=str(res.get("participant_id", "lab-user")),
                     workspace_url=workspace_url,
-                    workspace_title=str(
-                        res.get("workspace_title", "RAG Workspace")
-                    ),
+                    workspace_title=str(res.get("workspace_title", "RAG Workspace")),
                     content_repo_url=str(res["showroom_content_repo_url"]),
                     content_ref=str(res["showroom_content_ref"]),
                     apps_domain=apps_domain,
                     console_url=(
-                        f"{self._target.console_url.rstrip('/')}/k8s/ns/{demo_namespace}/core~v1~Pod"
-                        if self._target and self._target.console_url
-                        else os.environ.get("OPENSHIFT_CONSOLE_URL", "")
+                        f"{console_url}/k8s/ns/{demo_namespace}/core~v1~Pod" if console_url else ""
                     ),
-                    destination_server=self._target.api_url if self._target else "https://kubernetes.default.svc",
+                    destination_server=self._target.api_url
+                    if self._target
+                    else "https://kubernetes.default.svc",
                     storage_class=self._target.storage_class if self._target else "nfs-storage",
                     cluster_id=self._target.cluster_id if self._target else "oberon",
                     cluster_display_name=(
-                        self._target.display_name
-                        if self._target else "Oberon Primary"
+                        self._target.display_name if self._target else "Oberon Primary"
                     ),
-                    openshift_api_url=(
-                        self._target.api_url if self._target else ""
-                    ),
+                    openshift_api_url=(self._target.api_url if self._target else ""),
                     maas_endpoint=maas_endpoint,
                     maas_api_key=session_maas_key,
                     maas_model=requested_models[0] if requested_models else "",
                     content_playbook=str(res.get("showroom_content_playbook", "site.yml")),
                     journey=str(res.get("showroom_journey", "guided-rag")),
                     content_only=bool(res.get("content_only", False)),
+                    tool_tabs=tool_tabs,
                 ),
                 argocd_namespace=os.environ.get("SHOWROOM_ARGOCD_NAMESPACE", "argocd"),
                 argocd_project=os.environ.get("SHOWROOM_ARGOCD_PROJECT", "default"),
@@ -274,7 +379,12 @@ class OpenShiftProvisioningAdapter:
 
         route_names = list(routes.keys())
         fallback_url = f"https://{demo_namespace}.apps.cluster.local"
-        lab_url = routes.get("showroom") or routes.get("showroom-proxy") or routes.get("demo") or (routes.get(route_names[0]) if route_names else fallback_url)
+        lab_url = (
+            routes.get("showroom")
+            or routes.get("showroom-proxy")
+            or routes.get("demo")
+            or (routes.get(route_names[0]) if route_names else fallback_url)
+        )
 
         if not operator_workshop:
             self._active_namespaces[demo_namespace] = gw_namespace
@@ -290,7 +400,12 @@ class OpenShiftProvisioningAdapter:
                 "catalog_item_id": catalog_item_id,
                 "routes": routes,
                 "showroom_url": routes.get("showroom") or routes.get("showroom-proxy"),
-                "showroom_application": showroom_app["metadata"]["name"] if showroom_enabled else None,
+                "showroom_application": showroom_app["metadata"]["name"]
+                if showroom_enabled
+                else None,
+                "workload_application": (
+                    workload_app["metadata"]["name"] if workload_app else None
+                ),
                 "workspace_url": workspace_url,
                 "gateway_url": gateway_url,
                 "cluster_id": plan.target_cluster,
@@ -309,7 +424,9 @@ class OpenShiftProvisioningAdapter:
         except ApiException:
             return False
 
-    def _deploy_demo_frontend(self, namespace: str, pages: str, gateway_url: str, demo_name: str) -> None:
+    def _deploy_demo_frontend(
+        self, namespace: str, pages: str, gateway_url: str, demo_name: str
+    ) -> None:
         gateway = gateway_url.removeprefix("http://").removeprefix("https://")
         gw_host, _, gw_port = gateway.partition(":")
         gw_port = gw_port or "8080"
@@ -317,9 +434,7 @@ class OpenShiftProvisioningAdapter:
         try:
             with open("/etc/resolv.conf", encoding="utf-8") as resolv_conf:
                 dns_resolver = next(
-                    line.split()[1]
-                    for line in resolv_conf
-                    if line.startswith("nameserver ")
+                    line.split()[1] for line in resolv_conf if line.startswith("nameserver ")
                 )
         except (OSError, StopIteration, IndexError):
             pass
@@ -357,18 +472,23 @@ http {{
 }}"""
 
         config_data = {
-            "config.json": json.dumps({
-                "pages": [pages] if isinstance(pages, str) else pages,
-                "gateway_url": gateway_url,
-                "demo_name": demo_name,
-            }),
+            "config.json": json.dumps(
+                {
+                    "pages": [pages] if isinstance(pages, str) else pages,
+                    "gateway_url": gateway_url,
+                    "demo_name": demo_name,
+                }
+            ),
             "nginx.conf": nginx_conf,
         }
         try:
-            self._core_v1.create_namespaced_config_map(namespace, client.V1ConfigMap(
-                metadata=client.V1ObjectMeta(name="demo-config"),
-                data=config_data,
-            ))
+            self._core_v1.create_namespaced_config_map(
+                namespace,
+                client.V1ConfigMap(
+                    metadata=client.V1ObjectMeta(name="demo-config"),
+                    data=config_data,
+                ),
+            )
         except ApiException as e:
             if e.status != 409:
                 pass
@@ -380,8 +500,14 @@ http {{
             image=FRONTEND_IMAGE,
             ports=[client.V1ContainerPort(container_port=8080)],
             volume_mounts=[
-                client.V1VolumeMount(name="config", mount_path="/opt/app-root/src/config.json", sub_path="config.json"),
-                client.V1VolumeMount(name="config", mount_path="/etc/nginx/nginx.conf", sub_path="nginx.conf"),
+                client.V1VolumeMount(
+                    name="config",
+                    mount_path="/opt/app-root/src/config.json",
+                    sub_path="config.json",
+                ),
+                client.V1VolumeMount(
+                    name="config", mount_path="/etc/nginx/nginx.conf", sub_path="nginx.conf"
+                ),
             ],
             resources=client.V1ResourceRequirements(
                 requests={"cpu": "100m", "memory": "128Mi"},
@@ -399,7 +525,10 @@ http {{
                     spec=client.V1PodSpec(
                         containers=[container],
                         volumes=[
-                            client.V1Volume(name="config", config_map=client.V1ConfigMapVolumeSource(name="demo-config")),
+                            client.V1Volume(
+                                name="config",
+                                config_map=client.V1ConfigMapVolumeSource(name="demo-config"),
+                            ),
                         ],
                     ),
                 ),
@@ -413,13 +542,16 @@ http {{
                 pass
 
         try:
-            self._core_v1.create_namespaced_service(namespace, client.V1Service(
-                metadata=client.V1ObjectMeta(name="demo-frontend"),
-                spec=client.V1ServiceSpec(
-                    selector={"app": "demo-frontend"},
-                    ports=[client.V1ServicePort(name="http", port=8080, target_port=8080)],
+            self._core_v1.create_namespaced_service(
+                namespace,
+                client.V1Service(
+                    metadata=client.V1ObjectMeta(name="demo-frontend"),
+                    spec=client.V1ServiceSpec(
+                        selector={"app": "demo-frontend"},
+                        ports=[client.V1ServicePort(name="http", port=8080, target_port=8080)],
+                    ),
                 ),
-            ))
+            )
         except ApiException as e:
             if e.status != 409:
                 pass
@@ -427,8 +559,20 @@ http {{
         oc = shutil.which("oc") or shutil.which("kubectl")
         if oc:
             subprocess.run(
-                [oc, "create", "route", "edge", "demo", "--service=demo-frontend", "--port=8080", "-n", namespace],
-                capture_output=True, text=True, timeout=30,
+                [
+                    oc,
+                    "create",
+                    "route",
+                    "edge",
+                    "demo",
+                    "--service=demo-frontend",
+                    "--port=8080",
+                    "-n",
+                    namespace,
+                ],
+                capture_output=True,
+                text=True,
+                timeout=30,
             )
 
     @staticmethod
@@ -441,14 +585,111 @@ http {{
         return f"{base_url.rstrip('/')}/{path.lstrip('/')}"
 
     @staticmethod
-    def _content_workspace_url(
-        route_name: str, namespace: str, apps_domain: str
-    ) -> str:
+    def _content_workspace_url(route_name: str, namespace: str, apps_domain: str) -> str:
         """Return the stable hostname OpenShift assigns to an unnamed Route."""
         route = re.sub(r"[^a-z0-9-]+", "-", route_name.lower()).strip("-")
         if not route or not namespace or not apps_domain:
             return ""
         return f"https://{route}-{namespace}.{apps_domain}"
+
+    @staticmethod
+    def _resolve_showroom_tabs(
+        tab_specs: list[dict],
+        *,
+        namespace: str,
+        apps_domain: str,
+        console_url: str,
+        workload_routes: dict[str, str],
+        cluster_service_urls: dict[str, str],
+        route_urls: dict[str, str] | None = None,
+    ) -> tuple[ShowroomToolTab, ...]:
+        """Resolve catalog tab sources without inventing missing endpoints."""
+        if not tab_specs:
+            return ()
+        resolved: list[ShowroomToolTab] = []
+        route_urls = route_urls or {}
+        for spec in tab_specs:
+            title = str(spec.get("title") or spec.get("name") or "").strip()
+            source = str(spec.get("source", "")).strip()
+            if source == "showroom.terminal":
+                resolved.append(ShowroomToolTab(name=title, path="/terminal", port=443))
+                continue
+            if source == "cluster.console_url" and console_url:
+                resolved.append(
+                    ShowroomToolTab(
+                        name=title,
+                        url=(f"{console_url.rstrip('/')}/k8s/ns/{namespace}/core~v1~Pod"),
+                    )
+                )
+                continue
+            if source.startswith("cluster.") and source.endswith("_url"):
+                service = source.removeprefix("cluster.").removesuffix("_url")
+                if cluster_service_urls.get(service):
+                    resolved.append(ShowroomToolTab(name=title, url=cluster_service_urls[service]))
+                    continue
+            if source.startswith("workload.route."):
+                route_id = source.removeprefix("workload.route.")
+                route_name = workload_routes.get(route_id, "")
+                if route_name:
+                    route_url = route_urls.get(route_name) or (
+                        f"https://{route_name}-{namespace}.{apps_domain}"
+                    )
+                    resolved.append(ShowroomToolTab(name=title, url=route_url))
+                    continue
+            if source.startswith("https://"):
+                resolved.append(ShowroomToolTab(name=title, url=source))
+                continue
+            raise ValueError(f"Cannot resolve Showroom tab '{title}' from source '{source}'")
+        return tuple(resolved)
+
+    @staticmethod
+    def _resolve_workload_runtime_secret(
+        source_map: dict[str, str], resources: dict
+    ) -> dict[str, str]:
+        """Resolve only approved runtime sources into a directly-applied Secret."""
+        requested_models = list(resources.get("requested_models", []))
+        available = {
+            "maas_api_key": str(resources.get("maas_api_key", "")),
+            "maas_endpoint": str(resources.get("maas_endpoint", "")),
+            "requested_model": requested_models[0] if requested_models else "",
+        }
+        result: dict[str, str] = {}
+        for key, source in source_map.items():
+            if source not in available:
+                raise ValueError(f"Unsupported workload runtime Secret source '{source}'")
+            if not available[source]:
+                raise ValueError(f"Workload runtime Secret source '{source}' is unavailable")
+            result[str(key)] = available[source]
+        if source_map and not result:
+            raise ValueError("Workload runtime Secret contract resolved no values")
+        return result
+
+    def _apply_workload_runtime_secret(self, secret: dict) -> None:
+        namespace = secret["metadata"]["namespace"]
+        name = secret["metadata"]["name"]
+        try:
+            self._core_v1.create_namespaced_secret(namespace, body=secret)
+        except ApiException as exc:
+            if exc.status != 409:
+                raise ValueError(
+                    f"Failed to create workload runtime Secret '{name}': {exc.reason}"
+                ) from exc
+            self._core_v1.patch_namespaced_secret(name, namespace, body=secret)
+
+    def _wait_for_named_routes(self, namespace: str, route_names: set[str]) -> dict[str, str]:
+        timeout = int(os.environ.get("WORKLOAD_ROUTE_TIMEOUT", "600"))
+        deadline = time.time() + timeout
+        routes: dict[str, str] = {}
+        while time.time() < deadline:
+            routes = self._get_routes(namespace)
+            if route_names.issubset(routes):
+                return routes
+            time.sleep(HEALTH_INTERVAL)
+        missing = sorted(route_names.difference(routes))
+        raise ValueError(
+            f"Workload routes were not ready in namespace '{namespace}' "
+            f"within {timeout}s: {', '.join(missing)}"
+        )
 
     def _wait_for_showroom_route(self, namespace: str) -> dict[str, str]:
         """Wait for Argo CD to sync far enough for the chart route to exist."""
@@ -518,9 +759,7 @@ http {{
         if not participant_id:
             return
         body = client.V1RoleBinding(
-            metadata=client.V1ObjectMeta(
-                name="launchpad-participant", namespace=namespace
-            ),
+            metadata=client.V1ObjectMeta(name="launchpad-participant", namespace=namespace),
             role_ref=client.V1RoleRef(
                 api_group="rbac.authorization.k8s.io",
                 kind="ClusterRole",
@@ -535,9 +774,7 @@ http {{
             ],
         )
         try:
-            self._rbac_v1.create_namespaced_role_binding(
-                namespace=namespace, body=body
-            )
+            self._rbac_v1.create_namespaced_role_binding(namespace=namespace, body=body)
         except ApiException as exc:
             if exc.status != 409:
                 raise ValueError(
@@ -546,6 +783,7 @@ http {{
 
     def _create_demo_secrets(self, namespace: str, session_maas_key: str = "") -> None:
         import os
+
         litellm_key = session_maas_key or os.environ.get("LITELLM_API_KEY", "")
         secret = client.V1Secret(
             metadata=client.V1ObjectMeta(name="gateway-config"),
@@ -590,9 +828,7 @@ http {{
         }
         if extra_labels:
             labels.update(extra_labels)
-        body = client.V1Namespace(
-            metadata=client.V1ObjectMeta(name=namespace, labels=labels)
-        )
+        body = client.V1Namespace(metadata=client.V1ObjectMeta(name=namespace, labels=labels))
         try:
             self._core_v1.create_namespace(body=body)
         except ApiException as exc:
@@ -644,6 +880,7 @@ http {{
         policy = self._build_demo_network_policy(namespace)
         try:
             from kubernetes import client as k8s_client
+
             net_v1 = k8s_client.NetworkingV1Api()
             net_v1.create_namespaced_network_policy(namespace=namespace, body=policy)
         except Exception as e:
@@ -656,15 +893,21 @@ http {{
 
         subprocess.run(
             [helm, "dependency", "build", chart_path],
-            capture_output=True, text=True, timeout=120,
+            capture_output=True,
+            text=True,
+            timeout=120,
         )
 
         result = subprocess.run(
             [helm, "install", release_name, chart_path, "-n", namespace, "--timeout", "120s"],
-            capture_output=True, text=True, timeout=180,
+            capture_output=True,
+            text=True,
+            timeout=180,
         )
         if result.returncode != 0:
-            raise ValueError(f"Helm install failed for '{release_name}' in '{namespace}':\n{result.stderr[:300]}")
+            raise ValueError(
+                f"Helm install failed for '{release_name}' in '{namespace}':\n{result.stderr[:300]}"
+            )
 
     def _deploy_kustomize(self, kustomize_path: str, namespace: str) -> None:
         kubectl = shutil.which("kubectl") or shutil.which("oc")
@@ -673,7 +916,9 @@ http {{
 
         result = subprocess.run(
             [kubectl, "apply", "-k", kustomize_path, "-n", namespace],
-            capture_output=True, text=True, timeout=120,
+            capture_output=True,
+            text=True,
+            timeout=120,
         )
         if result.returncode != 0:
             raise ValueError(f"Kustomize apply failed in '{namespace}':\n{result.stderr[:300]}")
@@ -687,11 +932,16 @@ http {{
             )
 
         deploy_dir = Path(overlay_path)
-        skip_files = {"namespace.yaml", "kustomization.yaml", "secrets-template.yaml", "keycloak-realm.yaml", "oauth-proxy.yaml", "postgres-backup.yaml", "frontend-deployment.yaml"}
-        yamls = sorted([
-            f for f in deploy_dir.glob("*.yaml")
-            if f.name not in skip_files
-        ])
+        skip_files = {
+            "namespace.yaml",
+            "kustomization.yaml",
+            "secrets-template.yaml",
+            "keycloak-realm.yaml",
+            "oauth-proxy.yaml",
+            "postgres-backup.yaml",
+            "frontend-deployment.yaml",
+        }
+        yamls = sorted([f for f in deploy_dir.glob("*.yaml") if f.name not in skip_files])
 
         if not yamls:
             raise ValueError(f"No YAML files found in {overlay_path}")
@@ -699,13 +949,11 @@ http {{
         for yaml_file in yamls:
             content = yaml_file.read_text()
             cleaned = "\n".join(
-                line for line in content.splitlines()
-                if not line.strip().startswith("namespace:")
+                line for line in content.splitlines() if not line.strip().startswith("namespace:")
             )
             cleaned = self._inject_storage_class(
                 cleaned,
-                os.environ.get("DEMO_STORAGE_CLASS")
-                or os.environ.get("SANDBOX_STORAGE_CLASS", ""),
+                os.environ.get("DEMO_STORAGE_CLASS") or os.environ.get("SANDBOX_STORAGE_CLASS", ""),
             )
             result = subprocess.run(
                 [kubectl, "apply", "-f", "-", "-n", namespace],

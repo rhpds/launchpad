@@ -86,7 +86,7 @@ order flow until runtime and live certification gates pass:
 
 | ID | Name | Current gate |
 |---|---|---|
-| `agentops-observability` | AgentOps in Production: End-to-End Observability with Red Hat AI | Runtime adapter and one-seat certification required |
+| `agentops-observability` | AgentOps in Production: End-to-End Observability with Red Hat AI | RHDP app-of-apps adaptation, Arena prerequisites, and one-seat certification required |
 
 ## Architecture
 
@@ -109,7 +109,12 @@ Arena OpenShift adapters
     └── deterministic retry and cleanup
 ```
 
-Launchpad has adapters for mock, local, direct OpenShift, and RHDP modes. **Direct OpenShift mode is the deployed Oberon path.** RHDP/AgnosticD integration remains repository capability and historical design context; it is not required for the internal Intel deployment.
+Launchpad has adapters for mock, local, direct OpenShift, and RHDP modes.
+**Direct OpenShift mode is the deployed Arena path.** RHDP/AgnosticD integration
+remains repository capability and a useful source contract for importing labs;
+it is not the runtime control plane for the internal Intel deployment. The
+AgentOps import analysis is in
+[docs/agentops-rhdp-gap-analysis.md](docs/agentops-rhdp-gap-analysis.md).
 
 ## Repository layout
 

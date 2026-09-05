@@ -102,21 +102,46 @@ the measured safe limit rather than copying the platform-wide maximum.
 
 ## AgentOps intake status
 
+The detailed RHDP topology and Launchpad adaptation decisions are recorded in
+[agentops-rhdp-gap-analysis.md](agentops-rhdp-gap-analysis.md).
+
 `agentops-observability` is registered as a draft candidate from:
 
 - Showroom: `rhpds/agentops-intel-showroom` at
   `f1881c61de55ebf5640c27e76469f4efe458edaf`;
-- workload: `rh-ai-quickstart/multi-agent-loan-origination` at
-  `1e50e51c334c1b6ed854d81a3f28fd324792f481`.
+- RHDP automation: `rhpds/agentops-in-prod-automation` at
+  `6ea100531ac869fa66abe69ae223d6b56dbce9a2`;
+- transitive Mortgage AI application: `rh-ai-quickstart/multi-agent-loan-origination`
+  at `1e50e51c334c1b6ed854d81a3f28fd324792f481`.
+
+The RHDP deployment path was also traced through AgnosticV
+`agd_v2/agentops-intel` at
+`48fc6eebedb295bddf1b915a230e5e90f89db0af`. That configuration does not
+deploy the application chart directly. It runs the bootstrap chart from
+`rhpds/agentops-in-prod-automation` at
+`6ea100531ac869fa66abe69ae223d6b56dbce9a2`, so that immutable automation
+revision is now Launchpad's declared workload source. The application
+repository remains recorded as transitive source provenance.
 
 Its source and Antora build pass. It is not orderable because the Showroom
 expects a pre-provisioned mortgage application, MLflow, Grafana, OpenShift
 Logging, user workload monitoring, OpenShift AI workbenches/pipelines, a model,
-and six environment tabs. The upstream workload is a Helm chart, but Launchpad
-does not yet have the per-seat Helm adapter and functional validators required
-to own that lifecycle safely. Its default render also creates a cluster-wide
-MLflow role and binding plus one Keycloak deployment per seat; both must be
-replaced by shared, least-privilege platform integration before activation. The
-source contains roughly 34 MiB of instructional images and references a mutable
-`latest` Showroom theme, so content delivery and theme pinning are also explicit
-activation gates rather than hidden per-seat download costs.
+and eight environment tabs.
+
+The RHDP automation is a workshop-scoped app-of-apps. It installs cluster-global
+Applications named `mlflow`, `logging`, `cluster-monitoring`, `image-puller`,
+and `openshift-ai`, then uses ApplicationSets for each `wksp-userN` namespace.
+Those global names make the unmodified bootstrap unsafe for concurrent
+Launchpad orders. Launchpad must install compatible shared Arena services once
+and generate only uniquely owned, namespace-scoped seat resources per order.
+The current AgnosticV catalog declares `num_users: 1` and
+`workshop_user_mode: single`; 5- and 25-seat use is a new Launchpad
+certification target, not a capability inherited from the RHDP item.
+The upstream bootstrap also places the LiteMaaS virtual key in Helm values,
+which would expose it in the Argo CD Application. Launchpad's workload adapter
+therefore keeps runtime Secret data out of Application manifests and leaves
+this specific integration fail closed until its complete Secret mapping exists.
+
+The source contains roughly 34 MiB of instructional images and references a
+mutable `latest` Showroom theme, so content delivery and theme pinning are also
+explicit activation gates rather than hidden per-seat download costs.

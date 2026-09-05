@@ -30,6 +30,8 @@ def build_catalog_item(intake: dict[str, Any]) -> dict[str, Any]:
     runtime = intake["runtime"]
     certification = intake["certification"]
     resources = runtime["seat_resources"]
+    workload_contract = runtime.get("workload", {})
+    references = intake.get("references", {})
 
     return {
         "catalog_item_id": catalog["catalog_item_id"],
@@ -44,9 +46,7 @@ def build_catalog_item(intake: dict[str, Any]) -> dict[str, Any]:
         "default_hardware_profile": runtime.get("default_hardware_profile", "xeon-basic"),
         "default_quota_profile": runtime.get("default_quota_profile", "large"),
         "default_ttl": runtime.get("default_ttl", "4h"),
-        "provisioner_refs": runtime.get(
-            "provisioner_refs", ["helm-workload", "showroom"]
-        ),
+        "provisioner_refs": runtime.get("provisioner_refs", ["helm-workload", "showroom"]),
         "validation_refs": runtime.get(
             "validation_refs",
             [
@@ -56,9 +56,7 @@ def build_catalog_item(intake: dict[str, Any]) -> dict[str, Any]:
                 "agentops-journey",
             ],
         ),
-        "observability_profile": runtime.get(
-            "observability_profile", "agentops-full-stack"
-        ),
+        "observability_profile": runtime.get("observability_profile", "agentops-full-stack"),
         "supported_branding": catalog.get(
             "supported_branding", ["redhat-intel-default", "intel-internal"]
         ),
@@ -91,9 +89,23 @@ def build_catalog_item(intake: dict[str, Any]) -> dict[str, Any]:
             "workload_repo": workload["repo_url"],
             "workload_revision": workload["revision"],
             "workload_deploy_type": runtime["deployment_type"],
+            "workload_deployment_scope": runtime.get("deployment_scope", "seat"),
             "workload_deploy_path": workload["deploy_path"],
+            "workload_source_kind": workload_contract.get("source_kind", "chart"),
+            "workload_gitops_ready": bool(workload_contract.get("gitops_ready", False)),
+            "workload_release_name": workload_contract.get(
+                "release_name", catalog["catalog_item_id"]
+            ),
+            "workload_helm_values": workload_contract.get("helm_values", {}),
+            "workload_runtime_secret_name": workload_contract.get("runtime_secret_name", ""),
+            "workload_runtime_secret_sources": workload_contract.get("runtime_secret_sources", {}),
+            "workload_runtime_secret_value_path": workload_contract.get(
+                "runtime_secret_value_path", ""
+            ),
+            "workload_routes": workload_contract.get("routes", {}),
             "source_content_repo": showroom["repo_url"],
             "source_content_revision": showroom["revision"],
+            "source_references": references,
         },
     }
 
@@ -141,6 +153,11 @@ def _validate_contract(intake: dict[str, Any], errors: list[str]) -> None:
         errors.append("runtime.required_capabilities must be a list")
     if not isinstance(runtime.get("required_models"), list):
         errors.append("runtime.required_models must be a list")
+    if runtime.get("deployment_scope", "seat") not in {"seat", "workshop"}:
+        errors.append("runtime.deployment_scope must be seat or workshop")
+    workload_contract = runtime.get("workload", {})
+    if workload_contract and not isinstance(workload_contract, dict):
+        errors.append("runtime.workload must be a mapping")
     resources = _required_mapping(runtime, "seat_resources", errors, "runtime")
     for key in ("cpu_millicores", "memory_mib", "pods", "storage_gib"):
         value = resources.get(key)
@@ -203,7 +220,7 @@ def _validate_showroom(
     ):
         errors.append("Showroom playbook does not select the declared local start_path")
 
-    ui_bundle = ((((playbook or {}).get("ui") or {}).get("bundle") or {}).get("url"))
+    ui_bundle = (((playbook or {}).get("ui") or {}).get("bundle") or {}).get("url")
     if isinstance(ui_bundle, str) and "/latest/" in ui_bundle:
         warnings.append(
             "Showroom UI bundle uses a mutable latest URL; pin a release before activation"
@@ -223,9 +240,7 @@ def _validate_showroom(
         for image_ref in IMAGE_REF.findall(page.read_text()):
             image_ref = image_ref.strip()
             if not _resolve_image(content_root, page, image_ref):
-                errors.append(
-                    f"Showroom page {page.name} references missing image: {image_ref}"
-                )
+                errors.append(f"Showroom page {page.name} references missing image: {image_ref}")
 
     if not (source / "ui-config.yml").is_file():
         warnings.append(
@@ -272,9 +287,7 @@ def validate_intake(
 
     if showroom_dir is not None and (intake.get("sources") or {}).get("showroom"):
         before = len(errors)
-        _validate_showroom(
-            Path(showroom_dir), intake["sources"]["showroom"], errors, warnings
-        )
+        _validate_showroom(Path(showroom_dir), intake["sources"]["showroom"], errors, warnings)
         checks["showroom_structure"] = "pass" if len(errors) == before else "fail"
     else:
         checks["showroom_structure"] = "not-run" if showroom_dir is None else "fail"

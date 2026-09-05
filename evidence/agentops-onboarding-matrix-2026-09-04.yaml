@@ -1,0 +1,87 @@
+schema: launchpad.redhat.com/evidence-matrix/v1
+iteration: agentops-onboarding-foundation
+date: 2026-09-04
+release_threshold: 100
+status: blocked
+
+source_pins:
+  showroom: f1881c61de55ebf5640c27e76469f4efe458edaf
+  agnosticv: 48fc6eebedb295bddf1b915a230e5e90f89db0af
+  automation: 6ea100531ac869fa66abe69ae223d6b56dbce9a2
+  application: 1e50e51c334c1b6ed854d81a3f28fd324792f481
+
+matrix:
+  - id: CDD-AGENTOPS-001
+    requirement: Immutable Showroom, AgnosticV, automation, and application provenance
+    red: Workload source represented only the transitive application chart
+    green_local: pass
+    green_integration: pass
+    green_live: not-run
+    evidence:
+      - catalog-onboarding/agentops-observability.yaml
+      - test-receipts/catalog-onboarding-agentops-observability.json
+  - id: TDD-AGENTOPS-002
+    requirement: Workload Applications contain no runtime secret values
+    red: No workload GitOps contract or secret boundary existed
+    green_local: pass
+    green_integration: not-run
+    green_live: not-run
+    evidence:
+      - backend/tests/test_workload_gitops.py
+  - id: CBT-AGENTOPS-003
+    requirement: Runtime Secret, GitOps Application, tab resolver, and cleanup are independently tested
+    red: Components did not exist
+    green_local: pass
+    green_integration: not-run
+    green_live: not-run
+    evidence:
+      - backend/tests/test_workload_gitops.py
+      - backend/tests/test_showroom_provisioning.py
+      - backend/tests/test_cleanup_openshift.py
+  - id: BDD-AGENTOPS-004
+    requirement: Given an uncertified app-of-apps, ordering fails before any cluster mutation
+    red: Catalog status was the only runtime guard
+    green_local: pass
+    green_integration: not-run
+    green_live: not-run
+    evidence:
+      - backend/tests/test_showroom_provisioning.py
+  - id: EDD-AGENTOPS-005
+    requirement: Source validation and Antora build produce a machine-readable receipt
+    red: The RHDP deployment path was absent from evidence
+    green_local: pass
+    green_integration: pass
+    green_live: not-run
+    evidence:
+      - test-receipts/catalog-onboarding-agentops-observability.json
+  - id: LIVE-AGENTOPS-006
+    requirement: Arena shared RHOAI, MLflow, monitoring, logging, and pipeline prerequisites
+    red: Shared service prerequisites had not been inspected on Arena
+    green_local: not-applicable
+    green_integration: partial
+    green_live: blocked-missing-mlflow-route-grafana-and-logging
+    evidence:
+      - evidence/agentops-arena-prerequisites-2026-09-04.json
+  - id: LIVE-AGENTOPS-007
+    requirement: One participant completes all eight tabs and full reclaim
+    red: not-run
+    green_local: not-applicable
+    green_integration: not-run
+    green_live: not-run
+    evidence: []
+
+rubric:
+  source_and_contract: {earned: 15, possible: 15}
+  secret_boundary: {earned: 10, possible: 15}
+  namespace_and_rbac_isolation: {earned: 0, possible: 15}
+  shared_service_readiness: {earned: 5, possible: 15}
+  participant_tabs_and_journey: {earned: 5, possible: 15}
+  cleanup_and_repeatability: {earned: 5, possible: 10}
+  five_seat_certification: {earned: 0, possible: 5}
+  twenty_five_seat_certification: {earned: 0, possible: 10}
+  total: {earned: 40, possible: 100}
+
+decision: >-
+  Keep the catalog item draft. Source intake is valid, but the AgentOps
+  experience is not orderable until the missing shared Arena services, secure
+  per-seat overlay, eight-tab journey, and complete reclaim are GREEN-live.

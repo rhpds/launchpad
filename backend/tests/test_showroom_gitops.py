@@ -7,6 +7,7 @@ from app.adapters.openshift.showroom_gitops import (
     SHOWROOM_CHART,
     ShowroomGitOpsAdapter,
     ShowroomSeat,
+    ShowroomToolTab,
     application_name,
     build_showroom_application,
 )
@@ -15,20 +16,26 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 def test_builds_official_chart_application_with_personalized_git_content():
-    app = build_showroom_application(ShowroomSeat(
-        namespace="launchpad-intel-guided-rag-123456",
-        workshop_id="workshop-1",
-        seat_id="seat-07",
-        participant_id="intel-user-07",
-        workspace_url="https://demo.apps.example.com/rag",
-        content_repo_url="https://github.com/jkershawrh/launchpad.git",
-        content_ref="327da5a",
-        apps_domain="apps.example.com",
-        console_url="https://console-openshift-console.apps.example.com",
-        journey="guided-rag",
-    ))
+    app = build_showroom_application(
+        ShowroomSeat(
+            namespace="launchpad-intel-guided-rag-123456",
+            workshop_id="workshop-1",
+            seat_id="seat-07",
+            participant_id="intel-user-07",
+            workspace_url="https://demo.apps.example.com/rag",
+            content_repo_url="https://github.com/jkershawrh/launchpad.git",
+            content_ref="327da5a",
+            apps_domain="apps.example.com",
+            console_url="https://console-openshift-console.apps.example.com",
+            journey="guided-rag",
+            session_id="session-1",
+            tenant_id="tenant-1",
+        )
+    )
 
     assert app["spec"]["source"]["chart"] == SHOWROOM_CHART
+    assert app["metadata"]["labels"]["launchpad.redhat.com/session-id"] == ("session-1")
+    assert app["metadata"]["labels"]["launchpad.redhat.com/tenant"] == "tenant-1"
     assert app["spec"]["syncPolicy"]["automated"] == {"prune": True, "selfHeal": True}
     values = yaml.safe_load(app["spec"]["source"]["helm"]["values"])
     assert values["content"]["repoRef"] == "327da5a"
@@ -44,18 +51,26 @@ def test_builds_official_chart_application_with_personalized_git_content():
 
 
 def test_operator_workshop_places_namespace_console_inside_showroom():
-    app = build_showroom_application(ShowroomSeat(
-        namespace="operator-seat-1", workshop_id="workshop-1", seat_id="seat-1",
-        participant_id="user-1", workspace_url="",
-        content_repo_url="https://github.com/jkershawrh/launchpad.git",
-        content_ref="main", apps_domain="apps.example.com",
-        console_url="https://console.example.com", journey="openshift-operators",
-        cluster_display_name="Arena CPU Execution",
-    ))
+    app = build_showroom_application(
+        ShowroomSeat(
+            namespace="operator-seat-1",
+            workshop_id="workshop-1",
+            seat_id="seat-1",
+            participant_id="user-1",
+            workspace_url="",
+            content_repo_url="https://github.com/jkershawrh/launchpad.git",
+            content_ref="main",
+            apps_domain="apps.example.com",
+            console_url="https://console.example.com",
+            journey="openshift-operators",
+            cluster_display_name="Arena CPU Execution",
+        )
+    )
     values = yaml.safe_load(app["spec"]["source"]["helm"]["values"])
     ui = yaml.safe_load(values["content"]["uiConfig"])
     assert [tab["name"] for tab in ui["tabs"]] == [
-        "Terminal", "OpenShift Console",
+        "Terminal",
+        "OpenShift Console",
     ]
     assert ui["persist_url_state"] is False
     assert ui["tabs"][-1]["url"] == "https://console.example.com"
@@ -76,7 +91,9 @@ def test_launchpad_terminal_defaults_oc_to_its_rotating_seat_identity():
     containerfile = (image_dir / "Containerfile").read_text()
     entrypoint = (image_dir / "launchpad-runttyd").read_text()
 
-    assert "@sha256:606317dc396db33b879c1d3807844990cd37bb0c787b0b525edbeb70283b5350" in containerfile
+    assert (
+        "@sha256:606317dc396db33b879c1d3807844990cd37bb0c787b0b525edbeb70283b5350" in containerfile
+    )
     assert "tokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token" in entrypoint
     assert "namespace: ${NAMESPACE}" in entrypoint
     assert 'KUBECONFIG="${HOME}/.kube/config"' in entrypoint
@@ -84,25 +101,27 @@ def test_launchpad_terminal_defaults_oc_to_its_rotating_seat_identity():
 
 
 def test_content_lab_receives_launchpad_runtime_values_and_named_workspace_tab():
-    app = build_showroom_application(ShowroomSeat(
-        namespace="launchpad-seat-agent-1",
-        workshop_id="workshop-1",
-        seat_id="seat-1",
-        participant_id="lp-user-1",
-        workspace_url="https://solution-ui-launchpad-seat-agent-1.apps.example.com",
-        workspace_title="Solution Architect",
-        content_repo_url="https://github.com/rhpds/launchpad.git",
-        content_ref="main",
-        content_playbook="site-intel-xeon6-agent-201.yml",
-        apps_domain="apps.example.com",
-        console_url="https://console.example.com/k8s/ns/launchpad-seat-agent-1",
-        openshift_api_url="https://api.example.com:6443",
-        maas_endpoint="https://models.example.com",
-        maas_api_key="sk-seat-1",
-        maas_model="granite-2b-cpu",
-        journey="intel-xeon6-agent-201",
-        content_only=True,
-    ))
+    app = build_showroom_application(
+        ShowroomSeat(
+            namespace="launchpad-seat-agent-1",
+            workshop_id="workshop-1",
+            seat_id="seat-1",
+            participant_id="lp-user-1",
+            workspace_url="https://solution-ui-launchpad-seat-agent-1.apps.example.com",
+            workspace_title="Solution Architect",
+            content_repo_url="https://github.com/rhpds/launchpad.git",
+            content_ref="main",
+            content_playbook="site-intel-xeon6-agent-201.yml",
+            apps_domain="apps.example.com",
+            console_url="https://console.example.com/k8s/ns/launchpad-seat-agent-1",
+            openshift_api_url="https://api.example.com:6443",
+            maas_endpoint="https://models.example.com",
+            maas_api_key="sk-seat-1",
+            maas_model="granite-2b-cpu",
+            journey="intel-xeon6-agent-201",
+            content_only=True,
+        )
+    )
 
     values = yaml.safe_load(app["spec"]["source"]["helm"]["values"])
     ui = yaml.safe_load(values["content"]["uiConfig"])
@@ -125,6 +144,36 @@ def test_content_lab_receives_launchpad_runtime_values_and_named_workspace_tab()
     assert values["terminal"]["storage"]["setup"] == "false"
 
 
+def test_declared_tool_tabs_replace_the_legacy_three_tab_layout_in_order():
+    app = build_showroom_application(
+        ShowroomSeat(
+            namespace="launchpad-seat-agentops-1",
+            workshop_id="workshop-1",
+            seat_id="seat-1",
+            participant_id="lp-user-1",
+            workspace_url="",
+            content_repo_url="https://github.com/example/showroom.git",
+            content_ref="b" * 40,
+            apps_domain="apps.arena.example.com",
+            tool_tabs=(
+                ShowroomToolTab(name="OpenShift Console", url="https://console.example.com"),
+                ShowroomToolTab(name="Terminal", path="/terminal", port=443),
+                ShowroomToolTab(name="Mortgage AI App", url="https://mortgage.example.com"),
+                ShowroomToolTab(name="Grafana", url="https://grafana.example.com"),
+            ),
+        )
+    )
+
+    values = yaml.safe_load(app["spec"]["source"]["helm"]["values"])
+    ui = yaml.safe_load(values["content"]["uiConfig"])
+    assert ui["tabs"] == [
+        {"name": "OpenShift Console", "url": "https://console.example.com"},
+        {"name": "Terminal", "path": "/terminal", "port": 443},
+        {"name": "Mortgage AI App", "url": "https://mortgage.example.com"},
+        {"name": "Grafana", "url": "https://grafana.example.com"},
+    ]
+
+
 def test_application_name_is_stable_dns_safe_and_bounded():
     name = application_name("Launchpad_Intel_" + "very-long-namespace-" * 6)
     assert len(name) <= 63
@@ -135,8 +184,13 @@ def test_application_name_is_stable_dns_safe_and_bounded():
 def test_content_revision_is_required():
     try:
         ShowroomSeat(
-            namespace="lab", workshop_id="w", seat_id="s", participant_id="u",
-            workspace_url="", content_repo_url="https://example/repo.git", content_ref="",
+            namespace="lab",
+            workshop_id="w",
+            seat_id="s",
+            participant_id="u",
+            workspace_url="",
+            content_repo_url="https://example/repo.git",
+            content_ref="",
             apps_domain="apps.example.com",
         )
     except ValueError as exc:

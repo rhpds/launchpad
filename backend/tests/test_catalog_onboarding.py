@@ -30,8 +30,12 @@ def test_agentops_is_registered_as_a_fail_closed_draft():
     assert catalog["metadata"]["showroom_content_ref"] == (
         "f1881c61de55ebf5640c27e76469f4efe458edaf"
     )
-    assert catalog["metadata"]["workload_revision"] == (
-        "1e50e51c334c1b6ed854d81a3f28fd324792f481"
+    assert catalog["metadata"]["workload_revision"] == ("6ea100531ac869fa66abe69ae223d6b56dbce9a2")
+    assert catalog["metadata"]["workload_deployment_scope"] == "workshop"
+    assert catalog["metadata"]["workload_source_kind"] == "app-of-apps"
+    assert catalog["metadata"]["workload_gitops_ready"] is False
+    assert catalog["metadata"]["source_references"]["agnosticv"]["path"] == (
+        "agd_v2/agentops-intel"
     )
 
 
@@ -73,7 +77,11 @@ def test_agentops_intake_captures_the_large_lab_runtime_contract():
         "mortgage-ai",
         "grafana",
         "rhoai",
+        "mlflow-docs",
+        "rhoai-docs",
     ]
+    assert runtime["deployment_scope"] == "workshop"
+    assert runtime["workload"]["source_kind"] == "app-of-apps"
     assert certification["promotion_sequence"] == [1, 5, 25]
 
 
@@ -167,9 +175,7 @@ def test_validator_rejects_mutable_refs_and_missing_showroom_assets(tmp_path: Pa
     (showroom / "content/antora.yml").write_text(
         "name: modules\ntitle: Example\nversion: ~\nnav:\n  - modules/ROOT/nav.adoc\n"
     )
-    (showroom / "content/modules/ROOT/nav.adoc").write_text(
-        "* xref:index.adoc[Start]\n"
-    )
+    (showroom / "content/modules/ROOT/nav.adoc").write_text("* xref:index.adoc[Start]\n")
     (pages / "index.adoc").write_text("= Start\nimage::missing.png[]\n")
 
     workload = tmp_path / "workload/deploy/helm/example"

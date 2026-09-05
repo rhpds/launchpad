@@ -1,0 +1,88 @@
+{
+  "schema": "launchpad.redhat.com/live-prerequisite-evidence/v1",
+  "evidence_id": "LIVE-AGENTOPS-006",
+  "observed_at": "2026-09-05T02:32:48Z",
+  "repository_revision": "3b5a856dd01a3d30d91bc89e40fadb4267d4cca2",
+  "cluster": {
+    "cluster_id": "arena",
+    "openshift_version": "4.22.3",
+    "available": true,
+    "progressing": false,
+    "ready_nodes": 5,
+    "aggregate_pod_slots": 1250,
+    "default_storage_class": "nfs-storage"
+  },
+  "prerequisites": {
+    "openshift_gitops": {
+      "status": "pass",
+      "version": "1.21.4"
+    },
+    "openshift_ai": {
+      "status": "pass",
+      "version": "3.5.0",
+      "datasciencecluster": "default-dsc",
+      "datasciencecluster_phase": "Ready"
+    },
+    "data_science_pipelines": {
+      "status": "pass",
+      "crd_available": true
+    },
+    "user_workload_monitoring": {
+      "status": "pass",
+      "enabled": true
+    },
+    "mlflow": {
+      "status": "partial",
+      "operator_ready": true,
+      "ui_deployment_ready": true,
+      "participant_route_available": false
+    },
+    "grafana": {
+      "status": "fail",
+      "deployment_available": false,
+      "participant_route_available": false
+    },
+    "logging_loki": {
+      "status": "fail",
+      "operator_available": false
+    },
+    "keycloak": {
+      "status": "pass",
+      "route": "keycloak.apps.arena.fm2aihpcsed.com"
+    },
+    "console_embed": {
+      "status": "pass",
+      "webhook_ready": true
+    },
+    "model_contract": {
+      "status": "fail",
+      "showroom_expected_model": "qwen3-14b",
+      "arena_registered_profile": "cpu-granite"
+    }
+  },
+  "access_boundary": {
+    "launchpad_provisioner_present": true,
+    "argocd_manager_present": true,
+    "provisioner_can_create_namespaces": true,
+    "provisioner_can_create_central_argocd_applications": false
+  },
+  "gitops_control_plane": {
+    "application": "openshift-gitops/launchpad-arena",
+    "health": "Healthy",
+    "sync": "OutOfSync",
+    "revision": "3b5a856dd01a3d30d91bc89e40fadb4267d4cca2",
+    "action": "review drift before sync"
+  },
+  "result": "blocked",
+  "blockers": [
+    "shared MLflow participant route is absent",
+    "Grafana is absent",
+    "OpenShift Logging/Loki is absent",
+    "Arena model contract does not match the Showroom content",
+    "per-seat namespace-scoped AgentOps overlay is not certified"
+  ],
+  "security": {
+    "secrets_included": false,
+    "inspection_mode": "read-only"
+  }
+}

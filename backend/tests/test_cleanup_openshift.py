@@ -2,6 +2,7 @@
 TDD: OpenShift-specific cleanup hardening.
 Fix 5: Gateway lock, Fix 6: Cleanup timeout, Fix 7: Orphaned RoleBinding.
 """
+
 import threading
 import pytest
 from unittest.mock import MagicMock
@@ -30,12 +31,14 @@ def _req(**kw):
 # FIX 5: Gateway Namespace Lock
 # ═══════════════════════════════════════════════════════════════════════════════
 
-class TestGatewayNamespaceLock:
 
+class TestGatewayNamespaceLock:
     def test_gateway_lock_exists(self):
         """RED: ProvisioningService should have _gw_locks dict."""
         svc = _svc()
-        assert hasattr(svc, "_gw_locks"), "Service must have _gw_locks for gateway namespace locking"
+        assert hasattr(svc, "_gw_locks"), (
+            "Service must have _gw_locks for gateway namespace locking"
+        )
 
     def test_get_gw_lock_returns_lock(self):
         """RED: _get_gw_lock should return a threading.Lock."""
@@ -64,6 +67,7 @@ class TestGatewayNamespaceLock:
 
 try:
     from kubernetes.client.rest import ApiException as _K8sApiException
+
     HAS_KUBERNETES = True
 except ImportError:
     HAS_KUBERNETES = False
@@ -71,10 +75,10 @@ except ImportError:
 
 @pytest.mark.skipif(not HAS_KUBERNETES, reason="kubernetes package not installed")
 class TestCleanupTimeoutFatal:
-
     def test_cleanup_timeout_error_exists(self):
         """RED: CleanupTimeoutError should be importable."""
         from app.adapters.openshift.cleanup import CleanupTimeoutError
+
         assert CleanupTimeoutError is not None
 
     def test_cleanup_timeout_raises(self):
@@ -105,9 +109,7 @@ class TestCleanupTimeoutFatal:
         adapter._wait_for_deletion = MagicMock()
 
         assert adapter.cleanup("async-delete-namespace") is True
-        adapter._core_v1.delete_namespace.assert_called_once_with(
-            name="async-delete-namespace"
-        )
+        adapter._core_v1.delete_namespace.assert_called_once_with(name="async-delete-namespace")
         adapter._wait_for_deletion.assert_not_called()
 
     def test_showroom_delete_timeout_is_configurable(self):
@@ -127,10 +129,26 @@ class TestCleanupTimeoutFatal:
             "slow-argo-namespace", timeout=30
         )
 
+    def test_cleanup_deletes_workload_application_before_namespace(self):
+        from app.adapters.openshift.cleanup import OpenShiftCleanupAdapter
+
+        adapter = OpenShiftCleanupAdapter.__new__(OpenShiftCleanupAdapter)
+        adapter._active_namespaces = {}
+        adapter._core_v1 = MagicMock()
+        adapter._rbac_v1 = MagicMock()
+        adapter._showroom_gitops = MagicMock()
+        adapter._workload_gitops = MagicMock()
+
+        assert adapter.cleanup("workload-seat") is True
+
+        adapter._workload_gitops.delete_for_namespace.assert_called_once_with(
+            "workload-seat", timeout=60
+        )
+        adapter._core_v1.delete_namespace.assert_called_once_with(name="workload-seat")
+
 
 @pytest.mark.skipif(not HAS_KUBERNETES, reason="kubernetes package not installed")
 class TestOrphanedRoleBindingCleanup:
-
     def test_cleanup_deletes_role_binding(self):
         """RED: cleanup should delete the image-puller RoleBinding from parent namespace."""
         from app.adapters.openshift.cleanup import OpenShiftCleanupAdapter

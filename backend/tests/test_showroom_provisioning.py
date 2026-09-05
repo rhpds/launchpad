@@ -1,5 +1,6 @@
 from unittest.mock import MagicMock
 
+import pytest
 from app.adapters.openshift.provisioning import OpenShiftProvisioningAdapter
 from app.domain.enums import CatalogCategory, CatalogStatus
 from app.domain.models import CatalogItem, LabRequest
@@ -58,7 +59,8 @@ def test_operator_workshop_plan_skips_generic_demo_runtime():
         },
     )
     request = LabRequest(
-        tenant_id="partner-a", requester_id="user-a",
+        tenant_id="partner-a",
+        requester_id="user-a",
         catalog_item_id=item.catalog_item_id,
         requested_mode=CatalogCategory.GUIDED_BUILD,
     )
@@ -69,10 +71,112 @@ def test_operator_workshop_plan_skips_generic_demo_runtime():
     assert plan.required_resources["showroom_journey"] == "openshift-operators"
 
 
-def test_guided_workspace_deep_links_to_the_rag_experience():
-    url = OpenShiftProvisioningAdapter._workspace_url(
-        "https://workspace.example.test", "/try-it"
+def test_helm_workload_plan_carries_only_declarative_non_secret_contract():
+    adapter = object.__new__(OpenShiftProvisioningAdapter)
+    adapter._overlay_path = "/tmp/demo"
+    item = CatalogItem(
+        catalog_item_id="agentops",
+        display_name="AgentOps",
+        category=CatalogCategory.GUIDED_BUILD,
+        status=CatalogStatus.DRAFT,
+        provisioner_refs=["helm-workload", "showroom"],
+        metadata={
+            "showroom": True,
+            "workload_gitops_ready": False,
+            "workload_repo": "https://github.com/example/workload.git",
+            "workload_revision": "a" * 40,
+            "workload_deploy_path": "deploy/helm/example",
+            "workload_release_name": "example",
+            "workload_runtime_secret_name": "example-runtime",
+            "workload_runtime_secret_value_path": "runtime.existingSecret",
+            "workload_helm_values": {"keycloak": {"enabled": False}},
+            "workload_routes": {"ui": "example-ui"},
+            "showroom_tabs": [
+                {"id": "terminal", "title": "Terminal", "source": "showroom.terminal"},
+                {"id": "app", "title": "App", "source": "workload.route.ui"},
+            ],
+        },
     )
+    request = LabRequest(
+        tenant_id="partner-a",
+        requester_id="user-a",
+        catalog_item_id="agentops",
+        requested_mode=CatalogCategory.GUIDED_BUILD,
+    )
+
+    plan = adapter.create_plan(request, item)
+
+    assert plan.required_resources["workload_enabled"] is True
+    assert plan.required_resources["workload_gitops_ready"] is False
+    assert plan.required_resources["workload_revision"] == "a" * 40
+    assert plan.required_resources["workload_helm_values"] == {"keycloak": {"enabled": False}}
+    assert "maas_api_key" not in plan.required_resources
+
+    with pytest.raises(ValueError, match="not activation-ready"):
+        adapter.provision(plan)
+
+
+def test_resolves_declared_showroom_tabs_from_cluster_and_workload_contract():
+    tabs = OpenShiftProvisioningAdapter._resolve_showroom_tabs(
+        [
+            {"title": "OpenShift", "source": "cluster.console_url"},
+            {"title": "Terminal", "source": "showroom.terminal"},
+            {"title": "App", "source": "workload.route.ui"},
+            {"title": "Grafana", "source": "cluster.grafana_url"},
+        ],
+        namespace="launchpad-seat-1",
+        apps_domain="apps.arena.example.com",
+        console_url="https://console.example.com",
+        workload_routes={"ui": "mortgage-ai-ui-route"},
+        cluster_service_urls={"grafana": "https://grafana.example.com"},
+    )
+
+    assert [tab.name for tab in tabs] == ["OpenShift", "Terminal", "App", "Grafana"]
+    assert tabs[0].url.endswith("/k8s/ns/launchpad-seat-1/core~v1~Pod")
+    assert tabs[1].path == "/terminal"
+    assert tabs[2].url == ("https://mortgage-ai-ui-route-launchpad-seat-1.apps.arena.example.com")
+
+
+def test_unresolved_declared_showroom_tab_fails_closed():
+    with pytest.raises(ValueError, match="Cannot resolve Showroom tab"):
+        OpenShiftProvisioningAdapter._resolve_showroom_tabs(
+            [{"title": "MLflow", "source": "cluster.mlflow_url"}],
+            namespace="launchpad-seat-1",
+            apps_domain="apps.arena.example.com",
+            console_url="https://console.example.com",
+            workload_routes={},
+            cluster_service_urls={},
+        )
+
+
+def test_runtime_secret_resolver_accepts_only_explicit_dynamic_sources():
+    resolved = OpenShiftProvisioningAdapter._resolve_workload_runtime_secret(
+        {
+            "LLM_API_KEY": "maas_api_key",
+            "LLM_BASE_URL": "maas_endpoint",
+            "LLM_MODEL": "requested_model",
+        },
+        {
+            "maas_api_key": "sk-seat-secret",
+            "maas_endpoint": "https://models.example.com/v1",
+            "requested_models": ["granite"],
+        },
+    )
+
+    assert resolved == {
+        "LLM_API_KEY": "sk-seat-secret",
+        "LLM_BASE_URL": "https://models.example.com/v1",
+        "LLM_MODEL": "granite",
+    }
+
+    with pytest.raises(ValueError, match="Unsupported"):
+        OpenShiftProvisioningAdapter._resolve_workload_runtime_secret(
+            {"PASSWORD": "catalog_literal"}, {"catalog_literal": "unsafe"}
+        )
+
+
+def test_guided_workspace_deep_links_to_the_rag_experience():
+    url = OpenShiftProvisioningAdapter._workspace_url("https://workspace.example.test", "/try-it")
 
     assert url == "https://workspace.example.test/try-it"
 
@@ -82,9 +186,7 @@ def test_content_workspace_route_uses_stable_openshift_route_hostname():
         "solution-ui", "launchpad-seat-agent-1", "apps.arena.example"
     )
 
-    assert url == (
-        "https://solution-ui-launchpad-seat-agent-1.apps.arena.example"
-    )
+    assert url == ("https://solution-ui-launchpad-seat-agent-1.apps.arena.example")
 
 
 def test_showroom_is_deployed_by_gitops_not_inline_html():
@@ -95,22 +197,26 @@ def test_showroom_is_deployed_by_gitops_not_inline_html():
 def test_showroom_prefers_model_endpoint_carried_by_provisioning_plan(monkeypatch):
     monkeypatch.setenv("LITELLM_API_BASE", "http://global-litellm:4000/v1")
 
-    endpoint = OpenShiftProvisioningAdapter._showroom_maas_endpoint({
-        "maas_endpoint": "http://arena-tools:8000/v1",
-    })
+    endpoint = OpenShiftProvisioningAdapter._showroom_maas_endpoint(
+        {
+            "maas_endpoint": "http://arena-tools:8000/v1",
+        }
+    )
 
     assert endpoint == "http://arena-tools:8000"
 
 
 def test_wait_for_showroom_route_accepts_chart_proxy_route(monkeypatch):
     adapter = OpenShiftProvisioningAdapter.__new__(OpenShiftProvisioningAdapter)
-    route_snapshots = iter([
-        {"demo": "https://demo.example.test"},
-        {
-            "demo": "https://demo.example.test",
-            "showroom-proxy": "https://showroom.example.test",
-        },
-    ])
+    route_snapshots = iter(
+        [
+            {"demo": "https://demo.example.test"},
+            {
+                "demo": "https://demo.example.test",
+                "showroom-proxy": "https://showroom.example.test",
+            },
+        ]
+    )
     adapter._get_routes = lambda _namespace: next(route_snapshots)
     monkeypatch.setattr("app.adapters.openshift.provisioning.time.sleep", lambda _seconds: None)
     monkeypatch.setattr(
@@ -125,9 +231,7 @@ def test_wait_for_showroom_route_accepts_chart_proxy_route(monkeypatch):
 
 def test_wait_for_showroom_route_requires_http_200(monkeypatch):
     adapter = OpenShiftProvisioningAdapter.__new__(OpenShiftProvisioningAdapter)
-    adapter._get_routes = lambda _namespace: {
-        "showroom": "https://showroom.example.test"
-    }
+    adapter._get_routes = lambda _namespace: {"showroom": "https://showroom.example.test"}
     responses = iter([MagicMock(status_code=503), MagicMock(status_code=200)])
     request = MagicMock(side_effect=lambda *_args, **_kwargs: next(responses))
     monkeypatch.setattr("app.adapters.openshift.provisioning.requests.get", request)
@@ -143,9 +247,7 @@ def test_showroom_namespace_is_labeled_for_namespaced_argocd():
     adapter = OpenShiftProvisioningAdapter.__new__(OpenShiftProvisioningAdapter)
     adapter._core_v1 = MagicMock()
 
-    adapter._create_namespace(
-        "lab-showroom", {"argocd.argoproj.io/managed-by": "argocd"}
-    )
+    adapter._create_namespace("lab-showroom", {"argocd.argoproj.io/managed-by": "argocd"})
 
     body = adapter._core_v1.create_namespace.call_args.kwargs["body"]
     assert body.metadata.labels["argocd.argoproj.io/managed-by"] == "argocd"

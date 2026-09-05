@@ -31,26 +31,31 @@ class OpenShiftCleanupAdapter:
             )
 
         if clients is None:
-          try:
-            config.load_incluster_config()
-          except config.ConfigException:
             try:
-                config.load_kube_config()
-            except config.ConfigException as exc:
-                raise ValueError(
-                    f"Unable to load Kubernetes configuration "
-                    f"(tried in-cluster and kubeconfig): {exc}"
-                ) from exc
+                config.load_incluster_config()
+            except config.ConfigException:
+                try:
+                    config.load_kube_config()
+                except config.ConfigException as exc:
+                    raise ValueError(
+                        f"Unable to load Kubernetes configuration "
+                        f"(tried in-cluster and kubeconfig): {exc}"
+                    ) from exc
 
-          self._core_v1 = client.CoreV1Api()
-          self._rbac_v1 = client.RbacAuthorizationV1Api()
-          custom_objects = client.CustomObjectsApi()
+            self._core_v1 = client.CoreV1Api()
+            self._rbac_v1 = client.RbacAuthorizationV1Api()
+            custom_objects = client.CustomObjectsApi()
         else:
-          self._core_v1 = clients.core
-          self._rbac_v1 = clients.rbac
-          custom_objects = argocd_custom_objects or clients.custom
+            self._core_v1 = clients.core
+            self._rbac_v1 = clients.rbac
+            custom_objects = argocd_custom_objects or clients.custom
         from app.adapters.openshift.showroom_gitops import ShowroomGitOpsAdapter
+        from app.adapters.openshift.workload_gitops import WorkloadGitOpsAdapter
+
         self._showroom_gitops = ShowroomGitOpsAdapter(
+            custom_objects, os.environ.get("SHOWROOM_ARGOCD_NAMESPACE", "argocd")
+        )
+        self._workload_gitops = WorkloadGitOpsAdapter(
             custom_objects, os.environ.get("SHOWROOM_ARGOCD_NAMESPACE", "argocd")
         )
 
@@ -69,12 +74,13 @@ class OpenShiftCleanupAdapter:
         # will self-heal by recreating the lab namespace after reclamation.
         showroom_gitops = getattr(self, "_showroom_gitops", None)
         if showroom_gitops is not None:
-            showroom_delete_timeout = max(
-                1, int(os.environ.get("SHOWROOM_DELETE_TIMEOUT", "60"))
-            )
-            showroom_gitops.delete_for_namespace(
-                namespace, timeout=showroom_delete_timeout
-            )
+            showroom_delete_timeout = max(1, int(os.environ.get("SHOWROOM_DELETE_TIMEOUT", "60")))
+            showroom_gitops.delete_for_namespace(namespace, timeout=showroom_delete_timeout)
+
+        workload_gitops = getattr(self, "_workload_gitops", None)
+        if workload_gitops is not None:
+            workload_delete_timeout = max(1, int(os.environ.get("WORKLOAD_DELETE_TIMEOUT", "60")))
+            workload_gitops.delete_for_namespace(namespace, timeout=workload_delete_timeout)
 
         try:
             self._core_v1.delete_namespace(name=namespace)

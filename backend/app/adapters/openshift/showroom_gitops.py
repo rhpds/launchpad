@@ -32,6 +32,32 @@ def application_name(namespace: str) -> str:
 
 
 @dataclass(frozen=True)
+class ShowroomToolTab:
+    name: str
+    url: str = ""
+    path: str = ""
+    port: int | None = None
+
+    def __post_init__(self) -> None:
+        if not self.name.strip():
+            raise ValueError("Showroom tab name is required")
+        if bool(self.url) == bool(self.path):
+            raise ValueError("Showroom tab must declare exactly one of url or path")
+        if self.port is not None and not self.path:
+            raise ValueError("Showroom tab port is valid only with path")
+
+    def as_config(self) -> dict:
+        config = {"name": self.name}
+        if self.url:
+            config["url"] = self.url
+        else:
+            config["path"] = self.path
+            if self.port is not None:
+                config["port"] = self.port
+        return config
+
+
+@dataclass(frozen=True)
 class ShowroomSeat:
     namespace: str
     workshop_id: str
@@ -55,6 +81,9 @@ class ShowroomSeat:
     maas_endpoint: str = ""
     maas_api_key: str = ""
     maas_model: str = ""
+    tool_tabs: tuple[ShowroomToolTab, ...] = ()
+    session_id: str = ""
+    tenant_id: str = ""
 
     def __post_init__(self) -> None:
         if not self.content_ref.strip():
@@ -76,11 +105,17 @@ def build_showroom_application(
         "launchpad.redhat.com/seat-id": seat.seat_id,
         "launchpad.redhat.com/cluster-id": seat.cluster_id,
     }
+    if seat.session_id:
+        labels["launchpad.redhat.com/session-id"] = seat.session_id
+    if seat.tenant_id:
+        labels["launchpad.redhat.com/tenant"] = seat.tenant_id
     user_data = {
         "guid": seat.seat_id,
         "user": seat.participant_id,
         "workshop_id": seat.workshop_id,
         "seat_id": seat.seat_id,
+        "session_id": seat.session_id,
+        "tenant_id": seat.tenant_id,
         "namespace": seat.namespace,
         "project_name": seat.namespace,
         "workspace_url": seat.workspace_url,
@@ -92,9 +127,7 @@ def build_showroom_application(
         "showroom_journey": seat.journey,
         "maas_endpoint": seat.maas_endpoint,
         "maas_url": seat.maas_endpoint,
-        "maas_api_url": f"{seat.maas_endpoint.rstrip('/')}/v1"
-        if seat.maas_endpoint
-        else "",
+        "maas_api_url": f"{seat.maas_endpoint.rstrip('/')}/v1" if seat.maas_endpoint else "",
         "maas_api_key": seat.maas_api_key,
         "litellm_api_key": seat.maas_api_key,
         "maas_model": seat.maas_model,
@@ -102,11 +135,14 @@ def build_showroom_application(
     # Antora content is Showroom's primary guide pane, so it must not also be
     # configured as a tool tab. Doing so duplicates (and through a public
     # reverse proxy can recursively embed) the Showroom shell.
-    tabs = [{"name": "Terminal", "path": "/terminal", "port": 443}]
-    if seat.workspace_url:
-        tabs.insert(1, {"name": seat.workspace_title, "url": seat.workspace_url})
-    if seat.console_url:
-        tabs.append({"name": "OpenShift Console", "url": seat.console_url})
+    if seat.tool_tabs:
+        tabs = [tab.as_config() for tab in seat.tool_tabs]
+    else:
+        tabs = [{"name": "Terminal", "path": "/terminal", "port": 443}]
+        if seat.workspace_url:
+            tabs.insert(1, {"name": seat.workspace_title, "url": seat.workspace_url})
+        if seat.console_url:
+            tabs.append({"name": "OpenShift Console", "url": seat.console_url})
     ui_config = {
         "type": "showroom",
         "default_width": 40,
@@ -164,7 +200,10 @@ def build_showroom_application(
                 "repoURL": SHOWROOM_CHART_REPOSITORY,
                 "chart": SHOWROOM_CHART,
                 "targetRevision": chart_version,
-                "helm": {"releaseName": "showroom", "values": yaml.safe_dump(values, sort_keys=False)},
+                "helm": {
+                    "releaseName": "showroom",
+                    "values": yaml.safe_dump(values, sort_keys=False),
+                },
             },
             "destination": {"server": seat.destination_server, "namespace": seat.namespace},
             "syncPolicy": {
@@ -251,6 +290,4 @@ class ShowroomGitOpsAdapter:
                 name,
             )
             return
-        raise TimeoutError(
-            f"Argo CD Application '{name}' was not deleted within {timeout}s"
-        )
+        raise TimeoutError(f"Argo CD Application '{name}' was not deleted within {timeout}s")
