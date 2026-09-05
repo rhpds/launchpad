@@ -6,6 +6,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[2]
 MANIFEST = ROOT / "deploy/multicluster/arena-shared-mlflow.yaml"
+BOOTSTRAP = ROOT / "scripts/configure-arena-shared-mlflow-postgres.sh"
 CLUSTER_REGISTRIES = (
     ROOT / "config/clusters.yaml",
     ROOT / "config/clusters-arena-cert.yaml",
@@ -16,8 +17,13 @@ CATALOG = ROOT / "catalog/agentops-observability/catalog-item.yaml"
 INTAKE = ROOT / "catalog-onboarding/agentops-observability.yaml"
 
 
-def test_shared_mlflow_uses_the_installed_rhoai_operator_and_disposable_storage():
-    mlflow = yaml.safe_load(MANIFEST.read_text())
+def _resources() -> dict[tuple[str, str], dict]:
+    resources = [item for item in yaml.safe_load_all(MANIFEST.read_text()) if item]
+    return {(item["kind"], item["metadata"]["name"]): item for item in resources}
+
+
+def test_shared_mlflow_uses_the_installed_rhoai_operator_and_postgres_secret():
+    mlflow = _resources()[("MLflow", "mlflow")]
 
     assert mlflow["apiVersion"] == "mlflow.opendatahub.io/v1"
     assert mlflow["kind"] == "MLflow"
@@ -26,7 +32,11 @@ def test_shared_mlflow_uses_the_installed_rhoai_operator_and_disposable_storage(
     assert mlflow["metadata"]["labels"]["launchpad.redhat.com/shared-service"] == "true"
 
     spec = mlflow["spec"]
-    assert spec["backendStoreUri"] == "sqlite:////mlflow/mlflow.db"
+    assert "backendStoreUri" not in spec
+    assert spec["backendStoreUriFrom"] == {
+        "name": "mlflow-postgres",
+        "key": "backend-store-uri",
+    }
     assert spec["serveArtifacts"] is True
     assert spec["artifactsDestination"] == "file:///mlflow/artifacts"
     assert spec["replicas"] == 1
@@ -40,6 +50,45 @@ def test_shared_mlflow_uses_the_installed_rhoai_operator_and_disposable_storage(
             "operator": "Exists",
         }
     ]
+
+
+def test_shared_mlflow_postgres_is_persistent_restricted_and_not_secret_in_git():
+    resources = _resources()
+    statefulset = resources[("StatefulSet", "mlflow-postgres")]
+    service = resources[("Service", "mlflow-postgres")]
+    policy = resources[("NetworkPolicy", "mlflow-postgres")]
+    disruption_budget = resources[("PodDisruptionBudget", "mlflow-postgres")]
+
+    container = statefulset["spec"]["template"]["spec"]["containers"][0]
+    assert "postgresql-16@sha256:" in container["image"]
+    assert container["securityContext"] == {
+        "allowPrivilegeEscalation": False,
+        "capabilities": {"drop": ["ALL"]},
+    }
+    assert statefulset["spec"]["volumeClaimTemplates"][0]["spec"] == {
+        "accessModes": ["ReadWriteOnce"],
+        "storageClassName": "nfs-storage",
+        "resources": {"requests": {"storage": "50Gi"}},
+    }
+    assert service["spec"]["ports"][0]["port"] == 5432
+    assert policy["spec"]["ingress"][0]["from"][0]["podSelector"] == {
+        "matchLabels": {"app": "mlflow"}
+    }
+    assert disruption_budget["spec"]["minAvailable"] == 1
+    assert not any(kind == "Secret" for kind, _name in resources)
+    assert "postgresql://" not in MANIFEST.read_text()
+
+
+def test_postgres_bootstrap_generates_the_secret_without_printing_credentials():
+    script = BOOTSTRAP.read_text()
+
+    assert ': "${KUBECONFIG:?' in script
+    assert "openssl rand -hex 32" in script
+    assert "backend-store-uri" in script
+    assert "create secret generic" in script
+    assert "apply -f" in script
+    assert "set -x" not in script
+    assert "echo ${" not in script
 
 
 def test_arena_registry_publishes_the_rhoai_and_mlflow_services():
