@@ -1,0 +1,207 @@
+{
+  "schema": "launchpad.redhat.com/agentops-live-seat-evidence/v5",
+  "evidence_id": "LIVE-AGENTOPS-020",
+  "observed_at": {
+    "requested": "2026-09-05T09:43:20.947223Z",
+    "provisioning_complete": "2026-09-05T09:44:57.735241Z",
+    "ready": "2026-09-05T09:45:03.141772Z",
+    "reclaimed": "2026-09-05T09:58:42.141018Z"
+  },
+  "source": {
+    "implementation_commit": "59563b0a77252e8b91077c30c23ab524a8402bce",
+    "deployed_catalog_commit": "196182a4e7f7fc5ebeb4276c513b62774346f386",
+    "showroom_content_ref": "59563b0a77252e8b91077c30c23ab524a8402bce",
+    "workload_revision": "63456b6684737a5936c27c9496e45dc2fd1b06c0",
+    "backend_image_digest": "sha256:79d60a4addbee565c5a480216c6266fe1c60c75f9e84bbdaa137e0e22ca3d422",
+    "terminal_image_digest": "sha256:164aa93d20af95dc916aa695556a1cae2ec057385ee1b254157df9eead099d9b"
+  },
+  "cluster_id": "arena",
+  "result": "pass-internal-one-seat",
+  "certification_boundary": "This run certifies one internally accessed AgentOps seat created and reclaimed through Launchpad on Arena. It does not certify public-code ingress, five or twenty-five AgentOps seats, production logging storage, PostgreSQL-backed shared MLflow, service-ca TLS for the pipeline database, or the three-workshop September event topology.",
+  "order": {
+    "workshop_id": "9c08a6a4-4600-4f7d-ba61-2c38df333609",
+    "seat_id": "63ebbf50-2a13-4b6d-8bde-e5bdc18e6bf1",
+    "session_id": "2fbf6706-3c12-4bb5-98aa-32d49aa3a7f4",
+    "namespace": "launchpad-smoke-test-tenant-agentops-63ebbf",
+    "catalog_item_id": "agentops-observability",
+    "seat_count": 1,
+    "exposure_policy": "internal",
+    "cluster_ref_persisted": true,
+    "seconds_requested_to_ready": 102.195,
+    "final_workshop_status": "completed",
+    "final_seat_status": "reclaimed",
+    "final_session_status": "reclaimed"
+  },
+  "readiness_gate": {
+    "status": "pass",
+    "contract": "datasciencepipelinesapplications.opendatahub.io/v1 dspa Ready=True",
+    "observed_while_false": {
+      "dspa_ready": false,
+      "workshop_status": "provisioning",
+      "workload_application_sync": "Synced",
+      "showroom_application_sync": "Synced"
+    },
+    "observed_at_release": {
+      "dspa_ready": true,
+      "database_available": true,
+      "object_store_available": true,
+      "api_server_ready": true,
+      "persistence_agent_ready": true,
+      "scheduled_workflow_ready": true,
+      "workflow_controller_ready": true,
+      "mlmd_proxy_ready": true,
+      "webhook_ready": true,
+      "workshop_status": "ready"
+    }
+  },
+  "checks": {
+    "workload_health": {
+      "status": "pass",
+      "steady_pods": 13,
+      "not_fully_ready": 0,
+      "container_restarts": 0,
+      "workload_application": "Synced/Healthy",
+      "showroom_application": "Synced/Healthy"
+    },
+    "showroom_content": {
+      "status": "pass",
+      "pages_tested": 11,
+      "pages_http_200": 11,
+      "terminal_image_pinned_by_digest": true,
+      "console_url_scoped_to_exact_namespace": true
+    },
+    "terminal_scope": {
+      "status": "pass",
+      "default_project": "launchpad-smoke-test-tenant-agentops-63ebbf",
+      "create_deployments_in_assigned_namespace": true,
+      "get_pods_in_openshift_logging": false,
+      "maas_api_key_nonempty": true,
+      "maas_endpoint_nonempty": true,
+      "maas_api_url_nonempty": true,
+      "maas_model_nonempty": true
+    },
+    "runtime_secret_boundary": {
+      "status": "pass",
+      "secret_name": "launchpad-participant-runtime",
+      "secret_keys": [
+        "MAAS_API_KEY",
+        "MAAS_API_URL",
+        "MAAS_ENDPOINT",
+        "MAAS_MODEL"
+      ],
+      "session_seat_tenant_workshop_cluster_labels_exact": true,
+      "maas_api_key_present_in_argo_application": false,
+      "maas_or_litellm_secret_field_present_in_argo_application": false,
+      "maas_api_key_retained_after_reclaim": false
+    },
+    "embedding_ingestion": {
+      "status": "pass",
+      "documents": 8,
+      "chunks": 41,
+      "embedded_chunks": 41,
+      "dimensions_min": 768,
+      "dimensions_max": 768
+    },
+    "semantic_retrieval": {
+      "status": "pass",
+      "query": "FHA minimum credit score mortgage insurance premium DTI limits",
+      "returned_expected_sections": [
+        "Minimum Credit Score",
+        "DTI Limits"
+      ]
+    },
+    "agent_websocket": {
+      "status": "pass",
+      "terminal_event": "done",
+      "seconds": 47.017,
+      "answer_characters": 1419,
+      "answer_mentions_fha": true,
+      "answer_mentions_credit": true,
+      "answer_mentions_insurance": true
+    },
+    "mlflow_trace": {
+      "status": "pass-with-warning",
+      "experiment_exists": true,
+      "trace_count": 1,
+      "state": "OK",
+      "span_count": 7,
+      "known_warning": "MLflow LangChain autolog emitted current_context token created in a different Context warnings; the seven-span trace still completed."
+    },
+    "openshift_logging": {
+      "status": "pass-one-seat-pilot",
+      "own_namespace_marker_http_status": 200,
+      "own_result_streams": 1,
+      "own_marker_lines": 1,
+      "cross_namespace_query_http_status": 403,
+      "temporary_test_identity_removed": true
+    },
+    "storage": {
+      "status": "pass-one-seat",
+      "pvc_count": 4,
+      "storage_class": "launchpad-nfs-ephemeral",
+      "requested_storage_gib": 35
+    }
+  },
+  "cleanup": {
+    "status": "pass",
+    "observed_within_seconds": 50,
+    "remaining_namespaces": 0,
+    "remaining_applications": 0,
+    "remaining_persistent_volumes": 0,
+    "remaining_temporary_log_test_resources": 0,
+    "showroom_terminal_pv_deleted_automatically": true,
+    "manual_permission_repair_required": false
+  },
+  "tests": {
+    "red": {
+      "initial_contract_run": "7 failed, 38 passed",
+      "runtime_secret_helper_run": "1 failed"
+    },
+    "green": {
+      "focused": "65 passed",
+      "non_local_regression": "961 passed, 13 deselected",
+      "pre_commit_secret_scan": "pass",
+      "shell_syntax": "pass",
+      "python_compile": "pass"
+    }
+  },
+  "red_green": {
+    "operator_readiness": {
+      "red": "Launchpad could report a seat ready after Routes and pods appeared while the DSPA operator was still reconciling.",
+      "green": "The live workshop remained provisioning at DSPA Ready=False and became ready only after the declared Ready=True condition."
+    },
+    "showroom_secret_boundary": {
+      "red": "The Showroom Argo CD Application serialized the per-seat model API key in Helm user_data.",
+      "green": "The model key exists only in a directly applied namespaced Secret, is loaded into the terminal process, is absent from Argo, and is cleared from the session at reclaim."
+    },
+    "terminal_storage_cleanup": {
+      "red": "The prior terminal home volume remained Released because root-squashed NFS could not remove a participant-owned .kube/config.",
+      "green": "The pinned terminal image normalized home permissions during shutdown and its PV deleted automatically with no manual repair."
+    }
+  },
+  "test_strategy": {
+    "TDD": "Failing readiness, secret-boundary, terminal-runtime, and terminal-cleanup contracts preceded the implementation.",
+    "EDD": "This immutable artifact records commits, image digests, lifecycle IDs and timestamps, live operator conditions, route/content checks, functional AI results, authorization denials, and zero-residue cleanup.",
+    "CDD": "The catalog intake, generated catalog item, provisioning plan, DSPA condition, namespaced Secret, Showroom terminal, Argo labels, and cleanup target use one versioned contract.",
+    "BDD": "Given one internal AgentOps workshop seat on Arena, when Launchpad provisions it, the participant can use the scoped Showroom and AI journey only after DSPA is ready, and reclaim removes all generated cluster resources.",
+    "CBT": "Readiness, Showroom, terminal, Secret handling, embeddings, semantic retrieval, WebSocket generation, MLflow, logging authorization, RBAC, storage, and cleanup were proven independently and together."
+  },
+  "remaining_release_gates": [
+    "PostgreSQL backend for shared MLflow before five-seat certification",
+    "durable supported object and block storage plus measured non-demo Loki sizing before five-seat certification",
+    "OpenShift service-ca TLS for the per-seat RHOAI pipeline database",
+    "resolve or suppress the verified MLflow async-context autolog warning",
+    "trusted public DNS and TLS plus public-code participant certification",
+    "five-seat AgentOps workshop",
+    "twenty-five-seat AgentOps workshop",
+    "at least two additional 250-pod workers for the exact three-workshop event target",
+    "staggered 25-seat AgentOps, Serve LLMs, and Build an Agent event rehearsal"
+  ],
+  "security": {
+    "secrets_included": false,
+    "credential_values_logged": false,
+    "cross_namespace_access_denied": true,
+    "runtime_key_absent_from_gitops": true,
+    "runtime_key_cleared_after_reclaim": true
+  }
+}

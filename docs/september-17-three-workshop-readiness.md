@@ -123,15 +123,20 @@ without manual repair.
 The OpenShift Logging sub-gate subsequently passed at one-seat pilot scale: the
 supported 6.6 operators, LokiStack, forwarder, and Console plugin are live; an
 assigned participant queried its marker with HTTP 200 and received HTTP 403
-for a cross-namespace query. Gate A remains RED because no single Launchpad
-order has yet created and proven the workload Application, runtime Secret,
-Showroom, entitlement, protected routes, complete journey, and reclaim.
-Trusted external TLS is also RED. Before Gate B, the pipeline MariaDB needs
-service-ca TLS, shared MLflow must move from SQLite to PostgreSQL, and logging
-must move from the `1x.demo` NFS/MinIO pilot to durable S3-compatible object
-storage, dynamic block storage, and production sizing. Immutable results are
-in `evidence/agentops-mlflow-live-2026-09-05.json` and
-`evidence/agentops-logging-live-2026-09-05.json`.
+for a cross-namespace query.
+
+The internal form of Gate A passed on September 5 through one Launchpad-created
+order. The order created the runtime Secret, workload and Showroom Applications,
+exact participant namespace, operator-aware readiness gate, complete AI and
+observability journey, and automatic zero-residue reclaim. The model key was
+absent from Argo CD and cleared from the reclaimed session. Evidence is in
+`evidence/agentops-launchpad-one-seat-2026-09-05.json`.
+
+Public-code access and trusted external TLS remain RED and are not implied by
+the internal Gate A result. Before Gate B, the pipeline MariaDB needs service-ca
+TLS, shared MLflow must move from SQLite to PostgreSQL, and logging must move
+from the `1x.demo` NFS/MinIO pilot to durable S3-compatible object storage,
+dynamic block storage, and production sizing.
 
 ### Gate B: five AgentOps seats
 

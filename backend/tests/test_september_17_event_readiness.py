@@ -47,7 +47,10 @@ def test_event_readiness_manifest_keeps_the_exact_workshop_target_and_budget():
     )
     assert readiness["public_access_certified"] is False
     assert readiness["overall_status"] == "RED"
-    assert readiness["next_gate"] == "agentops-one-seat-launchpad"
+    assert readiness["next_gate"] == "agentops-five-seat-prerequisites"
+    assert readiness["latest_agentops_component_evidence"] == (
+        "evidence/agentops-launchpad-one-seat-2026-09-05.json"
+    )
 
 
 def test_event_runbook_names_every_gate_and_does_not_overclaim_capacity():

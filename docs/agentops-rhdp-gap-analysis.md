@@ -243,17 +243,16 @@ A restart loaded from the persistent cache and became ready in 40 seconds. A
 real `/v1/embeddings` request returned a 768-dimensional vector in 0.288
 seconds; the post-restart request completed in 0.164 seconds.
 
-This clears deployment of the shared endpoint itself. `LIVE-AGENTOPS-014`
-remains partial until a Launchpad-created AgentOps seat proves that all seeded
+This clears deployment of the shared endpoint itself. The later
+Launchpad-created run in `LIVE-AGENTOPS-020` also proves that all seeded
 knowledge-base chunks are embedded and searchable through the application.
 
 The sanitized live inventory is captured in
 `evidence/agentops-arena-prerequisites-2026-09-04.json`; the chart and permission
 evidence is captured in `evidence/agentops-seat-overlay-2026-09-04.json`. The
 first live workload and reclaim result is captured in
-`evidence/agentops-one-seat-live-2026-09-04.json`. The catalog remains draft
-until shared services, route authorization, and the complete one-seat journey
-are GREEN-live.
+`evidence/agentops-one-seat-live-2026-09-04.json`. The complete internal
+Launchpad-created one-seat result is captured separately below.
 
 The shared embedding component, including the RED/GREEN failures, persistent
 cache restart, 25-request burst, and isolation result, is captured in
@@ -294,6 +293,29 @@ This is a one-seat result only: before five seats, replace NFS-backed pilot
 MinIO and `1x.demo` with durable S3-compatible object storage, suitable dynamic
 block storage, and measured production sizing. Evidence is in
 `evidence/agentops-logging-live-2026-09-05.json`.
+
+The internal Launchpad-created one-seat gate then passed end to end. Launchpad
+persisted Arena before mutation, held the workshop in `provisioning` while the
+DSPA was `Ready=False`, and released it only after `Ready=True`. Both Argo CD
+Applications were Synced/Healthy, all 13 steady pods were Ready with zero
+restarts, all 11 Antora pages returned 200, the terminal defaulted to the exact
+seat namespace, and cross-namespace pod access was denied. The seat retained
+8 documents, 41/41 768-dimensional embeddings, a successful FHA agent answer,
+one healthy seven-span MLflow trace, and an own-namespace Loki query with a
+cross-namespace 403 denial.
+
+The per-seat model key now exists only in a directly applied namespaced Secret;
+it was absent from both Argo Applications and cleared from the session during
+reclaim. Reclaim removed the namespace, both Applications, and all four PVs in
+the observation window. The Showroom terminal PV required no manual repair,
+which closes the root-squashed NFS cleanup defect. The immutable result is in
+`evidence/agentops-launchpad-one-seat-2026-09-05.json`.
+
+The catalog remains draft and capped at one seat because this was an internal
+pilot. Before five seats, shared MLflow needs PostgreSQL, the pipeline database
+needs service-ca TLS, and Logging needs supported durable storage and measured
+non-demo sizing. Public-code ingress and trusted public TLS remain a separate
+participant-access certification gate.
 
 The capacity snapshot is RED for the September 17 exact trio. Arena has 1,250
 aggregate pod slots, but only 500 are on the two schedulable workers; the other

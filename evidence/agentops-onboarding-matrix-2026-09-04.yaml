@@ -5,7 +5,7 @@ release_threshold: 100
 status: blocked
 
 source_pins:
-  showroom: 0d697f3ddd1e5008dfd9bb32c3e3bdd0398383a9
+  showroom: 59563b0a77252e8b91077c30c23ab524a8402bce
   upstream_showroom: f1881c61de55ebf5640c27e76469f4efe458edaf
   launchpad_seat_chart: 63456b6684737a5936c27c9496e45dc2fd1b06c0
   agnosticv: 48fc6eebedb295bddf1b915a230e5e90f89db0af
@@ -26,20 +26,22 @@ matrix:
     requirement: Workload Applications contain no runtime secret values
     red: No workload GitOps contract or secret boundary existed
     green_local: pass
-    green_integration: not-run
-    green_live: not-run
+    green_integration: pass
+    green_live: pass-namespaced-secret-key-absent-from-argo-and-cleared-on-reclaim
     evidence:
       - backend/tests/test_workload_gitops.py
+      - evidence/agentops-launchpad-one-seat-2026-09-05.json
   - id: CBT-AGENTOPS-003
     requirement: Runtime Secret, GitOps Application, tab resolver, and cleanup are independently tested
     red: Components did not exist
     green_local: pass
-    green_integration: not-run
-    green_live: not-run
+    green_integration: pass
+    green_live: pass-one-seat-components-and-cleanup
     evidence:
       - backend/tests/test_workload_gitops.py
       - backend/tests/test_showroom_provisioning.py
       - backend/tests/test_cleanup_openshift.py
+      - evidence/agentops-launchpad-one-seat-2026-09-05.json
   - id: BDD-AGENTOPS-004
     requirement: Given an uncertified app-of-apps, ordering fails before any cluster mutation
     red: Catalog status was the only runtime guard
@@ -107,12 +109,13 @@ matrix:
     red: Three content contract tests failed because the native component and provenance record did not exist
     green_local: pass-19-content-tests-and-antora-build
     green_integration: pass-remote-fetch-build-no-warnings
-    green_live: not-run
+    green_live: pass-11-pages-terminal-console-and-tabs
     evidence:
       - backend/tests/test_showroom_content_package.py
       - content-agentops-observability/UPSTREAM.md
       - site-agentops-observability.yml
       - test-receipts/catalog-onboarding-agentops-observability.json
+      - evidence/agentops-launchpad-one-seat-2026-09-05.json
   - id: CDD-AGENTOPS-012
     requirement: Public AgentOps tools are reachable only through the entitled seat allowlist
     red: Two test modules failed collection because no tool allowlist or secure proxy contract existed
@@ -174,26 +177,39 @@ matrix:
     requirement: Launchpad-created order completes all participant tabs and exact reclaim
     red: Direct component proofs do not create the Launchpad order boundary
     green_local: pass-provisioning-and-rbac-contracts
-    green_integration: not-run
-    green_live: blocked
+    green_integration: pass-internal-order
+    green_live: pass-internal-one-seat-public-access-not-certified
     evidence:
       - evidence/agentops-mlflow-live-2026-09-05.json
       - evidence/agentops-logging-live-2026-09-05.json
+      - evidence/agentops-launchpad-one-seat-2026-09-05.json
+  - id: LIVE-AGENTOPS-019
+    requirement: Operator readiness gates workshop release rather than pod and Route appearance alone
+    red: A Synced Application could precede DSPA readiness while Launchpad continued toward ready
+    green_local: pass-false-then-true-and-timeout-contracts
+    green_integration: pass-declarative-catalog-contract
+    green_live: pass-workshop-held-at-provisioning-until-dspa-ready
+    evidence:
+      - backend/tests/test_showroom_provisioning.py
+      - catalog-onboarding/agentops-observability.yaml
+      - evidence/agentops-launchpad-one-seat-2026-09-05.json
 
 rubric:
   source_and_contract: {earned: 15, possible: 15}
   secret_boundary: {earned: 15, possible: 15}
-  namespace_and_rbac_isolation: {earned: 13, possible: 15}
+  namespace_and_rbac_isolation: {earned: 15, possible: 15}
   shared_service_readiness: {earned: 13, possible: 15}
-  participant_tabs_and_journey: {earned: 10, possible: 15}
+  participant_tabs_and_journey: {earned: 14, possible: 15}
   cleanup_and_repeatability: {earned: 10, possible: 10}
   five_seat_certification: {earned: 0, possible: 5}
   twenty_five_seat_certification: {earned: 0, possible: 10}
-  total: {earned: 76, possible: 100}
+  total: {earned: 82, possible: 100}
 
 decision: >-
   Keep the catalog item draft. Source intake is valid, but the AgentOps
-  experience is not orderable until one Launchpad-created order proves the
-  protected participant routes, adapted eight-tab journey, and complete
-  reclaim. The one-seat Logging pilot does not clear the durable storage and
-  production sizing requirements for five or twenty-five seats.
+  experience passed one internal Launchpad-created seat, including the
+  namespaced runtime Secret, operator-aware readiness, participant journey,
+  logging isolation, and automatic zero-residue reclaim. Keep the item capped
+  at one seat until MLflow, pipeline TLS, and logging storage are suitable for
+  five-seat testing; public-code access and trusted public TLS remain separate
+  certification gates.

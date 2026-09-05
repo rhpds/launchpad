@@ -2,7 +2,7 @@
   "schema": "launchpad.redhat.com/event-readiness/v1",
   "evidence_id": "READINESS-SEPTEMBER-17-THREE-WORKSHOPS-20260905",
   "generated_at": "2026-09-05T05:34:12Z",
-  "updated_at": "2026-09-05T06:44:00Z",
+  "updated_at": "2026-09-05T09:58:42Z",
   "source_revision_before_readiness_contract": "cf28c65",
   "event_date": "2026-09-17",
   "cluster_id": "arena",
@@ -17,7 +17,7 @@
       "catalog_item_id": "agentops-observability",
       "seat_count": 25,
       "release_status": "RED",
-      "current_certification_stage": "implementation",
+      "current_certification_stage": "one-seat-internal",
       "current_catalog_limit": 1,
       "cpu_millicores": 62500,
       "memory_mib": 179200,
@@ -69,18 +69,20 @@
     "three staggered 25-seat workshop orders retained together",
     "75 concurrent internal participant journeys",
     "75 seat-scoped terminal identities and cross-seat denial",
-    "sequential reclaim with zero residue"
+    "sequential reclaim with zero residue",
+    "one internal Launchpad-created AgentOps seat with operator-aware readiness and zero-residue reclaim"
   ],
   "remaining_release_gates": [
-    "agentops-one-seat-launchpad",
+    "agentops-five-seat-prerequisites",
     "agentops-five-seat",
     "agentops-twenty-five-seat",
+    "agentops-public-code-access",
     "exact-event-trio-first-run",
     "exact-event-trio-repeat-run",
     "browser-and-operator-rehearsal",
     "event-day-capacity-preflight"
   ],
-  "next_gate": "agentops-one-seat-launchpad",
+  "next_gate": "agentops-five-seat-prerequisites",
   "capacity_status": {
     "declared_reservation_calculated": true,
     "current_arena_free_capacity_measured": true,
@@ -102,13 +104,14 @@
       "scheduler headroom after temporary rollout overlap"
     ]
   },
-  "latest_agentops_component_evidence": "evidence/agentops-mlflow-live-2026-09-05.json",
+  "latest_agentops_component_evidence": "evidence/agentops-launchpad-one-seat-2026-09-05.json",
   "critical_agentops_checks": [
-    "Mortgage AI, Grafana, metrics, logs, evaluation, and the complete DSPA journey",
-    "Launchpad-created runtime Secret, workload Application, Showroom, and entitlement",
-    "participant workload/shared route authorization and cross-seat denial",
-    "one-seat then five-seat then twenty-five-seat promotion",
-    "Launchpad reclaim with zero residue"
+    "PostgreSQL-backed shared MLflow",
+    "service-ca TLS for the RHOAI pipeline database",
+    "durable production-sized OpenShift Logging storage",
+    "public-code participant authorization and trusted TLS",
+    "five-seat then twenty-five-seat promotion",
+    "additional Arena worker pod capacity"
   ],
   "release_policy": {
     "rubric_score_required": 100,
