@@ -31,7 +31,7 @@ Your environment has Launchpad-managed shared model inference and an empty names
 |===
 | Component | What It Is | You Deploy?
 | Launchpad MaaS | Shared CPU inference with an automatically assigned virtual key | No -- pre-deployed
-| Your Namespace | Empty, ready for your agent | Yes -- 3 pods
+| Your Namespace | Empty, ready for your agent | Yes -- 2 workload pods
 |===
 
 == Connect to Your Lab Project
@@ -60,7 +60,7 @@ A model answers questions. An *agent* uses a model, instructions, and tools to c
 | Module | What You'll Do | Time
 | xref:01-anatomy.adoc[Anatomy of an Agent] | See why a model alone is not enough | ~8 min
 | xref:02-deploy-tools.adoc[Deploy the MCP Tools] | Deploy and test 3 Intel/OpenShift tools | ~12 min
-| xref:03-wire-agent.adoc[Wire the Agent] | Deploy the agent, get your first solution brief | ~15 min
+| xref:03-wire-agent.adoc[Wire the Agent] | Inspect the deployed agent and get your first solution brief | ~15 min
 | xref:04-test-and-tune.adoc[Make It Yours] | Write your own prompt, test with your customer, build your agent card | ~15 min
 |===
 

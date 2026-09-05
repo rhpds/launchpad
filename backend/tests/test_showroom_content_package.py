@@ -179,7 +179,7 @@ def test_agent_content_uses_launchpad_safe_workload_manifests():
     pages = content_root / "modules/ROOT/pages"
     content = "\n".join(path.read_text() for path in sorted(pages.glob("*.adoc")))
 
-    assert "intel-guided-content-v1.0.12" in content
+    assert "intel-guided-content-v1.0.13" in content
     assert "{litellm_api_endpoint}" not in content
     assert "{litellm_virtual_key}" not in content
     assert "{maas_endpoint}" in content
@@ -260,6 +260,9 @@ def test_agent_201_uses_three_pods_by_colocating_agent_and_tools():
     }
     assert "oc rollout status deploy/solution-tools" not in guide
     assert "All 2 workload pods running" in guide
+    assert "Yes -- 3 pods" not in guide
+    assert "Yes -- 2 workload pods" in guide
+    assert "Inspect the deployed agent" in guide
 
 
 def test_agent_201_remote_certification_driver_understands_colocated_tools():
