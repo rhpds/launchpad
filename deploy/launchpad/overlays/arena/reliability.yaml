@@ -1,0 +1,75 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: launchpad-arena-reliability
+  labels:
+    app.kubernetes.io/name: launchpad-reliability
+    app.kubernetes.io/part-of: partner-ai-launchpad
+spec:
+  groups:
+    - name: launchpad.arena.infrastructure
+      rules:
+        - alert: ArenaWorkerNotReady
+          expr: kube_node_status_condition{condition="Ready",status="true",node=~"gnr2.*|rhgnr1"} == 0
+          for: 2m
+          labels:
+            severity: critical
+          annotations:
+            summary: Arena worker {{ $labels.node }} is not Ready
+            description: Launchpad placement and ingress may be degraded until the worker recovers.
+        - alert: ArenaIngressRouterReplicaUnavailable
+          expr: kube_deployment_status_replicas_available{namespace="openshift-ingress",deployment="router-default"} < 2
+          for: 2m
+          labels:
+            severity: critical
+          annotations:
+            summary: Arena has fewer than two available default ingress routers
+            description: Validate both worker router paths before accepting another workshop.
+    - name: launchpad.arena.control-plane
+      rules:
+        - alert: LaunchpadControlPlaneUnavailable
+          expr: kube_deployment_status_replicas_available{namespace="partner-ai-launchpad",deployment=~"backend|partner-portal|admin|public-access-gateway"} < 1
+          for: 2m
+          labels:
+            severity: critical
+          annotations:
+            summary: Launchpad component {{ $labels.deployment }} is unavailable
+            description: Requests or participant access may fail while this deployment has no available replica.
+        - alert: LaunchpadReconcilerFailed
+          expr: kube_job_status_failed{namespace="partner-ai-launchpad",job_name=~"launchpad-resource-reconciler-.*"} > 0
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: Launchpad resource reconciliation failed
+            description: Inspect the failed reconciler Job before cleanup drift accumulates.
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: partner-portal
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: partner-portal
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: launchpad-admin
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: admin
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: public-access-gateway
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: public-access-gateway
