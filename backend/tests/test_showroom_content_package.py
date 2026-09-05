@@ -18,7 +18,7 @@ INTEL_GUIDED_LABS = [
         "workspace_route": "app",
         "content_ref": "intel-guided-content-v1.0.10",
         "max_workshop_seats": 25,
-        "certification_stage": "twenty-five-seat-candidate",
+        "certification_stage": "twenty-five-seat",
     },
     {
         "catalog_id": "intel-llm-cpu-serving",
@@ -30,7 +30,7 @@ INTEL_GUIDED_LABS = [
         "workspace_route": "rag",
         "content_ref": "intel-guided-content-v1.0.8",
         "max_workshop_seats": 25,
-        "certification_stage": "twenty-five-seat-candidate",
+        "certification_stage": "twenty-five-seat",
     },
     {
         "catalog_id": "intel-llm-tool-calling",
