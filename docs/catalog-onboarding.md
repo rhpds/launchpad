@@ -109,7 +109,9 @@ The detailed RHDP topology and Launchpad adaptation decisions are recorded in
 
 - Showroom: `rhpds/agentops-intel-showroom` at
   `f1881c61de55ebf5640c27e76469f4efe458edaf`;
-- RHDP automation: `rhpds/agentops-in-prod-automation` at
+- Launchpad seat chart: `rhpds/launchpad`, `deploy/workloads/agentops-seat`, at
+  `2fcf40b74387046b657e0050513144afead09892`;
+- referenced RHDP automation: `rhpds/agentops-in-prod-automation` at
   `6ea100531ac869fa66abe69ae223d6b56dbce9a2`;
 - transitive Mortgage AI application: `rh-ai-quickstart/multi-agent-loan-origination`
   at `1e50e51c334c1b6ed854d81a3f28fd324792f481`.
@@ -119,9 +121,11 @@ The RHDP deployment path was also traced through AgnosticV
 `48fc6eebedb295bddf1b915a230e5e90f89db0af`. That configuration does not
 deploy the application chart directly. It runs the bootstrap chart from
 `rhpds/agentops-in-prod-automation` at
-`6ea100531ac869fa66abe69ae223d6b56dbce9a2`, so that immutable automation
-revision is now Launchpad's declared workload source. The application
-repository remains recorded as transitive source provenance.
+`6ea100531ac869fa66abe69ae223d6b56dbce9a2`. That repository is retained as
+immutable provenance, but it is not Launchpad's deployable workload source.
+The deployable source is the Launchpad-owned namespace-scoped seat chart at
+`2fcf40b74387046b657e0050513144afead09892`. The application repository remains
+recorded as transitive source provenance.
 
 Its source and Antora build pass. It is not orderable because the Showroom
 expects a pre-provisioned mortgage application, MLflow, Grafana, OpenShift
@@ -132,16 +136,33 @@ The RHDP automation is a workshop-scoped app-of-apps. It installs cluster-global
 Applications named `mlflow`, `logging`, `cluster-monitoring`, `image-puller`,
 and `openshift-ai`, then uses ApplicationSets for each `wksp-userN` namespace.
 Those global names make the unmodified bootstrap unsafe for concurrent
-Launchpad orders. Launchpad must install compatible shared Arena services once
-and generate only uniquely owned, namespace-scoped seat resources per order.
+Launchpad orders. Launchpad installs compatible shared Arena services once and
+generates only uniquely owned, namespace-scoped seat resources per order.
 The current AgnosticV catalog declares `num_users: 1` and
 `workshop_user_mode: single`; 5- and 25-seat use is a new Launchpad
 certification target, not a capability inherited from the RHDP item.
 The upstream bootstrap also places the LiteMaaS virtual key in Helm values,
-which would expose it in the Argo CD Application. Launchpad's workload adapter
-therefore keeps runtime Secret data out of Application manifests and leaves
-this specific integration fail closed until its complete Secret mapping exists.
+which would expose it in the Argo CD Application. The Launchpad adapter now
+creates an idempotent runtime Secret directly through the Arena API and passes
+only the Secret name to Argo CD. Generated database and object-storage
+passwords, the LiteMaaS endpoint/key, requested model, and composed connection
+URLs are resolved without serializing secret values in Git or the Application.
+The chart also receives workshop, seat, session, tenant, and cluster identity
+values and labels every resource with them.
+
+The chart renders no Secret or cluster-scoped resource. An Arena server-side
+dry run accepted all 21 rendered resources. The live Argo service account can
+create every rendered resource except `ServiceMonitor`; the required
+least-privilege rule is committed in `deploy/multicluster/arena-argocd-rbac.yaml`
+and must be applied and verified before live deployment.
 
 The source contains roughly 34 MiB of instructional images and references a
 mutable `latest` Showroom theme, so content delivery and theme pinning are also
 explicit activation gates rather than hidden per-seat download costs.
+
+The item stays `gitops_ready: false`. A one-seat deployment is blocked until
+the Argo RBAC delta is applied, participant-protected routes are wired, the
+Showroom is adapted from its hard-coded `wksp-user1`/password and `qwen3-14b`
+assumptions to Launchpad identity and `granite-3.2-8b-tools`, and Arena provides
+the expected MLflow and Logging/Loki experience. Only then can the eight-tab
+participant journey and zero-residue reclaim be certified.

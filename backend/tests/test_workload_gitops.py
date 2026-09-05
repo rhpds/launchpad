@@ -3,7 +3,6 @@ from unittest.mock import MagicMock
 
 import pytest
 import yaml
-from kubernetes.client.exceptions import ApiException
 from app.adapters.openshift.workload_gitops import (
     WorkloadGitOpsAdapter,
     WorkloadSeat,
@@ -11,6 +10,7 @@ from app.adapters.openshift.workload_gitops import (
     build_workload_application,
     workload_application_name,
 )
+from kubernetes.client.exceptions import ApiException
 
 
 def _seat(**updates) -> WorkloadSeat:
@@ -29,6 +29,7 @@ def _seat(**updates) -> WorkloadSeat:
         "helm_values": {"keycloak": {"enabled": False}},
         "runtime_secret_name": "example-runtime",
         "runtime_secret_value_path": "runtime.existingSecret",
+        "identity_value_path": "identity",
     }
     values.update(updates)
     return WorkloadSeat(**values)
@@ -58,6 +59,13 @@ def test_builds_git_pinned_cluster_aware_workload_application():
     assert values == {
         "keycloak": {"enabled": False},
         "runtime": {"existingSecret": "example-runtime"},
+        "identity": {
+            "workshopId": "workshop-1",
+            "seatId": "seat-1",
+            "sessionId": "session-1",
+            "tenantId": "tenant-1",
+            "clusterId": "arena",
+        },
     }
 
 

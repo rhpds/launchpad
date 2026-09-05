@@ -6,6 +6,7 @@ status: blocked
 
 source_pins:
   showroom: f1881c61de55ebf5640c27e76469f4efe458edaf
+  launchpad_seat_chart: 2fcf40b74387046b657e0050513144afead09892
   agnosticv: 48fc6eebedb295bddf1b915a230e5e90f89db0af
   automation: 6ea100531ac869fa66abe69ae223d6b56dbce9a2
   application: 1e50e51c334c1b6ed854d81a3f28fd324792f481
@@ -69,19 +70,50 @@ matrix:
     green_integration: not-run
     green_live: not-run
     evidence: []
+  - id: TDD-AGENTOPS-008
+    requirement: AgentOps seat chart renders no Secret or cluster-scoped object
+    red: Four chart contract tests failed because the chart did not exist
+    green_local: pass
+    green_integration: pass
+    green_live: not-run
+    evidence:
+      - backend/tests/test_agentops_seat_chart.py
+      - deploy/workloads/agentops-seat
+      - evidence/agentops-seat-overlay-2026-09-04.json
+  - id: CDD-AGENTOPS-009
+    requirement: Catalog declares immutable safe workload, identity values, and structured Secret sources
+    red: Six contract tests failed against the RHDP app-of-apps source and incomplete mapping
+    green_local: pass
+    green_integration: pass
+    green_live: not-run
+    evidence:
+      - backend/tests/test_catalog_onboarding.py
+      - backend/tests/test_workload_gitops.py
+      - catalog-onboarding/agentops-observability.yaml
+  - id: CBT-AGENTOPS-010
+    requirement: Arena API accepts every rendered namespace-scoped resource
+    red: Live Argo authorization rejected ServiceMonitor creation
+    green_local: pass
+    green_integration: pass-server-dry-run-21-resources
+    green_live: blocked-rbac-not-applied
+    evidence:
+      - backend/tests/test_agentops_seat_chart.py
+      - deploy/multicluster/arena-argocd-rbac.yaml
+      - evidence/agentops-seat-overlay-2026-09-04.json
 
 rubric:
   source_and_contract: {earned: 15, possible: 15}
-  secret_boundary: {earned: 10, possible: 15}
-  namespace_and_rbac_isolation: {earned: 0, possible: 15}
+  secret_boundary: {earned: 15, possible: 15}
+  namespace_and_rbac_isolation: {earned: 8, possible: 15}
   shared_service_readiness: {earned: 5, possible: 15}
   participant_tabs_and_journey: {earned: 5, possible: 15}
-  cleanup_and_repeatability: {earned: 5, possible: 10}
+  cleanup_and_repeatability: {earned: 7, possible: 10}
   five_seat_certification: {earned: 0, possible: 5}
   twenty_five_seat_certification: {earned: 0, possible: 10}
-  total: {earned: 40, possible: 100}
+  total: {earned: 55, possible: 100}
 
 decision: >-
   Keep the catalog item draft. Source intake is valid, but the AgentOps
-  experience is not orderable until the missing shared Arena services, secure
-  per-seat overlay, eight-tab journey, and complete reclaim are GREEN-live.
+  experience is not orderable until the Argo RBAC delta, missing shared Arena
+  services, protected participant routes, adapted eight-tab journey, and
+  complete reclaim are GREEN-live.

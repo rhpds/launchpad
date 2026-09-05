@@ -1,0 +1,45 @@
+{
+  "schema": "launchpad.redhat.com/evidence/v1",
+  "date": "2026-09-04",
+  "cluster": "arena",
+  "catalog_id": "agentops-observability",
+  "workload_revision": "2fcf40b74387046b657e0050513144afead09892",
+  "red_green": {
+    "chart_contract_red": "4 failed: deploy/workloads/agentops-seat was absent",
+    "chart_contract_green": "5 passed",
+    "catalog_mapping_red": "6 failed: unsafe workload source and missing identity/Secret mapping",
+    "catalog_mapping_green": "37 passed"
+  },
+  "render": {
+    "resource_count": 21,
+    "server_side_dry_run": "pass",
+    "target_namespace": "partner-ai-launchpad",
+    "created_resources": 0,
+    "secrets_rendered": 0,
+    "cluster_scoped_resources_rendered": 0,
+    "identity_labels": [
+      "launchpad.redhat.com/workshop-id",
+      "launchpad.redhat.com/seat-id",
+      "launchpad.redhat.com/session-id",
+      "launchpad.redhat.com/tenant-id",
+      "launchpad.redhat.com/cluster-id"
+    ]
+  },
+  "live_permissions": {
+    "launchpad_backend_can_create_application": true,
+    "launchpad_backend_can_create_runtime_secret": true,
+    "argocd_can_create_core_workload_resources": true,
+    "argocd_can_create_dspa": true,
+    "argocd_can_create_servicemonitor_before_remediation": false,
+    "remediation": "deploy/multicluster/arena-argocd-rbac.yaml",
+    "remediation_applied": false
+  },
+  "decision": "blocked",
+  "remaining_gates": [
+    "Apply and verify the Arena Argo ServiceMonitor permission",
+    "Adapt Showroom variables and model narrative for Launchpad and Granite",
+    "Protect Mortgage AI and Grafana routes with participant entitlement",
+    "Provide and certify the expected MLflow and Logging/Loki experience",
+    "Complete one-seat functional, isolation, and zero-residue reclaim journey"
+  ]
+}

@@ -24,16 +24,23 @@ def test_agentops_is_registered_as_a_fail_closed_draft():
     assert catalog == build_catalog_item(intake)
     assert catalog["catalog_item_id"] == "agentops-observability"
     assert catalog["status"] == "draft"
-    assert catalog["metadata"]["certification_stage"] == "intake"
+    assert catalog["metadata"]["certification_stage"] == "implementation"
     assert catalog["metadata"]["max_workshop_seats"] == 1
     assert catalog["metadata"]["activation_blockers"]
     assert catalog["metadata"]["showroom_content_ref"] == (
         "f1881c61de55ebf5640c27e76469f4efe458edaf"
     )
-    assert catalog["metadata"]["workload_revision"] == ("6ea100531ac869fa66abe69ae223d6b56dbce9a2")
-    assert catalog["metadata"]["workload_deployment_scope"] == "workshop"
-    assert catalog["metadata"]["workload_source_kind"] == "app-of-apps"
+    assert catalog["metadata"]["workload_repo"] == "https://github.com/rhpds/launchpad.git"
+    assert catalog["metadata"]["workload_revision"] == ("2fcf40b74387046b657e0050513144afead09892")
+    assert catalog["metadata"]["workload_deploy_path"] == "deploy/workloads/agentops-seat"
+    assert catalog["metadata"]["workload_deployment_scope"] == "seat"
+    assert catalog["metadata"]["workload_source_kind"] == "launchpad-seat-chart"
     assert catalog["metadata"]["workload_gitops_ready"] is False
+    assert catalog["metadata"]["workload_identity_value_path"] == "identity"
+    assert catalog["metadata"]["workload_runtime_secret_name"] == "agentops-runtime"
+    assert catalog["metadata"]["source_references"]["automation"]["revision"] == (
+        "6ea100531ac869fa66abe69ae223d6b56dbce9a2"
+    )
     assert catalog["metadata"]["source_references"]["agnosticv"]["path"] == (
         "agd_v2/agentops-intel"
     )
@@ -69,7 +76,7 @@ def test_agentops_intake_captures_the_large_lab_runtime_contract():
         "openshift_logging",
         "data_science_pipelines",
     }
-    assert runtime["required_models"] == ["qwen3-14b"]
+    assert runtime["required_models"] == ["granite-3.2-8b-tools"]
     assert [tab["id"] for tab in runtime["tabs"]] == [
         "openshift-console",
         "terminal",
@@ -80,8 +87,10 @@ def test_agentops_intake_captures_the_large_lab_runtime_contract():
         "mlflow-docs",
         "rhoai-docs",
     ]
-    assert runtime["deployment_scope"] == "workshop"
-    assert runtime["workload"]["source_kind"] == "app-of-apps"
+    assert runtime["deployment_scope"] == "seat"
+    assert runtime["workload"]["source_kind"] == "launchpad-seat-chart"
+    assert runtime["workload"]["identity_value_path"] == "identity"
+    assert runtime["workload"]["runtime_secret_value_path"] == "runtime.existingSecret"
     assert certification["promotion_sequence"] == [1, 5, 25]
 
 
@@ -198,3 +207,30 @@ def test_validator_rejects_mutable_refs_and_missing_showroom_assets(tmp_path: Pa
     assert report["validation_status"] == "fail"
     assert any("immutable 40-character Git SHA" in error for error in report["errors"])
     assert any("missing.png" in error for error in report["errors"])
+
+
+def test_validator_rejects_mutable_reference_and_literal_runtime_secret():
+    intake = load_intake(INTAKE_PATH)
+    intake["references"]["automation"]["revision"] = "main"
+    intake["runtime"]["workload"]["runtime_secret_sources"]["LLM_API_KEY"] = {
+        "value": "embedded-secret"
+    }
+
+    report = validate_intake(intake)
+
+    assert report["validation_status"] == "fail"
+    assert any("references.automation.revision" in error for error in report["errors"])
+    assert any("Sensitive runtime field 'LLM_API_KEY'" in error for error in report["errors"])
+
+
+def test_validator_rejects_incomplete_runtime_secret_and_identity_contract():
+    intake = load_intake(INTAKE_PATH)
+    workload = intake["runtime"]["workload"]
+    workload["identity_value_path"] = "bad..path"
+    workload["runtime_secret_value_path"] = ""
+
+    report = validate_intake(intake)
+
+    assert report["validation_status"] == "fail"
+    assert any("identity_value_path" in error for error in report["errors"])
+    assert any("runtime Secret name and value path" in error for error in report["errors"])

@@ -8,6 +8,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[2]
 CHART = ROOT / "deploy/workloads/agentops-seat"
+ARENA_ARGO_RBAC = ROOT / "deploy/multicluster/arena-argocd-rbac.yaml"
 
 FORBIDDEN_CLUSTER_KINDS = {
     "ClusterRole",
@@ -165,3 +166,21 @@ def test_agentops_grafana_can_read_only_its_seat_metrics():
             "namespace": "launchpad-agentops-seat-1",
         }
     ]
+
+
+def test_arena_argocd_can_manage_only_namespaced_monitoring_resources():
+    documents = [
+        document for document in yaml.safe_load_all(ARENA_ARGO_RBAC.read_text()) if document
+    ]
+    role = next(
+        document
+        for document in documents
+        if document["kind"] == "ClusterRole"
+        and document["metadata"]["name"] == "launchpad-argocd-manager"
+    )
+
+    monitoring_rule = next(
+        rule for rule in role["rules"] if "monitoring.coreos.com" in rule["apiGroups"]
+    )
+    assert monitoring_rule["resources"] == ["servicemonitors"]
+    assert set(monitoring_rule["verbs"]) == {"create", "update", "patch", "delete"}

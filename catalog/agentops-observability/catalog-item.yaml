@@ -37,7 +37,7 @@ metadata:
   content_only: false
   onboarding_managed: true
   onboarding_contract: catalog-onboarding/agentops-observability.yaml
-  certification_stage: intake
+  certification_stage: implementation
   max_workshop_seats: 1
   promotion_sequence:
   - 1
@@ -47,14 +47,12 @@ metadata:
   - Choose the production content-delivery path, retain immutable source provenance,
     and replace the Showroom's mutable latest UI bundle with a pinned release before
     mirroring or adapting content into Launchpad.
-  - Adapt the RHDP app-of-apps so cluster-global RHOAI, MLflow, monitoring, logging,
-    and image-puller Applications are installed once on Arena while uniquely named
-    namespace-scoped Applications are created per workshop seat. The current upstream
-    bootstrap uses global names and cannot be instantiated safely by concurrent Launchpad
-    orders.
-  - Complete the AgentOps runtime Secret mapping without serializing the LiteMaaS
-    virtual key into an Argo CD Application. The upstream bootstrap currently passes
-    the token through Helm values.
+  - Server-dry-run and live-certify the pinned Launchpad seat chart. The chart replaces
+    the RHDP app-of-apps and renders no cluster-scoped resources, but its OpenShift
+    security-context and image compatibility have not yet been proven on Arena.
+  - Prove the generated runtime Secret, retry preservation, model-key revocation,
+    and zero-residue reclaim live. Unit tests confirm that no credentials are serialized
+    into the Argo CD Application.
   - 'Validate generated URLs for all eight RHDP tabs: OpenShift Console, Terminal,
     shared MLflow, per-seat Mortgage AI, per-seat Grafana, shared RHOAI, MLflow Docs,
     and RHOAI Docs.'
@@ -64,8 +62,8 @@ metadata:
   - Install and certify an Arena participant route for shared MLflow, per-seat Grafana,
     and OpenShift Logging/Loki. OpenShift AI 3.5, a Ready DataScienceCluster, user
     workload monitoring, and Data Science Pipelines were confirmed live on 2026-09-04.
-  - Select and load a workshop-capable model, then update the Showroom's qwen3-14b
-    statements if a different model is certified.
+  - Update and certify the Showroom journey for Arena's granite-3.2-8b-tools route
+    instead of its original qwen3-14b statements.
   - Complete one-seat functional certification, including app, trace, metrics, logs,
     evaluation, Showroom, access isolation, and full reclaim.
   showroom_journey: agentops-observability
@@ -100,27 +98,87 @@ metadata:
     title: RHOAI Docs
     source: https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/
   required_models:
-  - qwen3-14b
+  - granite-3.2-8b-tools
   inference_endpoint: litellm
   seat_cpu_millicores: 1250
   seat_memory_mib: 3072
   seat_pods: 11
   seat_storage_gib: 25
-  workload_repo: https://github.com/rhpds/agentops-in-prod-automation.git
-  workload_revision: 6ea100531ac869fa66abe69ae223d6b56dbce9a2
+  workload_repo: https://github.com/rhpds/launchpad.git
+  workload_revision: 2fcf40b74387046b657e0050513144afead09892
   workload_deploy_type: helm
-  workload_deployment_scope: workshop
-  workload_deploy_path: bootstrap
-  workload_source_kind: app-of-apps
+  workload_deployment_scope: seat
+  workload_deploy_path: deploy/workloads/agentops-seat
+  workload_source_kind: launchpad-seat-chart
   workload_gitops_ready: false
-  workload_release_name: agentops-bootstrap
+  workload_release_name: agentops
   workload_helm_values:
-    bootstrap:
-      repoURL: https://github.com/rhpds/agentops-in-prod-automation
-      targetRevision: 6ea100531ac869fa66abe69ae223d6b56dbce9a2
-  workload_runtime_secret_name: ''
-  workload_runtime_secret_sources: {}
-  workload_runtime_secret_value_path: ''
+    storageClass: nfs-storage
+  workload_runtime_secret_name: agentops-runtime
+  workload_runtime_secret_sources:
+    POSTGRES_DB:
+      value: mortgage-ai
+    POSTGRES_USER:
+      value: agentops
+    POSTGRES_PASSWORD:
+      source: generated_password
+      length: 32
+    DATABASE_URL:
+      template: postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@mortgage-ai-db:5432/mortgage-ai
+    COMPLIANCE_DATABASE_URL:
+      template: postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@mortgage-ai-db:5432/mortgage-ai
+    DEBUG:
+      value: 'false'
+    ALLOWED_HOSTS:
+      value: '["*"]'
+    COMPANY_NAME:
+      value: Fed Aura Capital
+    AGENT_NAME:
+      value: Intel Xeon AgentOps
+    AUTH_DISABLED:
+      value: 'true'
+    S3_ACCESS_KEY:
+      source: generated_password
+      length: 24
+    S3_SECRET_KEY:
+      source: generated_password
+      length: 32
+    S3_ENDPOINT:
+      value: http://minio-service:9000
+    S3_BUCKET:
+      value: documents
+    S3_REGION:
+      value: us-east-1
+    UPLOAD_MAX_SIZE_MB:
+      value: '50'
+    LLM_API_KEY:
+      source: maas_api_key
+    LLM_BASE_URL:
+      source: maas_endpoint
+    LLM_MODEL:
+      source: requested_model
+    LLM_MODEL_FAST:
+      source: requested_model
+    LLM_MODEL_CAPABLE:
+      source: requested_model
+    EMBEDDING_MODEL:
+      value: ''
+    EMBEDDING_PROVIDER:
+      value: ''
+    EMBEDDING_BASE_URL:
+      value: ''
+    MLFLOW_TRACKING_URI:
+      value: https://mlflow.redhat-ods-applications.svc.cluster.local:8443
+    MLFLOW_EXPERIMENT_NAME:
+      value: mortgage-ai
+    MLFLOW_WORKSPACE:
+      source: namespace
+    MLFLOW_TRACKING_AUTH:
+      value: kubernetes
+    MLFLOW_TRACKING_INSECURE_TLS:
+      value: 'true'
+  workload_runtime_secret_value_path: runtime.existingSecret
+  workload_identity_value_path: identity
   workload_routes:
     ui: mortgage-ai-ui-route
     grafana: grafana-route
@@ -131,6 +189,10 @@ metadata:
       repo_url: https://github.com/rhpds/agnosticv.git
       revision: 48fc6eebedb295bddf1b915a230e5e90f89db0af
       path: agd_v2/agentops-intel
+    automation:
+      repo_url: https://github.com/rhpds/agentops-in-prod-automation.git
+      revision: 6ea100531ac869fa66abe69ae223d6b56dbce9a2
+      path: bootstrap
     application:
       repo_url: https://github.com/rh-ai-quickstart/multi-agent-loan-origination.git
       revision: 1e50e51c334c1b6ed854d81a3f28fd324792f481

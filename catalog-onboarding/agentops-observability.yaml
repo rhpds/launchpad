@@ -21,15 +21,19 @@ sources:
     playbook: site.yml
     start_path: content
   workload:
-    repo_url: "https://github.com/rhpds/agentops-in-prod-automation.git"
-    revision: "6ea100531ac869fa66abe69ae223d6b56dbce9a2"
-    deploy_path: bootstrap
+    repo_url: "https://github.com/rhpds/launchpad.git"
+    revision: "2fcf40b74387046b657e0050513144afead09892"
+    deploy_path: deploy/workloads/agentops-seat
 
 references:
   agnosticv:
     repo_url: "https://github.com/rhpds/agnosticv.git"
     revision: "48fc6eebedb295bddf1b915a230e5e90f89db0af"
     path: agd_v2/agentops-intel
+  automation:
+    repo_url: "https://github.com/rhpds/agentops-in-prod-automation.git"
+    revision: "6ea100531ac869fa66abe69ae223d6b56dbce9a2"
+    path: bootstrap
   application:
     repo_url: "https://github.com/rh-ai-quickstart/multi-agent-loan-origination.git"
     revision: "1e50e51c334c1b6ed854d81a3f28fd324792f481"
@@ -37,7 +41,7 @@ references:
 
 runtime:
   deployment_type: helm
-  deployment_scope: workshop
+  deployment_scope: seat
   provisioner_refs:
     - helm-workload
     - showroom
@@ -62,7 +66,7 @@ runtime:
     - openshift_logging
     - data_science_pipelines
   required_models:
-    - qwen3-14b
+    - granite-3.2-8b-tools
   seat_resources:
     # Conservative intake envelope derived from the upstream Helm defaults,
     # plus the Showroom pod. Replace with measured requests after one-seat E2E.
@@ -96,19 +100,55 @@ runtime:
       title: RHOAI Docs
       source: https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/
   workload:
-    source_kind: app-of-apps
+    source_kind: launchpad-seat-chart
     gitops_ready: false
-    release_name: agentops-bootstrap
+    release_name: agentops
+    identity_value_path: identity
+    runtime_secret_name: agentops-runtime
+    runtime_secret_value_path: runtime.existingSecret
+    runtime_secret_sources:
+      POSTGRES_DB: {value: mortgage-ai}
+      POSTGRES_USER: {value: agentops}
+      POSTGRES_PASSWORD: {source: generated_password, length: 32}
+      DATABASE_URL:
+        template: >-
+          postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@mortgage-ai-db:5432/mortgage-ai
+      COMPLIANCE_DATABASE_URL:
+        template: >-
+          postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@mortgage-ai-db:5432/mortgage-ai
+      DEBUG: {value: "false"}
+      ALLOWED_HOSTS: {value: '["*"]'}
+      COMPANY_NAME: {value: "Fed Aura Capital"}
+      AGENT_NAME: {value: "Intel Xeon AgentOps"}
+      AUTH_DISABLED: {value: "true"}
+      S3_ACCESS_KEY: {source: generated_password, length: 24}
+      S3_SECRET_KEY: {source: generated_password, length: 32}
+      S3_ENDPOINT: {value: "http://minio-service:9000"}
+      S3_BUCKET: {value: documents}
+      S3_REGION: {value: us-east-1}
+      UPLOAD_MAX_SIZE_MB: {value: "50"}
+      LLM_API_KEY: {source: maas_api_key}
+      LLM_BASE_URL: {source: maas_endpoint}
+      LLM_MODEL: {source: requested_model}
+      LLM_MODEL_FAST: {source: requested_model}
+      LLM_MODEL_CAPABLE: {source: requested_model}
+      EMBEDDING_MODEL: {value: ""}
+      EMBEDDING_PROVIDER: {value: ""}
+      EMBEDDING_BASE_URL: {value: ""}
+      MLFLOW_TRACKING_URI:
+        value: "https://mlflow.redhat-ods-applications.svc.cluster.local:8443"
+      MLFLOW_EXPERIMENT_NAME: {value: mortgage-ai}
+      MLFLOW_WORKSPACE: {source: namespace}
+      MLFLOW_TRACKING_AUTH: {value: kubernetes}
+      MLFLOW_TRACKING_INSECURE_TLS: {value: "true"}
     helm_values:
-      bootstrap:
-        repoURL: https://github.com/rhpds/agentops-in-prod-automation
-        targetRevision: "6ea100531ac869fa66abe69ae223d6b56dbce9a2"
+      storageClass: nfs-storage
     routes:
       ui: mortgage-ai-ui-route
       grafana: grafana-route
 
 certification:
-  stage: intake
+  stage: implementation
   max_workshop_seats: 1
   promotion_sequence:
     - 1
@@ -120,15 +160,14 @@ certification:
       provenance, and replace the Showroom's mutable latest UI bundle with a
       pinned release before mirroring or adapting content into Launchpad.
     - >-
-      Adapt the RHDP app-of-apps so cluster-global RHOAI, MLflow, monitoring,
-      logging, and image-puller Applications are installed once on Arena while
-      uniquely named namespace-scoped Applications are created per workshop
-      seat. The current upstream bootstrap uses global names and cannot be
-      instantiated safely by concurrent Launchpad orders.
+      Server-dry-run and live-certify the pinned Launchpad seat chart. The
+      chart replaces the RHDP app-of-apps and renders no cluster-scoped
+      resources, but its OpenShift security-context and image compatibility
+      have not yet been proven on Arena.
     - >-
-      Complete the AgentOps runtime Secret mapping without serializing the
-      LiteMaaS virtual key into an Argo CD Application. The upstream bootstrap
-      currently passes the token through Helm values.
+      Prove the generated runtime Secret, retry preservation, model-key
+      revocation, and zero-residue reclaim live. Unit tests confirm that no
+      credentials are serialized into the Argo CD Application.
     - >-
       Validate generated URLs for all eight RHDP tabs: OpenShift Console,
       Terminal, shared MLflow, per-seat Mortgage AI, per-seat Grafana, shared
@@ -143,8 +182,8 @@ certification:
       DataScienceCluster, user workload monitoring, and Data Science Pipelines
       were confirmed live on 2026-09-04.
     - >-
-      Select and load a workshop-capable model, then update the Showroom's
-      qwen3-14b statements if a different model is certified.
+      Update and certify the Showroom journey for Arena's
+      granite-3.2-8b-tools route instead of its original qwen3-14b statements.
     - >-
       Complete one-seat functional certification, including app, trace,
       metrics, logs, evaluation, Showroom, access isolation, and full reclaim.

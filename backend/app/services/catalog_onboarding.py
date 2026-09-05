@@ -11,6 +11,9 @@ IMMUTABLE_GIT_SHA = re.compile(r"^[0-9a-f]{40}$")
 CATALOG_ID = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 IMAGE_REF = re.compile(r"image::([^\[]+)\[")
 XREF = re.compile(r"xref:([^\[#]+)(?:#[^\[]+)?\[")
+VALUE_PATH = re.compile(r"^[A-Za-z][A-Za-z0-9_-]*(?:\.[A-Za-z][A-Za-z0-9_-]*)*$")
+RUNTIME_TEMPLATE_FIELD = re.compile(r"\{([A-Z][A-Z0-9_]*)\}")
+SENSITIVE_RUNTIME_MARKERS = ("PASSWORD", "TOKEN", "SECRET", "API_KEY", "PRIVATE_KEY")
 
 
 def load_intake(path: Path | str) -> dict[str, Any]:
@@ -102,6 +105,7 @@ def build_catalog_item(intake: dict[str, Any]) -> dict[str, Any]:
             "workload_runtime_secret_value_path": workload_contract.get(
                 "runtime_secret_value_path", ""
             ),
+            "workload_identity_value_path": workload_contract.get("identity_value_path", ""),
             "workload_routes": workload_contract.get("routes", {}),
             "source_content_repo": showroom["repo_url"],
             "source_content_revision": showroom["revision"],
@@ -147,6 +151,21 @@ def _validate_contract(intake: dict[str, Any], errors: list[str]) -> None:
                 f"sources.{source_name}.revision must be an immutable 40-character Git SHA"
             )
 
+    references = intake.get("references", {})
+    if references and not isinstance(references, dict):
+        errors.append("references must be a mapping")
+    elif isinstance(references, dict):
+        for reference_name, reference in references.items():
+            if not isinstance(reference, dict):
+                errors.append(f"references.{reference_name} must be a mapping")
+                continue
+            if not str(reference.get("repo_url", "")).startswith("https://github.com/"):
+                errors.append(f"references.{reference_name}.repo_url must be an HTTPS GitHub URL")
+            if not IMMUTABLE_GIT_SHA.fullmatch(str(reference.get("revision", ""))):
+                errors.append(
+                    f"references.{reference_name}.revision must be an immutable 40-character Git SHA"
+                )
+
     if runtime.get("deployment_type") not in {"helm", "kustomize", "manifests"}:
         errors.append("runtime.deployment_type must be helm, kustomize, or manifests")
     if not isinstance(runtime.get("required_capabilities"), list):
@@ -158,6 +177,82 @@ def _validate_contract(intake: dict[str, Any], errors: list[str]) -> None:
     workload_contract = runtime.get("workload", {})
     if workload_contract and not isinstance(workload_contract, dict):
         errors.append("runtime.workload must be a mapping")
+    elif isinstance(workload_contract, dict):
+        identity_path = str(workload_contract.get("identity_value_path", ""))
+        if identity_path and not VALUE_PATH.fullmatch(identity_path):
+            errors.append("runtime.workload.identity_value_path must be a dotted Helm value path")
+
+        secret_name = str(workload_contract.get("runtime_secret_name", ""))
+        secret_path = str(workload_contract.get("runtime_secret_value_path", ""))
+        if bool(secret_name) != bool(secret_path):
+            errors.append(
+                "runtime.workload runtime Secret name and value path must be declared together"
+            )
+        if secret_path and not VALUE_PATH.fullmatch(secret_path):
+            errors.append(
+                "runtime.workload.runtime_secret_value_path must be a dotted Helm value path"
+            )
+
+        secret_sources = workload_contract.get("runtime_secret_sources", {})
+        if secret_sources and not isinstance(secret_sources, dict):
+            errors.append("runtime.workload.runtime_secret_sources must be a mapping")
+        elif isinstance(secret_sources, dict):
+            source_keys = {str(key) for key in secret_sources}
+            for raw_key, field_contract in secret_sources.items():
+                key = str(raw_key)
+                if isinstance(field_contract, str):
+                    if field_contract not in {
+                        "maas_api_key",
+                        "maas_endpoint",
+                        "requested_model",
+                        "namespace",
+                    }:
+                        errors.append(
+                            f"Runtime Secret field '{key}' uses unsupported source '{field_contract}'"
+                        )
+                    continue
+                if not isinstance(field_contract, dict):
+                    errors.append(f"Runtime Secret field '{key}' must be a source mapping")
+                    continue
+                declared = [
+                    name for name in ("source", "value", "template") if name in field_contract
+                ]
+                if len(declared) != 1:
+                    errors.append(
+                        f"Runtime Secret field '{key}' must declare exactly one of source, value, or template"
+                    )
+                    continue
+                if "value" in field_contract and any(
+                    marker in key.upper() for marker in SENSITIVE_RUNTIME_MARKERS
+                ):
+                    errors.append(
+                        f"Sensitive runtime field '{key}' cannot contain a catalog literal"
+                    )
+                if "source" in field_contract:
+                    source = str(field_contract["source"])
+                    if source not in {
+                        "generated_password",
+                        "maas_api_key",
+                        "maas_endpoint",
+                        "requested_model",
+                        "namespace",
+                    }:
+                        errors.append(
+                            f"Runtime Secret field '{key}' uses unsupported source '{source}'"
+                        )
+                    if source == "generated_password":
+                        length = field_contract.get("length", 32)
+                        if not isinstance(length, int) or not 24 <= length <= 128:
+                            errors.append(
+                                f"Generated runtime field '{key}' length must be between 24 and 128"
+                            )
+                if "template" in field_contract:
+                    template = str(field_contract["template"])
+                    fields = set(RUNTIME_TEMPLATE_FIELD.findall(template))
+                    if not fields or not fields.issubset(source_keys):
+                        errors.append(
+                            f"Runtime Secret template for '{key}' references unknown fields"
+                        )
     resources = _required_mapping(runtime, "seat_resources", errors, "runtime")
     for key in ("cpu_millicores", "memory_mib", "pods", "storage_gib"):
         value = resources.get(key)

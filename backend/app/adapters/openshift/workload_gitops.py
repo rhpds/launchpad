@@ -70,6 +70,7 @@ class WorkloadSeat:
     helm_values: dict[str, Any] = field(default_factory=dict)
     runtime_secret_name: str = ""
     runtime_secret_value_path: str = ""
+    identity_value_path: str = ""
 
     def __post_init__(self) -> None:
         if not IMMUTABLE_GIT_SHA.fullmatch(self.revision):
@@ -94,9 +95,14 @@ class WorkloadSeat:
                 raise ValueError(
                     "Runtime Secret Helm value path must be an existing-Secret reference"
                 )
+        if self.identity_value_path and any(
+            not part or not re.fullmatch(r"[A-Za-z][A-Za-z0-9_-]*", part)
+            for part in self.identity_value_path.split(".")
+        ):
+            raise ValueError("Workload identity Helm value path is invalid")
 
 
-def _set_value_path(values: dict[str, Any], path: str, value: str) -> None:
+def _set_value_path(values: dict[str, Any], path: str, value: Any) -> None:
     parts = path.split(".")
     if not all(parts):
         raise ValueError("Runtime Secret Helm value path is invalid")
@@ -119,6 +125,18 @@ def build_workload_application(
     helm_values = copy.deepcopy(seat.helm_values)
     if seat.runtime_secret_name:
         _set_value_path(helm_values, seat.runtime_secret_value_path, seat.runtime_secret_name)
+    if seat.identity_value_path:
+        _set_value_path(
+            helm_values,
+            seat.identity_value_path,
+            {
+                "workshopId": seat.workshop_id,
+                "seatId": seat.seat_id,
+                "sessionId": seat.session_id,
+                "tenantId": seat.tenant_id,
+                "clusterId": seat.cluster_id,
+            },
+        )
     sensitive_path = _sensitive_value_path(helm_values)
     if sensitive_path:
         raise ValueError(
