@@ -1,4 +1,14 @@
 {{- if .Values.dspa.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: agentops-pipeline-service-ca
+  annotations:
+    service.beta.openshift.io/inject-cabundle: "true"
+  labels:
+    {{- include "agentops.labels" . | nindent 4 }}
+data: {}
+---
 apiVersion: datasciencepipelinesapplications.opendatahub.io/v1
 kind: DataSciencePipelinesApplication
 metadata:
@@ -13,10 +23,14 @@ spec:
     artifactSignedURLExpirySeconds: 60
     cacheEnabled: true
     pipelineStore: kubernetes
+    cABundle:
+      configMapName: agentops-pipeline-service-ca
+      configMapKey: service-ca.crt
   database:
     disableHealthCheck: false
-    # podToPodTLS adds the OpenShift service CA to the DSP server trust bundle.
-    # The chart-owned MariaDB serves a matching service certificate.
+    # apiServer.cABundle adds the OpenShift service CA to the DSP trust bundle.
+    # The chart-owned MariaDB serves a matching service certificate and rejects
+    # every unencrypted client connection.
     customExtraParams: '{"tls":"true"}'
     externalDB:
       host: agentops-pipeline-db.{{ .Release.Namespace }}.svc.cluster.local
@@ -44,7 +58,16 @@ spec:
   persistenceAgent:
     deploy: true
     numWorkers: 2
-  podToPodTLS: true
+  # RHOAI 3.5 generates an MLMD server config that repeats the database
+  # connection without its TLS options when podToPodTLS is enabled. The
+  # duplicate plaintext connection is rejected by require_secure_transport.
+  # Keep the external database connection encrypted and CA-verified while the
+  # operator defect is tracked; do not expose the internal MLMD Envoy route.
+  mlmd:
+    deploy: true
+    envoy:
+      deployRoute: false
+  podToPodTLS: false
   scheduledWorkflow:
     cronScheduleTimezone: UTC
     deploy: true

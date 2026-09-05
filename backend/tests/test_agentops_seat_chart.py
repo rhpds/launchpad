@@ -241,6 +241,15 @@ def test_agentops_owns_a_supported_dspa_mariadb_and_normalizes_nfs_permissions()
     dspa = resources[("DataSciencePipelinesApplication", "dspa")]
     assert "mariaDB" not in dspa["spec"]["database"]
     assert dspa["spec"]["database"]["customExtraParams"] == '{"tls":"true"}'
+    assert dspa["spec"]["podToPodTLS"] is False
+    assert dspa["spec"]["mlmd"] == {
+        "deploy": True,
+        "envoy": {"deployRoute": False},
+    }
+    assert dspa["spec"]["apiServer"]["cABundle"] == {
+        "configMapName": "agentops-pipeline-service-ca",
+        "configMapKey": "service-ca.crt",
+    }
     assert dspa["spec"]["database"]["externalDB"] == {
         "host": "agentops-pipeline-db.launchpad-agentops-seat-1.svc.cluster.local",
         "port": "3306",
@@ -270,6 +279,21 @@ def test_agentops_owns_a_supported_dspa_mariadb_and_normalizes_nfs_permissions()
 
     pipeline_db = resources[("Deployment", "agentops-pipeline-db")]
     pipeline_service = resources[("Service", "agentops-pipeline-db")]
+    pipeline_ca = resources[("ConfigMap", "agentops-pipeline-service-ca")]
+    pipeline_policy = resources[("NetworkPolicy", "agentops-pipeline-database")]
+    assert pipeline_ca["metadata"]["annotations"] == {
+        "service.beta.openshift.io/inject-cabundle": "true"
+    }
+    assert pipeline_policy["spec"]["podSelector"]["matchLabels"] == {
+        "app.kubernetes.io/component": "pipeline-database",
+        "app.kubernetes.io/instance": "agentops",
+    }
+    allowed_peers = pipeline_policy["spec"]["ingress"][0]["from"]
+    assert {
+        "podSelector": {
+            "matchLabels": {"component": "data-science-pipelines"}
+        }
+    } in allowed_peers
     assert pipeline_service["metadata"]["annotations"] == {
         "service.beta.openshift.io/serving-cert-secret-name": "agentops-pipeline-db-tls"
     }
