@@ -16,9 +16,9 @@ INTEL_GUIDED_LABS = [
         "title": "Intel Xeon 6 201 — Building an AI Agent",
         "model": "granite-3.2-8b-tools",
         "workspace_route": "app",
-        "content_ref": "intel-guided-content-v1.0.7",
-        "max_workshop_seats": 5,
-        "certification_stage": "five-seat",
+        "content_ref": "intel-guided-content-v1.0.9",
+        "max_workshop_seats": 25,
+        "certification_stage": "twenty-five-seat-candidate",
     },
     {
         "catalog_id": "intel-llm-cpu-serving",
@@ -189,7 +189,7 @@ def test_agent_content_uses_launchpad_safe_workload_manifests():
     pages = content_root / "modules/ROOT/pages"
     content = "\n".join(path.read_text() for path in sorted(pages.glob("*.adoc")))
 
-    assert "intel-guided-content-v1.0.7" in content
+    assert "intel-guided-content-v1.0.9" in content
     assert "{litellm_api_endpoint}" not in content
     assert "{litellm_virtual_key}" not in content
     assert "{maas_endpoint}" in content
@@ -239,6 +239,28 @@ def test_agent_201_uses_the_workshop_certified_tool_model():
     assert catalog["metadata"]["required_models"] == [
         "granite-3.2-8b-tools"
     ]
+
+
+def test_agent_201_runtime_bounds_cpu_generation_for_workshop_scale():
+    containerfile = (
+        ROOT / "workshop-images/solution-agent/Containerfile"
+    ).read_text()
+    build_config = (
+        ROOT / "deploy/launchpad/overlays/arena/buildconfig.yaml"
+    ).read_text()
+    manifest = (
+        ROOT / "content-intel-xeon6-agent-201/manifests/solution-agent.yaml"
+    ).read_text()
+
+    assert "triforce-solution-agent@sha256:" in containerfile
+    assert "REQUIREMENTS_MAX_TOKENS" in containerfile
+    assert "BRIEF_MAX_TOKENS" in containerfile
+    assert '"256"' in containerfile
+    assert '"768"' in containerfile
+    assert "name: solution-agent-workshop" in build_config
+    assert "contextDir: workshop-images/solution-agent" in build_config
+    assert "REQUIREMENTS_MAX_TOKENS" in manifest
+    assert "BRIEF_MAX_TOKENS" in manifest
 
 
 def test_cpu_serving_content_uses_route_name_that_fits_launchpad_namespace():

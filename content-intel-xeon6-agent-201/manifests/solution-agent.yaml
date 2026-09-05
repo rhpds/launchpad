@@ -18,7 +18,7 @@ spec:
         runAsNonRoot: true
       containers:
         - name: solution-agent
-          image: quay.io/redhat-gpte/triforce-solution-agent@sha256:60897d598014f040c9f515312233b5a22df80c93ba3342c16f681be027933d03
+          image: image-registry.openshift-image-registry.svc:5000/partner-ai-launchpad/solution-agent-workshop@sha256:6d1ece781c0f5e5360097fa81c5a209447796ca1e1a47e5df8b0c6c7afcab6aa
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -40,6 +40,10 @@ spec:
               value: http://solution-tools:8095
             - name: ADVISOR_MODEL
               value: granite-2b-cpu
+            - name: REQUIREMENTS_MAX_TOKENS
+              value: "256"
+            - name: BRIEF_MAX_TOKENS
+              value: "768"
             - name: PROMPT_PATH
               value: /etc/advisor/system_prompt
           volumeMounts:

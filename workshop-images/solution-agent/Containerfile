@@ -1,0 +1,15 @@
+FROM quay.io/redhat-gpte/triforce-solution-agent@sha256:60897d598014f040c9f515312233b5a22df80c93ba3342c16f681be027933d03
+
+# The upstream 201 image fixes both completion budgets in graph.py.  Keep the
+# certified application intact while making those budgets explicit runtime
+# inputs so a workshop burst cannot request 2,560 tokens per participant.
+USER 0
+RUN grep -F 'llm = _get_llm(max_tokens=512)' /app/graph.py \
+    && grep -F 'llm = _get_llm(max_tokens=2048)' /app/graph.py \
+    && sed -i \
+      -e 's/_get_llm(max_tokens=512)/_get_llm(max_tokens=int(os.environ.get("REQUIREMENTS_MAX_TOKENS", "256")))/' \
+      -e 's/_get_llm(max_tokens=2048)/_get_llm(max_tokens=int(os.environ.get("BRIEF_MAX_TOKENS", "768")))/' \
+      /app/graph.py \
+    && grep -F 'REQUIREMENTS_MAX_TOKENS' /app/graph.py \
+    && grep -F 'BRIEF_MAX_TOKENS' /app/graph.py
+USER 1001

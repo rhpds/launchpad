@@ -124,3 +124,25 @@ spec:
   resources:
     requests: {cpu: "500m", memory: 1Gi, ephemeral-storage: 2Gi}
     limits: {cpu: "2", memory: 2Gi, ephemeral-storage: 8Gi}
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata: {name: solution-agent-workshop}
+---
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata: {name: solution-agent-workshop}
+spec:
+  runPolicy: SerialLatestOnly
+  source:
+    type: Git
+    git: {uri: "https://github.com/rhpds/launchpad.git", ref: main}
+    contextDir: workshop-images/solution-agent
+  strategy:
+    type: Docker
+    dockerStrategy: {dockerfilePath: Containerfile}
+  output:
+    to: {kind: ImageStreamTag, name: "solution-agent-workshop:cpu-bounded-v1"}
+  resources:
+    requests: {cpu: "500m", memory: 1Gi, ephemeral-storage: 2Gi}
+    limits: {cpu: "2", memory: 2Gi, ephemeral-storage: 8Gi}
