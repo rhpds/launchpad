@@ -265,6 +265,7 @@ def test_agent_201_uses_three_pods_by_colocating_agent_and_tools():
 def test_agent_201_remote_certification_driver_understands_colocated_tools():
     driver = (ROOT / "scripts/certify-agent-201-remote-seat.sh").read_text()
 
+    assert "/www/modules/02-deploy-tools.html" in driver
     assert "--containers=solution-agent" in driver
     assert "for deployment in solution-agent solution-ui" in driver
     assert "for deployment in solution-tools solution-agent solution-ui" not in driver
