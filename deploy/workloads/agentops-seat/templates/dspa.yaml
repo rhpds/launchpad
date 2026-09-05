@@ -15,9 +15,9 @@ spec:
     pipelineStore: kubernetes
   database:
     disableHealthCheck: false
-    # The chart-owned MariaDB is namespace-local. Add service-ca TLS before
-    # promoting AgentOps beyond the one-seat pilot gate.
-    customExtraParams: '{"tls":"false"}'
+    # podToPodTLS adds the OpenShift service CA to the DSP server trust bundle.
+    # The chart-owned MariaDB serves a matching service certificate.
+    customExtraParams: '{"tls":"true"}'
     externalDB:
       host: agentops-pipeline-db.{{ .Release.Namespace }}.svc.cluster.local
       port: "3306"

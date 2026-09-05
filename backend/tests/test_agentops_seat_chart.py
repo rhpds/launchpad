@@ -240,7 +240,7 @@ def test_agentops_owns_a_supported_dspa_mariadb_and_normalizes_nfs_permissions()
 
     dspa = resources[("DataSciencePipelinesApplication", "dspa")]
     assert "mariaDB" not in dspa["spec"]["database"]
-    assert dspa["spec"]["database"]["customExtraParams"] == '{"tls":"false"}'
+    assert dspa["spec"]["database"]["customExtraParams"] == '{"tls":"true"}'
     assert dspa["spec"]["database"]["externalDB"] == {
         "host": "agentops-pipeline-db.launchpad-agentops-seat-1.svc.cluster.local",
         "port": "3306",
@@ -269,13 +269,48 @@ def test_agentops_owns_a_supported_dspa_mariadb_and_normalizes_nfs_permissions()
     ]
 
     pipeline_db = resources[("Deployment", "agentops-pipeline-db")]
+    pipeline_service = resources[("Service", "agentops-pipeline-db")]
+    assert pipeline_service["metadata"]["annotations"] == {
+        "service.beta.openshift.io/serving-cert-secret-name": "agentops-pipeline-db-tls"
+    }
+
+    pipeline_pod = pipeline_db["spec"]["template"]["spec"]
+    tls_init = pipeline_pod["initContainers"][0]
+    assert tls_init["name"] == "prepare-mariadb-tls"
+    assert "chmod 0600 /work/tls.key" in tls_init["command"][2]
+    assert tls_init["securityContext"] == {
+        "allowPrivilegeEscalation": False,
+        "capabilities": {"drop": ["ALL"]},
+        "runAsNonRoot": True,
+    }
+
     pipeline_container = pipeline_db["spec"]["template"]["spec"]["containers"][0]
     assert pipeline_container["image"].startswith("registry.redhat.io/rhel9/mariadb-105@sha256:")
+    assert "MYSQL_ALLOW_EMPTY_PASSWORD" not in {
+        item["name"] for item in pipeline_container["env"]
+    }
+    assert pipeline_container["command"] == ["/usr/bin/run-mysqld"]
+    assert pipeline_container["args"] == [
+        "--ssl=ON",
+        "--ssl-key=/var/run/mariadb-tls/tls.key",
+        "--ssl-cert=/var/run/mariadb-tls/tls.crt",
+        "--tls-version=TLSv1.2,TLSv1.3",
+        "--require-secure-transport=ON",
+    ]
+    readiness = pipeline_container["readinessProbe"]["exec"]["command"][3]
+    assert "--ssl-verify-server-cert" in readiness
+    assert "service-ca.crt" in readiness
+    assert "SHOW STATUS LIKE 'Ssl_version'" in readiness
     assert pipeline_container["lifecycle"]["preStop"]["exec"]["command"] == [
         "/bin/sh",
         "-c",
         "chmod -R a+rwx /var/lib/mysql || true",
     ]
+    assert {volume["name"] for volume in pipeline_pod["volumes"]} == {
+        "data",
+        "mariadb-serving-cert",
+        "mariadb-tls",
+    }
     pipeline_pvc = resources[("PersistentVolumeClaim", "pipeline-db-data")]
     assert pipeline_pvc["spec"]["storageClassName"] == "launchpad-nfs-ephemeral"
 

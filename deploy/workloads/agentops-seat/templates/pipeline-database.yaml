@@ -15,6 +15,8 @@ apiVersion: v1
 kind: Service
 metadata:
   name: agentops-pipeline-db
+  annotations:
+    service.beta.openshift.io/serving-cert-secret-name: agentops-pipeline-db-tls
   labels:
     {{- include "agentops.labels" . | nindent 4 }}
 spec:
@@ -49,10 +51,41 @@ spec:
       serviceAccountName: agentops-seat
       securityContext:
         {{- include "agentops.podSecurityContext" . | nindent 8 }}
+      initContainers:
+        - name: prepare-mariadb-tls
+          image: {{ .Values.images.mariadb | quote }}
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -c
+            - >-
+              cp /serving-cert/tls.crt /work/tls.crt &&
+              cp /serving-cert/tls.key /work/tls.key &&
+              chmod 0644 /work/tls.crt &&
+              chmod 0600 /work/tls.key
+          securityContext:
+            {{- include "agentops.containerSecurityContext" . | nindent 12 }}
+          resources:
+            requests: {cpu: 10m, memory: 16Mi}
+            limits: {cpu: 100m, memory: 64Mi}
+          volumeMounts:
+            - name: mariadb-serving-cert
+              mountPath: /serving-cert
+              readOnly: true
+            - name: mariadb-tls
+              mountPath: /work
       containers:
         - name: mariadb
           image: {{ .Values.images.mariadb | quote }}
           imagePullPolicy: IfNotPresent
+          command:
+            - /usr/bin/run-mysqld
+          args:
+            - --ssl=ON
+            - --ssl-key=/var/run/mariadb-tls/tls.key
+            - --ssl-cert=/var/run/mariadb-tls/tls.crt
+            - --tls-version=TLSv1.2,TLSv1.3
+            - --require-secure-transport=ON
           securityContext:
             {{- include "agentops.containerSecurityContext" . | nindent 12 }}
           env:
@@ -63,8 +96,10 @@ spec:
                 secretKeyRef: {name: {{ include "agentops.runtimeSecret" . }}, key: MLPIPELINE_PASSWORD}
             - name: MYSQL_DATABASE
               value: mlpipeline
-            - name: MYSQL_ALLOW_EMPTY_PASSWORD
-              value: "true"
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
           ports:
             - name: mysql
               containerPort: 3306
@@ -74,7 +109,14 @@ spec:
                 - /bin/sh
                 - -i
                 - -c
-                - MYSQL_PWD=$MYSQL_PASSWORD mysql -h 127.0.0.1 -u $MYSQL_USER -D $MYSQL_DATABASE -e 'SELECT 1'
+                - >-
+                  MYSQL_PWD="$MYSQL_PASSWORD" mysql --connect-timeout=5
+                  --ssl-ca=/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+                  --ssl-verify-server-cert
+                  -h "agentops-pipeline-db.${POD_NAMESPACE}.svc.cluster.local"
+                  -u "$MYSQL_USER" -D "$MYSQL_DATABASE" -Nse
+                  "SHOW STATUS LIKE 'Ssl_version'" |
+                  awk '$2 ~ /^TLSv1\.[23]$/ {found=1} END {exit !found}'
             initialDelaySeconds: 5
             periodSeconds: 10
             timeoutSeconds: 1
@@ -93,7 +135,15 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /var/lib/mysql
+            - name: mariadb-tls
+              mountPath: /var/run/mariadb-tls
+              readOnly: true
       volumes:
         - name: data
           persistentVolumeClaim:
             claimName: pipeline-db-data
+        - name: mariadb-serving-cert
+          secret:
+            secretName: agentops-pipeline-db-tls
+        - name: mariadb-tls
+          emptyDir: {}
