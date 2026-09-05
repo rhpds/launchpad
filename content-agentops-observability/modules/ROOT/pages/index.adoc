@@ -1,0 +1,53 @@
+= AgentOps Observability with Red Hat AI -- Powered by Intel
+
+image::intel-logo.png[Intel logo,width=200,align=center,link=self]
+
+_Powered by Intel and Red Hat OpenShift AI_
+
+Welcome to the AgentOps Observability with Red Hat AI workshop, powered by Intel!
+
+== What you'll learn
+
+In this workshop, you will:
+
+* Monitor the Stack: Utilize Red Hat AI's out-of-the-box observability stack to track key metrics and logs of your Agentic App
+* Trace Multi-Agent Executions: Track requests across multi-agent frameworks and MCP tools to understand the complete decision-making path
+* From Development to Production: Automate quality monitoring with AI pipelines that run continuously on the platform
+
+== Who this is for
+
+This workshop is designed for site reliability engineers (SREs), Platform Engineers, and AI Developers/Engineers who want to implement end-to-end observability for multi-agent AI systems.
+
+== Prerequisites
+
+This workshop assumes basic familiarity with Kubernetes and AI/ML concepts.
+
+== Infrastructure
+
+This lab runs on Intel AI hardware, demonstrating that production-grade multi-agent AI workloads run efficiently on Intel's AI platform.
+
+* *Model:* {maas_model} (`granite-3.2-8b-tools` for the current Arena certification target)
+* *Serving:* vLLM optimized for Intel
+* *Hardware:* Intel compute on Red Hat OpenShift AI
+* *Scale:* Launchpad certification progresses through 1, 5, and 25 concurrent seats
+
+== Workshop environment
+
+You will work with a multi-agent mortgage lending application built with LangGraph and integrated with Model Context Protocol (MCP) tools.
+
+Launchpad has already authenticated the Terminal to project `{user_project}`.
+The embedded OpenShift Console uses the same participant SSO session—there is
+no shared workshop password or separate OpenShift account.
+
+NOTE: Your seat is namespace-scoped on {cluster_display_name}. Environment
+URLs and credentials are generated for this seat and expire with the lab.
+
+== Estimated time
+
+This workshop will take approximately **1 hour 30 minutes** to complete.
+
+You can work at your own pace.
+
+== Let's get started!
+
+Click on **Workshop Overview** in the navigation to begin your learning journey.

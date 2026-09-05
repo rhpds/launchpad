@@ -1,0 +1,63 @@
+= Intel hardware architecture
+:navtitle: Intel Hardware
+
+== Powered by Intel
+
+This workshop runs on **Intel** hardware on {cluster_display_name}. All LLM
+inference is accessed through the seat-scoped Launchpad LiteMaaS credential.
+
+[cols="1,2",options="header"]
+|===
+|Component |Intel Hardware
+
+|**LLM Inference**
+|{maas_model} through the Launchpad model gateway
+
+|**Model Serving**
+|vLLM optimized for Intel compute
+
+|**Infrastructure**
+|Red Hat OpenShift AI on Intel compute nodes
+|===
+
+== Model-to-hardware mapping
+
+[cols="1,1,1",options="header"]
+|===
+|Model |Hardware |Performance
+
+|{maas_model}
+|Intel CPU execution cluster
+|Measured during Launchpad 1-, 5-, and 25-seat certification
+
+|===
+
+== Why Intel for AI inference?
+
+* **Purpose-built for AI**: Intel's AI hardware is designed for deep learning training and inference workloads
+* **High throughput**: vLLM batches concurrent model requests efficiently
+* **Scalable**: Launchpad reserves aggregate capacity before creating workshop seats
+* **Evidence-driven**: The catalog publishes only the seat count proven by live certification
+* **Enterprise-ready**: Integrated with Red Hat OpenShift AI for deployment, observability, and lifecycle management
+
+== Certification targets
+
+Launchpad measures real system prompts across all five agent personas. The
+catalog stays in draft until these values are captured from repeatable Arena
+runs:
+
+[cols="1,1",options="header"]
+|===
+|Metric |Result
+
+|Throughput |Pending live measurement
+|Average latency |Pending live measurement
+|p95 at certified seat count |Pending live measurement
+|Error rate |Must satisfy the release rubric
+|Tool accuracy |Measured with real prompts from all agents
+|Concurrent capacity |Promotion sequence: 1, 5, then 25 seats
+|===
+
+== Intel partnership
+
+This lab is part of the **Red Hat + Intel AI Partnership**, demonstrating that production-grade multi-agent AI workloads run efficiently on Intel's AI hardware platform with Red Hat OpenShift AI providing the enterprise platform layer.

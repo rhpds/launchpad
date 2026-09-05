@@ -1,0 +1,49 @@
+= Workshop overview
+:imagesdir: ../assets/images
+:navtitle: Workshop Overview
+:toc:
+:toc-placement: preamble
+:icons: font
+
+== What is AgentOps?
+
+Traditional DevOps taught us to monitor, debug, and maintain software systems in production. But AI agents introduce new challenges: non-deterministic behavior, multi-agent orchestration, large language model (LLM) quality variations, and distributed tool calls.
+
+**AgentOps** extends observability practices to handle these realities. Beyond tracking request rates and latency, you need to trace agent reasoning paths, measure token consumption, validate tool call success, and continuously evaluate output quality.
+
+This workshop shows you how.
+
+== Your role and mission
+
+You're a senior engineer at Fed Aura Capital, a mortgage lending company that has deployed a sophisticated multi-agent AI system to handle the complete lending lifecycle. The system uses 5 distinct LangGraph agents, each serving a different persona: prospect inquiry, borrower application intake, loan officer pipeline management, underwriter compliance checks, and executive analytics.
+
+Your CTO has called an emergency meeting: "Our AI agents are failing in production, but we can't see where or why. Customer complaints are rising, loan processing times are unpredictable, and we have no visibility into what's happening inside these multi-agent workflows. We need end-to-end observability. Yesterday."
+
+**Your assignment**: Implement a comprehensive AgentOps observability strategy using Red Hat OpenShift AI (RHOAI) to gain full visibility into your multi-agent system.
+
+**The objective**: Establish monitoring and tracing capabilities that allow your team to diagnose distributed failures, understand agent decision paths, and ensure consistent quality across all AI-powered workflows.
+
+== Fed Aura Capital's challenges
+
+**The situation**: Fed Aura Capital has deployed a multi-agent AI system handling mortgage applications, but lacks visibility into the distributed workflows spanning multiple agents and MCP (Model Context Protocol, a standard for connecting AI agents to external tools and data sources) tools.
+
+**Project timeline**: The board has given the engineering team 2 weeks to demonstrate improved observability and reduced incident response time.
+
+**Current challenges** (operational pain points):
+
+* **Blind spots in agent interactions**: When a loan application fails, teams cannot trace the request path across the 5 agents, resulting in hours spent manually correlating logs
+* **Hidden latency bottlenecks**: Some agents introduce unpredictable delays, but there's no way to identify which ones. Customer complaints about slow processing continue to rise.
+* **Silent failures in MCP tools**: External tool calls (compliance checks, credit scoring) fail without alerting, and incomplete loan applications are discovered days later
+* **No quality baseline**: No systematic way to evaluate if agents are providing consistent, accurate responses, increasing the risk of compliance violations
+
+**The opportunity**: Red Hat OpenShift AI provides an integrated observability stack that can address these challenges. You've been selected to evaluate and implement it for Fed Aura Capital's use case.
+
+**Technical perspective**: "MLflow tracing combined with RHOAI's metrics stack can give us the visibility we need, but we need to validate how it integrates with our LangGraph agents and MCP tools."
+
+== Hardware: Powered by Intel
+
+The AI inference powering this lab runs on Intel hardware. The multi-agent
+system uses `{maas_model}` through Launchpad's LiteMaaS endpoint, served by vLLM
+on Intel compute across all five agent personas.
+
+This demonstrates that production-grade agentic AI workloads run efficiently on Intel's AI infrastructure, with Red Hat OpenShift AI providing the enterprise platform layer for deployment, observability, and lifecycle management.

@@ -1,4 +1,6 @@
 """Contract for the repository-owned Antora/Nookbag Showroom package."""
+
+import re
 from pathlib import Path
 
 import pytest
@@ -60,9 +62,7 @@ def test_operator_workshop_playbook_starts_on_operator_journey():
 
     assert playbook["site"]["start_page"] == "modules::index.adoc"
     assert playbook["content"]["sources"][0]["start_path"] == "content-operators"
-    assert playbook["asciidoc"]["attributes"]["showroom_journey"] == (
-        "openshift-operators"
-    )
+    assert playbook["asciidoc"]["attributes"]["showroom_journey"] == ("openshift-operators")
     assert playbook["output"]["dir"] == "./www"
 
     operator_index = ROOT / "content-operators/modules/ROOT/pages/index.adoc"
@@ -129,9 +129,7 @@ def test_intel_guided_lab_is_native_launchpad_content(lab):
     assert metadata["max_workshop_seats"] == lab["max_workshop_seats"]
     assert metadata["certification_stage"] == lab["certification_stage"]
     assert metadata["required_models"] == [lab["model"]]
-    assert metadata["showroom_content_repo_url"] == (
-        "https://github.com/rhpds/launchpad.git"
-    )
+    assert metadata["showroom_content_repo_url"] == ("https://github.com/rhpds/launchpad.git")
     assert metadata["showroom_content_ref"] == lab["content_ref"]
     assert metadata["showroom_content_playbook"] == lab["playbook"]
     assert metadata.get("workspace_route_name", "") == lab["workspace_route"]
@@ -147,25 +145,17 @@ def test_intel_guided_lab_is_native_launchpad_content(lab):
 
     playbook = yaml.safe_load((ROOT / lab["playbook"]).read_text())
     assert playbook["site"]["start_page"] == "modules::index.adoc"
-    assert playbook["content"]["sources"] == [
-        {"url": ".", "start_path": lab["content_path"]}
-    ]
+    assert playbook["content"]["sources"] == [{"url": ".", "start_path": lab["content_path"]}]
     assert "rhdp_showroom_theme" in playbook["ui"]["bundle"]["url"]
-    assert playbook["ui"]["supplemental_files"] == [
-        {"path": "./content/supplemental-ui"}
-    ]
+    assert playbook["ui"]["supplemental_files"] == [{"path": "./content/supplemental-ui"}]
     assert playbook["output"]["dir"] == "./www"
 
     component = yaml.safe_load((ROOT / lab["content_path"] / "antora.yml").read_text())
     assert component["title"] == lab["title"]
     assert component["asciidoc"]["attributes"]["project_name"] == "%namespace%"
-    assert component["asciidoc"]["attributes"]["cluster_display_name"] == (
-        "%cluster_display_name%"
-    )
+    assert component["asciidoc"]["attributes"]["cluster_display_name"] == ("%cluster_display_name%")
     if lab["catalog_id"] == "intel-llm-tool-calling":
-        assert component["asciidoc"]["attributes"]["maas_api_url"] == (
-            "%maas_api_url%"
-        )
+        assert component["asciidoc"]["attributes"]["maas_api_url"] == ("%maas_api_url%")
 
     nav = ROOT / lab["content_path"] / "modules/ROOT/nav.adoc"
     index = ROOT / lab["content_path"] / "modules/ROOT/pages/index.adoc"
@@ -212,45 +202,30 @@ def test_agent_content_uses_launchpad_safe_workload_manifests():
         assert manifest.exists()
         resources = list(yaml.safe_load_all(manifest.read_text()))
         route = next(resource for resource in resources if resource["kind"] == "Route")
-        deployment = next(
-            resource for resource in resources if resource["kind"] == "Deployment"
-        )
+        deployment = next(resource for resource in resources if resource["kind"] == "Deployment")
         assert route["metadata"]["name"] == route_name
         assert "@sha256:" in deployment["spec"]["template"]["spec"]["containers"][0]["image"]
 
     ui_resources = list(
-        yaml.safe_load_all(
-            (content_root / "manifests" / "solution-ui.yaml").read_text()
-        )
+        yaml.safe_load_all((content_root / "manifests" / "solution-ui.yaml").read_text())
     )
-    ui_deployment = next(
-        resource for resource in ui_resources if resource["kind"] == "Deployment"
+    ui_deployment = next(resource for resource in ui_resources if resource["kind"] == "Deployment")
+    assert (
+        ui_deployment["spec"]["template"]["spec"]["containers"][0]["resources"]["limits"]["memory"]
+        == "512Mi"
     )
-    assert ui_deployment["spec"]["template"]["spec"]["containers"][0][
-        "resources"
-    ]["limits"]["memory"] == "512Mi"
 
 
 def test_agent_201_uses_the_workshop_certified_tool_model():
-    catalog = yaml.safe_load(
-        (ROOT / "catalog/intel-xeon6-agent-201/catalog-item.yaml").read_text()
-    )
+    catalog = yaml.safe_load((ROOT / "catalog/intel-xeon6-agent-201/catalog-item.yaml").read_text())
 
-    assert catalog["metadata"]["required_models"] == [
-        "granite-3.2-8b-tools"
-    ]
+    assert catalog["metadata"]["required_models"] == ["granite-3.2-8b-tools"]
 
 
 def test_agent_201_runtime_bounds_cpu_generation_for_workshop_scale():
-    containerfile = (
-        ROOT / "workshop-images/solution-agent/Containerfile"
-    ).read_text()
-    build_config = (
-        ROOT / "deploy/launchpad/overlays/arena/buildconfig.yaml"
-    ).read_text()
-    manifest = (
-        ROOT / "content-intel-xeon6-agent-201/manifests/solution-agent.yaml"
-    ).read_text()
+    containerfile = (ROOT / "workshop-images/solution-agent/Containerfile").read_text()
+    build_config = (ROOT / "deploy/launchpad/overlays/arena/buildconfig.yaml").read_text()
+    manifest = (ROOT / "content-intel-xeon6-agent-201/manifests/solution-agent.yaml").read_text()
 
     assert "triforce-solution-agent@sha256:" in containerfile
     assert "REQUIREMENTS_MAX_TOKENS" in containerfile
@@ -261,6 +236,65 @@ def test_agent_201_runtime_bounds_cpu_generation_for_workshop_scale():
     assert "contextDir: workshop-images/solution-agent" in build_config
     assert "REQUIREMENTS_MAX_TOKENS" in manifest
     assert "BRIEF_MAX_TOKENS" in manifest
+
+
+def test_agentops_showroom_is_native_launchpad_content():
+    playbook_path = ROOT / "site-agentops-observability.yml"
+    content_root = ROOT / "content-agentops-observability"
+
+    assert playbook_path.exists()
+    playbook = yaml.safe_load(playbook_path.read_text())
+    assert playbook["content"]["sources"] == [
+        {"url": ".", "start_path": "content-agentops-observability"}
+    ]
+    assert "releases/download/patternfly-6/" in playbook["ui"]["bundle"]["url"]
+    assert "releases/download/latest/" not in playbook["ui"]["bundle"]["url"]
+
+    component = yaml.safe_load((content_root / "antora.yml").read_text())
+    attributes = component["asciidoc"]["attributes"]
+    assert attributes["project_name"] == "%namespace%"
+    assert attributes["user_project"] == "%namespace%"
+    assert attributes["maas_model"] == "%maas_model%"
+    assert attributes["maas_endpoint"] == "%maas_endpoint%"
+    assert attributes["cluster_display_name"] == "%cluster_display_name%"
+    assert "password" not in attributes
+
+    pages = content_root / "modules/ROOT/pages"
+    content = "\n".join(path.read_text() for path in sorted(pages.glob("*.adoc")))
+    for forbidden in (
+        "qwen3-14b",
+        "wksp-user1",
+        "-u {user} -p {password}",
+        "*Password:* `{password}`",
+        "refs/heads/main/evaluations",
+    ):
+        assert forbidden not in content
+    assert "Launchpad has already authenticated this terminal" in content
+    assert "granite-3.2-8b-tools" in content
+
+
+def test_agentops_showroom_references_only_packaged_pages_and_images():
+    content_root = ROOT / "content-agentops-observability/modules/ROOT"
+    nav = (content_root / "nav.adoc").read_text()
+    page_names = set(re.findall(r"xref:([^#\[]+)", nav))
+    assert page_names
+    for page_name in page_names:
+        assert (content_root / "pages" / page_name).is_file(), page_name
+
+    for page in (content_root / "pages").glob("*.adoc"):
+        for image_name in re.findall(r"image::([^\[]+)\[", page.read_text()):
+            assert (content_root / "assets/images" / image_name).is_file(), (
+                page.name,
+                image_name,
+            )
+
+
+def test_agentops_showroom_records_immutable_upstream_provenance():
+    provenance = (ROOT / "content-agentops-observability/UPSTREAM.md").read_text()
+
+    assert "https://github.com/rhpds/agentops-intel-showroom" in provenance
+    assert "f1881c61de55ebf5640c27e76469f4efe458edaf" in provenance
+    assert "Launchpad adaptations" in provenance
 
 
 def test_cpu_serving_content_uses_route_name_that_fits_launchpad_namespace():
@@ -275,21 +309,15 @@ def test_cpu_serving_content_uses_route_name_that_fits_launchpad_namespace():
 
 def test_cpu_serving_uses_pinned_openshift_compatible_workbench_image():
     page = (
-        ROOT
-        / "content-intel-llm-cpu-serving/modules/ROOT/pages/04-wire-rag-frontend.adoc"
+        ROOT / "content-intel-llm-cpu-serving/modules/ROOT/pages/04-wire-rag-frontend.adoc"
     ).read_text()
-    containerfile = (
-        ROOT / "workshop-images/anythingllm-openshift/Containerfile"
-    ).read_text()
-    build_config = (
-        ROOT / "deploy/launchpad/overlays/arena/buildconfig.yaml"
-    ).read_text()
+    containerfile = (ROOT / "workshop-images/anythingllm-openshift/Containerfile").read_text()
+    build_config = (ROOT / "deploy/launchpad/overlays/arena/buildconfig.yaml").read_text()
 
     assert "anything-llm:latest" not in page
     assert (
         "partner-ai-launchpad/anythingllm-openshift@sha256:"
-        "1eee2162bed8ab643133dd9420ea086566f7c778849e9ff3eddc71a6a6cd8f98"
-        in page
+        "1eee2162bed8ab643133dd9420ea086566f7c778849e9ff3eddc71a6a6cd8f98" in page
     )
     assert "STORAGE_DIR" in page
     assert "DISABLE_TELEMETRY" in page
@@ -298,8 +326,7 @@ def test_cpu_serving_uses_pinned_openshift_compatible_workbench_image():
     assert "--timeout=300s" in page
     assert (
         "ghcr.io/mintplex-labs/anything-llm@sha256:"
-        "e7751e8e65f470506379dbc2059d6a4c61eb3f22de58c184aef536a42bdd8335"
-        in containerfile
+        "e7751e8e65f470506379dbc2059d6a4c61eb3f22de58c184aef536a42bdd8335" in containerfile
     )
     assert "chgrp -R 0 /app" in containerfile
     assert "rm -rf /app/server/node_modules/.prisma/client" in containerfile
@@ -308,8 +335,7 @@ def test_cpu_serving_uses_pinned_openshift_compatible_workbench_image():
 
 def test_tool_calling_hardware_story_respects_participant_rbac_boundary():
     page = (
-        ROOT
-        / "content-intel-llm-tool-calling/modules/ROOT/pages/07-intel-story.adoc"
+        ROOT / "content-intel-llm-tool-calling/modules/ROOT/pages/07-intel-story.adoc"
     ).read_text()
 
     assert "oc get nodes" not in page

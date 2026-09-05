@@ -1,0 +1,314 @@
+= Module 5: From development to production
+:imagesdir: ../assets/images
+:navtitle: Module 5: Dev to Production
+:toc: macro
+:toclevels: 1
+
+[NOTE]
+====
+**This module is optional.** It shows how to automate evaluations into CI/CD pipelines for continuous quality monitoring.
+====
+
+Observability tells you if your system is working, but evaluations tell you if your agents are working *well*. In production, you need evaluations that run automatically (on a schedule or as part of a CI/CD pipeline), not manually from a notebook.
+
+In this module, you'll import and run an evaluation pipeline in Red Hat OpenShift AI, then use MLflow's Prompt Registry to catch a prompt regression before it reaches production.
+
+TIP: In this module, you're wearing **both hats**: AI Developers define the evaluation logic, while SRE/Platform Engineers manage the pipeline infrastructure and scheduling.
+
+== Learning objectives
+
+By the end of this module, you'll be able to:
+
+* Import an evaluation pipeline definition into OpenShift AI
+* Run an automated evaluation pipeline and configure its parameters
+* View automated evaluation results in MLflow
+* Detect prompt regressions by comparing evaluation results across prompt versions
+
+== Why automated evaluations matter
+
+Running evaluations manually from a notebook works during development, but it has limitations:
+
+* **Manual**: Someone has to open the notebook and click Run
+* **Not reproducible**: Results depend on the notebook environment and who ran it
+* **Not schedulable**: You can't trigger it automatically on a model update or prompt change
+
+AI Pipelines solve these problems by packaging evaluation logic into containerized steps that run on the OpenShift AI platform.
+
+[cols="1,1",options="header"]
+|===
+|Inner Loop |Outer Loop
+
+|Jupyter notebook
+|AI Pipeline (Kubeflow Pipelines)
+
+|Manual execution
+|Automated, scheduled, or triggered
+
+|Developer's workbench
+|Platform-managed containers
+
+|Interactive exploration
+|Reproducible, auditable runs
+|===
+
+Red Hat OpenShift AI includes https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/{rhoai_version}/[Data Science Pipelines^] (based on Kubeflow Pipelines) for orchestrating multi-step ML workflows, including evaluation pipelines.
+
+== Exercise 1: Import an evaluation pipeline
+
+The mortgage-ai project includes a pre-compiled evaluation pipeline that packages a simple evaluation into 4 automated steps.
+
+. In Red Hat OpenShift AI, navigate to **Develop & Train** > **Pipelines** > **Pipeline definitions**:
++
+image::eval16.png[OpenShift AI Pipeline definitions page showing no pipelines with Import pipeline button,link=self,width=700]
+
+. Click **Import pipeline** and configure it:
++
+--
+* **Pipeline name**: `eval-simple-run`
+* Select **Import by url**
+* Paste the pipeline URL:
++
+[source,text]
+----
+https://raw.githubusercontent.com/rh-ai-quickstart/multi-agent-loan-origination/1e50e51c334c1b6ed854d81a3f28fd324792f481/evaluations/pipelines_gen/simple-eval-pipeline.yaml
+----
+--
++
+image::eval17.png[Import pipeline dialog with name eval-simple-run and Import by url selected,link=self,width=500]
++
+Click **Import pipeline**.
+
+. The pipeline graph shows the 4 automated steps:
++
+image::eval18.png[Pipeline definition graph showing setup-mlflow-op then create-dataset-op then run-simple-eval-op then report-results-op,link=self,width=700]
++
+--
+* **setup-mlflow-op**: Configure MLflow tracking URI, workspace, and experiment
+* **create-dataset-op**: Create the evaluation dataset on the MLflow server (6 test cases covering common mortgage inquiries)
+* **run-simple-eval-op**: Run the 3 deterministic scorers (contains_expected, has_numeric_result, and response_length)
+* **report-results-op**: Print the evaluation summary
+--
+
+This evaluation is packaged as a pipeline that can run without a notebook: fully automated and reproducible.
+
+== Exercise 2: Run the evaluation pipeline
+
+. Click **Actions** > **Create run**:
++
+image::eval19.png[Actions dropdown showing Create run and Create schedule options,link=self,width=300]
++
+NOTE: Notice the **Create schedule** option. In production, you would schedule evaluations to run periodically (e.g., every 6 hours) to continuously monitor agent quality.
+
+. In the **Create run** form, set the run name to `eval-run-1`:
++
+image::eval20.png[Create run form showing run type project experiment and run name fields,link=self,width=700]
+
+. Scroll down to **Parameters** and configure the required values:
++
+--
+* **mlflow_tracking_uri**: `{mlflow_tracking_uri}`
+* **mlflow_workspace**: `{user_project}`
+--
++
+image::eval21.png[Create run Parameters section showing agent_name dataset_name mlflow_experiment_name mlflow_tracking_uri and mlflow_workspace,link=self,width=500]
++
+The other parameters (`agent_name`, `dataset_name`, `mlflow_experiment_name`) use sensible defaults. Click **Create run**.
+
+. The pipeline starts executing. You can watch each step complete in the graph view:
++
+image::eval22.png[Pipeline run eval-run-1 executing showing the 4-step graph with Running status,link=self,width=700]
++
+Each step runs in its own container on the OpenShift AI platform. The pipeline authenticates to MLflow using the pod's Kubernetes service account token, so no manual token management is needed.
+
+== Exercise 3: View automated evaluation results in MLflow
+
+. Switch to the MLflow UI. Make sure you are still in the **{user_project}** workspace:
++
+image::reselect-project-mlflow.png[MLflow workspace selector showing user project workspace,link=self,width=400]
++
+Once the pipeline completes, the evaluation results appear in MLflow.
+
+[start=2]
+. Navigate to the experiments tab to view the traces. The name of the new experiment is **multi-agent-loan-origination-eval**.
++
+image::find-new-exp.png[MLflow experiments tab showing multi-agent-loan-origination-eval experiment,link=self]
++
+
+. Click on `Traces` from the side bar:
++
+image::traces-nav.png[MLflow sidebar showing Traces navigation link,link=self]
++
+
+You'll see the 6 new traces from the pipeline run with their assessment results:
++
+image::eval23.png[MLflow Traces showing 6 automated evaluation traces with assessment columns,link=self,width=700]
++
+The results show each trace with its scorer assessments, produced by an automated pipeline instead of a manual notebook run.
+
+. To see all assessment and expectation columns, click **Columns** and check **All Assessments** and **All Expectations**:
++
+image::eval24.png[MLflow Columns dropdown showing All Assessments and All Expectations checkboxes,link=self,width=250]
+
+TIP: If assessment columns are not visible in the Traces view, use the **Columns** dropdown to enable **All Assessments**. MLflow doesn't always show them by default.
+
+== Exercise 4: Catch a bad prompt before production
+
+Automated pipelines ensure evaluations run continuously, but the real payoff comes when they catch a problem before it reaches users.
+
+In this exercise, you'll simulate a realistic scenario: a team member proposes a prompt change to reduce latency, and you use evaluations to discover that the change would silently degrade response quality.
+
+The scenario: A developer at Fed Aura Capital notices the prospect agent calls tools for questions it could answer from general knowledge. They propose a "quick optimization": change `TOOL USE (MANDATORY)` to `TOOL USE (OPTIONAL)` in the system prompt, telling the agent to prefer its own knowledge and only call tools when truly necessary.
+
+This sounds reasonable. It might reduce latency. But will the agent still provide accurate, product-specific responses? Let's find out.
+
+=== Open the regression detection notebook
+
+. In JupyterLab, navigate to `multi-agent-loan-origination/evaluations/` and open **evaluate_agent_v2.ipynb**:
++
+image::eval25.png[JupyterLab showing evaluate_agent_v2.ipynb open with Prompt Regression Detection title and environment setup,link=self,width=700]
++
+This notebook is purpose-built for prompt regression detection. It registers a modified Version 2 of the system prompt, runs the evaluation dataset, and compares results against the Version 1 baseline.
+
+. Run the **Install Dependencies** cell.
+
+. Run the environment variables configuration cell. Copy the **LLM_API_KEY** and **MLFLOW_TRACKING_TOKEN** values from **evaluate_agent.ipynb**.
+
+. Run the **Setup**, **Configure MLflow** and **1. Load Existing Prompt (Version 1)** cells.
+
+=== Review the modified prompt
+
+[start=3]
+. Run the cells under **2. Create Modified Prompt (Version 2)**. The notebook makes a single, subtle change to the system prompt:
++
+image::eval26.png[Modified system prompt Version 2 showing TOOL USE changed from MANDATORY to OPTIONAL,link=self,width=700]
++
+The change: `TOOL USE (MANDATORY)` becomes `TOOL USE (OPTIONAL)`. The agent is now told to _"prefer answering from your general knowledge instead of calling tools"_ and _"Only call tools if you truly cannot answer from your own knowledge."_
++
+This is a realistic scenario. Someone might "optimize" the prompt to reduce tool call latency, not realizing that tool-sourced data (specific product rates, loan limits, affordability calculations) is what makes the responses accurate.
+
+=== Register Version 2 in MLflow
+
+[start=4]
+. Run the cells under **3. Register Version 2 in MLflow Prompt Registry**. The notebook registers the modified prompt as Version 2 with a descriptive commit message:
++
+image::eval27.png[Notebook registering Version 2 prompt in MLflow with commit message V2 Changed TOOL USE from MANDATORY to OPTIONAL,link=self,width=500]
++
+The output confirms `public-assistant-system-prompt (version 2)` with URI `prompts:/public-assistant-system-prompt/2`. Notice the tags include `"purpose": "regression-detection"`, making it clear this version is being tested, not deployed.
+
+=== Compare prompt versions in MLflow
+
+[start=5]
+. Navigate to the *MLflow Console* tab. Switch to the **mortgage-ai-eval** experiment:
++
+image::nav-mortgageaieval-exp.png[Navigating to the mortgage-ai-eval experiment in MLflow,link=self]
++
+. Navigate to **Prompts** and click on **public-assistant-system-prompt**. Click the **Compare** tab.
+
++
+image::compare-prompts.png[MLflow Prompts Compare tab for public-assistant-system-prompt,link=self]
++
+
+. MLflow shows a side-by-side diff of Version 2 (left) and Version 1 (right):
++
+image::eval28.png[MLflow Prompts Compare view showing side-by-side diff of Version 2 and Version 1 with red and green highlighting on the TOOL USE change,link=self,width=700]
++
+The diff highlighting makes the change immediately visible: the `TOOL USE` section changed from `(MANDATORY)` to `(OPTIONAL)`, and the instructions shifted from _"you MUST call the product_info tool"_ to _"you may call the product_info tool, but prefer answering from your general knowledge."_
++
+This is the same experience as reviewing a code diff in a pull request, but for prompts. Before this, prompt changes at Fed Aura Capital were untracked text edits in YAML files. Now every change is versioned, diffable, and linked to evaluation results.
+
+=== Run evaluations against Version 2
+
+[start=6]
+. Return to the notebook. Run the cells under **#5** thru  **7. Run Evaluation with V2 Prompt**. This runs the 6 test cases and 3 deterministic scorers with the modified v2 prompt:
++
+image::eval29.png[Notebook running V2 evaluation showing 6 examples and 3 scorers with results contains_expected 83 percent has_numeric_result 50 percent response_length 100 percent,link=self,width=500]
++
+The results will likely show regressions compared to the Version 1 baseline. Look for drops in `contains_expected` (the agent may no longer mention expected product keywords consistently) and changes in `has_numeric_result` (suggesting the agent is giving generic answers instead of tool-sourced specifics). Your exact percentages may vary, but the pattern of degradation should be visible.
+
+=== Compare V1 vs V2 results
+
+[start=7]
+. Run the cells under **9. Compare V1 vs V2 Results**. The notebook compares the v2 scores against the v1 baseline and flags regressions:
++
+image::eval30.png[Notebook comparing V1 baseline vs V2 modified prompt showing contains_expected 100 percent to 83 percent REGRESSION and has_numeric_result regression,link=self,width=500]
++
+The comparison table will show which scorers regressed (exact percentages may vary):
++
+[cols="2,1,1,1,1",options="header"]
+|===
+|Scorer |V1 (baseline) |V2 (modified) |Delta |Status
+
+|contains_expected
+|100%
+|83%
+|-17%
+|REGRESSION
+
+|has_numeric_result
+|50%
+|33%
+|-17%
+|REGRESSION
+
+|response_length
+|100%
+|100%
+|0%
+|OK
+|===
++
+You'll likely see regressions in multiple scorers. The agent may still produce long-enough responses (`response_length` often stays stable), but those responses become less specific: missing expected keywords and lacking numeric values like rates and dollar amounts. The "optimization" made responses faster but less accurate.
+
+=== View per-trace results in MLflow
+
+[start=8]
+. In the MLflow UI, from the **MLflow Console** tab, navigate to **Prompts**, click **public-assistant-system-prompt**, and select the **Traces** tab:
+
++
+image::prompt-traces.png[MLflow Prompts Traces tab showing evaluation traces by prompt version,link=self]
++
+
+You can now see evaluation traces from both Version 1 and Version 2, with assessment columns showing per-trace pass/fail:
++
+image::eval31.png[MLflow Prompts Traces tab showing Version 1 and Version 2 traces side by side with assessment columns contains_expected has_numeric_result and mortgage_guidelines,link=self,width=700]
++
+The traces are grouped by prompt version. You can see exactly which test cases passed or failed for each version:
++
+--
+* **Version 1** traces should show more consistent `True` values for `contains_expected` because the agent called the right tools and included the expected keywords.
+* **Version 2** traces will likely show `False` for several test cases because the agent answered from general knowledge instead of calling the `product_info` tool, missing expected keywords.
+--
++
+Click into any failing trace to understand why the response missed the expected keyword and diagnose the root cause.
+
+. To compare the prompt versions side by side, navigate to **Prompts** > **public-assistant-system-prompt** and click the **Text** tab to view the differences:
++
+image::eval34.png[MLflow Prompt comparison showing text differences between Version 1 and Version 2,link=self,width=700]
++
+This lets you correlate specific prompt changes with evaluation regressions, a critical capability for prompt engineering at scale.
+
+=== The verdict
+
+The prompt change that seemed like a harmless optimization would have caused a **measurable regression** in response accuracy. Without this evaluation framework, the change would have been deployed to production based on a quick manual test ("it still answers questions, looks good"). Fed Aura Capital's prospect agent would have started giving generic mortgage advice instead of specific product information, potentially misguiding customers and creating compliance risk.
+
+The evaluation infrastructure caught the regression before it reached a single user. This is the core value of AgentOps: **visibility into quality, not just availability**.
+
+== Module summary
+
+**What you accomplished:**
+
+* Imported a pre-compiled evaluation pipeline into OpenShift AI
+* Configured and ran an automated evaluation pipeline
+* Viewed automated evaluation results in MLflow alongside notebook-driven results
+* Detected a prompt regression before production by comparing Version 1 and Version 2 evaluation results
+
+**Key takeaways:**
+
+* The inner loop (notebook) is for exploration and development; the outer loop (pipeline) is for automation and production
+* OpenShift AI Pipelines package the same evaluation logic into reproducible, schedulable, containerized runs
+* MLflow's Prompt Registry combined with evaluations creates a quality gate: every prompt change can be tested, diffed, and compared before deployment
+* Evaluations catch subtle regressions that manual testing would miss, preventing bad prompts from reaching production
+
+**Next steps:**
+
+The Conclusion recaps the full observability journey (from the black box of Module 1 through metrics, traces, and automated pipelines) and provides resources for continuing your AgentOps practice.
