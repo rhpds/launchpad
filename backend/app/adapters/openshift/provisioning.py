@@ -104,7 +104,13 @@ class OpenShiftProvisioningAdapter:
         demo_source = meta.get("demo_source", "launchpad")
         deploy_method = meta.get("deploy_method", "kustomize-dir")
         deploy_path = meta.get("deploy_path", str(DEMO_DEPLOY_ROOT))
-        namespace = f"launchpad-{request.tenant_id}-{uuid.uuid4().hex[:8]}"
+        seat_ref = str(request.metadata.get("seat_id") or request.request_id)
+        suffix = re.sub(r"[^a-z0-9]", "", seat_ref.lower())[:6]
+        namespace = self._demo_namespace(
+            request.tenant_id,
+            catalog_item.catalog_item_id,
+            suffix or uuid.uuid4().hex[:6],
+        )
 
         return ProvisioningPlan(
             request_id=request.request_id,
@@ -132,6 +138,7 @@ class OpenShiftProvisioningAdapter:
                 "deploy_path": deploy_path,
                 "overlay_path": str(self._overlay_path),
                 "catalog_item_id": catalog_item.catalog_item_id,
+                "tenant_id": request.tenant_id,
                 "demo_pages": meta.get("demo_pages", "all"),
                 "workspace_path": meta.get("workspace_path", ""),
                 "workspace_route_name": meta.get("workspace_route_name", ""),
@@ -203,23 +210,14 @@ class OpenShiftProvisioningAdapter:
                 "runtime contract and certification first"
             )
 
-        # Extract tenant from namespace name
         namespace = plan.target_namespace or f"launchpad-demo-{uuid.uuid4().hex[:8]}"
-        # Parse tenant: launchpad-{tenant}-{hash}
-        parts = namespace.split("-")
-        tenant_id = "-".join(parts[1:-1]) if len(parts) > 2 else "default"
+        tenant_id = str(res.get("tenant_id") or "default")
         gw_namespace = f"launchpad-gw-{tenant_id}"
-        seat_id = str(res.get("seat_id", ""))
-        # Keep the deterministic suffix at six characters so the generated
-        # OpenShift Route host label remains within the 63-character limit.
-        suffix = (
-            re.sub(r"[^a-z0-9]", "", seat_id.lower())[:6]
-            if showroom_enabled and seat_id
-            else uuid.uuid4().hex[:6]
-        )
-        demo_namespace = self._demo_namespace(
-            tenant_id, catalog_item_id, suffix or uuid.uuid4().hex[:6]
-        )
+        # The final target is selected by create_plan and persisted on the
+        # session before this method performs any cluster mutation. Never
+        # generate a second namespace here: cleanup and retry must target the
+        # exact same object after an interrupted process.
+        demo_namespace = namespace
 
         # --- Step 1: Ensure tenant gateway exists ---
         if not operator_workshop:

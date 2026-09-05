@@ -382,6 +382,26 @@ def test_guided_seat_namespace_can_use_stable_seat_suffix():
     assert namespace.endswith("-003606")
 
 
+def test_create_plan_persists_exact_namespace_used_for_the_workshop_seat():
+    adapter = object.__new__(OpenShiftProvisioningAdapter)
+    adapter._overlay_path = "/tmp/demo"
+    item = _guided_item()
+    request = LabRequest(
+        tenant_id="smoke-test-tenant",
+        requester_id="participant-1",
+        catalog_item_id=item.catalog_item_id,
+        requested_mode=CatalogCategory.GUIDED_BUILD,
+        metadata={"seat_id": "003606bd-5b75-40dc-8eb8-8b7533c5de04"},
+    )
+
+    plan = adapter.create_plan(request, item)
+
+    assert plan.target_namespace == (
+        "launchpad-smoke-test-tenant-guided-rag-on-xeon-003606"
+    )
+    assert plan.required_resources["tenant_id"] == "smoke-test-tenant"
+
+
 def test_gateway_pvc_uses_configured_storage_class():
     manifest = """apiVersion: v1
 kind: PersistentVolumeClaim
