@@ -1967,19 +1967,38 @@ class ProvisioningService:
             raise ValueError("Target cluster credentials are unavailable")
         from kubernetes import client
         name = f"launchpad-participant-{hashlib.sha256(username.encode()).hexdigest()[:12]}"
-        binding = client.V1RoleBinding(
-            metadata=client.V1ObjectMeta(
-                name=name,
-                labels={"launchpad.redhat.com/order-id": order_id, "launchpad.redhat.com/managed": "true"},
-            ),
-            role_ref=client.V1RoleRef(api_group="rbac.authorization.k8s.io", kind="ClusterRole", name="edit"),
-            subjects=[client.RbacV1Subject(api_group="rbac.authorization.k8s.io", kind="User", name=username)],
-        )
-        try:
-            clients.rbac.create_namespaced_role_binding(session.namespace, binding)
-        except client.ApiException as exc:
-            if exc.status != 409:
-                raise ValueError(f"Failed to grant participant namespace access: {exc.reason}") from exc
+        role_bindings = [(name, "edit")]
+        if session.catalog_item_id == "agentops-observability":
+            role_bindings.append((f"{name}-logs", "cluster-logging-application-view"))
+        for binding_name, cluster_role in role_bindings:
+            binding = client.V1RoleBinding(
+                metadata=client.V1ObjectMeta(
+                    name=binding_name,
+                    labels={
+                        "launchpad.redhat.com/order-id": order_id,
+                        "launchpad.redhat.com/managed": "true",
+                    },
+                ),
+                role_ref=client.V1RoleRef(
+                    api_group="rbac.authorization.k8s.io",
+                    kind="ClusterRole",
+                    name=cluster_role,
+                ),
+                subjects=[
+                    client.RbacV1Subject(
+                        api_group="rbac.authorization.k8s.io",
+                        kind="User",
+                        name=username,
+                    )
+                ],
+            )
+            try:
+                clients.rbac.create_namespaced_role_binding(session.namespace, binding)
+            except client.ApiException as exc:
+                if exc.status != 409:
+                    raise ValueError(
+                        f"Failed to grant participant namespace access: {exc.reason}"
+                    ) from exc
 
     def unbind_public_participant(self, order_id: str, seat_ref: str, username: str) -> None:
         session = self._public_access_session(order_id, seat_ref)
@@ -1988,11 +2007,20 @@ class ProvisioningService:
             return
         from kubernetes import client
         name = f"launchpad-participant-{hashlib.sha256(username.encode()).hexdigest()[:12]}"
-        try:
-            clients.rbac.delete_namespaced_role_binding(name, session.namespace)
-        except client.ApiException as exc:
-            if exc.status != 404:
-                raise ValueError(f"Failed to revoke participant namespace access: {exc.reason}") from exc
+        binding_names = [name]
+        if session.catalog_item_id == "agentops-observability":
+            binding_names.append(f"{name}-logs")
+        for binding_name in binding_names:
+            try:
+                clients.rbac.delete_namespaced_role_binding(
+                    binding_name,
+                    session.namespace,
+                )
+            except client.ApiException as exc:
+                if exc.status != 404:
+                    raise ValueError(
+                        f"Failed to revoke participant namespace access: {exc.reason}"
+                    ) from exc
 
     def enforce_ttl(self) -> int:
         now = datetime.utcnow()

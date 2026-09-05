@@ -120,13 +120,18 @@ Assigned-workspace MLflow writes returned 200, cross-workspace writes returned
 chart topology reclaimed its namespace, PVs, and NFS directories in 59 seconds
 without manual repair.
 
-Gate A remains RED because this was a direct Helm component run: it did not
-create a Launchpad order, workload Application, runtime Secret, Showroom, or
-participant entitlement, and the OpenShift Logging journey was not run.
-Trusted external TLS is also RED, the pipeline MariaDB connection needs
-service-ca TLS, and shared MLflow must move from SQLite to PostgreSQL before
-the five-seat promotion. The immutable result is in
-`evidence/agentops-mlflow-live-2026-09-05.json`.
+The OpenShift Logging sub-gate subsequently passed at one-seat pilot scale: the
+supported 6.6 operators, LokiStack, forwarder, and Console plugin are live; an
+assigned participant queried its marker with HTTP 200 and received HTTP 403
+for a cross-namespace query. Gate A remains RED because no single Launchpad
+order has yet created and proven the workload Application, runtime Secret,
+Showroom, entitlement, protected routes, complete journey, and reclaim.
+Trusted external TLS is also RED. Before Gate B, the pipeline MariaDB needs
+service-ca TLS, shared MLflow must move from SQLite to PostgreSQL, and logging
+must move from the `1x.demo` NFS/MinIO pilot to durable S3-compatible object
+storage, dynamic block storage, and production sizing. Immutable results are
+in `evidence/agentops-mlflow-live-2026-09-05.json` and
+`evidence/agentops-logging-live-2026-09-05.json`.
 
 ### Gate B: five AgentOps seats
 

@@ -1,0 +1,273 @@
+# One-seat AgentOps certification dependency only.
+#
+# Red Hat's supported operators are used, but 1x.demo and NFS-backed MinIO are
+# not the September 25-seat storage topology. Replace MinIO with durable S3 and
+# provide supported dynamic block storage before the five-seat promotion.
+# The logging-loki-s3 Secret is generated directly on Arena and is never stored
+# in Git.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: logging-minio
+  namespace: openshift-logging
+  labels:
+    launchpad.redhat.com/shared-service: "true"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: launchpad-nfs-ephemeral
+  resources:
+    requests:
+      storage: 100Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: logging-minio
+  namespace: openshift-logging
+  labels:
+    launchpad.redhat.com/shared-service: "true"
+spec:
+  selector:
+    app.kubernetes.io/name: logging-minio
+  ports:
+    - name: api
+      port: 9000
+      targetPort: api
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logging-minio
+  namespace: openshift-logging
+  labels:
+    app.kubernetes.io/name: logging-minio
+    launchpad.redhat.com/shared-service: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: logging-minio
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: logging-minio
+        launchpad.redhat.com/shared-service: "true"
+    spec:
+      containers:
+        - name: minio
+          image: quay.io/minio/minio:RELEASE.2023-06-19T19-52-50Z
+          args:
+            - server
+            - /data
+            - --console-address
+            - :9001
+          env:
+            - name: MINIO_ROOT_USER
+              valueFrom:
+                secretKeyRef:
+                  name: logging-loki-s3
+                  key: access_key_id
+            - name: MINIO_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: logging-loki-s3
+                  key: access_key_secret
+          ports:
+            - name: api
+              containerPort: 9000
+            - name: console
+              containerPort: 9001
+          readinessProbe:
+            httpGet:
+              path: /minio/health/ready
+              port: api
+            periodSeconds: 10
+            failureThreshold: 12
+          livenessProbe:
+            httpGet:
+              path: /minio/health/live
+              port: api
+            periodSeconds: 30
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - /bin/sh
+                  - -c
+                  - chmod -R a+rwx /data || true
+          resources:
+            requests:
+              cpu: 200m
+              memory: 512Mi
+            limits:
+              cpu: "2"
+              memory: 4Gi
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: logging-minio
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: logging-minio-bootstrap
+  namespace: openshift-logging
+  labels:
+    launchpad.redhat.com/shared-service: "true"
+spec:
+  backoffLimit: 12
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: logging-minio-bootstrap
+        launchpad.redhat.com/shared-service: "true"
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: bootstrap
+          image: quay.io/minio/mc:RELEASE.2023-06-19T19-31-19Z
+          command:
+            - /bin/sh
+            - -c
+          args:
+            - >-
+              until mc --config-dir /tmp/.mc alias set logging http://logging-minio:9000
+              "$MINIO_ROOT_USER" "$MINIO_ROOT_PASSWORD"; do sleep 5; done;
+              mc --config-dir /tmp/.mc mb --ignore-existing logging/logging-loki
+          env:
+            - name: MC_CONFIG_DIR
+              value: /tmp/.mc
+            - name: MINIO_ROOT_USER
+              valueFrom:
+                secretKeyRef:
+                  name: logging-loki-s3
+                  key: access_key_id
+            - name: MINIO_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: logging-loki-s3
+                  key: access_key_secret
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+---
+apiVersion: loki.grafana.com/v1
+kind: LokiStack
+metadata:
+  name: logging-loki
+  namespace: openshift-logging
+  labels:
+    launchpad.redhat.com/shared-service: "true"
+    launchpad.redhat.com/certification-stage: one-seat-pilot
+spec:
+  size: 1x.demo
+  storage:
+    schemas:
+      - version: v13
+        effectiveDate: "2024-10-01"
+    secret:
+      name: logging-loki-s3
+      type: s3
+  storageClassName: launchpad-nfs-ephemeral
+  tenants:
+    mode: openshift-logging
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: logging-collector
+  namespace: openshift-logging
+  labels:
+    launchpad.redhat.com/shared-service: "true"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: logging-collector:write-logs
+  labels:
+    launchpad.redhat.com/shared-service: "true"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: logging-collector-logs-writer
+subjects:
+  - kind: ServiceAccount
+    name: logging-collector
+    namespace: openshift-logging
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: logging-collector:collect-application
+  labels:
+    launchpad.redhat.com/shared-service: "true"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: collect-application-logs
+subjects:
+  - kind: ServiceAccount
+    name: logging-collector
+    namespace: openshift-logging
+---
+apiVersion: observability.openshift.io/v1
+kind: ClusterLogForwarder
+metadata:
+  name: instance
+  namespace: openshift-logging
+  labels:
+    launchpad.redhat.com/shared-service: "true"
+spec:
+  serviceAccount:
+    name: logging-collector
+  inputs:
+    - name: launchpad-application
+      type: application
+      application:
+        includes:
+          - namespace: launchpad-*
+  outputs:
+    - name: lokistack-out
+      type: lokiStack
+      lokiStack:
+        target:
+          name: logging-loki
+          namespace: openshift-logging
+        authentication:
+          token:
+            from: serviceAccount
+      tls:
+        ca:
+          key: service-ca.crt
+          configMapName: logging-loki-gateway-ca-bundle
+  pipelines:
+    - name: application-logs
+      inputRefs:
+        - launchpad-application
+      outputRefs:
+        - lokistack-out
+---
+apiVersion: observability.openshift.io/v1alpha1
+kind: UIPlugin
+metadata:
+  name: logging
+  labels:
+    launchpad.redhat.com/shared-service: "true"
+spec:
+  type: Logging
+  logging:
+    lokiStack:
+      name: logging-loki
+    logsLimit: 50
+    timeout: 30s
+    schema: viaq

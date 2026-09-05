@@ -343,6 +343,23 @@ def test_workshop_participant_gets_edit_only_in_seat_namespace():
     assert binding.subjects[0].name == "workshop-user-1"
 
 
+def test_agentops_workshop_participant_gets_namespaced_application_log_view():
+    adapter = OpenShiftProvisioningAdapter.__new__(OpenShiftProvisioningAdapter)
+    adapter._rbac_v1 = MagicMock()
+
+    adapter._grant_participant_access(
+        "seat-namespace", "workshop-user-1", grant_application_logs=True
+    )
+
+    calls = adapter._rbac_v1.create_namespaced_role_binding.call_args_list
+    assert len(calls) == 2
+    assert {call.kwargs["body"].role_ref.name for call in calls} == {
+        "edit",
+        "cluster-logging-application-view",
+    }
+    assert {call.kwargs["namespace"] for call in calls} == {"seat-namespace"}
+
+
 def test_guided_lab_namespace_keeps_generated_showroom_host_label_valid():
     namespace = OpenShiftProvisioningAdapter._demo_namespace(
         "smoke-test-tenant",

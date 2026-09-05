@@ -8,7 +8,7 @@ clusters:
     local: true
     priority: 10
     public_access_enabled: false
-    capabilities: [cpu, openshift, operators, openshift-ai, rhoai, showroom, model_endpoint, embedding_endpoint, mlflow, user_workload_monitoring, data_science_pipelines, control-plane]
+    capabilities: [cpu, openshift, operators, openshift-ai, rhoai, showroom, model_endpoint, embedding_endpoint, mlflow, openshift_logging, agentops_observability_stack, user_workload_monitoring, data_science_pipelines, control-plane]
     service_urls:
       mlflow: https://rh-ai.apps.arena.fm2aihpcsed.com/mlflow
     model_endpoints:

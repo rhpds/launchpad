@@ -150,6 +150,9 @@ available:
 - Data Science Pipelines support;
 - a supported shared MLflow 3.14.0 tracking server with workspace-scoped
   authorization (installed and certified on 2026-09-05);
+- supported OpenShift Logging and Loki 6.6 operators, a Ready one-seat Loki
+  pilot, application-log forwarding limited to `launchpad-*`, and the Console
+  logging plugin;
 - user workload monitoring; and
 - the Launchpad Keycloak route and embedded-console webhook.
 
@@ -162,7 +165,8 @@ The live check and render/dry-run gates established the remaining blockers:
   but they have not yet been exercised through a Launchpad-created seat;
 - Arena participant routes present a certificate chain that the external test
   client does not trust;
-- OpenShift Logging/Loki is not installed;
+- OpenShift Logging/Loki passes the one-seat ingestion and namespace-isolation
+  check, but its `1x.demo` NFS-backed MinIO topology is not a scale topology;
 - direct Mortgage AI and Grafana Routes are not yet protected by the
   participant entitlement gateway; and
 - the `launchpad-arena` Argo CD Application is Healthy but OutOfSync at
@@ -275,10 +279,21 @@ namespace, PV, NFS-directory, or Application residue and no manual repair.
 
 This evidence is still `partial`, not a one-seat release certificate. Shared
 MLflow uses SQLite and must move to PostgreSQL before scale; the per-seat RHOAI
-pipeline MariaDB connection needs service-ca TLS; OpenShift Logging is not
-installed; and the Launchpad order, Showroom, runtime Secret, entitlement,
-participant routes, and Launchpad reclaim were not run. The exact result is in
+pipeline MariaDB connection needs service-ca TLS; and the Launchpad order,
+Showroom, runtime Secret, entitlement, participant routes, and Launchpad
+reclaim were not run. The exact result is in
 `evidence/agentops-mlflow-live-2026-09-05.json`.
+
+The follow-up OpenShift Logging pilot installed the supported Loki, Logging,
+and Cluster Observability operators. Its LokiStack, ClusterLogForwarder, and
+Console UI plugin report Ready/Available. A participant log marker was returned
+from the assigned namespace with HTTP 200, while a cross-namespace query was
+denied with HTTP 403. The first broad collector configuration overloaded the
+demo stack; limiting collection to `launchpad-*` made ingestion functional.
+This is a one-seat result only: before five seats, replace NFS-backed pilot
+MinIO and `1x.demo` with durable S3-compatible object storage, suitable dynamic
+block storage, and measured production sizing. Evidence is in
+`evidence/agentops-logging-live-2026-09-05.json`.
 
 The capacity snapshot is RED for the September 17 exact trio. Arena has 1,250
 aggregate pod slots, but only 500 are on the two schedulable workers; the other

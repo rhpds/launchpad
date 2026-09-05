@@ -86,7 +86,7 @@ order flow until runtime and live certification gates pass:
 
 | ID | Name | Current gate |
 |---|---|---|
-| `agentops-observability` | AgentOps in Production: End-to-End Observability with Red Hat AI | RHDP app-of-apps adaptation, Arena prerequisites, and one-seat certification required |
+| `agentops-observability` | AgentOps in Production: End-to-End Observability with Red Hat AI | Shared embeddings, MLflow, and one-seat Logging are live; Launchpad-created one-seat journey and scale storage remain |
 
 ## Architecture
 

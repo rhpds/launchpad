@@ -1,0 +1,111 @@
+{
+  "schema": "launchpad.redhat.com/agentops-live-seat-evidence/v4",
+  "evidence_id": "LIVE-AGENTOPS-019",
+  "observed_at": "2026-09-05T08:03:58Z",
+  "source_revision_before_live_run": "de3c317",
+  "cluster_id": "arena",
+  "result": "partial",
+  "certification_boundary": "OpenShift Logging, Loki, the Console logging plugin, and namespace-scoped participant log authorization passed a one-seat live pilot on Arena. The pilot uses a 1x.demo LokiStack with NFS-backed MinIO and NFS temporary storage; it is not a five-seat or twenty-five-seat production storage topology.",
+  "operators": {
+    "loki_operator": {"version": "6.6.0", "phase": "Succeeded"},
+    "cluster_logging": {"version": "6.6.0", "phase": "Succeeded"},
+    "cluster_observability_operator": {"version": "1.5.2", "phase": "Succeeded"}
+  },
+  "shared_logging": {
+    "lokistack": {
+      "name": "logging-loki",
+      "namespace": "openshift-logging",
+      "size": "1x.demo",
+      "ready": true,
+      "warning": "InsufficientIngesterReplicas",
+      "schema": "v13"
+    },
+    "cluster_log_forwarder": {
+      "name": "instance",
+      "ready": true,
+      "authorized": true,
+      "valid": true,
+      "application_namespace_filter": "launchpad-*"
+    },
+    "console_ui_plugin": {
+      "name": "logging",
+      "available": true,
+      "degraded": false
+    },
+    "pods": {
+      "running": 15,
+      "succeeded_jobs": 1,
+      "container_restarts": 0,
+      "vector_collectors": 5
+    },
+    "storage": {
+      "bound_pvcs": 5,
+      "requested_gib": 140,
+      "object_store": "pilot MinIO on launchpad-nfs-ephemeral",
+      "temporary_storage_class": "launchpad-nfs-ephemeral"
+    }
+  },
+  "participant_authorization": {
+    "namespace": "launchpad-cert-logging-0905",
+    "identity_type": "namespace ServiceAccount equivalent to participant identity",
+    "edit_only_own_query_http_status": 403,
+    "application_log_role": "cluster-logging-application-view",
+    "own_namespace_query_http_status": 200,
+    "own_marker": "AGENTOPS_LOGGING_CERT_0905",
+    "own_marker_count": 16,
+    "own_result_streams": 18,
+    "cross_namespace_query_http_status": 403,
+    "cross_namespace": "openshift-logging"
+  },
+  "red_green": {
+    "object_store_bootstrap": {
+      "red": "The MinIO client attempted to write configuration under a non-writable home directory and the bucket bootstrap Job failed.",
+      "green": "The Job uses an explicit /tmp/.mc configuration directory, completed successfully, and created the Loki bucket without storing credentials in Git."
+    },
+    "collector_scope": {
+      "red": "Forwarding all application namespaces overloaded the one-seat demo Loki topology and collectors returned 400, 429, 500, and 502 responses with dropped batches.",
+      "green": "The ClusterLogForwarder now selects only launchpad-* namespaces; collector rollout completed and the participant marker was ingested."
+    },
+    "participant_isolation": {
+      "red": "The normal namespace edit role could not query application logs and returned 403.",
+      "green": "A namespace RoleBinding to cluster-logging-application-view permits the participant's own log query while a query for openshift-logging remains 403."
+    }
+  },
+  "test_strategy": {
+    "TDD": "Manifest and participant RBAC contracts cover supported operator channels, secret boundaries, forwarding scope, role creation, and idempotent removal.",
+    "EDD": "This immutable artifact records operator versions, custom-resource conditions, pod and storage inventory, RED/GREEN failures, functional marker ingestion, and cross-namespace denial.",
+    "CDD": "The AgentOps required-capability contract, Arena cluster registry, Launchpad participant RoleBindings, ClusterLogForwarder, Loki gateway, and Console UI plugin use one declared logging interface.",
+    "BDD": "Given an entitled AgentOps participant, when its workload emits a marker, then it can query that marker in its assigned namespace and cannot query another namespace.",
+    "CBT": "Operators, object-store bootstrap, LokiStack, log forwarding, Console plugin, participant authorization, ingestion, and isolation were verified independently before Launchpad integration."
+  },
+  "scale_blockers": [
+    "replace pilot MinIO with durable supported S3-compatible object storage",
+    "provide dynamic block storage appropriate for production Loki components",
+    "replace 1x.demo with a measured production Loki sizing profile",
+    "load-test ingestion and queries at five and twenty-five AgentOps seats"
+  ],
+  "cleanup": {
+    "status": "pass",
+    "namespace": "launchpad-cert-logging-0905",
+    "namespace_removed": true,
+    "observed_under_seconds": 45,
+    "shared_logging_retained": true
+  },
+  "remaining_release_gates": [
+    "Launchpad-created AgentOps order, runtime Secret, workload Application, Showroom, participant entitlement, full journey, and reclaim",
+    "trusted external TLS for participant services",
+    "service-ca TLS for the per-seat RHOAI pipeline database",
+    "PostgreSQL backend for shared MLflow before scale",
+    "durable production logging storage before scale",
+    "five-seat AgentOps workshop",
+    "twenty-five-seat AgentOps workshop",
+    "additional Arena pod capacity",
+    "exact staggered September event trio"
+  ],
+  "security": {
+    "secrets_included": false,
+    "credential_values_logged": false,
+    "cross_namespace_access_denied": true,
+    "temporary_authorization_namespace_removed": true
+  }
+}

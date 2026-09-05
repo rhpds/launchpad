@@ -21,10 +21,12 @@ matrix is independently GREEN-live by Sep 15.
 
 As of September 5, the direct AgentOps component is GREEN for shared Nomic
 embeddings, MLflow workspace isolation and tracing, DSPA, the application
-journey, and automatic zero-residue reclaim. It remains RED as a Launchpad lab
-because order creation, Showroom, entitlement, participant routes, logging,
-and trusted TLS have not passed together. Shared MLflow must move from SQLite
-to PostgreSQL and the pipeline database must use service-ca TLS before scale.
+journey, automatic zero-residue reclaim, and one-seat OpenShift Logging
+ingestion/isolation. It remains RED as a Launchpad lab because order creation,
+Showroom, entitlement, participant routes, the full journey, and trusted TLS
+have not passed together. Shared MLflow must move from SQLite to PostgreSQL,
+the pipeline database must use service-ca TLS, and Logging needs durable
+object/block storage and production sizing before scale.
 The measured event envelope is 525 participant pods, so the current two-worker
 500-pod ceiling cannot host the exact trio even from an empty starting point.
 

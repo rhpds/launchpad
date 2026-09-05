@@ -145,6 +145,7 @@ class OpenShiftProvisioningAdapter:
                 "workshop_id": request.metadata.get("workshop_id", request.request_id),
                 "seat_id": request.metadata.get("seat_id", request.request_id),
                 "participant_id": request.metadata.get("participant_id", request.requester_id),
+                "required_capabilities": list(catalog_item.required_capabilities),
                 "showroom_content_repo_url": meta.get(
                     "showroom_content_repo_url",
                     os.environ.get(
@@ -245,7 +246,12 @@ class OpenShiftProvisioningAdapter:
             },
         )
         self._grant_image_pull(demo_namespace)
-        self._grant_participant_access(demo_namespace, str(res.get("participant_id", "")))
+        self._grant_participant_access(
+            demo_namespace,
+            str(res.get("participant_id", "")),
+            grant_application_logs="openshift_logging"
+            in set(res.get("required_capabilities", [])),
+        )
         # The official Showroom chart clones Git content and builds Antora at
         # startup. Keep the restricted egress policy for ordinary demos, but
         # do not attach it to guided Showroom namespaces.
@@ -850,7 +856,12 @@ http {{
             if exc.status != 409:
                 pass
 
-    def _grant_participant_access(self, namespace: str, participant_id: str) -> None:
+    def _grant_participant_access(
+        self,
+        namespace: str,
+        participant_id: str,
+        grant_application_logs: bool = False,
+    ) -> None:
         if not participant_id:
             return
         body = client.V1RoleBinding(
@@ -874,6 +885,38 @@ http {{
             if exc.status != 409:
                 raise ValueError(
                     f"Failed to grant workshop access to {participant_id}: {exc.reason}"
+                ) from exc
+
+        if not grant_application_logs:
+            return
+        log_binding = client.V1RoleBinding(
+            metadata=client.V1ObjectMeta(
+                name="launchpad-participant-application-logs",
+                namespace=namespace,
+            ),
+            role_ref=client.V1RoleRef(
+                api_group="rbac.authorization.k8s.io",
+                kind="ClusterRole",
+                name="cluster-logging-application-view",
+            ),
+            subjects=[
+                client.RbacV1Subject(
+                    api_group="rbac.authorization.k8s.io",
+                    kind="User",
+                    name=participant_id,
+                )
+            ],
+        )
+        try:
+            self._rbac_v1.create_namespaced_role_binding(
+                namespace=namespace,
+                body=log_binding,
+            )
+        except ApiException as exc:
+            if exc.status != 409:
+                raise ValueError(
+                    f"Failed to grant application log access to {participant_id}: "
+                    f"{exc.reason}"
                 ) from exc
 
     def _create_demo_secrets(self, namespace: str, session_maas_key: str = "") -> None:

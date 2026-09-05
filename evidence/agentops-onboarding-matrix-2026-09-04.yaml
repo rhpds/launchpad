@@ -7,7 +7,7 @@ status: blocked
 source_pins:
   showroom: 0d697f3ddd1e5008dfd9bb32c3e3bdd0398383a9
   upstream_showroom: f1881c61de55ebf5640c27e76469f4efe458edaf
-  launchpad_seat_chart: 6936ee6b9d64df8ccda8902279b8cc3a1e4c0545
+  launchpad_seat_chart: 6fc278ec8200802a5dd536a1e76656bd160d697e
   agnosticv: 48fc6eebedb295bddf1b915a230e5e90f89db0af
   automation: 6ea100531ac869fa66abe69ae223d6b56dbce9a2
   application: 1e50e51c334c1b6ed854d81a3f28fd324792f481
@@ -137,7 +137,7 @@ matrix:
     red: Local initialization exceeded 14 minutes and the generation endpoint returned 404
     green_local: pass-manifest-registry-and-runtime-injection-contracts
     green_integration: pass-live-backend-injection-health-cache-restart-and-25-request-burst
-    green_live: partial-shared-endpoint-ready-kb-ingestion-not-run
+    green_live: pass-41-of-41-chunks-embedded-and-retrieved
     evidence:
       - evidence/agentops-one-seat-live-2026-09-04.json
       - evidence/agentops-shared-embedding-live-2026-09-05.json
@@ -147,10 +147,11 @@ matrix:
     requirement: Shared MLflow tracking server records participant traces
     red: Arena exposes an MLflow UI component but no tracking server service or participant route
     green_local: not-applicable
-    green_integration: not-run
-    green_live: fail
+    green_integration: pass-workspace-rbac-and-trace
+    green_live: pass-one-seven-span-trace-and-cross-workspace-denial
     evidence:
       - evidence/agentops-one-seat-live-2026-09-04.json
+      - evidence/agentops-mlflow-live-2026-09-05.json
   - id: LIVE-AGENTOPS-016
     requirement: Participant workload routes present a client-trusted TLS chain
     red: External client rejected the Arena ingress certificate chain
@@ -159,21 +160,40 @@ matrix:
     green_live: fail
     evidence:
       - evidence/agentops-one-seat-live-2026-09-04.json
+  - id: LIVE-AGENTOPS-017
+    requirement: One-seat OpenShift Logging ingestion and participant namespace isolation
+    red: Arena had no Logging/Loki stack and namespace edit alone could not query application logs
+    green_local: pass-manifest-secret-boundary-and-rbac-contracts
+    green_integration: pass-supported-operators-loki-forwarder-and-console-plugin
+    green_live: pass-own-marker-200-cross-namespace-403-one-seat-pilot
+    evidence:
+      - backend/tests/test_arena_agentops_logging.py
+      - backend/tests/test_public_rbac.py
+      - evidence/agentops-logging-live-2026-09-05.json
+  - id: LIVE-AGENTOPS-018
+    requirement: Launchpad-created order completes all participant tabs and exact reclaim
+    red: Direct component proofs do not create the Launchpad order boundary
+    green_local: pass-provisioning-and-rbac-contracts
+    green_integration: not-run
+    green_live: blocked
+    evidence:
+      - evidence/agentops-mlflow-live-2026-09-05.json
+      - evidence/agentops-logging-live-2026-09-05.json
 
 rubric:
   source_and_contract: {earned: 15, possible: 15}
   secret_boundary: {earned: 15, possible: 15}
-  namespace_and_rbac_isolation: {earned: 10, possible: 15}
-  shared_service_readiness: {earned: 8, possible: 15}
+  namespace_and_rbac_isolation: {earned: 13, possible: 15}
+  shared_service_readiness: {earned: 13, possible: 15}
   participant_tabs_and_journey: {earned: 10, possible: 15}
   cleanup_and_repeatability: {earned: 10, possible: 10}
   five_seat_certification: {earned: 0, possible: 5}
   twenty_five_seat_certification: {earned: 0, possible: 10}
-  total: {earned: 68, possible: 100}
+  total: {earned: 76, possible: 100}
 
 decision: >-
   Keep the catalog item draft. Source intake is valid, but the AgentOps
-  experience is not orderable until AgentOps ingestion uses the now-live
-  shared embedding endpoint and the remaining shared services, protected
-  participant routes, adapted eight-tab journey, and complete reclaim are
-  GREEN-live.
+  experience is not orderable until one Launchpad-created order proves the
+  protected participant routes, adapted eight-tab journey, and complete
+  reclaim. The one-seat Logging pilot does not clear the durable storage and
+  production sizing requirements for five or twenty-five seats.

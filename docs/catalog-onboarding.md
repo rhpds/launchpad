@@ -169,7 +169,12 @@ The repository now contains roughly 34 MiB of instructional images. The
 adapted playbook uses the pinned PatternFly 6 Showroom theme; content delivery
 therefore uses the same immutable Git-first path as the other Launchpad labs.
 
-The item stays `gitops_ready: false`. A one-seat deployment is blocked until
-participant-protected routes are wired and Arena provides the expected MLflow
-and Logging/Loki experience. Only then can the adapted eight-tab participant
-journey and zero-residue reclaim be certified.
+The namespace-scoped workload is now `gitops_ready: true`, while the catalog
+item remains `draft` and capped at one seat. Arena now provides a functional
+shared MLflow service and a supported OpenShift Logging 6.6 one-seat pilot.
+The participant can query application logs in the assigned namespace and is
+denied access to another namespace. The next gate is a Launchpad-created order
+that proves the runtime Secret, workload Application, protected routes,
+Showroom, complete participant journey, and zero-residue reclaim together.
+Five- and 25-seat promotion also require durable S3-compatible object storage,
+dynamic block storage, and a production-sized Loki topology.
