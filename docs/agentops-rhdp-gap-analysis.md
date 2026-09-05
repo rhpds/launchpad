@@ -10,7 +10,8 @@ repeatable 5- and 25-seat workshops on Arena.
 | Layer | Repository and revision | Purpose |
 |---|---|---|
 | Catalog orchestration | private `rhpds/agnosticv`, `agd_v2/agentops-intel`, reviewed at `48fc6eebedb295bddf1b915a230e5e90f89db0af` | RHDP variables, workload order, access, and Showroom tabs |
-| Showroom | `rhpds/agentops-intel-showroom` at `f1881c61de55ebf5640c27e76469f4efe458edaf` | Antora participant journey |
+| Launchpad Showroom | `rhpds/launchpad`, `content-agentops-observability`, at `0d697f3ddd1e5008dfd9bb32c3e3bdd0398383a9` | Adapted Antora participant journey |
+| Upstream Showroom | `rhpds/agentops-intel-showroom` at `f1881c61de55ebf5640c27e76469f4efe458edaf` | Immutable content and screenshot provenance |
 | Launchpad seat chart | `rhpds/launchpad`, `deploy/workloads/agentops-seat`, at `2fcf40b74387046b657e0050513144afead09892` | Safe namespace-scoped deployment source |
 | GitOps automation | `rhpds/agentops-in-prod-automation` at `6ea100531ac869fa66abe69ae223d6b56dbce9a2` | Reviewed RHDP bootstrap provenance; not deployed by Launchpad |
 | Application | `rh-ai-quickstart/multi-agent-loan-origination` at `1e50e51c334c1b6ed854d81a3f28fd324792f481` | Mortgage AI application source and base chart |
@@ -115,9 +116,10 @@ cluster services remain intact.
 ## Certification order
 
 1. Confirm shared Arena services and their routes/RBAC.
-2. Adapt the Showroom to Launchpad identity, URLs, and
-   `granite-3.2-8b-tools`, then protect all participant routes.
-3. Complete one seat across all eight tabs, including traces, metrics, logs,
+2. Protect all participant workload and shared-service routes through the
+   entitlement gateway.
+3. Complete one seat with the adapted Showroom across all eight tabs,
+   including traces, metrics, logs,
    pipelines, access isolation, and zero-residue reclaim.
 4. Certify five seats with concurrent participant use.
 5. Certify 25 seats with staggered provisioning, concurrent participant use,
@@ -148,8 +150,6 @@ The live check and render/dry-run gates established the remaining blockers:
   contract;
 - the new per-seat Grafana chart has not yet been live certified;
 - OpenShift Logging/Loki is not installed;
-- the catalog now selects `granite-3.2-8b-tools`, but the Showroom content still
-  documents `qwen3-14b`, `wksp-user1`, and RHDP password authentication; and
 - direct Mortgage AI and Grafana Routes are not yet protected by the
   participant entitlement gateway; and
 - the `launchpad-arena` Argo CD Application is Healthy but OutOfSync at
@@ -167,8 +167,16 @@ can create namespaced `ServiceMonitor` and DSPA resources and remains unable to
 create cluster roles. This clears the chart's discovered authorization gap but
 does not substitute for a real one-seat deployment and functional journey.
 
+The adapted Showroom was added to this repository at
+`0d697f3ddd1e5008dfd9bb32c3e3bdd0398383a9`. Its Antora build and source
+contract pass with no warnings. It uses Launchpad SSO and the generated seat
+namespace, the `granite-3.2-8b-tools` model contract, immutable application and
+pipeline references, and chart-aligned Secret, Grafana, and health-check
+instructions. The original upstream commit remains recorded in
+`content-agentops-observability/UPSTREAM.md`.
+
 The sanitized live inventory is captured in
 `evidence/agentops-arena-prerequisites-2026-09-04.json`; the chart and permission
 evidence is captured in `evidence/agentops-seat-overlay-2026-09-04.json`. The
-catalog remains draft until shared services, content adaptation, route
-authorization, and the complete one-seat journey are GREEN-live.
+catalog remains draft until shared services, route authorization, and the
+complete one-seat journey are GREEN-live.

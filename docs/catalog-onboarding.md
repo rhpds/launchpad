@@ -107,7 +107,10 @@ The detailed RHDP topology and Launchpad adaptation decisions are recorded in
 
 `agentops-observability` is registered as a draft candidate from:
 
-- Showroom: `rhpds/agentops-intel-showroom` at
+- Launchpad Showroom: `rhpds/launchpad`,
+  `content-agentops-observability`, at
+  `0d697f3ddd1e5008dfd9bb32c3e3bdd0398383a9`;
+- upstream Showroom provenance: `rhpds/agentops-intel-showroom` at
   `f1881c61de55ebf5640c27e76469f4efe458edaf`;
 - Launchpad seat chart: `rhpds/launchpad`, `deploy/workloads/agentops-seat`, at
   `2fcf40b74387046b657e0050513144afead09892`;
@@ -127,10 +130,16 @@ The deployable source is the Launchpad-owned namespace-scoped seat chart at
 `2fcf40b74387046b657e0050513144afead09892`. The application repository remains
 recorded as transitive source provenance.
 
-Its source and Antora build pass. It is not orderable because the Showroom
-expects a pre-provisioned mortgage application, MLflow, Grafana, OpenShift
-Logging, user workload monitoring, OpenShift AI workbenches/pipelines, a model,
-and eight environment tabs.
+Its source and Antora build pass. The Launchpad-owned component replaces the
+fixed RHDP username/password and `wksp-user1` namespace with participant SSO
+and generated seat values, pins the PatternFly 6 UI and application sources,
+and describes the Arena `granite-3.2-8b-tools` target. The upstream screenshots
+and instructional flow remain attributed at their immutable revision.
+
+It is not orderable because the complete live experience still requires the
+pre-provisioned mortgage application, shared MLflow, per-seat Grafana,
+OpenShift Logging, user workload monitoring, OpenShift AI workbenches and
+pipelines, and eight authorized environment tabs.
 
 The RHDP automation is a workshop-scoped app-of-apps. It installs cluster-global
 Applications named `mlflow`, `logging`, `cluster-monitoring`, `image-puller`,
@@ -156,13 +165,11 @@ dry run accepted all 21 rendered resources. The least-privilege rule in
 remote Argo service account can create namespaced `ServiceMonitor` and DSPA
 resources but cannot create cluster roles.
 
-The source contains roughly 34 MiB of instructional images and references a
-mutable `latest` Showroom theme, so content delivery and theme pinning are also
-explicit activation gates rather than hidden per-seat download costs.
+The repository now contains roughly 34 MiB of instructional images. The
+adapted playbook uses the pinned PatternFly 6 Showroom theme; content delivery
+therefore uses the same immutable Git-first path as the other Launchpad labs.
 
 The item stays `gitops_ready: false`. A one-seat deployment is blocked until
-participant-protected routes are wired, the Showroom is adapted from its
-hard-coded `wksp-user1`/password and `qwen3-14b`
-assumptions to Launchpad identity and `granite-3.2-8b-tools`, and Arena provides
-the expected MLflow and Logging/Loki experience. Only then can the eight-tab
-participant journey and zero-residue reclaim be certified.
+participant-protected routes are wired and Arena provides the expected MLflow
+and Logging/Loki experience. Only then can the adapted eight-tab participant
+journey and zero-residue reclaim be certified.

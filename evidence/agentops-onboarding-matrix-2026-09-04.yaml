@@ -5,7 +5,8 @@ release_threshold: 100
 status: blocked
 
 source_pins:
-  showroom: f1881c61de55ebf5640c27e76469f4efe458edaf
+  showroom: 0d697f3ddd1e5008dfd9bb32c3e3bdd0398383a9
+  upstream_showroom: f1881c61de55ebf5640c27e76469f4efe458edaf
   launchpad_seat_chart: 2fcf40b74387046b657e0050513144afead09892
   agnosticv: 48fc6eebedb295bddf1b915a230e5e90f89db0af
   automation: 6ea100531ac869fa66abe69ae223d6b56dbce9a2
@@ -100,17 +101,28 @@ matrix:
       - backend/tests/test_agentops_seat_chart.py
       - deploy/multicluster/arena-argocd-rbac.yaml
       - evidence/agentops-seat-overlay-2026-09-04.json
+  - id: TDD-AGENTOPS-011
+    requirement: Repository-owned AgentOps Showroom uses Launchpad identity, namespace, model, and immutable sources
+    red: Three content contract tests failed because the native component and provenance record did not exist
+    green_local: pass-19-content-tests-and-antora-build
+    green_integration: pass-remote-fetch-build-no-warnings
+    green_live: not-run
+    evidence:
+      - backend/tests/test_showroom_content_package.py
+      - content-agentops-observability/UPSTREAM.md
+      - site-agentops-observability.yml
+      - test-receipts/catalog-onboarding-agentops-observability.json
 
 rubric:
   source_and_contract: {earned: 15, possible: 15}
   secret_boundary: {earned: 15, possible: 15}
   namespace_and_rbac_isolation: {earned: 10, possible: 15}
   shared_service_readiness: {earned: 5, possible: 15}
-  participant_tabs_and_journey: {earned: 5, possible: 15}
+  participant_tabs_and_journey: {earned: 8, possible: 15}
   cleanup_and_repeatability: {earned: 7, possible: 10}
   five_seat_certification: {earned: 0, possible: 5}
   twenty_five_seat_certification: {earned: 0, possible: 10}
-  total: {earned: 57, possible: 100}
+  total: {earned: 60, possible: 100}
 
 decision: >-
   Keep the catalog item draft. Source intake is valid, but the AgentOps

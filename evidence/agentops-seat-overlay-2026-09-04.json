@@ -39,7 +39,6 @@
   },
   "decision": "blocked",
   "remaining_gates": [
-    "Adapt Showroom variables and model narrative for Launchpad and Granite",
     "Protect Mortgage AI and Grafana routes with participant entitlement",
     "Provide and certify the expected MLflow and Logging/Loki experience",
     "Complete one-seat functional, isolation, and zero-residue reclaim journey"

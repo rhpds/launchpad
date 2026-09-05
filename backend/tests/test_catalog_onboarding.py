@@ -27,9 +27,14 @@ def test_agentops_is_registered_as_a_fail_closed_draft():
     assert catalog["metadata"]["certification_stage"] == "implementation"
     assert catalog["metadata"]["max_workshop_seats"] == 1
     assert catalog["metadata"]["activation_blockers"]
-    assert catalog["metadata"]["showroom_content_ref"] == (
-        "f1881c61de55ebf5640c27e76469f4efe458edaf"
+    assert catalog["metadata"]["showroom_content_repo_url"] == (
+        "https://github.com/rhpds/launchpad.git"
     )
+    assert catalog["metadata"]["showroom_content_ref"] == (
+        "0d697f3ddd1e5008dfd9bb32c3e3bdd0398383a9"
+    )
+    assert catalog["metadata"]["showroom_content_playbook"] == ("site-agentops-observability.yml")
+    assert catalog["metadata"]["showroom_content_start_path"] == ("content-agentops-observability")
     assert catalog["metadata"]["workload_repo"] == "https://github.com/rhpds/launchpad.git"
     assert catalog["metadata"]["workload_revision"] == ("2fcf40b74387046b657e0050513144afead09892")
     assert catalog["metadata"]["workload_deploy_path"] == "deploy/workloads/agentops-seat"
@@ -40,6 +45,9 @@ def test_agentops_is_registered_as_a_fail_closed_draft():
     assert catalog["metadata"]["workload_runtime_secret_name"] == "agentops-runtime"
     assert catalog["metadata"]["source_references"]["automation"]["revision"] == (
         "6ea100531ac869fa66abe69ae223d6b56dbce9a2"
+    )
+    assert catalog["metadata"]["source_references"]["upstream_showroom"]["revision"] == (
+        "f1881c61de55ebf5640c27e76469f4efe458edaf"
     )
     assert catalog["metadata"]["source_references"]["agnosticv"]["path"] == (
         "agd_v2/agentops-intel"
@@ -92,6 +100,9 @@ def test_agentops_intake_captures_the_large_lab_runtime_contract():
     assert runtime["workload"]["identity_value_path"] == "identity"
     assert runtime["workload"]["runtime_secret_value_path"] == "runtime.existingSecret"
     assert certification["promotion_sequence"] == [1, 5, 25]
+    blockers = "\n".join(certification["activation_blockers"])
+    assert "mutable latest UI bundle" not in blockers
+    assert "instead of its original qwen3-14b" not in blockers
 
 
 def test_validator_accepts_complete_local_source_contract(tmp_path: Path):

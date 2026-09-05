@@ -16,16 +16,20 @@ catalog:
 
 sources:
   showroom:
-    repo_url: "https://github.com/rhpds/agentops-intel-showroom.git"
-    revision: "f1881c61de55ebf5640c27e76469f4efe458edaf"
-    playbook: site.yml
-    start_path: content
+    repo_url: "https://github.com/rhpds/launchpad.git"
+    revision: "0d697f3ddd1e5008dfd9bb32c3e3bdd0398383a9"
+    playbook: site-agentops-observability.yml
+    start_path: content-agentops-observability
   workload:
     repo_url: "https://github.com/rhpds/launchpad.git"
     revision: "2fcf40b74387046b657e0050513144afead09892"
     deploy_path: deploy/workloads/agentops-seat
 
 references:
+  upstream_showroom:
+    repo_url: "https://github.com/rhpds/agentops-intel-showroom.git"
+    revision: "f1881c61de55ebf5640c27e76469f4efe458edaf"
+    path: content
   agnosticv:
     repo_url: "https://github.com/rhpds/agnosticv.git"
     revision: "48fc6eebedb295bddf1b915a230e5e90f89db0af"
@@ -156,14 +160,10 @@ certification:
     - 25
   activation_blockers:
     - >-
-      Choose the production content-delivery path, retain immutable source
-      provenance, and replace the Showroom's mutable latest UI bundle with a
-      pinned release before mirroring or adapting content into Launchpad.
-    - >-
-      Server-dry-run and live-certify the pinned Launchpad seat chart. The
-      chart replaces the RHDP app-of-apps and renders no cluster-scoped
-      resources, but its OpenShift security-context and image compatibility
-      have not yet been proven on Arena.
+      Live-certify the pinned Launchpad seat chart. Arena accepted all 21
+      resources by server-side dry run and the remote Argo identity now has
+      the required namespaced permissions, but image and runtime compatibility
+      have not yet been proven with a real seat.
     - >-
       Prove the generated runtime Secret, retry preservation, model-key
       revocation, and zero-residue reclaim live. Unit tests confirm that no
@@ -173,17 +173,15 @@ certification:
       Terminal, shared MLflow, per-seat Mortgage AI, per-seat Grafana, shared
       RHOAI, MLflow Docs, and RHOAI Docs.
     - >-
-      Reconcile the RHDP user/common-password instructions with Launchpad
-      participant SSO and namespace-scoped RBAC; review and reduce the
-      upstream MLflow and Grafana cluster-scoped bindings.
+      Protect every participant workload and shared-service route through the
+      Launchpad entitlement gateway and prove cross-seat and cross-tenant
+      denial. The adapted Showroom already uses participant SSO and the
+      generated seat namespace.
     - >-
       Install and certify an Arena participant route for shared MLflow,
       per-seat Grafana, and OpenShift Logging/Loki. OpenShift AI 3.5, a Ready
       DataScienceCluster, user workload monitoring, and Data Science Pipelines
       were confirmed live on 2026-09-04.
-    - >-
-      Update and certify the Showroom journey for Arena's
-      granite-3.2-8b-tools route instead of its original qwen3-14b statements.
     - >-
       Complete one-seat functional certification, including app, trace,
       metrics, logs, evaluation, Showroom, access isolation, and full reclaim.
