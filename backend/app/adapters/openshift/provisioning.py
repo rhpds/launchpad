@@ -108,7 +108,7 @@ class OpenShiftProvisioningAdapter:
         suffix = re.sub(r"[^a-z0-9]", "", seat_ref.lower())[:6]
         namespace = self._demo_namespace(
             request.tenant_id,
-            catalog_item.catalog_item_id,
+            str(meta.get("namespace_slug") or catalog_item.catalog_item_id),
             suffix or uuid.uuid4().hex[:6],
         )
 

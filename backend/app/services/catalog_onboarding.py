@@ -78,6 +78,7 @@ def build_catalog_item(intake: dict[str, Any]) -> dict[str, Any]:
             "activation_blockers": certification["activation_blockers"],
             "showroom_journey": catalog["catalog_item_id"],
             "showroom_title": catalog["display_name"],
+            "namespace_slug": runtime.get("namespace_slug", catalog["catalog_item_id"]),
             "showroom_content_repo_url": showroom["repo_url"],
             "showroom_content_ref": showroom["revision"],
             "showroom_content_playbook": showroom["playbook"],

@@ -402,6 +402,30 @@ def test_create_plan_persists_exact_namespace_used_for_the_workshop_seat():
     assert plan.required_resources["tenant_id"] == "smoke-test-tenant"
 
 
+def test_catalog_namespace_slug_leaves_room_for_operator_generated_routes():
+    adapter = object.__new__(OpenShiftProvisioningAdapter)
+    adapter._overlay_path = "/tmp/demo"
+    base_item = _guided_item()
+    item = base_item.model_copy(
+        update={
+            "catalog_item_id": "agentops-observability",
+            "metadata": {**base_item.metadata, "namespace_slug": "agentops"},
+        }
+    )
+    request = LabRequest(
+        tenant_id="smoke-test-tenant",
+        requester_id="participant-1",
+        catalog_item_id=item.catalog_item_id,
+        requested_mode=CatalogCategory.GUIDED_BUILD,
+        metadata={"seat_id": "8b8f64ab-3bbf-432f-946c-3d375e21a483"},
+    )
+
+    plan = adapter.create_plan(request, item)
+
+    assert "-agentops-" in plan.target_namespace
+    assert len(f"ds-pipeline-dspa-{plan.target_namespace}") <= 63
+
+
 def test_gateway_pvc_uses_configured_storage_class():
     manifest = """apiVersion: v1
 kind: PersistentVolumeClaim

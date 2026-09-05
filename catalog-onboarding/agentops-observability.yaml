@@ -44,6 +44,7 @@ references:
     path: deploy/helm/mortgage-ai
 
 runtime:
+  namespace_slug: agentops
   deployment_type: helm
   deployment_scope: seat
   provisioner_refs:
