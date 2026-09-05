@@ -2,10 +2,15 @@
   "schema": "launchpad.redhat.com/event-readiness/v1",
   "evidence_id": "READINESS-SEPTEMBER-17-THREE-WORKSHOPS-20260905",
   "generated_at": "2026-09-05T05:34:12Z",
-  "updated_at": "2026-09-05T11:31:06Z",
+  "updated_at": "2026-09-05T14:53:47Z",
   "source_revision_before_readiness_contract": "cf28c65",
   "event_date": "2026-09-17",
-  "cluster_id": "arena",
+  "deployment_scope": "fleet",
+  "candidate_cluster_targets": {
+    "agentops-observability": "arena",
+    "intel-llm-cpu-serving": "oberon",
+    "intel-xeon6-agent-201": "brutus"
+  },
   "provisioning_mode": "staggered",
   "concurrent_participant_seats": 75,
   "public_access_certified": false,
@@ -17,8 +22,9 @@
       "catalog_item_id": "agentops-observability",
       "seat_count": 25,
       "release_status": "RED",
-      "current_certification_stage": "one-seat-internal",
+      "current_certification_stage": "five-seat-red-live",
       "current_catalog_limit": 1,
+      "candidate_cluster_id": "arena",
       "cpu_millicores": 62500,
       "memory_mib": 179200,
       "pod_slots": 375,
@@ -32,6 +38,7 @@
       "release_status": "GREEN-live-25",
       "current_certification_stage": "twenty-five-seat",
       "current_catalog_limit": 25,
+      "candidate_cluster_id": "oberon",
       "cpu_millicores": 16625,
       "memory_mib": 37200,
       "pod_slots": 50,
@@ -44,6 +51,7 @@
       "release_status": "GREEN-live-25",
       "current_certification_stage": "twenty-five-seat",
       "current_catalog_limit": 25,
+      "candidate_cluster_id": "brutus",
       "cpu_millicores": 10375,
       "memory_mib": 22800,
       "pod_slots": 100,
@@ -75,16 +83,18 @@
     "one clean Launchpad-created AgentOps pipeline with verified MariaDB service-ca TLS 1.3, current-generation DSPA readiness, stable Argo reconciliation, and zero-residue reclaim"
   ],
   "remaining_release_gates": [
-    "agentops-five-seat-prerequisites",
+    "agentops-topology-and-cleanup-remediation",
     "agentops-five-seat",
     "agentops-twenty-five-seat",
+    "brutus-onboarding-and-twenty-five-seat-certification",
+    "oberon-reenable-and-twenty-five-seat-recertification",
     "agentops-public-code-access",
     "exact-event-trio-first-run",
     "exact-event-trio-repeat-run",
     "browser-and-operator-rehearsal",
     "event-day-capacity-preflight"
   ],
-  "next_gate": "agentops-five-seat-prerequisites",
+  "next_gate": "fleet-remediation-prerequisites",
   "capacity_status": {
     "declared_reservation_calculated": true,
     "current_arena_free_capacity_measured": true,
@@ -109,12 +119,41 @@
   "latest_agentops_component_evidence": "evidence/agentops-launchpad-one-seat-2026-09-05.json",
   "latest_agentops_shared_service_evidence": "evidence/agentops-mlflow-postgres-live-2026-09-05.json",
   "latest_agentops_pipeline_tls_evidence": "evidence/agentops-pipeline-database-tls-live-2026-09-05.json",
+  "latest_agentops_five_seat_evidence": "evidence/agentops-five-seat-red-live-build77-2026-09-05.json",
+  "latest_fleet_snapshot": {
+    "observed_at": "2026-09-05T14:53:47Z",
+    "twenty_percent_pod_reserve": true,
+    "clusters": {
+      "arena": {
+        "schedulable_pod_slots": 500,
+        "active_worker_pods": 220,
+        "additional_slots_after_reserve": 180,
+        "registered": true
+      },
+      "brutus": {
+        "schedulable_pod_slots": 250,
+        "active_worker_pods": 109,
+        "additional_slots_after_reserve": 91,
+        "registered": false
+      },
+      "oberon": {
+        "schedulable_pod_slots": 500,
+        "active_worker_pods": 359,
+        "additional_slots_after_reserve": 41,
+        "registered": true,
+        "enabled": false
+      }
+    }
+  },
   "critical_agentops_checks": [
     "replace the RHOAI 3.5 podToPodTLS compatibility workaround with upstream-supported encrypted internal pipeline transport before production",
     "durable production-sized OpenShift Logging storage",
     "public-code participant authorization and trusted TLS",
     "five-seat then twenty-five-seat promotion",
-    "additional Arena worker pod capacity"
+    "per-node placement and recent-node-failure circuit breaker",
+    "workshop-shared AgentOps services or additional stable Arena worker capacity",
+    "Brutus onboarding and lightweight-lab certification",
+    "Oberon lightweight-lab re-certification"
   ],
   "release_policy": {
     "rubric_score_required": 100,

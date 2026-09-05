@@ -1,0 +1,103 @@
+{
+  "evidence_id": "EDD-AGENTOPS-FIVE-SEAT-RED-LIVE-BUILD77-20260905",
+  "captured_at": "2026-09-05T14:53:47Z",
+  "result": "RED-live",
+  "cluster": "arena",
+  "catalog_item_id": "agentops-observability",
+  "workshop_id": "1fc1db47-75da-41c5-ab9c-9ed28c0699e9",
+  "deployed_source_commit": "0ea9c7643150d3bf6265fad8ff2e036212477b42",
+  "deployed_backend_digest": "sha256:391e8ae6228aef06d11efd0fcd3da4f485e8cd40b1ad9da52887ff7ace8a80ed",
+  "workload_revision": "322beb64d42f692aa30058812ab7c9ea01245e55",
+  "timeline": {
+    "provisioning_started_at": "2026-09-05T14:26:29Z",
+    "worker_first_became_unready_at": "2026-09-05T14:33:42Z",
+    "reclaim_requested_at": "2026-09-05T14:35:02Z",
+    "workshop_marked_completed_at": "2026-09-05T14:40:16Z",
+    "worker_final_recovery_at": "2026-09-05T14:42:01Z",
+    "zero_residue_verified_at": "2026-09-05T14:53:47Z"
+  },
+  "outcome": {
+    "seats_requested": 5,
+    "persisted_sessions": 4,
+    "seats_ready_before_reclaim": 0,
+    "seat_states_after_reclaim": {
+      "reclaimed": 4,
+      "failed": 1
+    },
+    "promotion_gate_passed": false
+  },
+  "capacity_and_staging": {
+    "corrected_reported_capacity_seats": 10,
+    "first_wave_namespaces": 4,
+    "fifth_namespace_created": false,
+    "fifth_seat_preflight_failure": "required model endpoint was unreachable while the execution worker and cluster network were unstable",
+    "rhgnr1_peak_active_pods": 239,
+    "worker_pod_ceiling": 250,
+    "worker_became_not_ready": true,
+    "postgresql_restarts_before_worker_outage": 0,
+    "post_cleanup_active_pods": {
+      "rhgnr1": 178,
+      "gnr2.fm2aihpcsed.com": 42
+    }
+  },
+  "root_causes": [
+    {
+      "id": "AGENTOPS-5-B77-RED-001",
+      "finding": "Aggregate capacity admitted the workshop, but the scheduler concentrated the first four seats on rhgnr1. The worker stopped posting Ready before reaching its 250-pod ceiling, interrupting API and model connectivity. Placement did not model per-node schedulability, workload distribution, or recent node instability."
+    },
+    {
+      "id": "AGENTOPS-5-B77-RED-002",
+      "finding": "The worker outage interrupted pod termination and Argo hook completion. Normal group reclaim removed all persisted session Applications but could not clear two hook finalizers or four Released NFS PVs without bounded operator cleanup."
+    }
+  ],
+  "red_green_matrix": [
+    {
+      "id": "AGENTOPS-5-POSTGRES",
+      "red": "Build 76 continuously changed PGDATA to mode 0777 and caused PostgreSQL restart loops.",
+      "green_live": "Build 77 removed the continuous permission sidecar; all four first-wave PostgreSQL pods had zero restarts before the worker outage."
+    },
+    {
+      "id": "AGENTOPS-5-RECLAIM-RACE",
+      "red": "Build 76 group reclaim lost failed persisted session links and required four direct session reclaims.",
+      "green_live": "Build 77 relinked and reclaimed all four persisted sessions; no direct session reclaim was required and all eight Argo Applications were removed."
+    },
+    {
+      "id": "AGENTOPS-5-TOPOLOGY",
+      "red_live": "rhgnr1 became NotReady with 239 active pods while four seats were being provisioned; the fifth seat failed closed before resource creation.",
+      "green_local": "pending per-node admission, topology spreading, and recent-node-failure circuit breaker",
+      "green_live": "pending rerun on a remediated execution topology"
+    },
+    {
+      "id": "AGENTOPS-5-CLEANUP",
+      "red_live": "Cleanup exceeded ten minutes and required removal of two orphan hook finalizers plus explicit deletion of four Released PVs.",
+      "green_local": "pending cleanup-controller regression and implementation",
+      "green_live": "pending rerun"
+    }
+  ],
+  "cleanup": {
+    "normal_group_reclaim_relinked_all_persisted_sessions": true,
+    "direct_session_reclaims_required": 0,
+    "force_deleted_stale_pod_records": 18,
+    "orphan_argocd_hook_finalizers_removed": 2,
+    "released_pvs_explicitly_deleted": 4,
+    "remaining_namespaces": 0,
+    "remaining_argocd_applications": 0,
+    "remaining_persistent_volumes": 0,
+    "within_ten_minute_slo": false
+  },
+  "platform_observations": {
+    "arena_authentication_operator_degraded": true,
+    "arena_authentication_degradation_reason": "OpenShift could not read the launchpad-public Keycloak discovery URL because it returned HTTP 503.",
+    "caused_agentops_scale_failure": false
+  },
+  "test_evidence": {
+    "applicable_regression_tests_passed": 989,
+    "local_runtime_tests_deselected": 13
+  },
+  "release_decision": {
+    "catalog_max_workshop_seats": 1,
+    "five_seat_gate": "not certified",
+    "next_action": "Do not repeat the current per-seat topology on Arena. Add per-node admission and topology spreading, automate interrupted-hook and Released-PV cleanup, and either introduce workshop-shared AgentOps services or add stable worker capacity before rerunning five seats."
+  },
+  "contains_plaintext_credentials": false
+}

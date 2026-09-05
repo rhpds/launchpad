@@ -1,4 +1,4 @@
-"""Contract for the September 17 Arena workshop release gate."""
+"""Contract for the September 17 fleet workshop release gate."""
 
 import json
 from pathlib import Path
@@ -13,7 +13,12 @@ def test_event_readiness_manifest_keeps_the_exact_workshop_target_and_budget():
 
     assert readiness["schema"] == "launchpad.redhat.com/event-readiness/v1"
     assert readiness["event_date"] == "2026-09-17"
-    assert readiness["cluster_id"] == "arena"
+    assert readiness["deployment_scope"] == "fleet"
+    assert readiness["candidate_cluster_targets"] == {
+        "agentops-observability": "arena",
+        "intel-llm-cpu-serving": "oberon",
+        "intel-xeon6-agent-201": "brutus",
+    }
     assert readiness["provisioning_mode"] == "staggered"
     assert readiness["concurrent_participant_seats"] == 75
 
@@ -47,10 +52,16 @@ def test_event_readiness_manifest_keeps_the_exact_workshop_target_and_budget():
     )
     assert readiness["public_access_certified"] is False
     assert readiness["overall_status"] == "RED"
-    assert readiness["next_gate"] == "agentops-five-seat-prerequisites"
+    assert readiness["next_gate"] == "fleet-remediation-prerequisites"
     assert readiness["latest_agentops_component_evidence"] == (
         "evidence/agentops-launchpad-one-seat-2026-09-05.json"
     )
+    assert readiness["latest_agentops_five_seat_evidence"] == (
+        "evidence/agentops-five-seat-red-live-build77-2026-09-05.json"
+    )
+    assert readiness["latest_fleet_snapshot"]["clusters"]["brutus"][
+        "additional_slots_after_reserve"
+    ] == 91
 
 
 def test_event_runbook_names_every_gate_and_does_not_overclaim_capacity():

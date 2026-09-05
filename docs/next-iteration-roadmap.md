@@ -6,7 +6,7 @@ Showroom-scale release gate. They are not blockers for completing the present
 
 ## Immediate release gate
 
-The dated release gate is now the September 17 Arena event candidate: 25
+The dated release gate is now the September 17 fleet event candidate: 25
 AgentOps seats, 25 Serve LLMs seats, and 25 Building an AI Agent seats. Orders
 are staggered but all 75 participant environments remain active concurrently.
 The capacity contract, AgentOps 1 -> 5 -> 25 promotion path, exact-trio proof
@@ -28,7 +28,11 @@ have not passed together. Shared MLflow must move from SQLite to PostgreSQL,
 the pipeline database must use service-ca TLS, and Logging needs durable
 object/block storage and production sizing before scale.
 The measured event envelope is 525 participant pods, so the current two-worker
-500-pod ceiling cannot host the exact trio even from an empty starting point.
+500-pod Arena ceiling cannot host the exact trio even from an empty starting
+point. The current candidate path dedicates Arena to a reduced/shared-stack
+AgentOps workshop, onboards Brutus for Building an AI Agent, and re-certifies
+Oberon for Serve LLMs. Both lightweight targets need at least nine additional
+pod slots within the standard 20 percent reserve before their live gates.
 
 ## Pathway 1: provisioning performance
 

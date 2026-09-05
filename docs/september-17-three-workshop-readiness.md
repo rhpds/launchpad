@@ -2,14 +2,15 @@
 
 ## Event outcome
 
-On **September 17, 2026**, Arena must support these three separate workshop
-orders:
+On **September 17, 2026**, the Launchpad execution fleet must support these
+three separate workshop orders. Provisioning remains staggered, but all 75
+participant seats must remain usable concurrently:
 
-| Provision order | Catalog item | Participant seats | Current release state |
-|---|---|---:|---|
-| 1 | `agentops-observability` | 25 | RED: implementation, limited to one seat |
-| 2 | `intel-llm-cpu-serving` | 25 | GREEN-live-25 |
-| 3 | `intel-xeon6-agent-201` | 25 | GREEN-live-25 |
+| Provision order | Catalog item | Participant seats | Current release state | Candidate target |
+|---|---|---:|---|---|
+| 1 | `agentops-observability` | 25 | RED: five-seat Arena gate failed, limited to one seat | Arena after topology reduction/capacity repair |
+| 2 | `intel-llm-cpu-serving` | 25 | GREEN-live-25 on Arena | Oberon after re-certification |
+| 3 | `intel-xeon6-agent-201` | 25 | GREEN-live-25 on Arena | Brutus after onboarding and certification |
 
 Provisioning is deliberately staggered. Request the next workshop only after
 the previous workshop is collectively Ready, but retain all three so 75
@@ -19,6 +20,7 @@ create all 75 seats at the same instant.
 The event provisioning order is **AgentOps first**, Serve LLMs second, and
 Building an AI Agent third. AgentOps has the largest footprint and the longest
 initialization path, so it must fail early enough to preserve recovery time.
+The candidate targets above are a remediation plan, not certified placement.
 
 ## What is already proven
 
@@ -29,9 +31,9 @@ by 75 concurrent participant journeys, and reclaimed with zero residue. The
 run included the exact Serve LLMs and Building an AI Agent catalog items.
 
 That evidence does not include AgentOps. Its third workshop was LLM Tool
-Calling. It also does not certify public access or simultaneous provisioning.
-Therefore the previous run proves the Launchpad orchestration pattern, not the
-September 17 release candidate.
+Calling. It also does not certify public access or the proposed Brutus/Oberon
+placement. Therefore the previous run proves the Launchpad orchestration
+pattern, not the September 17 release candidate.
 
 ## Declared capacity envelope
 
@@ -90,6 +92,43 @@ Scaling down unrelated deployments cannot solve this constraint: even an
 otherwise empty two-worker pool cannot place all 525 declared event pods.
 Running the workshops sequentially also does not meet the
 requirement because all 75 participants must use the labs concurrently.
+
+### Live fleet decision — September 5 after the AgentOps five-seat run
+
+The corrected AgentOps build removed the PostgreSQL restart defect and the
+workshop reclaimer found every persisted session. It still failed live: the
+first four seats concentrated on `rhgnr1`, which stopped posting Ready at about
+239 active pods. The fifth seat then failed closed before namespace creation
+because the required model endpoint was unreachable. Cleanup reached zero
+residue only after bounded removal of stale pod records, two orphan Argo hook
+finalizers, and four Released NFS PVs. The five-seat gate remains RED; see
+`evidence/agentops-five-seat-red-live-build77-2026-09-05.json`.
+
+Current pod-slot snapshots and the standard 20 percent reserve produce this
+candidate fleet assignment:
+
+| Cluster | Schedulable pod slots | Active worker pods | Additional slots after reserve | Candidate event role |
+|---|---:|---:|---:|---|
+| Arena | 500 | 220 after cleanup | 180 | AgentOps only, after redesign or added stable capacity |
+| Brutus | 250 | 109 | 91 | Building an AI Agent; currently nine slots short of its 100-slot peak contract |
+| Oberon | 500 | 359 | 41 | Serve LLMs; currently nine slots short of its 50-slot peak contract |
+
+Brutus is not registered as a Launchpad target and currently lacks the
+AgentOps/RHOAI operator set, but it has ample CPU and memory for a lightweight
+workshop. Oberon is disabled for placement and must be re-certified before it
+hosts event seats. The preferred three-cluster path is therefore:
+
+1. Keep Arena dedicated to AgentOps and reduce the per-seat topology by moving
+   DSPA, pipeline database, MinIO, Grafana, and other safe components to one
+   workshop-scoped shared stack, or add stable worker capacity.
+2. Onboard Brutus and remove at least nine baseline pod slots (or reduce the
+   Building an AI Agent peak contract) before its 1 -> 5 -> 25 certification.
+3. Re-enable Oberon only after removing at least nine baseline pod slots and
+   passing Serve LLMs 1 -> 5 -> 25 plus full reclaim.
+
+No catalog limit or target override changes until those measurements are
+GREEN-live. Placement must include per-node pod, CPU, memory, taint, topology,
+and recent Ready-transition checks; aggregate cluster totals are insufficient.
 
 ## Critical path: AgentOps 1 -> 5 -> 25
 
@@ -175,10 +214,11 @@ storage, and production sizing. Evidence is in
   shared model/embedding latency, DSPA reconciliation, and route stability.
 - Reclaim all seats and require zero residue.
 
-### Gate D: exact September trio
+### Gate D: exact September fleet trio
 
-- Provision AgentOps 25, wait for collective Ready, then provision Serve LLMs
-  25, wait for Ready, then provision Building an AI Agent 25.
+- Provision AgentOps 25 on its certified target, wait for collective Ready,
+  then provision Serve LLMs 25 on its certified target, wait for Ready, then
+  provision Building an AI Agent 25 on its certified target.
 - Keep all 75 seats active and validate all 75 participant journeys in one
   bounded concurrency window.
 - Prove 75 default projects match their assigned seats, 75 own-namespace edit
@@ -229,10 +269,11 @@ not justify silently raising the catalog limit or weakening validation.
 
 ### BDD
 
-Given the exact three event workshops are requested on Arena only after the
-previous order is Ready, when 75 participants concurrently complete their
-assigned lab journeys, then every functional and isolation check succeeds and
-sequential reclaim leaves no managed resource in any event workshop scope.
+Given the exact three event workshops are assigned to their persisted certified
+clusters only after the previous order is Ready, when 75 participants
+concurrently complete their assigned lab journeys, then every functional and
+isolation check succeeds and sequential reclaim leaves no managed resource in
+any event workshop scope on any cluster.
 
 ### EDD and release rubric
 
@@ -258,13 +299,14 @@ Any critical row that is not GREEN-live scores zero and blocks release.
 
 ## Public-access boundary
 
-The internal Arena workshop path is the release baseline. Public access is not
-certified by the existing 3x25 evidence. A temporary quick tunnel and a
+The internal multi-cluster workshop path is the release baseline. Public access
+is not certified by the existing 3x25 evidence. A temporary quick tunnel and a
 changing hostname are not an event-grade dependency. Public participation can
-be added only if the named ingress/tunnel, TLS, login/code claim, resume,
-Showroom, WebSocket terminal, embedded Console, 25-participant burst, expiry,
-and reclaim matrix is independently GREEN-live by Sep 15. Otherwise the event
-must use the certified internal/VPN access path.
+be added only if one stable front door resolves each entitlement through its
+persisted `cluster_ref`; every target independently passes TLS, private-origin
+routing, Keycloak/OIDC, Showroom, WebSocket terminal, Console, 25-participant
+burst, expiry, and reclaim checks by Sep 15. Otherwise the event must use the
+certified internal/VPN access path.
 
 ## Event contingency
 

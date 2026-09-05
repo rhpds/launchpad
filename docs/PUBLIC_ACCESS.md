@@ -67,6 +67,28 @@ Console exposure either needs separately approved exact Console and OAuth
 hostnames or must remain behind the same tested gateway; dynamic seat Routes
 must never be published individually.
 
+### Multi-cluster participant routing
+
+Running seats on Arena, Oberon, and Brutus must not change the participant
+contract: one order URL, one instructor code, one participant identity, and one
+My Lab Access page. The gateway resolves the entitlement to the session's
+immutable `cluster_ref` and proxies Showroom, workspace, and terminal traffic
+to that cluster's private ingress. Raw per-seat Routes remain private.
+
+Each execution cluster must pass its own private DNS, ingress, WebSocket,
+storage, and origin-health checks. Each OpenShift cluster must trust the same
+stable Keycloak issuer, map the same opaque participant username, and create
+RoleBindings only in that participant's assigned namespaces. Console/OAuth
+callbacks must use stable, explicitly approved hosts or a separately certified
+same-origin proxy; a Quick Tunnel hostname cannot satisfy this contract.
+
+Use one account-managed named Cloudflare Tunnel with redundant connectors and
+explicit path/hostname rules, or one stable front door whose private network
+can reach every target ingress. Do not expose multiple unrelated login pages or
+give participants cluster-specific codes. If any target's DNS, TLS, Keycloak,
+Console/OAuth, or external probe fails, public placement on that target fails
+closed while internal placement may remain eligible.
+
 Before implementing this mode, version the public-access contract and add RED
 tests for path isolation, callback generation, multi-order routing, WebSockets,
 cross-order denial, rotation, expiration and cleanup. Do not set a production
