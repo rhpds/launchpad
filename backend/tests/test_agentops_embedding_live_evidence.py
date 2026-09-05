@@ -3,7 +3,6 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[2]
 EVIDENCE = ROOT / "evidence/agentops-shared-embedding-live-2026-09-05.json"
 
