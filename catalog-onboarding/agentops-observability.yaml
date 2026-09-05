@@ -17,7 +17,7 @@ catalog:
 sources:
   showroom:
     repo_url: "https://github.com/rhpds/launchpad.git"
-    revision: "0d697f3ddd1e5008dfd9bb32c3e3bdd0398383a9"
+    revision: "59563b0a77252e8b91077c30c23ab524a8402bce"
     playbook: site-agentops-observability.yml
     start_path: content-agentops-observability
   workload:

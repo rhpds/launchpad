@@ -10,7 +10,7 @@ repeatable 5- and 25-seat workshops on Arena.
 | Layer | Repository and revision | Purpose |
 |---|---|---|
 | Catalog orchestration | private `rhpds/agnosticv`, `agd_v2/agentops-intel`, reviewed at `48fc6eebedb295bddf1b915a230e5e90f89db0af` | RHDP variables, workload order, access, and Showroom tabs |
-| Launchpad Showroom | `rhpds/launchpad`, `content-agentops-observability`, at `0d697f3ddd1e5008dfd9bb32c3e3bdd0398383a9` | Adapted Antora participant journey |
+| Launchpad Showroom | `rhpds/launchpad`, `content-agentops-observability`, at `59563b0a77252e8b91077c30c23ab524a8402bce` | Adapted Antora participant journey |
 | Upstream Showroom | `rhpds/agentops-intel-showroom` at `f1881c61de55ebf5640c27e76469f4efe458edaf` | Immutable content and screenshot provenance |
 | Launchpad seat chart | `rhpds/launchpad`, `deploy/workloads/agentops-seat`, at `63456b6684737a5936c27c9496e45dc2fd1b06c0` | Live-tested namespace-scoped deployment source with DNS-safe Route names |
 | GitOps automation | `rhpds/agentops-in-prod-automation` at `6ea100531ac869fa66abe69ae223d6b56dbce9a2` | Reviewed RHDP bootstrap provenance; not deployed by Launchpad |
@@ -185,7 +185,7 @@ create cluster roles. This clears the chart's discovered authorization gap but
 does not substitute for a real one-seat deployment and functional journey.
 
 The adapted Showroom was added to this repository at
-`0d697f3ddd1e5008dfd9bb32c3e3bdd0398383a9`. Its Antora build and source
+`59563b0a77252e8b91077c30c23ab524a8402bce`. Its Antora build and source
 contract pass with no warnings. It uses Launchpad SSO and the generated seat
 namespace, the `granite-3.2-8b-tools` model contract, immutable application and
 pipeline references, and chart-aligned Secret, Grafana, and health-check

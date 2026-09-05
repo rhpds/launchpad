@@ -109,7 +109,7 @@ The detailed RHDP topology and Launchpad adaptation decisions are recorded in
 
 - Launchpad Showroom: `rhpds/launchpad`,
   `content-agentops-observability`, at
-  `0d697f3ddd1e5008dfd9bb32c3e3bdd0398383a9`;
+  `59563b0a77252e8b91077c30c23ab524a8402bce`;
 - upstream Showroom provenance: `rhpds/agentops-intel-showroom` at
   `f1881c61de55ebf5640c27e76469f4efe458edaf`;
 - Launchpad seat chart: `rhpds/launchpad`, `deploy/workloads/agentops-seat`, at

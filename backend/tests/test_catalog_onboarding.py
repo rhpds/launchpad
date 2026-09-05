@@ -31,7 +31,7 @@ def test_agentops_is_registered_as_a_fail_closed_draft():
         "https://github.com/rhpds/launchpad.git"
     )
     assert catalog["metadata"]["showroom_content_ref"] == (
-        "0d697f3ddd1e5008dfd9bb32c3e3bdd0398383a9"
+        "59563b0a77252e8b91077c30c23ab524a8402bce"
     )
     assert catalog["metadata"]["showroom_content_playbook"] == ("site-agentops-observability.yml")
     assert catalog["metadata"]["showroom_content_start_path"] == ("content-agentops-observability")

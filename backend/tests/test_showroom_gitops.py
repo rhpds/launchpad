@@ -110,7 +110,8 @@ def test_operator_workshop_places_namespace_console_inside_showroom():
     assert values["terminal"]["resources"]["requests"]["cpu"] == "100m"
     assert values["terminal"]["image"] == (
         "image-registry.openshift-image-registry.svc:5000/partner-ai-launchpad/"
-        "launchpad-showroom-terminal:4.20"
+        "launchpad-showroom-terminal@sha256:"
+        "164aa93d20af95dc916aa695556a1cae2ec057385ee1b254157df9eead099d9b"
     )
     assert values["wetty"]["setup"] == "false"
 
