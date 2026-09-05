@@ -2,7 +2,7 @@
   "schema": "launchpad.redhat.com/event-readiness/v1",
   "evidence_id": "READINESS-SEPTEMBER-17-THREE-WORKSHOPS-20260905",
   "generated_at": "2026-09-05T05:34:12Z",
-  "updated_at": "2026-09-05T22:31:00Z",
+  "updated_at": "2026-09-05T23:03:46Z",
   "source_revision_before_readiness_contract": "cf28c65",
   "event_date": "2026-09-17",
   "deployment_scope": "fleet",
@@ -86,6 +86,7 @@
     "the exact corrected Agent 201 v1.0.13 Showroom content rendered and completed its live one-seat functional regression"
   ],
   "remaining_release_gates": [
+    "agentops-qualified-capacity-expansion-or-topology-reduction",
     "agentops-twenty-five-seat",
     "brutus-sixty-minute-soak-and-repeat-certification",
     "oberon-reenable-and-twenty-five-seat-recertification",
@@ -99,17 +100,17 @@
   "capacity_status": {
     "declared_reservation_calculated": true,
     "current_arena_free_capacity_measured": true,
-    "observed_at": "2026-09-05T22:31:00Z",
+    "observed_at": "2026-09-05T23:03:46Z",
     "schedulable_workers": 2,
     "qualified_agentops_workers": 1,
     "schedulable_pod_slots": 500,
-    "running_pods_on_workers": 223,
+    "running_pods_on_workers": 218,
     "qualified_worker_pod_slots": 250,
-    "running_pods_on_qualified_workers": 43,
+    "running_pods_on_qualified_workers": 41,
     "agentops_twenty_five_seat_pod_reservation": 425,
     "qualified_worker_protected_pod_capacity": 200,
-    "qualified_worker_available_slots_after_reserve": 157,
-    "qualified_worker_shortage_with_headroom": 268,
+    "qualified_worker_available_slots_after_reserve": 159,
+    "qualified_worker_shortage_with_headroom": 266,
     "fit_decision": "blocked-by-single-qualified-worker-and-pod-slots",
     "recommended_additional_250_pod_workers": 2,
     "required_checks": [
@@ -124,17 +125,20 @@
   "latest_agentops_shared_service_evidence": "evidence/agentops-mlflow-postgres-live-2026-09-05.json",
   "latest_agentops_pipeline_tls_evidence": "evidence/agentops-pipeline-database-tls-live-2026-09-05.json",
   "latest_agentops_five_seat_evidence": "evidence/agentops-five-seat-functional-live-build84-2026-09-05.json",
+  "latest_agentops_twenty_five_capacity_evidence": "evidence/agentops-twenty-five-seat-capacity-red-2026-09-05.json",
   "latest_fleet_snapshot": {
-    "observed_at": "2026-09-05T22:31:00Z",
+    "observed_at": "2026-09-05T23:03:46Z",
     "twenty_percent_pod_reserve": true,
     "clusters": {
       "arena": {
         "schedulable_pod_slots": 500,
-        "active_worker_pods": 223,
-        "additional_slots_after_reserve": 177,
+        "active_worker_pods": 218,
+        "additional_slots_after_reserve": 182,
         "registered": true,
         "qualified_agentops_workers": 1,
-        "qualified_agentops_pod_slots": 250
+        "qualified_agentops_pod_slots": 250,
+        "qualified_agentops_supported_seats": 9,
+        "available_worker_baremetal_hosts": 0
       },
       "brutus": {
         "schedulable_pod_slots": 250,
@@ -149,8 +153,8 @@
       },
       "oberon": {
         "schedulable_pod_slots": 500,
-        "active_worker_pods": 359,
-        "additional_slots_after_reserve": 41,
+        "active_worker_pods": 363,
+        "additional_slots_after_reserve": 37,
         "registered": true,
         "enabled": false
       }

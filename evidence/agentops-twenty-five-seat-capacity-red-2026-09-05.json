@@ -1,0 +1,114 @@
+{
+  "schema_version": "1.0",
+  "evidence_id": "EDD-AGENTOPS-TWENTY-FIVE-CAPACITY-RED-20260905",
+  "captured_at": "2026-09-05T23:03:46Z",
+  "cluster": "arena",
+  "catalog_item_id": "agentops-observability",
+  "catalog_version": "0.1.3",
+  "catalog_max_workshop_seats": 5,
+  "requested_certification_seats": 25,
+  "outcome": "blocked-by-qualified-worker-capacity",
+  "public_access_certified": false,
+  "source": {
+    "implementation_commit": "6a3b84dd70c2b0245f69650ebdff5986dafc46b7",
+    "digest_pin_commit": "9e93ba73e0db3c6c66da5fb1236c5798f72bfe78",
+    "backend_build": 86,
+    "backend_image_digest": "sha256:4da0718db907051104ecfe36d2f175c4efba525604c499c37ccadec8fe0f72f3"
+  },
+  "requested_resources": {
+    "cpu_millicores": 62500,
+    "memory_mib": 179200,
+    "pod_slots": 425,
+    "storage_gib_minimum": 750,
+    "capacity_headroom_percent": 20
+  },
+  "arena_inventory": {
+    "platform": "BareMetal",
+    "worker_machineset": "arena-86mfs-worker-0",
+    "worker_machineset_replicas": 0,
+    "baremetal_hosts_total": 3,
+    "baremetal_hosts_available": 0,
+    "baremetal_hosts_note": "All registered BareMetalHosts are unmanaged control-plane hosts; scaling the zero-replica worker MachineSet cannot create a worker until infrastructure adds hosts.",
+    "worker_nodes": 2,
+    "worker_pod_slots": 500,
+    "active_worker_pods": 218,
+    "qualified_agentops_workers": [
+      "gnr2.fm2aihpcsed.com"
+    ],
+    "unqualified_workers": [
+      "rhgnr1"
+    ],
+    "qualified_worker_pod_slots": 250,
+    "qualified_worker_active_pods": 41,
+    "qualified_worker_available_pods_after_headroom": 159
+  },
+  "other_registered_clusters": {
+    "oberon": {
+      "agentops_capability_eligible": false,
+      "agentops_qualified_workers": 0,
+      "schedulable_pod_slots": 500,
+      "active_pods": 363,
+      "protected_available_pods": 37,
+      "maximum_agentops_seats_by_current_pods_if_onboarded": 2,
+      "empty_cluster_protected_pod_ceiling": 400,
+      "twenty_five_seat_fit": false
+    },
+    "brutus": {
+      "agentops_capability_eligible": false,
+      "agentops_qualified_workers": 0,
+      "schedulable_pod_slots": 250,
+      "active_pods": 109,
+      "protected_available_pods": 91,
+      "maximum_agentops_seats_by_current_pods_if_onboarded": 5,
+      "empty_cluster_protected_pod_ceiling": 200,
+      "twenty_five_seat_fit": false
+    }
+  },
+  "red_green_matrix": [
+    {
+      "id": "AGENTOPS-25-CAPACITY-ELIGIBILITY",
+      "red": "Build 85 capacity preview counted unqualified rhgnr1 and reported 10 seats while actual AgentOps seat placement allowed only qualified gnr2.",
+      "green_local": "A failing regression reproduced the mismatch; capacity now applies required labels, Ready stability, pressure, taint, and cordon filters before accounting resources.",
+      "green_integration": "The non-local release suite passed 1041 tests with 13 local-only tests deselected.",
+      "green_live": "Build 86 reports Eligible nodes: 1 and a protected capacity of 9 AgentOps seats."
+    },
+    {
+      "id": "AGENTOPS-25-FAIL-CLOSED",
+      "red": "A cluster-wide aggregate preview could reserve more seats than the workload-qualified node set could place.",
+      "green_local": "Preview and reservation reuse the catalog-qualified node boundary.",
+      "green_integration": "A 25-seat certification override reaches capacity evaluation without changing the catalog's normal five-seat limit.",
+      "green_live": "The 25-seat preview returned can_provision=false; workshop count remained 54, session count remained 426, and AgentOps namespace count remained zero."
+    }
+  ],
+  "live_preview": {
+    "can_provision": false,
+    "selected_cluster": "arena",
+    "placement_reason": "Entire workshop assigned to arena; seats will not be split",
+    "supported_seats": 9,
+    "eligible_nodes": 1,
+    "max_by_cpu": 11,
+    "max_by_memory": 63,
+    "max_by_pods": 9,
+    "workshops_before": 54,
+    "workshops_after": 54,
+    "sessions_before": 426,
+    "sessions_after": 426,
+    "agentops_namespaces_before": 0,
+    "agentops_namespaces_after": 0
+  },
+  "capacity_gap": {
+    "seat_shortage": 16,
+    "pod_shortage_on_current_qualified_capacity": 266,
+    "additional_250_pod_workers_required": 2,
+    "why_one_is_insufficient": "Two qualified 250-pod nodes provide only 400 protected slots before subtracting platform pods, which is already less than the 425-pod workshop reservation.",
+    "alternative": "Reduce the 17-pod per-seat reservation with workshop-shared services, then remeasure isolation, operator behavior, performance, failure recovery, and cleanup before changing the catalog contract."
+  },
+  "release_decision": {
+    "capacity_safety_gate": "passed",
+    "twenty_five_seat_release_gate": "blocked",
+    "catalog_max_workshop_seats": 5,
+    "eligible_existing_twenty_five_seat_clusters": [],
+    "next_action": "Intel provisions two additional Arena worker hosts; Launchpad then certifies and labels them before the 25-seat functional run."
+  },
+  "contains_plaintext_credentials": false
+}

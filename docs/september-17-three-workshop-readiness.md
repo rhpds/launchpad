@@ -71,22 +71,29 @@ and `rhgnr1` are schedulable workers:
 |---|---:|
 | Schedulable worker nodes | 2 |
 | Schedulable pod slots | 500 |
-| Running pods on workers | 223 |
+| Running pods on workers | 218 |
 | AgentOps-qualified workers | 1 (`gnr2`) |
-| Running pods on the qualified worker | 43 |
+| Running pods on the qualified worker | 41 |
 | Unrequested worker CPU | 336,989m |
 | Unrequested worker memory | 1,281,934 MiB |
 | NFS free space reported | 6.5 TiB |
 
 CPU, memory, and NFS are not the immediate constraint. Pod slots and qualified
 worker topology are. Twenty-five AgentOps seats reserve 425 pod slots. The only
-qualified worker has 250 slots and 43 active pods; retaining the standard 20
-percent node reserve leaves 157 additional slots, a 268-slot shortage. Even if
+qualified worker has 250 slots and 41 active pods; retaining the standard 20
+percent node reserve leaves 159 additional slots, a 266-slot shortage. Even if
 the currently unstable `rhgnr1` were relabeled without remediation, the two
-workers together have only 177 additional protected slots at the current
-223-pod baseline. The measured path is a shared-service topology reduction or
+workers together have only 182 additional protected slots at the current
+218-pod baseline. The measured path is a shared-service topology reduction or
 **two additional qualified 250-pod workers**; one new worker still would not
 retain the required headroom at the current baseline.
+
+Arena's zero-replica worker MachineSet has no available BareMetalHost behind
+it. All registered BareMetalHosts are unmanaged control-plane hosts, so Intel
+must attach/register worker hardware before a MachineSet scale operation can
+produce nodes. Neither Oberon nor Brutus is a fallback for this workshop:
+neither has the full AgentOps capability set or a qualified worker, and their
+current protected pod availability is 37 and 91 respectively.
 
 A pilot-only alternative is to add targeted tolerations to Launchpad workloads
 so selected participant pods can use the three otherwise idle control-plane
@@ -125,9 +132,9 @@ candidate fleet assignment:
 
 | Cluster | Schedulable pod slots | Active worker pods | Additional slots after reserve | Candidate event role |
 |---|---:|---:|---:|---|
-| Arena | 500 | 223 | 177 | AgentOps; five seats certified, 25 blocked on qualified capacity/topology |
+| Arena | 500 | 218 | 182 | AgentOps; five seats certified, 25 blocked on qualified capacity/topology |
 | Brutus | 250 | 109 | 91 | Building an AI Agent; 75-pod contract passed the internal 25-seat gate |
-| Oberon | 500 | 359 | 41 | Serve LLMs; currently nine slots short of its 50-slot peak contract |
+| Oberon | 500 | 363 | 37 | Serve LLMs; currently thirteen slots short of its 50-slot peak contract |
 
 Brutus and Oberon are now registered with separate least-privilege Launchpad
 and Argo credentials but remain disabled for normal placement. Brutus's compact

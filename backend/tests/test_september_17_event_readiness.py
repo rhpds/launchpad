@@ -60,6 +60,13 @@ def test_event_readiness_manifest_keeps_the_exact_workshop_target_and_budget():
     assert readiness["latest_agentops_five_seat_evidence"] == (
         "evidence/agentops-five-seat-functional-live-build84-2026-09-05.json"
     )
+    assert readiness["latest_agentops_twenty_five_capacity_evidence"] == (
+        "evidence/agentops-twenty-five-seat-capacity-red-2026-09-05.json"
+    )
+    assert readiness["capacity_status"]["qualified_agentops_workers"] == 1
+    assert readiness["capacity_status"][
+        "qualified_worker_available_slots_after_reserve"
+    ] == 159
     assert readiness["latest_fleet_snapshot"]["clusters"]["brutus"][
         "additional_slots_after_reserve"
     ] == 91

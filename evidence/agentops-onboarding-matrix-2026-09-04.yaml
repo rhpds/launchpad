@@ -224,6 +224,16 @@ matrix:
       - backend/tests/test_agentops_five_seat_functional_live_build84_evidence.py
       - evidence/agentops-five-seat-red-live-build83-2026-09-05.json
       - evidence/agentops-five-seat-functional-live-build84-2026-09-05.json
+  - id: LIVE-AGENTOPS-023
+    requirement: Twenty-five-seat capacity preview counts only workers eligible for actual AgentOps seat placement and fails before mutation
+    red: Build 85 counted unqualified rhgnr1 and reported ten seats while actual placement allowed only gnr2
+    green_local: pass-qualified-label-ready-stability-pressure-taint-and-cordon-capacity-contract
+    green_integration: pass-1041-non-local-tests
+    green_live: pass-build86-one-eligible-node-nine-seats-25-rejected-zero-mutation
+    evidence:
+      - backend/tests/test_workshop_showroom.py
+      - backend/tests/test_agentops_twenty_five_capacity_evidence.py
+      - evidence/agentops-twenty-five-seat-capacity-red-2026-09-05.json
 
 rubric:
   source_and_contract: {earned: 15, possible: 15}
