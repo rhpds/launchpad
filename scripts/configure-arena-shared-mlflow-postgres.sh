@@ -28,7 +28,25 @@ fi
 oc --kubeconfig="${KUBECONFIG}" apply -f "${manifest}"
 oc --kubeconfig="${KUBECONFIG}" rollout status statefulset/mlflow-postgres \
   -n "${namespace}" --timeout=300s
-oc --kubeconfig="${KUBECONFIG}" wait mlflow/mlflow -n "${namespace}" \
-  --for=condition=Available --timeout=300s
 
-printf 'Arena shared MLflow is using its Secret-backed PostgreSQL service.\n'
+generation=$(oc --kubeconfig="${KUBECONFIG}" get mlflow/mlflow -n "${namespace}" \
+  -o jsonpath='{.metadata.generation}')
+deadline=$((SECONDS + 300))
+while ((SECONDS < deadline)); do
+  operator_ready=$(oc --kubeconfig="${KUBECONFIG}" get mlflow/mlflow -n "${namespace}" \
+    -o jsonpath='{.status.conditions[?(@.type=="MLflowOperatorReady")].status}')
+  observed_generation=$(oc --kubeconfig="${KUBECONFIG}" get mlflow/mlflow -n "${namespace}" \
+    -o jsonpath='{.status.conditions[?(@.type=="MLflowOperatorReady")].observedGeneration}')
+  available=$(oc --kubeconfig="${KUBECONFIG}" get mlflow/mlflow -n "${namespace}" \
+    -o jsonpath='{.status.conditions[?(@.type=="Available")].status}')
+  migration=$(oc --kubeconfig="${KUBECONFIG}" get mlflow/mlflow -n "${namespace}" \
+    -o jsonpath='{.status.conditions[?(@.type=="Migration")].status}')
+  if [[ "${operator_ready}" == "True" && "${observed_generation}" == "${generation}" && "${available}" == "True" && "${migration}" == "True" ]]; then
+    printf 'Arena shared MLflow is using its Secret-backed PostgreSQL service.\n'
+    exit 0
+  fi
+  sleep 5
+done
+
+printf 'Timed out waiting for Arena shared MLflow generation %s.\n' "${generation}" >&2
+exit 1

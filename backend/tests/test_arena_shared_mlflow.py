@@ -37,6 +37,7 @@ def test_shared_mlflow_uses_the_installed_rhoai_operator_and_postgres_secret():
         "name": "mlflow-postgres",
         "key": "backend-store-uri",
     }
+    assert spec["caBundleConfigMap"] == {"name": "mlflow-postgres-ca"}
     assert spec["serveArtifacts"] is True
     assert spec["artifactsDestination"] == "file:///mlflow/artifacts"
     assert spec["replicas"] == 1
@@ -79,6 +80,56 @@ def test_shared_mlflow_postgres_is_persistent_restricted_and_not_secret_in_git()
     assert "postgresql://" not in MANIFEST.read_text()
 
 
+def test_shared_mlflow_postgres_uses_openshift_service_ca_tls():
+    resources = _resources()
+    statefulset = resources[("StatefulSet", "mlflow-postgres")]
+    service = resources[("Service", "mlflow-postgres")]
+    ca_bundle = resources[("ConfigMap", "mlflow-postgres-ca")]
+
+    assert service["metadata"]["annotations"] == {
+        "service.beta.openshift.io/serving-cert-secret-name": "mlflow-postgres-tls"
+    }
+    assert ca_bundle["metadata"]["annotations"] == {
+        "service.beta.openshift.io/inject-cabundle": "true"
+    }
+    assert "data" not in ca_bundle
+
+    pod_spec = statefulset["spec"]["template"]["spec"]
+    init_container = pod_spec["initContainers"][0]
+    assert init_container["name"] == "prepare-postgresql-tls"
+    assert init_container["securityContext"] == {
+        "allowPrivilegeEscalation": False,
+        "capabilities": {"drop": ["ALL"]},
+    }
+    assert "chmod 0600 /work/tls.key" in init_container["command"][2]
+
+    container = pod_spec["containers"][0]
+    assert container["command"] == ["/usr/bin/run-postgresql"]
+    assert container["args"] == [
+        "-c",
+        "ssl=on",
+        "-c",
+        "ssl_min_protocol_version=TLSv1.2",
+        "-c",
+        "ssl_cert_file=/var/run/postgresql-tls/tls.crt",
+        "-c",
+        "ssl_key_file=/var/run/postgresql-tls/tls.key",
+    ]
+    assert "sslmode=require" in container["readinessProbe"]["exec"]["command"][2]
+    assert {mount["name"] for mount in container["volumeMounts"]} >= {
+        "postgres-data",
+        "postgresql-tls",
+    }
+    assert {volume["name"] for volume in pod_spec["volumes"]} == {
+        "postgresql-serving-cert",
+        "postgresql-tls",
+    }
+    serving_cert = next(
+        volume for volume in pod_spec["volumes"] if volume["name"] == "postgresql-serving-cert"
+    )
+    assert serving_cert["secret"]["secretName"] == "mlflow-postgres-tls"
+
+
 def test_postgres_bootstrap_generates_the_secret_without_printing_credentials():
     script = BOOTSTRAP.read_text()
 
@@ -89,6 +140,9 @@ def test_postgres_bootstrap_generates_the_secret_without_printing_credentials():
     assert "apply -f" in script
     assert "set -x" not in script
     assert "echo ${" not in script
+    assert "observedGeneration" in script
+    assert 'type=="MLflowOperatorReady"' in script
+    assert "Migration" in script
 
 
 def test_arena_registry_publishes_the_rhoai_and_mlflow_services():
