@@ -1,0 +1,209 @@
+{
+  "schema": "launchpad.redhat.com/agentops-live-seat-evidence/v1",
+  "evidence_id": "LIVE-AGENTOPS-013",
+  "observed_at": {
+    "started": "2026-09-05T03:57:38Z",
+    "reclaim_started": "2026-09-05T04:38:26Z",
+    "completed": "2026-09-05T04:39:30Z"
+  },
+  "repository_revision": "6936ee6b9d64df8ccda8902279b8cc3a1e4c0545",
+  "cluster_id": "arena",
+  "namespace": "launchpad-cert-agentops-da19d00",
+  "deployment": {
+    "method": "direct Helm certification deployment",
+    "release": "agentops",
+    "final_release_revision": 3,
+    "final_release_status": "deployed",
+    "catalog_order_created": false,
+    "showroom_created": false,
+    "purpose": "certify the namespace-scoped workload before enabling the draft catalog item"
+  },
+  "red_green": {
+    "minio_client_image": {
+      "red": "The declared MinIO client tag did not exist.",
+      "green": "The pinned RELEASE.2023-06-19T19-31-19Z image completed bucket bootstrap."
+    },
+    "ui_resource_behavior": {
+      "red": "NGINX inherited the host CPU count, spawned 172 workers, and was OOMKilled at 128 MiB.",
+      "green": "A generated NGINX config limits the UI to one worker; the UI remained Ready."
+    },
+    "database_roles": {
+      "red": "Migrations and LangGraph checkpoint initialization failed because runtime roles were absent and lending_app could not create checkpoint tables.",
+      "green": "Bootstrap creates separate generated-password roles, migrations use the admin URL, and lending_app has only the database and public-schema permissions needed by the application."
+    },
+    "api_startup": {
+      "red": "Liveness killed the API during local embedding initialization and RollingUpdate briefly doubled model work.",
+      "green": "A startup probe and Recreate strategy prevented premature restarts and duplicate API pods."
+    },
+    "embedding_scale": {
+      "red": "Local Nomic initialization did not finish within 14 minutes; the generation endpoint returned 404 for /v1/embeddings.",
+      "green": "not-achieved"
+    }
+  },
+  "checks": {
+    "api_and_database_health": {
+      "status": "pass",
+      "http_status": 200,
+      "components": ["API", "PostgreSQL"]
+    },
+    "seeded_application_data": {
+      "status": "pass",
+      "borrowers": 10,
+      "applications": 38,
+      "kb_documents": 8,
+      "kb_chunks": 41
+    },
+    "generation_endpoint": {
+      "status": "pass",
+      "model": "granite-3.2-8b-tools",
+      "models_http_status": 200,
+      "chat_http_status": 200,
+      "chat_seconds": 0.6
+    },
+    "agent_websocket": {
+      "status": "pass",
+      "terminal_event": "done",
+      "seconds": 4.2,
+      "response_characters": 107,
+      "checkpoint_rows_after_test": 5,
+      "audit_rows_after_test": 47
+    },
+    "dspa": {
+      "status": "pass",
+      "ready_condition": true
+    },
+    "minio": {
+      "status": "pass",
+      "bootstrap_job": "completed",
+      "buckets": ["documents", "pipeline"]
+    },
+    "grafana_health": {
+      "status": "pass",
+      "database": "ok",
+      "version": "11.6.0"
+    },
+    "mortgage_ui_route": {
+      "status": "pass",
+      "http_status_with_cluster_ca_bypass": 200,
+      "seconds": 0.999
+    },
+    "grafana_route": {
+      "status": "pass",
+      "http_status_with_cluster_ca_bypass": 200,
+      "seconds": 2.093
+    },
+    "trusted_route_tls": {
+      "status": "fail",
+      "reason": "The Arena ingress chain is not trusted by the external client."
+    },
+    "embedding_endpoint": {
+      "status": "fail",
+      "local_initialization_seconds_before_abort": 840,
+      "remote_generation_endpoint_http_status": 404,
+      "embedded_kb_chunks": 0,
+      "total_kb_chunks": 41
+    },
+    "mlflow_server": {
+      "status": "fail",
+      "reason": "Arena has an MLflow operator/UI but no shared tracking server service or participant route; tracing was disabled for the degraded application check."
+    },
+    "showroom_participant_journey": {
+      "status": "not-run",
+      "reason": "This was a direct workload-chart certification, not a Launchpad order."
+    },
+    "participant_entitlement_proxy": {
+      "status": "not-run",
+      "reason": "A positive workload-route proxy check requires a persisted Launchpad session."
+    },
+    "worker_recovery": {
+      "status": "partial",
+      "observation": "rhgnr1 briefly transitioned NotReady during initialization and recovered without pod replacement."
+    }
+  },
+  "measured_footprint": {
+    "chart": {
+      "cpu_millicores": 1730,
+      "memory_mib": 4964,
+      "pods": 13,
+      "storage_gib": 30
+    },
+    "showroom_observation": {
+      "cpu_millicores": 115,
+      "memory_mib": 336,
+      "pods": 1,
+      "storage_gib": 0
+    },
+    "reservation_with_showroom": {
+      "cpu_millicores": 2000,
+      "memory_mib": 6144,
+      "pods": 14,
+      "storage_gib": 30
+    }
+  },
+  "agnosticv_topology_review": {
+    "revision": "48fc6eebedb295bddf1b915a230e5e90f89db0af",
+    "default_num_users": 1,
+    "workshop_user_mode": "single",
+    "automation_revision": "6ea100531ac869fa66abe69ae223d6b56dbce9a2",
+    "supports_user_count_templates": true,
+    "per_user_components": ["namespace", "Mortgage AI", "MinIO", "Grafana", "Data Science Pipelines"],
+    "shared_components": ["MLflow", "OpenShift AI", "monitoring", "logging", "model endpoint"],
+    "decision": "Keep the Launchpad-native per-seat adapter and shared cluster services; do not reproduce AgnosticV or AgnosticD."
+  },
+  "reclaim": {
+    "status": "pass",
+    "duration_seconds": 64,
+    "resources_before": 123,
+    "remaining_namespaces": 0,
+    "remaining_namespaced_resources": 0,
+    "remaining_argocd_applications": 0
+  },
+  "red_green_matrix": [
+    {
+      "id": "LIVE-AGENTOPS-007",
+      "requirement": "Complete all participant tabs, shared observability services, entitlement isolation, and reclaim from a Launchpad order.",
+      "status": "blocked"
+    },
+    {
+      "id": "LIVE-AGENTOPS-013",
+      "requirement": "Run the namespace-scoped AgentOps workload, exercise a real agent call, and reclaim it with zero residue.",
+      "status": "GREEN-live"
+    },
+    {
+      "id": "LIVE-AGENTOPS-014",
+      "requirement": "Use a shared cached embedding endpoint with successful KB vector ingestion.",
+      "status": "RED-live"
+    },
+    {
+      "id": "LIVE-AGENTOPS-015",
+      "requirement": "Generate and inspect MLflow traces through a participant-accessible shared tracking server.",
+      "status": "RED-live"
+    },
+    {
+      "id": "LIVE-AGENTOPS-016",
+      "requirement": "Validate participant workload routes with a trusted Arena ingress certificate.",
+      "status": "RED-live"
+    }
+  ],
+  "test_strategy": {
+    "TDD": "Failing chart and catalog assertions preceded each runtime correction.",
+    "EDD": "This manifest records live HTTP, application, database, model, capacity, and reclaim observations.",
+    "CDD": "The generated draft catalog remains equal to its repository-native intake contract.",
+    "BDD": "A real WebSocket participant-agent exchange reached a done event and persisted checkpoints/audit events.",
+    "CBT": "Database, API, UI, MinIO, Grafana, DSPA, model access, routes, and cleanup were checked independently."
+  },
+  "result": "blocked",
+  "remaining_blockers": [
+    "shared cached embedding endpoint and cluster-specific runtime injection",
+    "shared MLflow tracking server and participant route",
+    "OpenShift Logging/Loki experience",
+    "trusted Arena ingress certificate for participant routes",
+    "Launchpad-ordered Showroom, entitlement isolation, and full eight-tab journey",
+    "five-seat and twenty-five-seat certification"
+  ],
+  "security": {
+    "secrets_included": false,
+    "credential_values_logged": false,
+    "certification_namespace_removed": true
+  }
+}

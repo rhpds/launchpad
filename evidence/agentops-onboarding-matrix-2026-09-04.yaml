@@ -7,7 +7,7 @@ status: blocked
 source_pins:
   showroom: 0d697f3ddd1e5008dfd9bb32c3e3bdd0398383a9
   upstream_showroom: f1881c61de55ebf5640c27e76469f4efe458edaf
-  launchpad_seat_chart: 2fcf40b74387046b657e0050513144afead09892
+  launchpad_seat_chart: 6936ee6b9d64df8ccda8902279b8cc3a1e4c0545
   agnosticv: 48fc6eebedb295bddf1b915a230e5e90f89db0af
   automation: 6ea100531ac869fa66abe69ae223d6b56dbce9a2
   application: 1e50e51c334c1b6ed854d81a3f28fd324792f481
@@ -66,11 +66,12 @@ matrix:
       - evidence/agentops-arena-prerequisites-2026-09-04.json
   - id: LIVE-AGENTOPS-007
     requirement: One participant completes all eight tabs and full reclaim
-    red: not-run
+    red: Workload functions, but shared MLflow, trusted TLS, Showroom, and entitlement checks remain incomplete
     green_local: not-applicable
-    green_integration: not-run
-    green_live: not-run
-    evidence: []
+    green_integration: partial-workload-and-agent-journey
+    green_live: blocked
+    evidence:
+      - evidence/agentops-one-seat-live-2026-09-04.json
   - id: TDD-AGENTOPS-008
     requirement: AgentOps seat chart renders no Secret or cluster-scoped object
     red: Four chart contract tests failed because the chart did not exist
@@ -122,6 +123,39 @@ matrix:
       - backend/tests/test_public_access.py
       - backend/tests/test_public_gateway.py
       - evidence/agentops-public-tool-proxy-2026-09-04.json
+  - id: LIVE-AGENTOPS-013
+    requirement: Namespace-scoped workload serves a real agent request and reclaims with zero residue
+    red: Image, UI worker, database-role, and startup failures prevented a functional seat
+    green_local: pass-51-focused-tests
+    green_integration: pass-live-component-health
+    green_live: pass-agent-call-and-zero-residue-reclaim
+    evidence:
+      - backend/tests/test_agentops_seat_chart.py
+      - evidence/agentops-one-seat-live-2026-09-04.json
+  - id: LIVE-AGENTOPS-014
+    requirement: Shared cached embedding service completes KB vector ingestion
+    red: Local initialization exceeded 14 minutes and the generation endpoint returned 404
+    green_local: not-run
+    green_integration: not-run
+    green_live: fail-zero-of-41-kb-chunks-embedded
+    evidence:
+      - evidence/agentops-one-seat-live-2026-09-04.json
+  - id: LIVE-AGENTOPS-015
+    requirement: Shared MLflow tracking server records participant traces
+    red: Arena exposes an MLflow UI component but no tracking server service or participant route
+    green_local: not-applicable
+    green_integration: not-run
+    green_live: fail
+    evidence:
+      - evidence/agentops-one-seat-live-2026-09-04.json
+  - id: LIVE-AGENTOPS-016
+    requirement: Participant workload routes present a client-trusted TLS chain
+    red: External client rejected the Arena ingress certificate chain
+    green_local: not-applicable
+    green_integration: not-run
+    green_live: fail
+    evidence:
+      - evidence/agentops-one-seat-live-2026-09-04.json
 
 rubric:
   source_and_contract: {earned: 15, possible: 15}
@@ -129,10 +163,10 @@ rubric:
   namespace_and_rbac_isolation: {earned: 10, possible: 15}
   shared_service_readiness: {earned: 5, possible: 15}
   participant_tabs_and_journey: {earned: 10, possible: 15}
-  cleanup_and_repeatability: {earned: 7, possible: 10}
+  cleanup_and_repeatability: {earned: 10, possible: 10}
   five_seat_certification: {earned: 0, possible: 5}
   twenty_five_seat_certification: {earned: 0, possible: 10}
-  total: {earned: 62, possible: 100}
+  total: {earned: 65, possible: 100}
 
 decision: >-
   Keep the catalog item draft. Source intake is valid, but the AgentOps

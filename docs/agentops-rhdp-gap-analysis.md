@@ -12,7 +12,7 @@ repeatable 5- and 25-seat workshops on Arena.
 | Catalog orchestration | private `rhpds/agnosticv`, `agd_v2/agentops-intel`, reviewed at `48fc6eebedb295bddf1b915a230e5e90f89db0af` | RHDP variables, workload order, access, and Showroom tabs |
 | Launchpad Showroom | `rhpds/launchpad`, `content-agentops-observability`, at `0d697f3ddd1e5008dfd9bb32c3e3bdd0398383a9` | Adapted Antora participant journey |
 | Upstream Showroom | `rhpds/agentops-intel-showroom` at `f1881c61de55ebf5640c27e76469f4efe458edaf` | Immutable content and screenshot provenance |
-| Launchpad seat chart | `rhpds/launchpad`, `deploy/workloads/agentops-seat`, at `2fcf40b74387046b657e0050513144afead09892` | Safe namespace-scoped deployment source |
+| Launchpad seat chart | `rhpds/launchpad`, `deploy/workloads/agentops-seat`, at `6936ee6b9d64df8ccda8902279b8cc3a1e4c0545` | Live-tested namespace-scoped deployment source |
 | GitOps automation | `rhpds/agentops-in-prod-automation` at `6ea100531ac869fa66abe69ae223d6b56dbce9a2` | Reviewed RHDP bootstrap provenance; not deployed by Launchpad |
 | Application | `rh-ai-quickstart/multi-agent-loan-origination` at `1e50e51c334c1b6ed854d81a3f28fd324792f481` | Mortgage AI application source and base chart |
 
@@ -84,8 +84,16 @@ and refuses to reuse one owned by another session.
 
 Every chart resource carries workshop, seat, session, tenant, and cluster
 labels. The Application uses the persisted `cluster_ref`, and its values carry
-the same identity. A live Arena server-side dry run accepted all 21 resources
-without creating them.
+the same identity. A live Arena server-side dry run accepted all 21 rendered
+resources. A later one-seat deployment also proved the operator-generated DSPA
+resources.
+
+The RHDP automation was reviewed at its pinned revision after the first live
+run. Although the catalog defaults to one user, its ApplicationSets use
+`user.count` to create per-user Mortgage AI, MinIO, Grafana, DSPA, and workspace
+resources. MLflow, OpenShift AI, monitoring, logging, and the model endpoint are
+shared. Launchpad therefore does not need its own AgnosticV/AgnosticD; its
+per-seat chart plus shared Arena services matches the relevant RHDP topology.
 
 ## Shared topology still required
 
@@ -95,6 +103,7 @@ Install and certify shared Arena prerequisites once, outside an order:
 - user workload monitoring;
 - OpenShift Logging/Loki;
 - shared MLflow and its namespace authorization model;
+- a shared cached OpenAI-compatible embedding endpoint;
 - OpenShift GitOps; and
 - durable image mirroring or pre-pull policy.
 
@@ -140,7 +149,7 @@ available:
 - OpenShift GitOps 1.21.4;
 - OpenShift AI 3.5.0 with a Ready `default-dsc`;
 - Data Science Pipelines support;
-- a managed MLflow operator and UI deployment;
+- a managed MLflow operator and UI deployment, but no tracking server;
 - user workload monitoring; and
 - the Launchpad Keycloak route and embedded-console webhook.
 
@@ -148,7 +157,10 @@ The live check and render/dry-run gates established the remaining blockers:
 
 - there is no shared `rh-ai`/MLflow participant route matching the Showroom
   contract;
-- the new per-seat Grafana chart has not yet been live certified;
+- local per-seat Nomic embedding initialization exceeded 14 minutes and the
+  Granite generation route does not expose `/v1/embeddings`;
+- Arena participant routes present a certificate chain that the external test
+  client does not trust;
 - OpenShift Logging/Loki is not installed;
 - direct Mortgage AI and Grafana Routes are not yet protected by the
   participant entitlement gateway; and
@@ -175,8 +187,43 @@ pipeline references, and chart-aligned Secret, Grafana, and health-check
 instructions. The original upstream commit remains recorded in
 `content-agentops-observability/UPSTREAM.md`.
 
+## First live seat result
+
+The namespace-scoped chart was deployed on Arena and corrected through explicit
+RED/GREEN tests. The live failures found and fixed were an unavailable MinIO
+client tag, an NGINX configuration that spawned 172 workers, absent PostgreSQL
+runtime roles, an incorrect migration connection boundary, and liveness probes
+that killed the API during initialization. The final chart deployment reached
+these functional results:
+
+- 12 steady pods were fully Ready and the bootstrap Job completed;
+- API and PostgreSQL health returned 200;
+- 38 seeded mortgage applications were queryable;
+- DSPA reported Ready and Grafana reported a healthy database;
+- Granite generation returned 200 in 0.6 seconds;
+- a real application WebSocket agent exchange completed in 4.2 seconds and
+  persisted checkpoint and audit rows; and
+- both participant workload Routes returned 200 when tested with the Arena CA
+  bypassed.
+
+The measured chart footprint was 1.73 CPU, 4,964 MiB memory, 13 pods including
+the completed bootstrap Job, and 30 GiB storage. Adding the measured Showroom
+pod and rounding for reservation gives 2 CPU, 6 GiB, 14 pods, and 30 GiB per
+seat. A 25-seat order therefore reserves about 50 CPU, 150 GiB memory, 350 pod
+slots, and 750 GiB storage before safety headroom.
+
+This run is not a completed participant certification. No shared embedding
+service was available, so all 41 KB chunks were stored without vectors. There
+was no MLflow tracking server, the route TLS chain was not trusted by the test
+client, and the workload was deployed directly rather than through a Launchpad
+Showroom/entitlement order. The disposable release and its 123 namespaced
+resources were reclaimed in 64 seconds, leaving zero namespace, labeled
+resource, or Argo Application residue.
+
 The sanitized live inventory is captured in
 `evidence/agentops-arena-prerequisites-2026-09-04.json`; the chart and permission
 evidence is captured in `evidence/agentops-seat-overlay-2026-09-04.json`. The
-catalog remains draft until shared services, route authorization, and the
-complete one-seat journey are GREEN-live.
+first live workload and reclaim result is captured in
+`evidence/agentops-one-seat-live-2026-09-04.json`. The catalog remains draft
+until shared services, route authorization, and the complete one-seat journey
+are GREEN-live.

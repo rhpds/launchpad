@@ -22,7 +22,7 @@ sources:
     start_path: content-agentops-observability
   workload:
     repo_url: "https://github.com/rhpds/launchpad.git"
-    revision: "2fcf40b74387046b657e0050513144afead09892"
+    revision: "6936ee6b9d64df8ccda8902279b8cc3a1e4c0545"
     deploy_path: deploy/workloads/agentops-seat
 
 references:
@@ -166,14 +166,15 @@ certification:
     - 25
   activation_blockers:
     - >-
-      Live-certify the pinned Launchpad seat chart. Arena accepted all 21
-      resources by server-side dry run and the remote Argo identity now has
-      the required namespaced permissions, but image and runtime compatibility
-      have not yet been proven with a real seat.
+      Repeat the one-seat run through the Launchpad provisioner. The pinned
+      chart, application agent path, DSPA, Grafana, and zero-residue Helm
+      reclaim were proven live on Arena, but the test did not create a
+      persisted Launchpad order, workload Application, or Showroom.
     - >-
-      Prove the generated runtime Secret, retry preservation, model-key
-      revocation, and zero-residue reclaim live. Unit tests confirm that no
-      credentials are serialized into the Argo CD Application.
+      Prove generated runtime Secret creation, retry preservation, model-key
+      revocation, and Launchpad-driven reclaim live. The direct chart reclaim
+      left zero residue, and unit tests confirm that no credentials are
+      serialized into the Argo CD Application.
     - >-
       Validate generated URLs for all eight RHDP tabs: OpenShift Console,
       Terminal, shared MLflow, per-seat Mortgage AI, per-seat Grafana, shared
