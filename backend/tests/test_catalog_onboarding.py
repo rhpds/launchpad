@@ -97,6 +97,9 @@ def test_agentops_intake_captures_the_large_lab_runtime_contract():
     assert runtime["workshop_node_spread"] is True
     assert runtime["workshop_node_min_ready_seconds"] == 900
     assert runtime["workshop_node_headroom_pods"] == 10
+    assert runtime["workshop_node_required_labels"] == {
+        "launchpad.redhat.com/agentops-certified": "true"
+    }
     assert runtime["workshop_provision_concurrency"] == 2
     assert set(runtime["required_capabilities"]) >= {
         "openshift",
@@ -294,5 +297,29 @@ def test_validator_rejects_invalid_workshop_provision_concurrency():
     assert report["validation_status"] == "fail"
     assert any(
         "workshop_provision_concurrency" in error
+        for error in report["errors"]
+    )
+
+
+@pytest.mark.parametrize(
+    "required_labels",
+    [
+        ["launchpad.redhat.com/agentops-certified=true"],
+        {"": "true"},
+        {"launchpad.redhat.com/agentops-certified": ""},
+        {"launchpad.redhat.com/agentops-certified": True},
+    ],
+)
+def test_validator_rejects_invalid_workshop_node_required_labels(
+    required_labels,
+):
+    intake = load_intake(INTAKE_PATH)
+    intake["runtime"]["workshop_node_required_labels"] = required_labels
+
+    report = validate_intake(intake)
+
+    assert report["validation_status"] == "fail"
+    assert any(
+        "workshop_node_required_labels" in error
         for error in report["errors"]
     )

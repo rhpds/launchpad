@@ -20,13 +20,14 @@ CATALOG = ROOT / "catalog/agentops-observability/catalog-item.yaml"
 def _node(
     name: str,
     *,
+    labels: dict[str, str] | None = None,
     ready: bool = True,
     ready_for_seconds: int = 3600,
     unschedulable: bool = False,
     taints: tuple[SimpleNamespace, ...] = (),
 ) -> SimpleNamespace:
     return SimpleNamespace(
-        metadata=SimpleNamespace(name=name),
+        metadata=SimpleNamespace(name=name, labels=labels or {}),
         spec=SimpleNamespace(unschedulable=unschedulable, taints=list(taints)),
         status=SimpleNamespace(
             allocatable={"pods": "250"},
@@ -88,11 +89,20 @@ def test_agentops_catalog_requires_seat_level_node_sharding():
     assert item.metadata["workshop_node_spread"] is True
     assert item.metadata["workshop_node_min_ready_seconds"] == 900
     assert item.metadata["workshop_node_headroom_pods"] == 10
+    assert item.metadata["workshop_node_required_labels"] == {
+        "launchpad.redhat.com/agentops-certified": "true"
+    }
     assert item.metadata["workshop_provision_concurrency"] == 2
 
 
-def test_agentops_seats_are_deterministically_sharded_across_eligible_workers():
-    nodes = [_node("rhgnr1"), _node("gnr2.fm2aihpcsed.com")]
+def test_agentops_seats_use_only_health_qualified_workers():
+    nodes = [
+        _node("rhgnr1"),
+        _node(
+            "gnr2.fm2aihpcsed.com",
+            labels={"launchpad.redhat.com/agentops-certified": "true"},
+        ),
+    ]
     pods = [_pod("rhgnr1") for _ in range(176)] + [
         _pod("gnr2.fm2aihpcsed.com") for _ in range(41)
     ]
@@ -104,13 +114,16 @@ def test_agentops_seats_are_deterministically_sharded_across_eligible_workers():
     third = adapter.create_plan(_seat_request(3), item)
 
     assert first.required_resources["workshop_node_name"] == "gnr2.fm2aihpcsed.com"
-    assert second.required_resources["workshop_node_name"] == "rhgnr1"
+    assert second.required_resources["workshop_node_name"] == "gnr2.fm2aihpcsed.com"
     assert third.required_resources["workshop_node_name"] == "gnr2.fm2aihpcsed.com"
 
 
 def test_recently_recovered_or_pressured_workers_are_excluded():
-    recently_recovered = _node("rhgnr1", ready_for_seconds=60)
-    stable = _node("gnr2.fm2aihpcsed.com")
+    labels = {"launchpad.redhat.com/agentops-certified": "true"}
+    recently_recovered = _node(
+        "rhgnr1", labels=labels, ready_for_seconds=60
+    )
+    stable = _node("gnr2.fm2aihpcsed.com", labels=labels)
     adapter = _adapter([recently_recovered, stable], [])
 
     plan = adapter.create_plan(_seat_request(2), _agentops_item())
@@ -124,8 +137,16 @@ def test_agentops_node_sharding_fails_closed_without_a_stable_worker():
     )
     adapter = _adapter(
         [
-            _node("control-plane", taints=(control_plane_taint,)),
-            _node("recovering-worker", ready_for_seconds=30),
+            _node(
+                "control-plane",
+                labels={"launchpad.redhat.com/agentops-certified": "true"},
+                taints=(control_plane_taint,),
+            ),
+            _node(
+                "recovering-worker",
+                labels={"launchpad.redhat.com/agentops-certified": "true"},
+                ready_for_seconds=30,
+            ),
         ],
         [],
     )

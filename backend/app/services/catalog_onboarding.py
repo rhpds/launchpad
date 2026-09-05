@@ -105,6 +105,9 @@ def build_catalog_item(intake: dict[str, Any]) -> dict[str, Any]:
             "workshop_node_headroom_pods": int(
                 runtime.get("workshop_node_headroom_pods", 0)
             ),
+            "workshop_node_required_labels": dict(
+                runtime.get("workshop_node_required_labels", {}) or {}
+            ),
             "workload_repo": workload["repo_url"],
             "workload_revision": workload["revision"],
             "workload_deploy_type": runtime["deployment_type"],
@@ -209,6 +212,19 @@ def _validate_contract(intake: dict[str, Any], errors: list[str]) -> None:
     if not isinstance(headroom_pods, int) or headroom_pods < 0:
         errors.append(
             "runtime.workshop_node_headroom_pods must be a non-negative integer"
+        )
+    required_labels = runtime.get("workshop_node_required_labels", {})
+    if not isinstance(required_labels, dict) or any(
+        not isinstance(key, str)
+        or not key.strip()
+        or not isinstance(value, str)
+        or not value.strip()
+        for key, value in (
+            required_labels.items() if isinstance(required_labels, dict) else []
+        )
+    ):
+        errors.append(
+            "runtime.workshop_node_required_labels must map non-empty strings"
         )
     workload_contract = runtime.get("workload", {})
     if workload_contract and not isinstance(workload_contract, dict):

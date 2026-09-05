@@ -1,0 +1,135 @@
+{
+  "evidence_id": "EDD-AGENTOPS-FIVE-SEAT-RED-LIVE-BUILD83-20260905",
+  "captured_at": "2026-09-05T21:46:38Z",
+  "result": "RED-live",
+  "cluster": "arena",
+  "catalog_item_id": "agentops-observability",
+  "catalog_version": "0.1.1",
+  "workshop_id": "a1b0cab9-a2ec-4376-841e-882cd95dad09",
+  "deployed_source_commit": "2fb62a33c03c545562f3c2b8499634e6406c8721",
+  "placement_implementation_commit": "83746d9cc90ab2f23fbfeab3a36e0ca068164864",
+  "deployed_backend_build": 83,
+  "deployed_backend_digest": "sha256:a18aafcb03dd99844d99f4c8524cf11a00b499058214a5daf42e9bb7b5fdb1cb",
+  "workload_revision": "322beb64d42f692aa30058812ab7c9ea01245e55",
+  "timeline": {
+    "workshop_created_at": "2026-09-05T21:17:43.479444Z",
+    "provisioning_started_at": "2026-09-05T21:17:51.375403Z",
+    "rhgnr1_first_not_ready_observed_at": "2026-09-05T21:23:49Z",
+    "rhgnr1_first_recovered_at": "2026-09-05T21:24:23Z",
+    "workshop_marked_completed_at": "2026-09-05T21:35:53.878559Z",
+    "rhgnr1_second_not_ready_observed_at": "2026-09-05T21:41:09Z",
+    "rhgnr1_second_recovered_at": "2026-09-05T21:41:33Z",
+    "cleanup_evaluated_at": "2026-09-05T21:46:38Z"
+  },
+  "outcome": {
+    "seats_requested": 5,
+    "persisted_sessions": 5,
+    "seats_ready_before_failure": 2,
+    "seats_started_after_reclaim_request": 1,
+    "final_workshop_status": "completed",
+    "final_seat_states": {
+      "reclaimed": 5
+    },
+    "promotion_gate_passed": false
+  },
+  "seat_observations": [
+    {
+      "seat_id": "ab71a321-3460-4bab-9f34-e9ba8ace8fc8",
+      "session_id": "df99fbee-cca8-42d4-952d-8f84deb0c1d5",
+      "namespace": "launchpad-smoke-test-tenant-agentops-ab71a3",
+      "node": "gnr2.fm2aihpcsed.com",
+      "pre_reclaim_result": "ready"
+    },
+    {
+      "seat_id": "a34ed874-2a7b-423e-ace7-892f2060c8e4",
+      "session_id": "db35bb17-30eb-4dfc-8627-961b7729c4c3",
+      "namespace": "launchpad-smoke-test-tenant-agentops-a34ed8",
+      "node": "rhgnr1",
+      "pre_reclaim_result": "failed-during-worker-runtime-outage"
+    },
+    {
+      "seat_id": "4b9d32ed-b13d-4133-8da1-2522050f46fa",
+      "session_id": "29386c83-9bfe-4c2b-bf61-72bbe198a1b4",
+      "namespace": "launchpad-smoke-test-tenant-agentops-4b9d32",
+      "node": "gnr2.fm2aihpcsed.com",
+      "pre_reclaim_result": "ready"
+    },
+    {
+      "seat_id": "ce046b7f-e4ab-4f0b-b7e7-07cbf13c49ec",
+      "session_id": "0f1915bd-400b-4be3-9a78-a15d44c1d56f",
+      "namespace": "launchpad-smoke-test-tenant-agentops-ce046b",
+      "node": "rhgnr1",
+      "pre_reclaim_result": "failed-dspa-readiness-timeout"
+    },
+    {
+      "seat_id": "7f0510ae-b77e-4d9a-9820-e3e87d9bebcb",
+      "session_id": "588d454a-bff5-4f7b-ba77-c44e36d9cfbd",
+      "namespace": "launchpad-smoke-test-tenant-agentops-7f0510",
+      "node": "gnr2.fm2aihpcsed.com",
+      "pre_reclaim_result": "became-healthy-after-reclaim-request"
+    }
+  ],
+  "root_causes": [
+    {
+      "id": "AGENTOPS-5-B83-RED-001",
+      "finding": "Topology spreading placed two AgentOps seats on rhgnr1, but that worker lost its container runtime and became NotReady during provisioning. It suffered another network and NotReady event during cleanup. Current Ready and pod-headroom checks did not represent workload-specific worker stability."
+    },
+    {
+      "id": "AGENTOPS-5-B83-RED-002",
+      "finding": "ThreadPoolExecutor had already queued all seats. After workshop reclaim changed the order to reclaiming, a queued fifth seat still entered provisioning, created a session and namespace, and reached health before reclaim could delete it."
+    },
+    {
+      "id": "AGENTOPS-5-B83-RED-003",
+      "finding": "The worker outage delayed pod termination and stale operator finalizers. The ephemeral NFS provisioner removed five of six interrupted-seat volumes, but root-squash could not delete one PostgreSQL tree owned by the deleted project's UID."
+    }
+  ],
+  "red_green_matrix": [
+    {
+      "id": "AGENTOPS-5-NODE-QUALIFICATION",
+      "red_live": "Two seats assigned to rhgnr1 failed while the worker became NotReady twice during the run and cleanup.",
+      "green_local": "Catalog v0.1.2 requires launchpad.redhat.com/agentops-certified=true and placement excludes workers without the exact capability label.",
+      "green_live": "pending corrected-build one-seat and five-seat reruns"
+    },
+    {
+      "id": "AGENTOPS-5-QUEUED-RECLAIM",
+      "red_live": "One queued seat began provisioning after workshop reclaim was requested.",
+      "green_local": "Queued workers re-read persisted workshop state before provisioning and canceled seats finish as reclaimed; regression covers a three-seat, concurrency-one race.",
+      "green_live": "pending fault rerun"
+    },
+    {
+      "id": "AGENTOPS-5-CLEANUP",
+      "red_live": "Cleanup required 29 stale pod API deletions and one Argo hook-finalizer repair; one PostgreSQL PV and backing directory remain.",
+      "green_local": "Ephemeral volumes retain Delete policy, but owner-UID-safe database cleanup requires a separate design before this cell can be green.",
+      "green_live": "failed"
+    }
+  ],
+  "cleanup": {
+    "normal_group_reclaim_relinked_all_persisted_sessions": true,
+    "direct_session_reclaims_required": 0,
+    "force_deleted_stale_pod_records": 29,
+    "orphan_argocd_hook_finalizers_removed": 1,
+    "remaining_namespaces": 0,
+    "remaining_argocd_applications": 0,
+    "ephemeral_persistent_volumes_deleted": 5,
+    "remaining_persistent_volumes": 1,
+    "remaining_pv": "pvc-6ee523d9-5b82-456c-9c44-69af6276ae34",
+    "remaining_pv_owner_uid": 1001090000,
+    "privilege_escalation_used": false,
+    "within_ten_minute_slo": false
+  },
+  "test_evidence": {
+    "red_contracts": [
+      "health-qualified node-label filtering failed before implementation",
+      "queued seats continued provisioning after group reclaim before implementation"
+    ],
+    "applicable_regression_tests_passed": 1030,
+    "local_runtime_tests_deselected": 13,
+    "pre_commit_secret_scan": "pass"
+  },
+  "release_decision": {
+    "catalog_max_workshop_seats": 1,
+    "five_seat_gate": "not certified",
+    "next_action": "Deploy catalog v0.1.2 and the backend node-qualification and queued-reclaim contracts. Label only the measured-stable gnr2 worker, rerun one seat, then rerun five seats and require zero residue before promotion."
+  },
+  "contains_plaintext_credentials": false
+}

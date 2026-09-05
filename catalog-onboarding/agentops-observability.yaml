@@ -9,7 +9,7 @@ catalog:
     OpenShift metrics and logs, Grafana dashboards, MLflow tracing and
     evaluation, and Red Hat OpenShift AI pipelines on Intel infrastructure.
   category: guided_build
-  version: "0.1.1"
+  version: "0.1.2"
   supported_branding:
     - redhat-intel-default
     - intel-internal
@@ -88,6 +88,11 @@ runtime:
   workshop_node_spread: true
   workshop_node_min_ready_seconds: 900
   workshop_node_headroom_pods: 10
+  # Only workers that have passed this workload's live stability gate may
+  # receive AgentOps seats. Arena currently labels gnr2; rhgnr1 remains
+  # quarantined after repeated container-runtime outages.
+  workshop_node_required_labels:
+    launchpad.redhat.com/agentops-certified: "true"
   workshop_provision_concurrency: 2
   tabs:
     - id: openshift-console

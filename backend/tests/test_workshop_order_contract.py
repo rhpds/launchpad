@@ -923,6 +923,52 @@ def test_reclaim_waits_for_inflight_provisioning_without_status_overwrite():
     )
 
 
+def test_reclaim_cancels_workshop_seats_that_have_not_started():
+    service = ProvisioningService()
+    item = service.catalog.get_item("inference-overdrive-quickstart")
+    item.metadata = {**item.metadata, "workshop_provision_concurrency": 1}
+    workshop = Workshop(
+        tenant_id="cancel-pending-tenant",
+        catalog_item_id=item.catalog_item_id,
+        num_users=3,
+    )
+    first_seat_started = threading.Event()
+    allow_first_seat_to_finish = threading.Event()
+    original = service._provision_workshop_seat
+    started_indexes = []
+
+    def tracked(target_workshop, index):
+        started_indexes.append(index)
+        if index == 0:
+            first_seat_started.set()
+            assert allow_first_seat_to_finish.wait(timeout=2)
+        return original(target_workshop, index)
+
+    result = {}
+
+    def provision():
+        result["workshop"] = service.provision_workshop(workshop)
+
+    with patch.object(service, "_provision_workshop_seat", side_effect=tracked):
+        thread = threading.Thread(target=provision)
+        thread.start()
+        assert first_seat_started.wait(timeout=2)
+        service.queue_workshop_reclaim(workshop.workshop_id)
+        allow_first_seat_to_finish.set()
+        thread.join(timeout=5)
+
+    assert not thread.is_alive()
+    assert started_indexes == [0]
+    assert result["workshop"].status == WorkshopStatus.RECLAIMING
+    assert len(result["workshop"].session_ids) == 1
+
+    reclaimed = service.reclaim_workshop(workshop.workshop_id)
+    assert reclaimed.status == WorkshopStatus.COMPLETED
+    assert all(
+        seat.status == WorkshopSeatStatus.RECLAIMED for seat in reclaimed.seats
+    )
+
+
 def test_reclaim_relinks_failed_sessions_after_inflight_provisioning_stops():
     service = ProvisioningService()
     order = service.create_workshop_order(

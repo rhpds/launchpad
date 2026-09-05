@@ -1203,6 +1203,12 @@ http {{
             int(metadata.get("seat_pods", 1))
             + int(metadata.get("workshop_node_headroom_pods", 0)),
         )
+        required_labels = {
+            str(key): str(value)
+            for key, value in (
+                metadata.get("workshop_node_required_labels", {}) or {}
+            ).items()
+        }
         active_by_node: dict[str, int] = {}
         for pod in self._core_v1.list_pod_for_all_namespaces().items:
             if getattr(getattr(pod, "status", None), "phase", "") in {
@@ -1217,9 +1223,12 @@ http {{
         eligible: list[str] = []
         for node in self._core_v1.list_node().items:
             name = str(getattr(getattr(node, "metadata", None), "name", ""))
+            labels = getattr(getattr(node, "metadata", None), "labels", None) or {}
             spec = getattr(node, "spec", None)
             status = getattr(node, "status", None)
             if not name or getattr(spec, "unschedulable", False):
+                continue
+            if any(labels.get(key) != value for key, value in required_labels.items()):
                 continue
             if any(
                 getattr(taint, "effect", "") in {"NoSchedule", "NoExecute"}

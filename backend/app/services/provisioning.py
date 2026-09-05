@@ -1599,7 +1599,11 @@ class ProvisioningService:
         )))
         with ThreadPoolExecutor(max_workers=concurrency) as executor:
             futures = {
-                executor.submit(self._provision_workshop_seat, workshop, i): i
+                executor.submit(
+                    self._provision_workshop_seat_unless_reclaiming,
+                    workshop,
+                    i,
+                ): i
                 for i in pending_indexes
             }
             for future in as_completed(futures):
@@ -1693,6 +1697,22 @@ class ProvisioningService:
         self._save_workshop(workshop)
         provision_event.set()
         return workshop
+
+    def _provision_workshop_seat_unless_reclaiming(
+        self, workshop: Workshop, index: int
+    ) -> tuple[WorkshopSeat, Optional[str]]:
+        """Do not start queued seat work after group reclaim is requested."""
+        current = self._workshops.get(workshop.workshop_id)
+        if current and current.status == WorkshopStatus.RECLAIMING:
+            seat = current.seats[index]
+            return seat.model_copy(
+                update={
+                    "status": WorkshopSeatStatus.PENDING,
+                    "error": None,
+                    "updated_at": datetime.utcnow(),
+                }
+            ), None
+        return self._provision_workshop_seat(workshop, index)
 
     def _provision_workshop_seat(
         self, workshop: Workshop, index: int
@@ -2077,6 +2097,23 @@ class ProvisioningService:
             if not failed_reclaims
             else WorkshopStatus.COMPLETED_WITH_ERRORS
         )
+        # A queued seat cancelled before it creates a session has no cluster
+        # resources to delete, but it is still part of the reclaimed order.
+        # Do not leave a completed workshop displaying pending/provisioning
+        # seats after a successful group reclaim.
+        for index, seat in enumerate(workshop.seats):
+            if not seat.session_id and seat.status in {
+                WorkshopSeatStatus.PENDING,
+                WorkshopSeatStatus.PROVISIONING,
+                WorkshopSeatStatus.RECLAIMING,
+            }:
+                workshop.seats[index] = seat.model_copy(
+                    update={
+                        "status": WorkshopSeatStatus.RECLAIMED,
+                        "error": None,
+                        "updated_at": datetime.utcnow(),
+                    }
+                )
         workshop = workshop.model_copy(update={
             "status": status,
             "completed_at": datetime.utcnow(),

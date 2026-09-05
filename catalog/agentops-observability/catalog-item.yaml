@@ -4,7 +4,7 @@ description: Investigate a production-style multi-agent mortgage application thr
   OpenShift metrics and logs, Grafana dashboards, MLflow tracing and evaluation, and
   Red Hat OpenShift AI pipelines on Intel infrastructure.
 category: guided_build
-version: 0.1.1
+version: 0.1.2
 status: draft
 required_capabilities:
 - openshift
@@ -113,6 +113,8 @@ metadata:
   workshop_node_spread: true
   workshop_node_min_ready_seconds: 900
   workshop_node_headroom_pods: 10
+  workshop_node_required_labels:
+    launchpad.redhat.com/agentops-certified: 'true'
   # Admit one seat per worker in each wave so transient Argo and operator pods
   # do not concentrate before the previous pair reaches collective readiness.
   workshop_provision_concurrency: 2
