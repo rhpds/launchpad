@@ -56,3 +56,17 @@ def test_twenty_five_seat_evidence_is_complete_and_does_not_overclaim_scope():
     )
     assert evidence["gate_rubric"]["score"] == 100
     assert evidence["gate_rubric"]["required"] == 100
+
+
+def test_tool_calling_driver_executes_the_complete_protocol_from_the_seat():
+    driver = (ROOT / "scripts/certify-tool-calling-journey.sh").read_text()
+
+    assert "*config-arena*" in driver
+    assert "refusing to validate a non-Arena cluster" in driver
+    assert "02-serving-with-tools.html" in driver
+    assert "deploy/showroom -c terminal" in driver
+    assert 'name:"get_weather"' in driver
+    assert "tool_calls" in driver
+    assert 'role:"tool"' in driver
+    assert "temperature" in driver
+    assert "complete-tool-protocol=true" in driver
