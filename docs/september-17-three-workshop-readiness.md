@@ -145,13 +145,19 @@ is disabled because the operator-generated MLMD server TLS configuration drops
 the database TLS options. The external MLMD route is disabled and NetworkPolicy
 limits database ingress, but an upstream-supported encrypted configuration for
 every internal pipeline hop is still required before production. Before Gate B,
-logging must also move from the `1x.demo` NFS/MinIO pilot to durable
-S3-compatible object storage, dynamic block storage, and production sizing.
-Evidence is in `evidence/agentops-mlflow-postgres-live-2026-09-05.json` and
+the `1x.demo` NFS/MinIO logging topology remains a pilot boundary. Arena has
+only two storage-capable workers; a supported internal ODF deployment requires
+three. The controlled five-seat certification can retain the pilot while it
+measures ingestion, query latency, restarts, and storage growth, but production
+activation still requires durable S3-compatible object storage, dynamic block
+storage, and production sizing. Evidence is in
+`evidence/agentops-mlflow-postgres-live-2026-09-05.json` and
 `evidence/agentops-pipeline-database-tls-live-2026-09-05.json`.
 
 ### Gate B: five AgentOps seats
 
+- Use the admin-only certification override to request exactly the next
+  declared promotion target while the normal catalog maximum remains one.
 - Provision five seats through a single workshop order.
 - Require 5/5 collective readiness and five successful concurrent participant
   journeys, including embeddings, an agent exchange, a trace, metrics, logs,

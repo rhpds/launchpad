@@ -10,6 +10,8 @@ from app.domain.clusters import ClusterTarget
 from app.domain.enums import CatalogCategory, SessionStatus, WorkshopSeatStatus, WorkshopStatus
 from app.domain.lifecycle import transition
 from app.domain.models import LabRequest, LabSession, Workshop, WorkshopSeat
+from app.auth.oauth import User, get_current_user
+from app.api.deps import provisioning_service as api_provisioning_service
 from app.main import app
 from app.services.cluster_registry import ClusterRegistry
 from app.services.provisioning import ProvisioningService
@@ -20,7 +22,10 @@ from pydantic import ValidationError
 def _catalog_with_workshop_limit(limit: int):
     catalog = SimpleNamespace()
     catalog.get_item = lambda _item_id: SimpleNamespace(
-        metadata={"max_workshop_seats": limit},
+        metadata={
+            "max_workshop_seats": limit,
+            "promotion_sequence": [1, 5, 25],
+        },
         required_capabilities=[],
     )
     return catalog
@@ -575,6 +580,103 @@ def test_direct_workshop_provision_rejects_catalog_certification_seat_limit():
                 num_users=2,
             )
         )
+
+
+def test_admin_certification_override_allows_only_next_declared_promotion_step():
+    service = ProvisioningService(catalog=_catalog_with_workshop_limit(1))
+    preview = service.preview_workshop_capacity(
+        Workshop(
+            tenant_id="pilot-tenant",
+            catalog_item_id="pilot-lab",
+            num_users=5,
+            certification_override=True,
+        )
+    )
+
+    assert preview["can_provision"] is True
+    assert preview["catalog_seat_limit"] == 1
+    assert preview["certification_override"] is True
+    assert preview["certification_target_seats"] == 5
+
+
+def test_certification_override_rejects_skipping_the_next_promotion_step():
+    service = ProvisioningService(catalog=_catalog_with_workshop_limit(1))
+
+    with pytest.raises(ValueError, match="next promotion target of 5"):
+        service.create_workshop_order(
+            Workshop(
+                tenant_id="pilot-tenant",
+                catalog_item_id="pilot-lab",
+                num_users=25,
+                certification_override=True,
+            )
+        )
+
+
+def test_certification_override_is_internal_only():
+    service = ProvisioningService(catalog=_catalog_with_workshop_limit(1))
+
+    with pytest.raises(ValueError, match="internal workshops only"):
+        service.create_workshop_order(
+            Workshop(
+                tenant_id="pilot-tenant",
+                catalog_item_id="pilot-lab",
+                num_users=5,
+                certification_override=True,
+                exposure_policy="public_code",
+            )
+        )
+
+
+def test_non_admin_cannot_request_workshop_certification_override():
+    app.dependency_overrides[get_current_user] = lambda: User(
+        username="participant",
+        tenant_ids=["pilot-tenant"],
+        is_admin=False,
+    )
+    try:
+        response = client.post(
+            "/api/v1/workshops/orders",
+            json={
+                "tenant_id": "pilot-tenant",
+                "catalog_item_id": "guided-rag-on-xeon",
+                "num_users": 5,
+                "certification_override": True,
+            },
+        )
+    finally:
+        app.dependency_overrides.pop(get_current_user, None)
+
+    assert response.status_code == 403
+    assert response.json()["detail"] == (
+        "Only administrators can request an uncertified workshop size"
+    )
+
+
+def test_admin_api_persists_certification_override_on_draft_order():
+    with patch.object(
+        api_provisioning_service,
+        "catalog",
+        _catalog_with_workshop_limit(1),
+    ):
+        response = client.post(
+            "/api/v1/workshops/orders",
+            json={
+                "tenant_id": "certification-tenant",
+                "catalog_item_id": "agentops-observability",
+                "num_users": 5,
+                "certification_override": True,
+                "exposure_policy": "internal",
+            },
+            headers={"Idempotency-Key": "agentops-five-seat-contract"},
+        )
+
+    assert response.status_code == 201
+    order = response.json()
+    assert order["status"] == "awaiting_confirmation"
+    assert order["certification_override"] is True
+    assert order["metadata"]["capacity_preview"]["catalog_seat_limit"] == 1
+    assert order["metadata"]["capacity_preview"]["certification_target_seats"] == 5
 
 
 def test_workshop_provisioning_respects_bounded_concurrency():

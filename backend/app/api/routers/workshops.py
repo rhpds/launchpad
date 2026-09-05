@@ -24,6 +24,7 @@ class WorkshopCreate(BaseModel):
     ocp_version: str = "4.20"
     purpose: str = "events"
     target_cluster: str | None = None
+    certification_override: bool = False
     exposure_policy: ExposurePolicy = ExposurePolicy.INTERNAL
 
 
@@ -38,14 +39,24 @@ def _to_workshop(body: WorkshopCreate) -> Workshop:
         ocp_version=body.ocp_version,
         purpose=body.purpose,
         target_cluster=body.target_cluster,
+        certification_override=body.certification_override,
         exposure_policy=body.exposure_policy,
     )
 
 
-@router.post("", response_model=Workshop, status_code=201)
-def create_workshop(body: WorkshopCreate, idempotency_key: str | None = Header(default=None), user: User = Depends(get_current_user)):
+def _authorize_overrides(body: WorkshopCreate, user: User) -> None:
     if body.target_cluster and not user.is_admin:
         raise HTTPException(403, "Only administrators can override workshop placement")
+    if body.certification_override and not user.is_admin:
+        raise HTTPException(
+            403,
+            "Only administrators can request an uncertified workshop size",
+        )
+
+
+@router.post("", response_model=Workshop, status_code=201)
+def create_workshop(body: WorkshopCreate, idempotency_key: str | None = Header(default=None), user: User = Depends(get_current_user)):
+    _authorize_overrides(body, user)
     workshop = _to_workshop(body)
     try:
         return provisioning_service.provision_workshop(workshop, idempotency_key=idempotency_key)
@@ -62,8 +73,7 @@ def list_workshops():
 
 @router.post("/capacity-preview")
 def preview_workshop_capacity(body: WorkshopCreate, user: User = Depends(get_current_user)):
-    if body.target_cluster and not user.is_admin:
-        raise HTTPException(403, "Only administrators can override workshop placement")
+    _authorize_overrides(body, user)
     return provisioning_service.preview_workshop_capacity(_to_workshop(body))
 
 
@@ -71,8 +81,7 @@ def preview_workshop_capacity(body: WorkshopCreate, user: User = Depends(get_cur
 def create_workshop_order(
     body: WorkshopCreate, idempotency_key: str | None = Header(default=None), user: User = Depends(get_current_user)
 ):
-    if body.target_cluster and not user.is_admin:
-        raise HTTPException(403, "Only administrators can override workshop placement")
+    _authorize_overrides(body, user)
     try:
         workshop = provisioning_service.create_workshop_order(
             _to_workshop(body), idempotency_key=idempotency_key

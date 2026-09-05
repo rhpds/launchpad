@@ -997,6 +997,7 @@ class ProvisioningService:
             "ocp_version": workshop.ocp_version,
             "purpose": workshop.purpose,
             "exposure_policy": workshop.exposure_policy.value,
+            "certification_override": workshop.certification_override,
         }
         return hashlib.sha256(json.dumps(order, sort_keys=True).encode()).hexdigest()
 
@@ -1040,10 +1041,32 @@ class ProvisioningService:
                 f"{workshop.catalog_item_id} has an invalid workshop seat limit"
             )
         if workshop.num_users > catalog_limit:
-            raise ValueError(
-                f"{workshop.catalog_item_id} is certified for a maximum of "
-                f"{catalog_limit} workshop seat(s)"
-            )
+            if not workshop.certification_override:
+                raise ValueError(
+                    f"{workshop.catalog_item_id} is certified for a maximum of "
+                    f"{catalog_limit} workshop seat(s)"
+                )
+            if workshop.exposure_policy != ExposurePolicy.INTERNAL:
+                raise ValueError(
+                    "Workshop certification overrides are available for internal workshops only"
+                )
+            sequence = sorted({
+                int(value)
+                for value in (catalog_item.metadata or {}).get(
+                    "promotion_sequence", []
+                )
+                if int(value) > catalog_limit
+            })
+            if not sequence:
+                raise ValueError(
+                    f"{workshop.catalog_item_id} does not declare a next certification target"
+                )
+            next_target = sequence[0]
+            if workshop.num_users != next_target:
+                raise ValueError(
+                    "Workshop certification override permits only the next "
+                    f"promotion target of {next_target} seat(s)"
+                )
         return catalog_limit
 
     def preview_workshop_capacity(self, workshop: Workshop) -> dict:
@@ -1108,6 +1131,10 @@ class ProvisioningService:
             ),
             "seats_requested": workshop.num_users,
             "catalog_seat_limit": catalog_limit,
+            "certification_override": workshop.certification_override,
+            "certification_target_seats": (
+                workshop.num_users if workshop.certification_override else None
+            ),
             "estimated_resources": {
                 "cpu_millicores": cpu_per_seat * workshop.num_users,
                 "memory_mib": memory_per_seat * workshop.num_users,

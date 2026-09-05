@@ -60,9 +60,11 @@ metadata:
     TLS; podToPodTLS remains disabled because the RHOAI-generated MLMD server TLS
     config drops the database TLS options. Shared MLflow metadata uses persistent
     PostgreSQL with verified service-ca TLS.
-  - Replace the one-seat 1x.demo Loki/MinIO/NFS pilot with durable S3-compatible object
-    storage, dynamic block storage, and production sizing before the five-seat load
-    gate.
+  - Replace the 1x.demo Loki/MinIO/NFS pilot with durable S3-compatible object storage,
+    dynamic block storage, and production sizing before production activation. Controlled
+    internal five-seat certification may retain the pilot only through the explicit
+    admin certification override and must measure ingestion, query latency, restarts,
+    and storage growth.
   - Complete the five-seat functional and zero-residue certification before raising
     the catalog maximum above one seat.
   showroom_journey: agentops-observability

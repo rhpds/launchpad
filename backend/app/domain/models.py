@@ -283,6 +283,7 @@ class Workshop(BaseModel):
     session_ids: List[str] = Field(default_factory=list)
     cluster_ref: Optional[str] = None
     target_cluster: Optional[str] = None
+    certification_override: bool = False
     created_at: datetime = Field(default_factory=datetime.utcnow)
     started_at: Optional[datetime] = None
     completed_at: Optional[datetime] = None
