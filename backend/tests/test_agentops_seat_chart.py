@@ -294,6 +294,16 @@ def test_agentops_owns_a_supported_dspa_mariadb_and_normalizes_nfs_permissions()
             "matchLabels": {"component": "data-science-pipelines"}
         }
     } in allowed_peers
+    assert {
+        "namespaceSelector": {
+            "matchLabels": {"kubernetes.io/metadata.name": "redhat-ods-applications"}
+        },
+        "podSelector": {
+            "matchLabels": {
+                "app.kubernetes.io/name": "data-science-pipelines-operator"
+            }
+        },
+    } in allowed_peers
     assert pipeline_service["metadata"]["annotations"] == {
         "service.beta.openshift.io/serving-cert-secret-name": "agentops-pipeline-db-tls"
     }

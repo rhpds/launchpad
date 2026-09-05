@@ -21,6 +21,12 @@ spec:
             matchLabels:
               app.kubernetes.io/component: pipeline-database
               app.kubernetes.io/instance: {{ .Release.Name }}
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: redhat-ods-applications
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: data-science-pipelines-operator
       ports:
         - protocol: TCP
           port: 3306
