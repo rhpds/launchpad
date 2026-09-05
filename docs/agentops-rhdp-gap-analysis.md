@@ -12,7 +12,7 @@ repeatable 5- and 25-seat workshops on Arena.
 | Catalog orchestration | private `rhpds/agnosticv`, `agd_v2/agentops-intel`, reviewed at `48fc6eebedb295bddf1b915a230e5e90f89db0af` | RHDP variables, workload order, access, and Showroom tabs |
 | Launchpad Showroom | `rhpds/launchpad`, `content-agentops-observability`, at `59563b0a77252e8b91077c30c23ab524a8402bce` | Adapted Antora participant journey |
 | Upstream Showroom | `rhpds/agentops-intel-showroom` at `f1881c61de55ebf5640c27e76469f4efe458edaf` | Immutable content and screenshot provenance |
-| Launchpad seat chart | `rhpds/launchpad`, `deploy/workloads/agentops-seat`, at `6ef880aabd441c39085575922fc3c14e14a83299` | Namespace-scoped source with DNS-safe Route names, service-ca TLS for its pipeline database, and a contained RHOAI 3.5 MLMD compatibility workaround; the revision awaits its clean one-seat rerun |
+| Launchpad seat chart | `rhpds/launchpad`, `deploy/workloads/agentops-seat`, at `e177a2fa92533d23b7e7846c93efe08a9a63493b` | Namespace-scoped source with DNS-safe Route names, service-ca TLS for its pipeline database, and a contained RHOAI 3.5 MLMD compatibility workaround; the revision awaits its clean one-seat rerun |
 | GitOps automation | `rhpds/agentops-in-prod-automation` at `6ea100531ac869fa66abe69ae223d6b56dbce9a2` | Reviewed RHDP bootstrap provenance; not deployed by Launchpad |
 | Application | `rh-ai-quickstart/multi-agent-loan-origination` at `1e50e51c334c1b6ed854d81a3f28fd324792f481` | Mortgage AI application source and base chart |
 

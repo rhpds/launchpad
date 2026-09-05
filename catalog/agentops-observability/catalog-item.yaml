@@ -103,7 +103,7 @@ metadata:
   seat_pods: 15
   seat_storage_gib: 30
   workload_repo: https://github.com/rhpds/launchpad.git
-  workload_revision: 6ef880aabd441c39085575922fc3c14e14a83299
+  workload_revision: e177a2fa92533d23b7e7846c93efe08a9a63493b
   workload_deploy_type: helm
   workload_deployment_scope: seat
   workload_deploy_path: deploy/workloads/agentops-seat
