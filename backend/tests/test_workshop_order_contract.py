@@ -425,6 +425,56 @@ def test_interrupted_reclaim_recovers_session_created_before_seat_link():
     cleanup.assert_called_once_with(order.workshop_id)
 
 
+def test_queue_reclaim_recovers_session_created_before_failed_seat_link():
+    service = ProvisioningService()
+    order = service.create_workshop_order(
+        Workshop(
+            tenant_id="failed-reclaim-tenant",
+            catalog_item_id="inference-overdrive-quickstart",
+            num_users=1,
+        )
+    )
+    seat = order.seats[0]
+    request = LabRequest(
+        tenant_id=order.tenant_id,
+        requester_id=seat.participant_id,
+        catalog_item_id=order.catalog_item_id,
+        requested_mode=CatalogCategory.QUICK_START,
+        metadata={"workshop_id": order.workshop_id, "seat_id": seat.seat_id},
+    )
+    session = LabSession(
+        request_id=request.request_id,
+        tenant_id=order.tenant_id,
+        catalog_item_id=order.catalog_item_id,
+        namespace="launchpad-failed-before-seat-link",
+        cluster_ref="arena",
+    )
+    service._save_request(request)
+    service._save_session(session)
+    service._save_workshop(
+        order.model_copy(
+            update={
+                "status": WorkshopStatus.FAILED,
+                "seats": [
+                    seat.model_copy(
+                        update={
+                            "status": WorkshopSeatStatus.FAILED,
+                            "error": "provisioning failed after namespace creation",
+                        }
+                    )
+                ],
+            }
+        )
+    )
+
+    queued = service.queue_workshop_reclaim(order.workshop_id)
+
+    assert queued.session_ids == [session.session_id]
+    assert queued.seats[0].session_id == session.session_id
+    assert queued.seats[0].request_id == request.request_id
+    assert queued.seats[0].status == WorkshopSeatStatus.RECLAIMING
+
+
 def test_workshop_order_rejects_more_than_supported_seat_limit():
     service = ProvisioningService()
     with patch.dict(os.environ, {"MAX_ACTIVE_SESSIONS_PER_WORKSHOP": "20"}):

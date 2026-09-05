@@ -1299,6 +1299,30 @@ class ProvisioningService:
         self._save_workshop(queued)
         return queued
 
+    def _link_persisted_workshop_sessions(self, workshop: Workshop) -> Workshop:
+        """Recover seat links when provisioning stopped after session persistence."""
+        session_ids = list(workshop.session_ids)
+        seats = list(workshop.seats)
+        seats_by_id = {seat.seat_id: index for index, seat in enumerate(seats)}
+        for session in self._sessions.values():
+            request = self._requests.get(session.request_id)
+            request_metadata = request.metadata if request else {}
+            if request_metadata.get("workshop_id") != workshop.workshop_id:
+                continue
+            if session.session_id not in session_ids:
+                session_ids.append(session.session_id)
+            seat_index = seats_by_id.get(request_metadata.get("seat_id"))
+            if seat_index is not None:
+                seats[seat_index] = seats[seat_index].model_copy(
+                    update={
+                        "status": WorkshopSeatStatus.RECLAIMING,
+                        "session_id": session.session_id,
+                        "request_id": request.request_id,
+                        "updated_at": datetime.utcnow(),
+                    }
+                )
+        return workshop.model_copy(update={"session_ids": session_ids, "seats": seats})
+
     def recover_interrupted_workshops(self) -> list[str]:
         """Resume workshop provision or reclaim jobs interrupted with the process.
 
@@ -1327,32 +1351,10 @@ class ProvisioningService:
         recovered: list[str] = []
         for workshop_id in reclaiming:
             try:
-                workshop = self._workshops[workshop_id]
-                session_ids = list(workshop.session_ids)
-                seats = list(workshop.seats)
-                seats_by_id = {seat.seat_id: index for index, seat in enumerate(seats)}
-                for session in self._sessions.values():
-                    request = self._requests.get(session.request_id)
-                    request_metadata = request.metadata if request else {}
-                    if request_metadata.get("workshop_id") != workshop_id:
-                        continue
-                    if session.session_id not in session_ids:
-                        session_ids.append(session.session_id)
-                    seat_index = seats_by_id.get(request_metadata.get("seat_id"))
-                    if seat_index is not None:
-                        seats[seat_index] = seats[seat_index].model_copy(
-                            update={
-                                "status": WorkshopSeatStatus.RECLAIMING,
-                                "session_id": session.session_id,
-                                "request_id": request.request_id,
-                                "updated_at": datetime.utcnow(),
-                            }
-                        )
-                self._save_workshop(
-                    workshop.model_copy(
-                        update={"session_ids": session_ids, "seats": seats}
-                    )
+                workshop = self._link_persisted_workshop_sessions(
+                    self._workshops[workshop_id]
                 )
+                self._save_workshop(workshop)
                 self.reclaim_workshop(workshop_id)
                 recovered.append(workshop_id)
             except Exception:
@@ -1972,6 +1974,8 @@ class ProvisioningService:
             WorkshopStatus.COMPLETED_WITH_ERRORS,
         }:
             return workshop
+
+        workshop = self._link_persisted_workshop_sessions(workshop)
 
         seats = [
             seat.model_copy(update={

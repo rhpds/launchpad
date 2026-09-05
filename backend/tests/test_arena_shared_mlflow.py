@@ -42,7 +42,7 @@ def test_shared_mlflow_uses_the_installed_rhoai_operator_and_disposable_storage(
     ]
 
 
-def test_arena_registry_publishes_the_rhoai_mlflow_service():
+def test_arena_registry_publishes_the_rhoai_and_mlflow_services():
     for path in CLUSTER_REGISTRIES:
         document = yaml.safe_load(path.read_text())
         registry = document.get("data", {}).get("clusters.yaml", document)
@@ -60,6 +60,9 @@ def test_arena_registry_publishes_the_rhoai_mlflow_service():
         }
         assert arena["service_urls"]["mlflow"] == (
             "https://rh-ai.apps.arena.fm2aihpcsed.com/mlflow"
+        )
+        assert arena["service_urls"]["rhoai"] == (
+            "https://rh-ai.apps.arena.fm2aihpcsed.com/"
         )
 
 
