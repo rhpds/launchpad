@@ -33,8 +33,23 @@ def build_catalog_item(intake: dict[str, Any]) -> dict[str, Any]:
     runtime = intake["runtime"]
     certification = intake["certification"]
     resources = runtime["seat_resources"]
+    transient_resources = runtime.get("transient_seat_resources", {})
+    shared_resources = runtime.get("workshop_shared_resources", {})
     workload_contract = runtime.get("workload", {})
     references = intake.get("references", {})
+    capacity_metadata = {}
+    if transient_resources:
+        capacity_metadata.update({
+            "seat_transient_cpu_millicores": transient_resources["cpu_millicores"],
+            "seat_transient_memory_mib": transient_resources["memory_mib"],
+            "seat_transient_pods": transient_resources["pods"],
+        })
+    if shared_resources:
+        capacity_metadata.update({
+            "workshop_shared_cpu_millicores": shared_resources["cpu_millicores"],
+            "workshop_shared_memory_mib": shared_resources["memory_mib"],
+            "workshop_shared_pods": shared_resources["pods"],
+        })
 
     return {
         "catalog_item_id": catalog["catalog_item_id"],
@@ -93,6 +108,7 @@ def build_catalog_item(intake: dict[str, Any]) -> dict[str, Any]:
             "seat_memory_mib": resources["memory_mib"],
             "seat_pods": resources["pods"],
             "seat_storage_gib": resources["storage_gib"],
+            **capacity_metadata,
             "workshop_provision_concurrency": int(
                 runtime.get("workshop_provision_concurrency", 5)
             ),
@@ -337,6 +353,22 @@ def _validate_contract(intake: dict[str, Any], errors: list[str]) -> None:
         value = resources.get(key)
         if not isinstance(value, int) or value < 0:
             errors.append(f"runtime.seat_resources.{key} must be a non-negative integer")
+    for resource_group in (
+        "transient_seat_resources",
+        "workshop_shared_resources",
+    ):
+        if resource_group not in runtime:
+            continue
+        group = runtime.get(resource_group)
+        if not isinstance(group, dict):
+            errors.append(f"runtime.{resource_group} must be a mapping")
+            continue
+        for key in ("cpu_millicores", "memory_mib", "pods"):
+            value = group.get(key)
+            if not isinstance(value, int) or value < 0:
+                errors.append(
+                    f"runtime.{resource_group}.{key} must be a non-negative integer"
+                )
 
     tabs = runtime.get("tabs")
     if not isinstance(tabs, list) or not tabs:

@@ -226,6 +226,22 @@ def test_capacity_preview_does_not_create_workshop():
     assert response.json()["seats_requested"] == 20
     assert response.json()["can_provision"] is True
     assert response.json()["estimated_resources"]["cpu_millicores"] == 20000
+    assert response.json()["resource_breakdown"]["per_seat"] == {
+        "cpu_millicores": 1000,
+        "memory_mib": 2048,
+        "pods": 1,
+    }
+    assert response.json()["resource_breakdown"]["transient"] == {
+        "concurrent_seats": 5,
+        "cpu_millicores": 0,
+        "memory_mib": 0,
+        "pods": 0,
+    }
+    assert response.json()["resource_breakdown"]["shared"] == {
+        "cpu_millicores": 0,
+        "memory_mib": 0,
+        "pods": 0,
+    }
     assert len(after) == len(before)
 
 

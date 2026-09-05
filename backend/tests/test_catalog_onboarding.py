@@ -24,7 +24,7 @@ def test_agentops_is_registered_as_a_fail_closed_draft():
     assert catalog == build_catalog_item(intake)
     assert catalog["catalog_item_id"] == "agentops-observability"
     assert catalog["status"] == "draft"
-    assert catalog["version"] == "0.1.3"
+    assert catalog["version"] == "0.1.4"
     assert catalog["metadata"]["certification_stage"] == "twenty-five-seat-certification"
     assert catalog["metadata"]["max_workshop_seats"] == 5
     assert catalog["metadata"]["activation_blockers"]
@@ -92,9 +92,17 @@ def test_agentops_intake_captures_the_large_lab_runtime_contract():
     assert runtime["seat_resources"] == {
         "cpu_millicores": 2500,
         "memory_mib": 7168,
-        "pods": 17,
+        "pods": 12,
         "storage_gib": 30,
     }
+    assert runtime["transient_seat_resources"] == {
+        "cpu_millicores": 0,
+        "memory_mib": 0,
+        "pods": 4,
+    }
+    generated = build_catalog_item(intake)["metadata"]
+    assert generated["seat_pods"] == 12
+    assert generated["seat_transient_pods"] == 4
     assert runtime["workshop_node_spread"] is True
     assert runtime["workshop_node_min_ready_seconds"] == 900
     assert runtime["workshop_node_headroom_pods"] == 10
@@ -298,6 +306,23 @@ def test_validator_rejects_invalid_workshop_provision_concurrency():
     assert report["validation_status"] == "fail"
     assert any(
         "workshop_provision_concurrency" in error
+        for error in report["errors"]
+    )
+
+
+def test_validator_rejects_invalid_transient_resource_contract():
+    intake = load_intake(INTAKE_PATH)
+    intake["runtime"]["transient_seat_resources"] = {
+        "cpu_millicores": 0,
+        "memory_mib": 0,
+        "pods": -1,
+    }
+
+    report = validate_intake(intake)
+
+    assert report["validation_status"] == "fail"
+    assert any(
+        "runtime.transient_seat_resources.pods" in error
         for error in report["errors"]
     )
 

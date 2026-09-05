@@ -1201,6 +1201,7 @@ http {{
         protected_pods = max(
             1,
             int(metadata.get("seat_pods", 1))
+            + int(metadata.get("seat_transient_pods", 0))
             + int(metadata.get("workshop_node_headroom_pods", 0)),
         )
         required_labels = {

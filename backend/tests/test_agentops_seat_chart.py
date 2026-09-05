@@ -126,8 +126,7 @@ def test_agentops_seat_chart_contains_the_participant_runtime_and_routes():
     resources = {(document["kind"], document["metadata"]["name"]) for document in documents}
 
     assert {
-        ("Deployment", "mortgage-ai-api"),
-        ("Deployment", "mortgage-ai-ui"),
+        ("Deployment", "mortgage-ai-app"),
         ("Deployment", "minio"),
         ("Deployment", "agentops-grafana"),
         ("StatefulSet", "mortgage-ai-db"),
@@ -149,18 +148,40 @@ def test_agentops_seat_chart_contains_the_participant_runtime_and_routes():
     assert images
     assert all(":latest" not in image for image in images)
 
-    api = next(
+    application = next(
         document
         for document in documents
-        if document["kind"] == "Deployment" and document["metadata"]["name"] == "mortgage-ai-api"
+        if document["kind"] == "Deployment" and document["metadata"]["name"] == "mortgage-ai-app"
     )
-    api_container = api["spec"]["template"]["spec"]["containers"][0]
+    application_spec = application["spec"]["template"]["spec"]
+    assert {container["name"] for container in application_spec["containers"]} == {
+        "api",
+        "ui",
+    }
+    api_container = next(
+        container for container in application_spec["containers"] if container["name"] == "api"
+    )
     assert {source["secretRef"]["name"] for source in api_container["envFrom"]} == {
         "agentops-runtime"
     }
-    assert api["spec"]["strategy"] == {"type": "Recreate"}
+    assert application["spec"]["strategy"] == {"type": "Recreate"}
+    services = {
+        document["metadata"]["name"]: document
+        for document in documents
+        if document["kind"] == "Service"
+    }
+    assert services["mortgage-ai-api"]["spec"]["selector"] == {
+        "app.kubernetes.io/part-of": "agentops-observability",
+        "app.kubernetes.io/component": "application",
+        "app.kubernetes.io/instance": "agentops",
+    }
+    assert services["mortgage-ai-ui"]["spec"]["selector"] == services[
+        "mortgage-ai-api"
+    ]["spec"]["selector"]
+    assert services["mortgage-ai-api"]["spec"]["ports"][0]["targetPort"] == "http-api"
+    assert services["mortgage-ai-ui"]["spec"]["ports"][0]["targetPort"] == "http-ui"
     assert api_container["startupProbe"] == {
-        "httpGet": {"path": "/health/", "port": "http"},
+        "httpGet": {"path": "/health/", "port": "http-api"},
         "periodSeconds": 10,
         "failureThreshold": 90,
     }
@@ -173,25 +194,28 @@ def test_agentops_runtime_images_start_with_certified_resource_behavior():
     )
 
     _, documents = _render()
-    ui = next(
+    application = next(
         document
         for document in documents
         if document["kind"] == "Deployment"
-        and document["metadata"]["name"] == "mortgage-ai-ui"
+        and document["metadata"]["name"] == "mortgage-ai-app"
     )
-    ui_spec = ui["spec"]["template"]["spec"]
+    ui_spec = application["spec"]["template"]["spec"]
     nginx_init = next(
         container
         for container in ui_spec["initContainers"]
         if container["name"] == "configure-nginx-workers"
     )
     assert "worker_processes  1" in nginx_init["args"][0]
+    ui_container = next(
+        container for container in ui_spec["containers"] if container["name"] == "ui"
+    )
     assert {
         "name": "nginx-config",
         "mountPath": "/etc/nginx/nginx.conf",
         "subPath": "nginx.conf",
         "readOnly": True,
-    } in ui_spec["containers"][0]["volumeMounts"]
+    } in ui_container["volumeMounts"]
 
     bootstrap = next(
         document
@@ -224,7 +248,7 @@ def test_agentops_database_initializes_runtime_roles_before_migration():
         "configMap": {"name": "mortgage-ai-db-init", "defaultMode": 365},
     } in database_spec["volumes"]
 
-    api = resources[("Deployment", "mortgage-ai-api")]
+    api = resources[("Deployment", "mortgage-ai-app")]
     migration = next(
         container
         for container in api["spec"]["template"]["spec"]["initContainers"]

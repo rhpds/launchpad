@@ -1113,15 +1113,9 @@ class ProvisioningService:
             workshop = workshop.model_copy(update={"cluster_ref": selected_cluster})
         can_provision, reason = self.check_workshop_capacity(workshop)
         metadata = catalog_item.metadata if catalog_item else {}
-        cpu_per_seat = int(metadata.get(
-            "seat_cpu_millicores",
-            os.environ.get("WORKSHOP_SEAT_CPU_MILLICORES", "1000"),
-        ))
-        memory_per_seat = int(metadata.get(
-            "seat_memory_mib",
-            os.environ.get("WORKSHOP_SEAT_MEMORY_MI", "2048"),
-        ))
-        pods_per_seat = int(metadata.get("seat_pods", 1))
+        estimate = self._workshop_resource_estimate(
+            metadata, workshop.num_users
+        )
         return {
             "can_provision": can_provision,
             "reason": reason,
@@ -1137,9 +1131,14 @@ class ProvisioningService:
                 workshop.num_users if workshop.certification_override else None
             ),
             "estimated_resources": {
-                "cpu_millicores": cpu_per_seat * workshop.num_users,
-                "memory_mib": memory_per_seat * workshop.num_users,
-                "pods": pods_per_seat * workshop.num_users,
+                "cpu_millicores": estimate["cpu_millicores"],
+                "memory_mib": estimate["memory_mib"],
+                "pods": estimate["pods"],
+            },
+            "resource_breakdown": {
+                "shared": estimate["shared"],
+                "per_seat": estimate["per_seat"],
+                "transient": estimate["transient"],
             },
         }
 
@@ -2030,6 +2029,105 @@ class ProvisioningService:
                 return int(float(value[:-len(suffix)]) * multiplier)
         return int(value) // (1024 * 1024)
 
+    @staticmethod
+    def _workshop_resource_estimate(metadata: dict, seats: int) -> dict:
+        """Return the steady plus bounded-burst reservation for a workshop.
+
+        Existing catalog items remain compatible: when the optional shared and
+        transient fields are absent, this is the original per-seat
+        multiplication. Transient resources are reserved only for the number
+        of seats that may provision concurrently, rather than for every seat.
+        """
+        seats = max(0, int(seats))
+        concurrency = max(
+            1,
+            int(
+                metadata.get(
+                    "workshop_provision_concurrency",
+                    os.environ.get("WORKSHOP_PROVISION_CONCURRENCY", "5"),
+                )
+            ),
+        )
+        concurrent_seats = min(seats, concurrency)
+
+        per_seat = {
+            "cpu_millicores": int(
+                metadata.get(
+                    "seat_cpu_millicores",
+                    os.environ.get("WORKSHOP_SEAT_CPU_MILLICORES", "1000"),
+                )
+            ),
+            "memory_mib": int(
+                metadata.get(
+                    "seat_memory_mib",
+                    os.environ.get("WORKSHOP_SEAT_MEMORY_MI", "2048"),
+                )
+            ),
+            "pods": int(metadata.get("seat_pods", 1)),
+        }
+        shared = {
+            "cpu_millicores": int(metadata.get("workshop_shared_cpu_millicores", 0)),
+            "memory_mib": int(metadata.get("workshop_shared_memory_mib", 0)),
+            "pods": int(metadata.get("workshop_shared_pods", 0)),
+        }
+        if seats == 0:
+            shared = {key: 0 for key in shared}
+        transient_per_seat = {
+            "cpu_millicores": int(metadata.get("seat_transient_cpu_millicores", 0)),
+            "memory_mib": int(metadata.get("seat_transient_memory_mib", 0)),
+            "pods": int(metadata.get("seat_transient_pods", 0)),
+        }
+        transient = {
+            "concurrent_seats": concurrent_seats,
+            **{
+                key: value * concurrent_seats
+                for key, value in transient_per_seat.items()
+            },
+        }
+        totals = {
+            key: shared[key] + per_seat[key] * seats + transient[key]
+            for key in ("cpu_millicores", "memory_mib", "pods")
+        }
+        return {
+            **totals,
+            "shared": shared,
+            "per_seat": per_seat,
+            "transient": transient,
+        }
+
+    @staticmethod
+    def _max_seats_for_resource(
+        available: int,
+        *,
+        shared: int,
+        per_seat: int,
+        transient_per_seat: int,
+        concurrency: int,
+    ) -> int:
+        """Solve shared + steady seats + a bounded concurrent rollout burst."""
+        available = max(0, int(available))
+        shared = max(0, int(shared))
+        per_seat = max(0, int(per_seat))
+        transient_per_seat = max(0, int(transient_per_seat))
+        concurrency = max(1, int(concurrency))
+
+        first_wave_cost = per_seat + transient_per_seat
+        if available < shared + first_wave_cost:
+            return 0
+        if first_wave_cost == 0:
+            return 999
+
+        seats_in_first_wave = min(
+            concurrency, (available - shared) // first_wave_cost
+        )
+        if seats_in_first_wave < concurrency:
+            return seats_in_first_wave
+        if per_seat == 0:
+            return 999
+
+        first_wave_total = shared + concurrency * first_wave_cost
+        return concurrency + (available - first_wave_total) // per_seat
+
     def _workshop_capacity(self, v1, workshop: Workshop) -> dict:
         total_cpu_m = total_mem_mi = total_pods = 0
         item = self.catalog.get_item(workshop.catalog_item_id)
@@ -2054,21 +2152,40 @@ class ProvisioningService:
                 requested_cpu_m += self._cpu_millicores(requests.get("cpu"))
                 requested_mem_mi += self._memory_mib(requests.get("memory"))
 
-        per_seat_cpu_m = int(metadata.get(
-            "seat_cpu_millicores", os.environ.get("WORKSHOP_SEAT_CPU_MILLICORES", "1000")
-        ))
-        per_seat_mem_mi = int(metadata.get(
-            "seat_memory_mib", os.environ.get("WORKSHOP_SEAT_MEMORY_MI", "2048")
-        ))
-        per_seat_pods = int(metadata.get("seat_pods", 1))
         headroom_pct = float(os.environ.get("WORKSHOP_CAPACITY_HEADROOM_PCT", "20"))
         fraction = 1 - headroom_pct / 100
         available_cpu = max(0, int(total_cpu_m * fraction) - requested_cpu_m)
         available_mem = max(0, int(total_mem_mi * fraction) - requested_mem_mi)
         available_pods = max(0, int(total_pods * fraction) - active_pods)
-        max_by_cpu = available_cpu // per_seat_cpu_m if per_seat_cpu_m else 999
-        max_by_mem = available_mem // per_seat_mem_mi if per_seat_mem_mi else 999
-        max_by_pods = available_pods // per_seat_pods if per_seat_pods else 999
+        # Workshop metadata is requester-controlled, so it must never waive
+        # shared capacity. A future shared-workload lifecycle can pass trusted
+        # persisted reservation state through an internal interface.
+        estimate = self._workshop_resource_estimate(metadata, 1)
+        concurrency = max(
+            1,
+            int(
+                metadata.get(
+                    "workshop_provision_concurrency",
+                    os.environ.get("WORKSHOP_PROVISION_CONCURRENCY", "5"),
+                )
+            ),
+        )
+
+        def max_for(resource: str, available: int) -> int:
+            shared = estimate["shared"][resource]
+            per_seat = estimate["per_seat"][resource]
+            transient = int(metadata.get(f"seat_transient_{resource}", 0))
+            return self._max_seats_for_resource(
+                available,
+                shared=shared,
+                per_seat=per_seat,
+                transient_per_seat=transient,
+                concurrency=concurrency,
+            )
+
+        max_by_cpu = max_for("cpu_millicores", available_cpu)
+        max_by_mem = max_for("memory_mib", available_mem)
+        max_by_pods = max_for("pods", available_pods)
         return {
             "max_seats": min(max_by_cpu, max_by_mem, max_by_pods),
             "max_by_cpu": max_by_cpu,

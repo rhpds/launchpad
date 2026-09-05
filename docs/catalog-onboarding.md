@@ -18,7 +18,10 @@ Each intake declares:
 - immutable Showroom repository SHA, playbook, and Antora start path;
 - immutable workload repository SHA, packaging type, and deployment path;
 - required cluster capabilities and models;
-- conservative per-seat CPU, memory, pod, and storage estimates;
+- conservative steady per-seat CPU, memory, pod, and storage estimates;
+- optional per-seat transient CPU, memory, and pod costs, bounded by the
+  declared workshop provisioning concurrency, plus optional workshop-shared
+  resource costs;
 - the complete participant tab contract;
 - the current certification stage, supported seat ceiling, promotion sequence,
   and every activation blocker.
@@ -100,6 +103,19 @@ The automated source gate is only the first layer:
 Large labs may stop at a lower certified seat ceiling. The catalog must publish
 the measured safe limit rather than copying the platform-wide maximum.
 
+Capacity contracts distinguish three resource classes:
+
+- `seat_resources` are present for every active participant seat;
+- `transient_seat_resources` exist only while a seat is provisioning and are
+  reserved for at most `workshop_provision_concurrency` seats at once; and
+- `workshop_shared_resources` are created once for the whole order.
+
+When the optional resource classes are omitted, Launchpad retains the original
+per-seat multiplication. A capacity preview returns the total reservation and
+the shared, steady per-seat, and bounded-transient breakdown. This prevents a
+short rollout burst from being multiplied across every seat while still
+failing closed when that burst cannot fit.
+
 ## AgentOps intake status
 
 The detailed RHDP topology and Launchpad adaptation decisions are recorded in
@@ -170,14 +186,19 @@ adapted playbook uses the pinned PatternFly 6 Showroom theme; content delivery
 therefore uses the same immutable Git-first path as the other Launchpad labs.
 
 The namespace-scoped workload is now `gitops_ready: true`, while the catalog
-item remains `draft` and capped at one seat. Arena now provides a functional
+item remains `draft` and capped at five internal seats. Arena now provides a functional
 shared MLflow service backed by persistent PostgreSQL with verified OpenShift
 service-ca TLS, plus a supported OpenShift Logging 6.6 one-seat pilot. The
 participant can query application logs in the assigned namespace and is denied
 access to another namespace. A Launchpad-created internal order has proven the
 runtime Secret, workload Application, protected routes, Showroom, complete
-participant journey, and zero-residue reclaim together. The next gate is
-pipeline database TLS and production Logging storage, followed by the five-seat
-functional and cleanup run. Five- and 25-seat promotion require durable
-S3-compatible object storage, dynamic block storage, and a production-sized
-Loki topology.
+participant journey, and zero-residue reclaim together. A five-seat run also
+proved isolated concurrent journeys and cleanup. The seat chart now co-locates
+the Mortgage API and UI without merging their Services or routes, reducing the
+measured steady topology from 13 to 12 pods per seat. Four rollout/bootstrap
+pods remain a bounded transient cost for each of the two concurrently
+provisioned seats. Per-seat DSPA and database instances remain isolated because
+sharing a project-scoped RHOAI pipeline service would change the participant
+security boundary. The 25-seat gate still requires measured live capacity,
+durable S3-compatible object storage, dynamic block storage, and a
+production-sized Loki topology.

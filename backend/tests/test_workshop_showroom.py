@@ -230,6 +230,84 @@ class TestCapacityGuard:
         pod.spec.node_name = node
         return pod
 
+    def test_resource_estimate_adds_shared_and_bounded_transient_workshop_costs(self):
+        metadata = {
+            "seat_cpu_millicores": 500,
+            "seat_memory_mib": 512,
+            "seat_pods": 3,
+            "seat_transient_cpu_millicores": 100,
+            "seat_transient_memory_mib": 64,
+            "seat_transient_pods": 4,
+            "workshop_shared_cpu_millicores": 1000,
+            "workshop_shared_memory_mib": 2048,
+            "workshop_shared_pods": 9,
+            "workshop_provision_concurrency": 2,
+        }
+
+        estimate = ProvisioningService._workshop_resource_estimate(metadata, 25)
+
+        assert estimate == {
+            "cpu_millicores": 13_700,
+            "memory_mib": 14_976,
+            "pods": 92,
+            "shared": {
+                "cpu_millicores": 1000,
+                "memory_mib": 2048,
+                "pods": 9,
+            },
+            "per_seat": {
+                "cpu_millicores": 500,
+                "memory_mib": 512,
+                "pods": 3,
+            },
+            "transient": {
+                "concurrent_seats": 2,
+                "cpu_millicores": 200,
+                "memory_mib": 128,
+                "pods": 8,
+            },
+        }
+
+    def test_capacity_solves_fixed_plus_per_seat_instead_of_dividing_all_headroom(self):
+        item = _make_catalog_item()
+        item.metadata = {
+            "seat_cpu_millicores": 100,
+            "seat_memory_mib": 100,
+            "seat_pods": 3,
+            "seat_transient_pods": 4,
+            "workshop_shared_pods": 9,
+            "workshop_provision_concurrency": 2,
+        }
+        svc = _make_service(catalog_item=item)
+        workshop = Workshop(
+            tenant_id="test-tenant",
+            catalog_item_id="demo-a",
+            num_users=25,
+            ttl="4h",
+        )
+        with (
+            patch.dict(
+                os.environ,
+                {
+                    "LAUNCHPAD_MODE": "openshift",
+                    "WORKSHOP_CAPACITY_HEADROOM_PCT": "0",
+                },
+                clear=False,
+            ),
+            patch("kubernetes.config.load_incluster_config"),
+            patch("kubernetes.client.CoreV1Api") as core_api,
+        ):
+            core_api.return_value.list_node.return_value.items = [
+                self._node(cpu="100", memory="100Gi", pods="100")
+            ]
+            core_api.return_value.list_pod_for_all_namespaces.return_value.items = []
+
+            can, reason = svc.check_workshop_capacity(workshop)
+
+        assert can is True
+        assert "support 27 seats" in reason
+        assert "Pods: 27" in reason
+
     def test_capacity_counts_only_catalog_qualified_stable_workers(self):
         required_labels = {"launchpad.redhat.com/agentops-certified": "true"}
         item = _make_catalog_item()

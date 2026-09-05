@@ -19,28 +19,34 @@ past its measured live evidence. Public access remains a separate certification
 gate; internal Arena access is the September release baseline unless the public
 matrix is independently GREEN-live by Sep 15.
 
-As of September 5, AgentOps passed its internal Launchpad-created one-seat gate,
-including Showroom, runtime credentials, the application journey, shared Nomic
-embeddings, PostgreSQL-backed MLflow isolation and tracing, DSPA with a
-service-ca TLS pipeline database, OpenShift Logging ingestion/isolation, and
-automatic zero-residue reclaim. Its five-seat gate remains RED after Arena node
-instability and per-seat topology pressure. Logging also still needs durable
-object/block storage and production sizing, and trusted public TLS is not
-certified.
-The compact Agent 201 topology reduces the measured event envelope to 500
-participant pods, so the current two-worker 500-pod Arena ceiling still cannot
-host the exact trio while retaining any scheduling headroom, even from an empty
-starting point. The current candidate path dedicates Arena to a reduced/shared-stack
-AgentOps workshop, uses Brutus for Building an AI Agent, and re-certifies
-Oberon for Serve LLMs. Brutus is registered and passed the one-, five-, and
+As of September 5, AgentOps passed its internal Launchpad-created one- and
+five-seat gates, including Showroom, runtime credentials, concurrent
+application journeys, shared Nomic embeddings, PostgreSQL-backed MLflow
+isolation and tracing, DSPA with a service-ca TLS pipeline database, OpenShift
+Logging ingestion/isolation, fault reclaim, and zero-residue normal reclaim.
+Logging still needs durable object/block storage and production sizing, and
+trusted public TLS is not certified.
+
+The AgentOps 0.1.4 candidate co-locates its API and UI while preserving their
+separate Services and routes. This reduces the steady topology from 13 to 12
+pods per seat. Capacity now reserves 300 steady pods plus only the eight
+rollout/bootstrap pods possible in a two-seat provisioning wave, instead of
+multiplying a 17-pod peak envelope into 425 slots. This 308-pod calculation is
+GREEN locally but remains a live-candidate estimate until the one- and
+five-seat chart reruns confirm it. The qualified single Arena worker still
+cannot admit 25 AgentOps seats. Per-seat DSPA and database isolation are
+retained; sharing the project-scoped pipeline stack is not an approved shortcut.
+
+The current candidate path dedicates Arena to AgentOps and re-certifies Oberon
+for Serve LLMs. Brutus is registered and passed the one-, five-, and
 25-seat internal gates with a measured three-pod contract. The 25-seat run
 created 75 healthy pods, completed all 25 simultaneous three-tool journeys,
 preserved namespace isolation, and reclaimed with zero residue. Its capacity
 preview now supports 30 seats while retaining 20 percent headroom. The
 integrated registry uses a retained 100Gi NFS claim and all three pinned digests
 passed `Always` pull probes after a deliberate registry restart. Brutus remains
-placement-disabled pending the 60-minute soak, two repeat scale runs, and an
-explicit event go/no-go; public access and Console OIDC are separate gates.
+placement-disabled and reserved for emergency use; public access and Console
+OIDC are separate gates.
 Oberon needs eleven
 additional protected slots before its live gate.
 

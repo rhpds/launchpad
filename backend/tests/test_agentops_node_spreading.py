@@ -155,6 +155,20 @@ def test_agentops_node_sharding_fails_closed_without_a_stable_worker():
         adapter.create_plan(_seat_request(1), _agentops_item())
 
 
+def test_agentops_node_sharding_reserves_the_transient_seat_burst():
+    node = _node(
+        "gnr2.fm2aihpcsed.com",
+        labels={"launchpad.redhat.com/agentops-certified": "true"},
+    )
+    # The candidate steady seat plus node headroom consumes 22 slots, but its
+    # four-pod rollout burst raises the admission requirement to 26.
+    pods = [_pod("gnr2.fm2aihpcsed.com") for _ in range(225)]
+    adapter = _adapter([node], pods)
+
+    with pytest.raises(ValueError, match="protected pod capacity"):
+        adapter.create_plan(_seat_request(1), _agentops_item())
+
+
 def test_selected_worker_is_applied_as_an_openshift_project_node_selector():
     adapter = OpenShiftProvisioningAdapter.__new__(OpenShiftProvisioningAdapter)
     adapter._core_v1 = MagicMock()

@@ -9,7 +9,7 @@ catalog:
     OpenShift metrics and logs, Grafana dashboards, MLflow tracing and
     evaluation, and Red Hat OpenShift AI pipelines on Intel infrastructure.
   category: guided_build
-  version: "0.1.3"
+  version: "0.1.4"
   supported_branding:
     - redhat-intel-default
     - intel-internal
@@ -75,14 +75,19 @@ runtime:
   required_models:
     - granite-3.2-8b-tools
   seat_resources:
-    # Rounded reservation envelope measured from the final Arena one-seat chart
-    # (2.08 CPU, 5.59 GiB, 13 steady running pods) plus transient RHOAI rollout
-    # and bootstrap Job headroom. The five-seat live gate retained this
-    # envelope; re-measure before the 25-seat gate.
+    # CPU and memory retain the rounded envelope measured from Arena build 84.
+    # The combined API/UI deployment reduces the measured 13-pod steady seat
+    # topology to 12 while preserving separate services and participant routes.
     cpu_millicores: 2500
     memory_mib: 7168
-    pods: 17
+    pods: 12
     storage_gib: 30
+  transient_seat_resources:
+    # RHOAI rollout and bootstrap Jobs can add four short-lived pods per seat.
+    # Capacity reserves this burst only for the bounded provisioning wave.
+    cpu_millicores: 0
+    memory_mib: 0
+    pods: 4
   # Spread seats across qualified stable workers when more than one is
   # available. The project node selector also constrains pods created later
   # by the OpenShift AI pipeline operator. Arena currently has one qualified

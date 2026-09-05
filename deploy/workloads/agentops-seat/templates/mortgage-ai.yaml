@@ -7,31 +7,33 @@ metadata:
     app.kubernetes.io/component: api
 spec:
   selector:
-    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: agentops-observability
+    app.kubernetes.io/component: application
     app.kubernetes.io/instance: {{ .Release.Name }}
   ports:
-    - {name: http, port: 8000, targetPort: http}
+    - {name: http, port: 8000, targetPort: http-api}
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mortgage-ai-api
+  name: mortgage-ai-app
   labels:
     {{- include "agentops.labels" . | nindent 4 }}
-    app.kubernetes.io/component: api
+    app.kubernetes.io/component: application
 spec:
   replicas: 1
   strategy:
     type: Recreate
   selector:
     matchLabels:
-      app.kubernetes.io/component: api
+      app.kubernetes.io/part-of: agentops-observability
+      app.kubernetes.io/component: application
       app.kubernetes.io/instance: {{ .Release.Name }}
   template:
     metadata:
       labels:
         {{- include "agentops.labels" . | nindent 8 }}
-        app.kubernetes.io/component: api
+        app.kubernetes.io/component: application
     spec:
       serviceAccountName: agentops-seat
       securityContext:
@@ -60,71 +62,6 @@ spec:
                   name: {{ include "agentops.runtimeSecret" . }}
                   key: MIGRATION_DATABASE_URL
             - {name: PYTHONPATH, value: /app/packages/db/src:/app/packages/api/src}
-      containers:
-        - name: api
-          image: {{ .Values.images.mortgageApi | quote }}
-          imagePullPolicy: IfNotPresent
-          securityContext:
-            {{- include "agentops.containerSecurityContext" . | nindent 12 }}
-          envFrom:
-            - secretRef:
-                name: {{ include "agentops.runtimeSecret" . }}
-          ports:
-            - {name: http, containerPort: 8000}
-          startupProbe:
-            httpGet: {path: /health/, port: http}
-            periodSeconds: 10
-            failureThreshold: 90
-          readinessProbe:
-            httpGet: {path: /health/, port: http}
-            initialDelaySeconds: 20
-            periodSeconds: 10
-            failureThreshold: 20
-          livenessProbe:
-            httpGet: {path: /health/, port: http}
-            initialDelaySeconds: 45
-            periodSeconds: 15
-            failureThreshold: 6
-          resources:
-            {{- toYaml .Values.resources.api | nindent 12 }}
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: mortgage-ai-ui
-  labels:
-    {{- include "agentops.labels" . | nindent 4 }}
-    app.kubernetes.io/component: ui
-spec:
-  selector:
-    app.kubernetes.io/component: ui
-    app.kubernetes.io/instance: {{ .Release.Name }}
-  ports:
-    - {name: http, port: 8080, targetPort: http}
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: mortgage-ai-ui
-  labels:
-    {{- include "agentops.labels" . | nindent 4 }}
-    app.kubernetes.io/component: ui
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app.kubernetes.io/component: ui
-      app.kubernetes.io/instance: {{ .Release.Name }}
-  template:
-    metadata:
-      labels:
-        {{- include "agentops.labels" . | nindent 8 }}
-        app.kubernetes.io/component: ui
-    spec:
-      serviceAccountName: agentops-seat
-      securityContext:
-        {{- include "agentops.podSecurityContext" . | nindent 8 }}
-      initContainers:
         - name: configure-nginx-workers
           image: {{ .Values.images.mortgageUi | quote }}
           imagePullPolicy: IfNotPresent
@@ -141,13 +78,39 @@ spec:
           volumeMounts:
             - {name: nginx-config, mountPath: /generated}
       containers:
+        - name: api
+          image: {{ .Values.images.mortgageApi | quote }}
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            {{- include "agentops.containerSecurityContext" . | nindent 12 }}
+          envFrom:
+            - secretRef:
+                name: {{ include "agentops.runtimeSecret" . }}
+          ports:
+            - {name: http-api, containerPort: 8000}
+          startupProbe:
+            httpGet: {path: /health/, port: http-api}
+            periodSeconds: 10
+            failureThreshold: 90
+          readinessProbe:
+            httpGet: {path: /health/, port: http-api}
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            failureThreshold: 20
+          livenessProbe:
+            httpGet: {path: /health/, port: http-api}
+            initialDelaySeconds: 45
+            periodSeconds: 15
+            failureThreshold: 6
+          resources:
+            {{- toYaml .Values.resources.api | nindent 12 }}
         - name: ui
           image: {{ .Values.images.mortgageUi | quote }}
           imagePullPolicy: IfNotPresent
           securityContext:
             {{- include "agentops.containerSecurityContext" . | nindent 12 }}
           env:
-            - {name: API_UPSTREAM, value: "mortgage-ai-api:8000"}
+            - {name: API_UPSTREAM, value: "127.0.0.1:8000"}
             - name: COMPANY_NAME
               valueFrom:
                 secretKeyRef: {name: {{ include "agentops.runtimeSecret" . }}, key: COMPANY_NAME}
@@ -155,13 +118,13 @@ spec:
               valueFrom:
                 secretKeyRef: {name: {{ include "agentops.runtimeSecret" . }}, key: AGENT_NAME}
           ports:
-            - {name: http, containerPort: 8080}
+            - {name: http-ui, containerPort: 8080}
           readinessProbe:
-            httpGet: {path: /, port: http}
+            httpGet: {path: /, port: http-ui}
             initialDelaySeconds: 10
             periodSeconds: 10
           livenessProbe:
-            httpGet: {path: /, port: http}
+            httpGet: {path: /, port: http-ui}
             initialDelaySeconds: 30
             periodSeconds: 15
           resources:
@@ -171,6 +134,21 @@ spec:
       volumes:
         - name: nginx-config
           emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mortgage-ai-ui
+  labels:
+    {{- include "agentops.labels" . | nindent 4 }}
+    app.kubernetes.io/component: ui
+spec:
+  selector:
+    app.kubernetes.io/part-of: agentops-observability
+    app.kubernetes.io/component: application
+    app.kubernetes.io/instance: {{ .Release.Name }}
+  ports:
+    - {name: http, port: 8080, targetPort: http-ui}
 ---
 apiVersion: route.openshift.io/v1
 kind: Route

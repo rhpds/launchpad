@@ -2,10 +2,10 @@
 
 ## Request to Intel infrastructure
 
-Provide **two additional Arena OpenShift worker hosts** for the September 17
-AgentOps workshop certification. Match the existing CPU-worker networking,
-storage access, and 250-pod node capacity. The hosts must join Arena as workers,
-not control-plane nodes.
+Provide **one additional Arena OpenShift worker host at minimum; two are
+preferred** for the September 17 AgentOps workshop certification. Match the
+existing CPU-worker networking, storage access, and 250-pod node capacity. The
+hosts must join Arena as workers, not control-plane nodes.
 
 Arena is a bare-metal cluster. Its `arena-86mfs-worker-0` MachineSet currently
 has zero replicas and there are no available BareMetalHost objects: all three
@@ -14,32 +14,33 @@ replica count by itself therefore cannot add capacity. Intel must first attach
 and register the worker hardware, or join equivalent worker nodes through its
 approved bare-metal process.
 
-## Why two workers are required
+## Why capacity is still required
 
-The certified AgentOps contract reserves 17 pod slots, 2,500 millicores,
-7,168 MiB memory, and 30 GiB storage per seat. Twenty-five seats require:
+The candidate AgentOps 0.1.4 contract reserves 12 steady pod slots, 2,500
+millicores, 7,168 MiB memory, and 30 GiB storage per seat. It also reserves a
+four-pod rollout/bootstrap burst for each of at most two seats provisioning at
+once. Twenty-five seats therefore require:
 
 | Resource | Required |
 |---|---:|
 | CPU | 62,500 millicores |
 | Memory | 179,200 MiB |
-| Pod slots | 425 |
+| Pod slots | 308 (300 steady + 8 bounded transient) |
 | Storage | at least 750 GiB |
 
-Only `gnr2.fm2aihpcsed.com` is currently AgentOps-qualified. After the 20%
-capacity reserve and its current 41 active pods, it offers 159 slots, or nine
-seats. One additional 250-pod worker is insufficient: two qualified workers
-provide only 400 protected slots before subtracting platform DaemonSets, less
-than the 425-slot reservation. Two additional workers create three qualified
-250-pod nodes and enough protected room for the workshop plus normal platform
-pods.
+Only `gnr2.fm2aihpcsed.com` is currently AgentOps-qualified. With a 250-pod
+ceiling, the protected single-worker budget is 200 pods before subtracting
+platform workloads. It cannot fit the 308-pod reservation. One equivalent
+additional worker creates a 400-pod protected two-worker budget and is the
+minimum theoretical topology, but the remaining margin must be re-measured
+after DaemonSets and platform services land on that worker. A second additional
+worker is preferred because it supplies practical failure and growth margin
+instead of making the event depend on both workers remaining fully available.
 
-No other registered cluster is a current alternative. Oberon has 37 protected
-pod slots available and lacks the complete AgentOps capability set; even empty,
-its 500-pod node retains only 400 slots after the required reserve. Brutus has
-91 protected slots available, a 200-slot empty protected ceiling, and also
-lacks the complete AgentOps operators and shared services. One workshop will
-not be split across clusters.
+No other registered cluster is a current baseline alternative. Oberon lacks
+the complete AgentOps capability set. Brutus is reserved for emergencies and
+also lacks the complete AgentOps operators and shared services. One workshop
+will not be split across clusters.
 
 ## Worker acceptance criteria
 
