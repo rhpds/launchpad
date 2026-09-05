@@ -898,3 +898,74 @@ def test_reclaim_waits_for_inflight_provisioning_without_status_overwrite():
         seat.status == WorkshopSeatStatus.RECLAIMED
         for seat in reclaim_result["workshop"].seats
     )
+
+
+def test_reclaim_relinks_failed_sessions_after_inflight_provisioning_stops():
+    service = ProvisioningService()
+    order = service.create_workshop_order(
+        Workshop(
+            tenant_id="relink-failed-reclaim-tenant",
+            catalog_item_id="inference-overdrive-quickstart",
+            num_users=2,
+        )
+    )
+    sessions = []
+    seats = []
+    for index, seat in enumerate(order.seats):
+        request = LabRequest(
+            tenant_id=order.tenant_id,
+            requester_id=seat.participant_id,
+            catalog_item_id=order.catalog_item_id,
+            requested_mode=CatalogCategory.QUICK_START,
+            metadata={"workshop_id": order.workshop_id, "seat_id": seat.seat_id},
+        )
+        session = LabSession(
+            request_id=request.request_id,
+            tenant_id=order.tenant_id,
+            catalog_item_id=order.catalog_item_id,
+            namespace=f"launchpad-relink-seat-{index + 1}",
+            cluster_ref="arena",
+        )
+        service._save_request(request)
+        service._save_session(session)
+        sessions.append(session)
+        seats.append(
+            seat.model_copy(
+                update={
+                    "status": (
+                        WorkshopSeatStatus.RECLAIMING
+                        if index == 0
+                        else WorkshopSeatStatus.FAILED
+                    ),
+                    "session_id": session.session_id,
+                    "request_id": request.request_id,
+                }
+            )
+        )
+
+    # This is the stale state observed when provisioning overwrites the links
+    # recovered by queue_workshop_reclaim: only the successful seat remains in
+    # session_ids even though both persisted sessions own cluster resources.
+    service._save_workshop(
+        order.model_copy(
+            update={
+                "status": WorkshopStatus.RECLAIMING,
+                "session_ids": [sessions[0].session_id],
+                "seats": seats,
+            }
+        )
+    )
+
+    with patch.object(
+        service, "_reclaim_workshop_session", return_value=None
+    ) as reclaim:
+        completed = service.reclaim_workshop(order.workshop_id)
+
+    assert {call.args[0] for call in reclaim.call_args_list} == {
+        session.session_id for session in sessions
+    }
+    assert completed.status == WorkshopStatus.COMPLETED
+    assert completed.session_ids == [session.session_id for session in sessions]
+    assert {seat.status for seat in completed.seats} == {
+        WorkshopSeatStatus.RECLAIMED
+    }

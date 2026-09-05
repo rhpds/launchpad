@@ -1,0 +1,80 @@
+{
+  "evidence_id": "EDD-AGENTOPS-FIVE-SEAT-RED-LIVE-BUILD76-20260905",
+  "captured_at": "2026-09-05T14:19:28Z",
+  "result": "RED-live",
+  "cluster": "arena",
+  "catalog_item_id": "agentops-observability",
+  "workshop_id": "d2f0f72c-93d4-4285-96c8-91fbf84c799d",
+  "deployed_source_commit": "4da18e03d297999d82aa5fbac5c641562e417814",
+  "deployed_backend_digest": "sha256:6285cbb7cdd69755d84dc06ff53f557840a1ff8b865b6a9462a0017a44391d23",
+  "workload_revision": "6b1be6261cf2e5a0d1ec4340d4b4d5bffd9d40d4",
+  "timeline": {
+    "provisioning_started_at": "2026-09-05T13:58:46Z",
+    "first_seat_ready_at": "2026-09-05T14:02:41Z",
+    "reclaim_requested_at": "2026-09-05T14:06:50Z",
+    "workshop_marked_completed_at": "2026-09-05T14:10:55Z",
+    "zero_residue_verified_at": "2026-09-05T14:19:28Z"
+  },
+  "outcome": {
+    "seats_requested": 5,
+    "seats_ready_before_reclaim": 1,
+    "seats_failed": 4,
+    "promotion_gate_passed": false
+  },
+  "capacity_and_staging": {
+    "corrected_reported_capacity_seats": 10,
+    "first_wave_namespaces": 4,
+    "fifth_namespace_started_after_first_ready_seat": true,
+    "rhgnr1_peak_active_pods": 243,
+    "worker_pod_ceiling": 250,
+    "worker_became_not_ready": false,
+    "node_warning_events_during_provisioning": 0
+  },
+  "root_causes": [
+    {
+      "id": "AGENTOPS-5-B76-RED-001",
+      "finding": "The continuous NFS permission sidecar changed PostgreSQL PGDATA to mode 0777, but PostgreSQL accepts only 0700 or 0750. Database initialization restarted and four dependent API pods never became ready."
+    },
+    {
+      "id": "AGENTOPS-5-B76-RED-002",
+      "finding": "A reclaim queued during validation relinked all persisted sessions, but the in-flight provisioning result overwrote workshop.session_ids with only the ready session. Group reclaim marked the workshop completed while four failed-seat namespaces remained."
+    }
+  ],
+  "red_green_matrix": [
+    {
+      "id": "AGENTOPS-5-CAPACITY",
+      "red": "Previous run advertised 40 seats and saturated a worker at 250 pods.",
+      "green_live": "Capacity advertised 10 seats, staged four namespaces first, and peaked at 243 pods without a worker Ready transition."
+    },
+    {
+      "id": "AGENTOPS-5-POSTGRES",
+      "red": "Continuous chmod changed PGDATA to 0777 and caused PostgreSQL restart loops during initialization.",
+      "green_local": "Continuous chmod sidecar removed; termination-time cleanup remains and chart contract proves PostgreSQL is the only database container.",
+      "green_live": "pending rerun"
+    },
+    {
+      "id": "AGENTOPS-5-RECLAIM-RACE",
+      "red": "Group reclaim marked completion after reclaiming only one of five persisted sessions.",
+      "green_local": "Reclaim rebuilds workshop session links after in-flight provisioning stops; regression covers failed persisted seats.",
+      "green_live": "pending rerun"
+    }
+  ],
+  "cleanup": {
+    "normal_group_reclaim_reclaimed_all_persisted_sessions": false,
+    "direct_session_reclaims_required": 4,
+    "remaining_namespaces": 0,
+    "remaining_argocd_applications": 0,
+    "remaining_persistent_volumes": 0,
+    "within_ten_minute_slo": false
+  },
+  "test_evidence": {
+    "applicable_regression_tests_passed": 988,
+    "local_runtime_tests_deselected": 13
+  },
+  "release_decision": {
+    "catalog_max_workshop_seats": 1,
+    "five_seat_gate": "not certified",
+    "next_action": "Deploy PostgreSQL and reclaim-race corrections, then repeat the five-seat Arena certification."
+  },
+  "contains_plaintext_credentials": false
+}

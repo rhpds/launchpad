@@ -2018,6 +2018,13 @@ class ProvisioningService:
         if not workshop:
             raise ValueError(f"Workshop {workshop_id} not found")
 
+        # A reclaim can be queued while seat workers are still validating. A
+        # failed worker persists its session but does not add that session to
+        # workshop.session_ids. Rebuild the links after the provisioning event
+        # has stopped so group reclaim cannot strand failed-seat resources.
+        workshop = self._link_persisted_workshop_sessions(workshop)
+        self._save_workshop(workshop)
+
         failed_reclaims = []
         seats_by_session = {
             seat.session_id: index
