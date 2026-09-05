@@ -60,9 +60,10 @@ done
 
 oc exec -n "$namespace" deploy/showroom -c terminal -- \
   oc set env -n "$namespace" deployment/solution-agent \
+  --containers=solution-agent \
   "ADVISOR_MODEL=${model}" >/dev/null
 
-for deployment in solution-tools solution-agent solution-ui; do
+for deployment in solution-agent solution-ui; do
   oc exec -n "$namespace" deploy/showroom -c terminal -- \
     oc rollout status -n "$namespace" "deployment/${deployment}" \
       --timeout=300s >/dev/null

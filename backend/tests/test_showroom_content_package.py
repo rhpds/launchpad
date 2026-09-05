@@ -262,6 +262,14 @@ def test_agent_201_uses_three_pods_by_colocating_agent_and_tools():
     assert "All 2 workload pods running" in guide
 
 
+def test_agent_201_remote_certification_driver_understands_colocated_tools():
+    driver = (ROOT / "scripts/certify-agent-201-remote-seat.sh").read_text()
+
+    assert "--containers=solution-agent" in driver
+    assert "for deployment in solution-agent solution-ui" in driver
+    assert "for deployment in solution-tools solution-agent solution-ui" not in driver
+
+
 def test_agent_201_runtime_bounds_cpu_generation_for_workshop_scale():
     containerfile = (ROOT / "workshop-images/solution-agent/Containerfile").read_text()
     build_config = (ROOT / "deploy/launchpad/overlays/arena/buildconfig.yaml").read_text()
