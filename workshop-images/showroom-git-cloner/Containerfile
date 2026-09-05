@@ -1,0 +1,8 @@
+FROM quay.io/rhpds/git-cloner@sha256:2b036e2ed3b7cb8cd214361e599884ddc47aadf6adf2220700f4ee5dfae52f65
+
+USER 0
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod 0755 /entrypoint.sh
+USER 1001
+
+ENTRYPOINT ["/entrypoint.sh"]

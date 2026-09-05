@@ -20,6 +20,11 @@ SHOWROOM_TERMINAL_IMAGE = (
     "image-registry.openshift-image-registry.svc:5000/partner-ai-launchpad/"
     "launchpad-showroom-terminal:4.20"
 )
+SHOWROOM_GIT_CLONER_IMAGE = (
+    "image-registry.openshift-image-registry.svc:5000/partner-ai-launchpad/"
+    "launchpad-showroom-git-cloner@sha256:"
+    "3ae8e259f03888ee90526fd7d76375c4a6340df31242ede6be423604c3fdc26d"
+)
 
 
 def application_name(namespace: str) -> str:
@@ -173,6 +178,7 @@ def build_showroom_application(
             "user_data": yaml.safe_dump(user_data, sort_keys=False),
             "zero_touch_bundle": "https://github.com/rhpds/nookbag/releases/download/nookbag-v0.4.0/nookbag-v0.4.0.zip",
         },
+        "git_cloner": {"image": SHOWROOM_GIT_CLONER_IMAGE},
     }
     if seat.journey == "openshift-operators" or seat.content_only:
         # Operator workshops need an oc terminal, not a heavyweight development

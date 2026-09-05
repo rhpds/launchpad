@@ -5,6 +5,7 @@ import pytest
 import yaml
 from app.adapters.openshift.showroom_gitops import (
     SHOWROOM_CHART,
+    SHOWROOM_GIT_CLONER_IMAGE,
     ShowroomGitOpsAdapter,
     ShowroomSeat,
     ShowroomToolTab,
@@ -13,6 +14,34 @@ from app.adapters.openshift.showroom_gitops import (
 )
 
 ROOT = Path(__file__).resolve().parents[2]
+
+
+def test_showroom_uses_immutable_git_cloner_that_marks_repo_safe_before_entering_it():
+    image_dir = ROOT / "workshop-images/showroom-git-cloner"
+    entrypoint = (image_dir / "entrypoint.sh").read_text()
+
+    assert SHOWROOM_GIT_CLONER_IMAGE.startswith(
+        "image-registry.openshift-image-registry.svc:5000/partner-ai-launchpad/"
+        "launchpad-showroom-git-cloner@sha256:"
+    )
+    assert entrypoint.index('git config --global --add safe.directory "${CLONE_DIR}"') < (
+        entrypoint.index('cd "${CLONE_DIR}"')
+    )
+
+    app = build_showroom_application(
+        ShowroomSeat(
+            namespace="launchpad-seat-agentops-1",
+            workshop_id="workshop-1",
+            seat_id="seat-1",
+            participant_id="lp-user-1",
+            workspace_url="",
+            content_repo_url="https://github.com/example/showroom.git",
+            content_ref="b" * 40,
+            apps_domain="apps.arena.example.com",
+        )
+    )
+    values = yaml.safe_load(app["spec"]["source"]["helm"]["values"])
+    assert values["git_cloner"]["image"] == SHOWROOM_GIT_CLONER_IMAGE
 
 
 def test_builds_official_chart_application_with_personalized_git_content():

@@ -107,6 +107,28 @@ apiVersion: image.openshift.io/v1
 kind: ImageStream
 metadata: {name: launchpad-showroom-terminal}
 ---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata: {name: launchpad-showroom-git-cloner}
+---
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata: {name: launchpad-showroom-git-cloner}
+spec:
+  runPolicy: SerialLatestOnly
+  source:
+    type: Git
+    git: {uri: "https://github.com/rhpds/launchpad.git", ref: main}
+    contextDir: workshop-images/showroom-git-cloner
+  strategy:
+    type: Docker
+    dockerStrategy: {dockerfilePath: Containerfile}
+  output:
+    to: {kind: ImageStreamTag, name: "launchpad-showroom-git-cloner:safe-v1"}
+  resources:
+    requests: {cpu: "100m", memory: 128Mi, ephemeral-storage: 512Mi}
+    limits: {cpu: "1", memory: 512Mi, ephemeral-storage: 2Gi}
+---
 apiVersion: build.openshift.io/v1
 kind: BuildConfig
 metadata: {name: launchpad-showroom-terminal}
