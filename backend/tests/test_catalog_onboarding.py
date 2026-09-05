@@ -36,7 +36,9 @@ def test_agentops_is_registered_as_a_fail_closed_draft():
     assert catalog["metadata"]["showroom_content_playbook"] == ("site-agentops-observability.yml")
     assert catalog["metadata"]["showroom_content_start_path"] == ("content-agentops-observability")
     assert catalog["metadata"]["workload_repo"] == "https://github.com/rhpds/launchpad.git"
-    assert catalog["metadata"]["workload_revision"] == ("63456b6684737a5936c27c9496e45dc2fd1b06c0")
+    assert catalog["metadata"]["workload_revision"] == (
+        "fd7d53d23efbb72a27f2e21e325c5f6177f900d0"
+    )
     assert catalog["metadata"]["workload_deploy_path"] == "deploy/workloads/agentops-seat"
     assert catalog["metadata"]["workload_deployment_scope"] == "seat"
     assert catalog["metadata"]["workload_source_kind"] == "launchpad-seat-chart"
