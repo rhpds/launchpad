@@ -33,10 +33,11 @@ def test_fleet_candidate_preserves_headroom_and_fail_closed_targets():
     assert clusters["brutus"]["enabled_for_launchpad"] is False
     assert clusters["oberon"]["enabled_for_launchpad"] is False
     brutus_certification = clusters["brutus"]["certification"]
-    assert brutus_certification["one_seat"] == "GREEN-live"
-    assert brutus_certification["five_seat"] == "GREEN-live-warm-functional"
-    assert brutus_certification["twenty_five_seat"] == "not-run"
-    assert brutus_certification["capacity_preview_seats"] == 22
+    assert brutus_certification["one_seat"] == "GREEN-live-exact-v1.0.13"
+    assert brutus_certification["five_seat"] == "GREEN-live-three-pod-functional"
+    assert brutus_certification["twenty_five_seat"] == "GREEN-live-internal"
+    assert brutus_certification["capacity_preview_seats"] == 30
+    assert brutus_certification["seat_pods"] == 3
     assert brutus_certification["own_namespace_edit"] is True
     assert brutus_certification["cross_namespace_edit"] is False
     assert brutus_certification["remaining_namespaces"] == 0
@@ -44,6 +45,10 @@ def test_fleet_candidate_preserves_headroom_and_fail_closed_targets():
     assert brutus_certification["five_seat_provisioning_seconds"] == 48
     assert brutus_certification["five_seat_functional_p95_seconds"] < 80
     assert brutus_certification["five_seat_reclaim_seconds"] == 39
+    assert brutus_certification["twenty_five_seat_provisioning_seconds"] == 168
+    assert brutus_certification["twenty_five_seat_functional_p95_seconds"] < 80
+    assert brutus_certification["twenty_five_seat_reclaim_seconds"] == 99
+    assert brutus_certification["internal_twenty_five_seat_scale_gate"] is True
     assert brutus_certification["integrated_registry_storage"] == (
         "pvc:nfs-storage/launchpad-image-registry-storage"
     )
@@ -57,6 +62,6 @@ def test_fleet_candidate_preserves_headroom_and_fail_closed_targets():
     }
     assert evidence["release_decision"]["placement_enabled"] is False
     assert evidence["release_decision"]["brutus_status"] == (
-        "five-seat-functional-disabled"
+        "twenty-five-seat-functional-disabled"
     )
     assert evidence["contains_plaintext_credentials"] is False

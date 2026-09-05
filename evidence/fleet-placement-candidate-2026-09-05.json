@@ -1,7 +1,7 @@
 {
   "schema": "launchpad.redhat.com/fleet-placement-readiness/v1",
   "evidence_id": "EDD-FLEET-PLACEMENT-CANDIDATE-20260905",
-  "captured_at": "2026-09-05T19:29:16Z",
+  "captured_at": "2026-09-05T20:26:46Z",
   "result": "RED-readiness",
   "event_target": {
     "provisioning_mode": "staggered",
@@ -62,10 +62,11 @@
       },
       "certification": {
         "catalog_item_id": "intel-xeon6-agent-201",
-        "one_seat": "GREEN-live",
-        "five_seat": "GREEN-live-warm-functional",
-        "twenty_five_seat": "not-run",
-        "capacity_preview_seats": 22,
+        "one_seat": "GREEN-live-exact-v1.0.13",
+        "five_seat": "GREEN-live-three-pod-functional",
+        "twenty_five_seat": "GREEN-live-internal",
+        "capacity_preview_seats": 30,
+        "seat_pods": 3,
         "functional_http_status": 200,
         "functional_latency_seconds": 69.061936,
         "own_namespace_edit": true,
@@ -76,6 +77,14 @@
         "five_seat_provisioning_seconds": 48,
         "five_seat_functional_p95_seconds": 78.221507,
         "five_seat_reclaim_seconds": 39,
+        "twenty_five_seat_provisioning_seconds": 168,
+        "twenty_five_seat_solution_stack_seconds": 122,
+        "twenty_five_seat_functional_p95_seconds": 79.452807,
+        "twenty_five_seat_reclaim_seconds": 99,
+        "twenty_five_seat_peak_pods": 184,
+        "twenty_five_seat_container_restarts": 0,
+        "internal_twenty_five_seat_scale_gate": true,
+        "scale_evidence": "evidence/brutus-agent-201-three-pod-certification-2026-09-05.json",
         "integrated_registry_storage": "pvc:nfs-storage/launchpad-image-registry-storage",
         "durable_registry_result": "GREEN-live",
         "durable_registry_evidence": "evidence/brutus-persistent-registry-2026-09-05.json",
@@ -123,17 +132,17 @@
   "required_remediation": [
     "Reduce AgentOps to workshop-shared infrastructure or add stable Arena worker capacity.",
     "Add per-node admission, workload spreading, and a recent-Ready-transition circuit breaker.",
-    "Automate cluster ingress CA rotation and model trust distribution before the next Brutus certification run.",
-    "Deploy and live-rerun verified route readiness, then prove Console/OIDC and twenty-five-seat concurrency with zero-residue reclaim on Brutus.",
+    "Automate cluster ingress CA rotation and model trust distribution before Brutus is enabled for normal placement.",
+    "Complete a 60-minute soak, two more consecutive twenty-five-seat runs, and Console/OIDC/public-access certification before Brutus general availability.",
     "Prove durable image pulls, storage deletion, private ingress, Showroom, terminal, Console/OIDC, and zero-residue reclaim on Oberon.",
     "Confirm and scale only unused Oberon workloads to recover at least eleven protected pod slots.",
     "Replace Quick Tunnels with one stable cluster-aware public front door before public event certification."
   ],
   "release_decision": {
     "placement_enabled": false,
-    "brutus_status": "five-seat-functional-disabled",
+    "brutus_status": "twenty-five-seat-functional-disabled",
     "oberon_status": "registered-disabled",
-    "next_gate": "deployed CA-verification rerun, pod-headroom remediation, and Brutus twenty-five-seat certification"
+    "next_gate": "AgentOps five-seat remediation and Oberon Serve LLM re-certification before the exact fleet rehearsal"
   },
   "contains_plaintext_credentials": false
 }

@@ -2,7 +2,7 @@
   "schema": "launchpad.redhat.com/event-readiness/v1",
   "evidence_id": "READINESS-SEPTEMBER-17-THREE-WORKSHOPS-20260905",
   "generated_at": "2026-09-05T05:34:12Z",
-  "updated_at": "2026-09-05T14:53:47Z",
+  "updated_at": "2026-09-05T20:26:46Z",
   "source_revision_before_readiness_contract": "cf28c65",
   "event_date": "2026-09-17",
   "deployment_scope": "fleet",
@@ -48,26 +48,26 @@
       "provision_order": 3,
       "catalog_item_id": "intel-xeon6-agent-201",
       "seat_count": 25,
-      "release_status": "GREEN-live-25",
+      "release_status": "GREEN-live-25-internal",
       "current_certification_stage": "twenty-five-seat",
       "current_catalog_limit": 25,
       "candidate_cluster_id": "brutus",
       "cpu_millicores": 10375,
       "memory_mib": 22800,
-      "pod_slots": 100,
+      "pod_slots": 75,
       "storage_gib_minimum": 0
     }
   ],
   "declared_event_reservation": {
     "cpu_millicores": 89500,
     "memory_mib": 239200,
-    "pod_slots": 525,
+    "pod_slots": 500,
     "storage_gib_minimum": 750
   },
   "admission_target_with_twenty_percent_headroom": {
     "cpu_millicores": 107400,
     "memory_mib": 287040,
-    "pod_slots": 630,
+    "pod_slots": 600,
     "storage_gib_minimum": 900
   },
   "previous_pattern_evidence": "evidence/arena-staggered-three-workshops-2026-09-04.json",
@@ -80,13 +80,15 @@
     "sequential reclaim with zero residue",
     "one internal Launchpad-created AgentOps seat with operator-aware readiness and zero-residue reclaim",
     "shared MLflow metadata on persistent PostgreSQL with verified OpenShift service-ca TLS",
-    "one clean Launchpad-created AgentOps pipeline with verified MariaDB service-ca TLS 1.3, current-generation DSPA readiness, stable Argo reconciliation, and zero-residue reclaim"
+    "one clean Launchpad-created AgentOps pipeline with verified MariaDB service-ca TLS 1.3, current-generation DSPA readiness, stable Argo reconciliation, and zero-residue reclaim",
+    "one-, five-, and twenty-five-seat three-pod Building an AI Agent runs on Brutus with full functional journeys, namespace isolation, and zero-residue reclaim",
+    "the exact corrected Agent 201 v1.0.13 Showroom content rendered and completed its live one-seat functional regression"
   ],
   "remaining_release_gates": [
     "agentops-topology-and-cleanup-remediation",
     "agentops-five-seat",
     "agentops-twenty-five-seat",
-    "brutus-onboarding-and-twenty-five-seat-certification",
+    "brutus-sixty-minute-soak-and-repeat-certification",
     "oberon-reenable-and-twenty-five-seat-recertification",
     "agentops-public-code-access",
     "exact-event-trio-first-run",
@@ -94,7 +96,7 @@
     "browser-and-operator-rehearsal",
     "event-day-capacity-preflight"
   ],
-  "next_gate": "fleet-remediation-prerequisites",
+  "next_gate": "agentops-five-seat-remediation",
   "capacity_status": {
     "declared_reservation_calculated": true,
     "current_arena_free_capacity_measured": true,
@@ -102,10 +104,10 @@
     "schedulable_workers": 2,
     "schedulable_pod_slots": 500,
     "running_pods_on_workers": 193,
-    "projected_pods_without_headroom": 718,
-    "projected_pods_with_event_headroom": 823,
-    "pod_slot_shortage_without_headroom": 218,
-    "pod_slot_shortage_with_event_headroom": 323,
+    "projected_pods_without_headroom": 693,
+    "projected_pods_with_event_headroom": 793,
+    "pod_slot_shortage_without_headroom": 193,
+    "pod_slot_shortage_with_event_headroom": 293,
     "fit_decision": "blocked-by-worker-pod-slots",
     "recommended_additional_250_pod_workers": 2,
     "required_checks": [
@@ -134,7 +136,12 @@
         "schedulable_pod_slots": 250,
         "active_worker_pods": 109,
         "additional_slots_after_reserve": 91,
-        "registered": false
+        "registered": true,
+        "enabled": false,
+        "seat_pods": 3,
+        "capacity_preview_seats": 30,
+        "internal_twenty_five_seat_certified": true,
+        "latest_evidence": "evidence/brutus-agent-201-three-pod-certification-2026-09-05.json"
       },
       "oberon": {
         "schedulable_pod_slots": 500,
@@ -152,7 +159,7 @@
     "five-seat then twenty-five-seat promotion",
     "per-node placement and recent-node-failure circuit breaker",
     "workshop-shared AgentOps services or additional stable Arena worker capacity",
-    "Brutus onboarding and lightweight-lab certification",
+    "Brutus 60-minute soak, two additional 25-seat repeats, public access, and Console/OIDC certification",
     "Oberon lightweight-lab re-certification"
   ],
   "release_policy": {

@@ -1,0 +1,245 @@
+{
+  "schema": "launchpad.redhat.com/workshop-certification/v1",
+  "evidence_id": "EDD-BRUTUS-AGENT201-THREE-POD-20260905",
+  "captured_at": "2026-09-05T20:26:46Z",
+  "source_commit": "aa3d2e9a71b92698aee9c438e03db1d8c229b1fb",
+  "cluster_ref": "brutus",
+  "exposure_policy": "internal",
+  "result": "GREEN-live-internal-25",
+  "normal_placement_enabled_after_run": false,
+  "catalog_contract": {
+    "catalog_item_id": "intel-xeon6-agent-201",
+    "seat_cpu_millicores": 415,
+    "seat_memory_mib": 912,
+    "seat_pods": 3,
+    "max_workshop_seats": 25
+  },
+  "runtime_revisions": {
+    "scale_run_catalog_version": "1.0.1",
+    "scale_run_showroom_content_ref": "100f89f198699371c0cc8b54d39ca17f37138591",
+    "scale_run_backend_image_digest": "sha256:0e17207e396db5ca6c36a9ebc9161a5f6eb82434f9b45db25f964e2c18e768e4",
+    "corrected_catalog_version": "1.0.2",
+    "corrected_showroom_content_ref": "946175fde859e791568b95f1181833d92c448e8a",
+    "corrected_backend_image_digest": "sha256:68a9b73f8021dfa1535e56f8ece78bfc8ad099ff553c520a6ea0b4eebea5c1af"
+  },
+  "capacity_preview": {
+    "can_provision": true,
+    "safe_seats": 30,
+    "requested_seats": 25,
+    "estimated_cpu_millicores": 10375,
+    "estimated_memory_mib": 22800,
+    "estimated_pods": 75,
+    "headroom_percent": 20
+  },
+  "runs": {
+    "one_seat": {
+      "workshop_id": "ffa7233d-a60a-4a6f-89a4-d5f71fc23a96",
+      "session_ids": [
+        "242b4505-047d-4122-b3bf-affdc5a09cf4"
+      ],
+      "seats_ready": 1,
+      "pods_per_seat": 3,
+      "containers_per_seat": 6,
+      "functional_http_200": 1,
+      "functional_journey_seconds": 70.756736,
+      "own_namespace_edit_allowed": 1,
+      "cross_namespace_read_denied": 1,
+      "node_list_denied": 1,
+      "argocd_synced_healthy": 1,
+      "reclaim_seconds": 38,
+      "remaining_namespaces": 0,
+      "remaining_persistent_volumes": 0,
+      "remaining_argocd_applications": 0
+    },
+    "five_seat": {
+      "workshop_id": "380ef071-2685-4833-97fb-6a10d3066e3d",
+      "session_ids": [
+        "e3ee53c8-7a26-4563-bcf2-a183a3078388",
+        "1d852067-92f4-47f0-a22f-97e7fb0abf5c",
+        "b23ebdf8-4429-4c10-9398-d16e685f60b1",
+        "d1d4a603-a9ed-4d97-b30a-5e17c946b28c",
+        "b9551958-449b-460d-895e-5da227a6a58e"
+      ],
+      "seats_ready": 5,
+      "collectively_ready_seconds": 49,
+      "solution_stack_deploy_seconds": 24,
+      "pods": 15,
+      "running_pods": 15,
+      "ready_containers": 30,
+      "containers": 30,
+      "functional_http_200": 5,
+      "functional_journey_seconds": [
+        75.400854,
+        75.025141,
+        75.347388,
+        75.086919,
+        75.463375
+      ],
+      "own_namespace_edit_allowed": 5,
+      "cross_namespace_read_denied": 5,
+      "node_list_denied": 5,
+      "argocd_synced_healthy": 5,
+      "reclaim_seconds": 38,
+      "remaining_namespaces": 0,
+      "remaining_persistent_volumes": 0,
+      "remaining_argocd_applications": 0
+    },
+    "twenty_five_seat": {
+      "workshop_id": "ce4407f4-4cd1-41f1-aade-2d6aae6e1d71",
+      "seats_ready": 25,
+      "provisioning_seconds": 168,
+      "solution_stack_deploy_seconds": 122,
+      "pods": 75,
+      "running_pods": 75,
+      "ready_containers": 150,
+      "containers": 150,
+      "container_restarts": 0,
+      "showroom_module_02_http_200": 25,
+      "argocd_synced_healthy": 25,
+      "functional_http_200": 25,
+      "functional_journey_seconds": [
+        79.157675,
+        77.384318,
+        77.673446,
+        79.482399,
+        79.452807,
+        77.556815,
+        79.443161,
+        79.094919,
+        79.210141,
+        79.245539,
+        79.273125,
+        77.70494,
+        77.477662,
+        77.499798,
+        77.441642,
+        79.163444,
+        77.337619,
+        77.65144,
+        79.011424,
+        77.525425,
+        79.115899,
+        77.415605,
+        77.503128,
+        79.419194,
+        79.063845
+      ],
+      "functional_journey_mean_seconds": 78.4122164,
+      "functional_journey_p95_seconds": 79.452807,
+      "functional_journey_max_seconds": 79.482399,
+      "inference_errors": 0,
+      "required_tools_per_journey": [
+        "intel_hardware_lookup",
+        "openshift_capabilities",
+        "reference_architectures"
+      ],
+      "terminal_project_matches_seat": 25,
+      "own_namespace_edit_allowed": 25,
+      "cross_namespace_read_denied": 25,
+      "node_list_denied": 25,
+      "active_cluster_pods_at_peak": 184,
+      "protected_pod_ceiling": 200,
+      "node_pressure": {
+        "memory": false,
+        "disk": false,
+        "pid": false
+      },
+      "reclaim_seconds": 99,
+      "cleanup": {
+        "workshop_status": "completed",
+        "reclaimed_sessions": 25,
+        "remaining_namespaces": 0,
+        "remaining_persistent_volumes": 0,
+        "remaining_argocd_applications": 0,
+        "active_cluster_pods_before_run": 109,
+        "active_cluster_pods_after_reclaim": 109
+      }
+    }
+  },
+  "corrected_content_regression": {
+    "workshop_id": "3a1a89fa-52f2-488c-be97-90f95c89821a",
+    "session_id": "7924966d-b1f6-4b95-83c3-003326b88d3b",
+    "catalog_version": "1.0.2",
+    "showroom_content_ref": "946175fde859e791568b95f1181833d92c448e8a",
+    "showroom_content_tag": "intel-guided-content-v1.0.13",
+    "seat_ready_seconds": 41.839,
+    "solution_stack_deploy_seconds": 27,
+    "pods": 3,
+    "ready_containers": 6,
+    "container_restarts": 0,
+    "module_02_http_status": 200,
+    "rendered_two_workload_pods": true,
+    "rendered_inspect_deployed_agent": true,
+    "browser_errors": 0,
+    "functional_http_status": 200,
+    "functional_journey_seconds": 69.503025,
+    "terminal_project_matches_seat": true,
+    "own_namespace_edit_allowed": true,
+    "cross_namespace_read_denied": true,
+    "node_list_denied": true,
+    "reclaim_seconds": 37,
+    "cleanup": {
+      "remaining_namespaces": 0,
+      "remaining_persistent_volumes": 0,
+      "remaining_argocd_applications": 0,
+      "active_cluster_pods_after_reclaim": 109
+    }
+  },
+  "image_supply": {
+    "registry_storage": "pvc:nfs-storage/launchpad-image-registry-storage",
+    "registry_capacity": "100Gi",
+    "registry_reclaim_policy": "Retain",
+    "registry_available_at_peak": true,
+    "registry_degraded_at_peak": false,
+    "durable_registry_result": "GREEN-live",
+    "evidence": "evidence/brutus-persistent-registry-2026-09-05.json"
+  },
+  "route_tls": {
+    "collective_readiness_uses_configured_ca": true,
+    "verified_live_rerun": true,
+    "one_five_and_twenty_five_seat_readiness_passed": true
+  },
+  "red_green_matrix": [
+    {
+      "id": "BRUTUS25-PODS-001",
+      "red": "The prior four-pod seat contract fit only 22 protected Brutus seats.",
+      "green": "Tools were co-located with the agent without removing either service; the three-pod contract previews 30 protected seats and ran 25 with 16 pod slots still below the protected ceiling."
+    },
+    {
+      "id": "BRUTUS25-FUNCTION-001",
+      "red": "Twenty-five concurrent complete Agent 201 participant journeys were unproven on Brutus.",
+      "green": "All 25 simultaneous journeys returned HTTP 200, called all three required tools, and recorded zero inference errors."
+    },
+    {
+      "id": "BRUTUS25-ISOLATION-001",
+      "red": "Seat isolation had only been exercised at five-seat scale on Brutus.",
+      "green": "All 25 terminals selected their own project, retained edit there, and were denied cross-namespace reads and node listing."
+    },
+    {
+      "id": "BRUTUS25-CLEANUP-001",
+      "red": "Twenty-five-seat bulk reclaim and Argo finalizer recovery were unproven.",
+      "green": "Reclaim completed with all 25 records reclaimed and zero namespaces, PVs, or Applications; the cluster returned to its 109-pod baseline."
+    },
+    {
+      "id": "BRUTUS25-VISUAL-001",
+      "red": "Rendered QA found stale four-pod and deployment wording after the compact topology change.",
+      "green": "Immutable v1.0.13 content renders the two participant workload pods and instructs users to inspect the deployed agent; browser error logs are empty."
+    }
+  ],
+  "release_boundary": {
+    "internal_twenty_five_seat_scale_gate": true,
+    "public_access_certified": false,
+    "openshift_console_oidc_certified": false,
+    "sixty_minute_soak_complete": false,
+    "consecutive_twenty_five_seat_runs": 1,
+    "general_availability": false
+  },
+  "not_certified": [
+    "Brutus public access and trusted external browser TLS",
+    "Brutus OpenShift Console participant OIDC",
+    "a 60-minute twenty-five-seat soak",
+    "three consecutive twenty-five-seat certification runs",
+    "the exact three-workshop September 17 fleet rehearsal"
+  ],
+  "contains_plaintext_credentials": false
+}

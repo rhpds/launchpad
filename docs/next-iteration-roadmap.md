@@ -19,27 +19,29 @@ past its measured live evidence. Public access remains a separate certification
 gate; internal Arena access is the September release baseline unless the public
 matrix is independently GREEN-live by Sep 15.
 
-As of September 5, the direct AgentOps component is GREEN for shared Nomic
-embeddings, MLflow workspace isolation and tracing, DSPA, the application
-journey, automatic zero-residue reclaim, and one-seat OpenShift Logging
-ingestion/isolation. It remains RED as a Launchpad lab because order creation,
-Showroom, entitlement, participant routes, the full journey, and trusted TLS
-have not passed together. Shared MLflow must move from SQLite to PostgreSQL,
-the pipeline database must use service-ca TLS, and Logging needs durable
-object/block storage and production sizing before scale.
-The measured event envelope is 525 participant pods, so the current two-worker
-500-pod Arena ceiling cannot host the exact trio even from an empty starting
-point. The current candidate path dedicates Arena to a reduced/shared-stack
+As of September 5, AgentOps passed its internal Launchpad-created one-seat gate,
+including Showroom, runtime credentials, the application journey, shared Nomic
+embeddings, PostgreSQL-backed MLflow isolation and tracing, DSPA with a
+service-ca TLS pipeline database, OpenShift Logging ingestion/isolation, and
+automatic zero-residue reclaim. Its five-seat gate remains RED after Arena node
+instability and per-seat topology pressure. Logging also still needs durable
+object/block storage and production sizing, and trusted public TLS is not
+certified.
+The compact Agent 201 topology reduces the measured event envelope to 500
+participant pods, so the current two-worker 500-pod Arena ceiling still cannot
+host the exact trio while retaining any scheduling headroom, even from an empty
+starting point. The current candidate path dedicates Arena to a reduced/shared-stack
 AgentOps workshop, uses Brutus for Building an AI Agent, and re-certifies
-Oberon for Serve LLMs. Brutus is registered and completed a warm five-seat
-functional run in 48 seconds, followed by five simultaneous three-tool model
-journeys and zero-residue reclaim in 39 seconds. Its integrated registry now
-uses a retained 100Gi NFS claim and all three pinned digests passed `Always`
-pull probes after a deliberate registry restart. It remains placement-disabled
-because the CA-verification regression needs a deployed live rerun and its
-capacity preview supports only 22 seats at the four-pod contract. It therefore
-needs nine additional protected pod slots or a measured three-pod contract
-before the 25-seat gate. Oberon needs eleven
+Oberon for Serve LLMs. Brutus is registered and passed the one-, five-, and
+25-seat internal gates with a measured three-pod contract. The 25-seat run
+created 75 healthy pods, completed all 25 simultaneous three-tool journeys,
+preserved namespace isolation, and reclaimed with zero residue. Its capacity
+preview now supports 30 seats while retaining 20 percent headroom. The
+integrated registry uses a retained 100Gi NFS claim and all three pinned digests
+passed `Always` pull probes after a deliberate registry restart. Brutus remains
+placement-disabled pending the 60-minute soak, two repeat scale runs, and an
+explicit event go/no-go; public access and Console OIDC are separate gates.
+Oberon needs eleven
 additional protected slots before its live gate.
 
 The Brutus one-seat run also measured the fleet prerequisites that must move
@@ -47,9 +49,9 @@ out of the ordering path: a 10m42s cold Showroom terminal-image mirror, a
 resumable registry HTTP 408 while moving the solution-agent image, execution
 cluster ingress-CA distribution, and a 300-second private model Route timeout.
 The warm five-seat run initially proved concurrency but not durable supply.
-That gate is now GREEN-live in
-`evidence/brutus-persistent-registry-2026-09-05.json`; the twenty-five-seat run
-still requires protected pod headroom and the deployed CA-verification rerun.
+Durability is GREEN-live in `evidence/brutus-persistent-registry-2026-09-05.json`,
+and the deployed CA-verification plus internal 25-seat scale reruns are GREEN-live
+in `evidence/brutus-agent-201-three-pod-certification-2026-09-05.json`.
 
 ## Pathway 1: provisioning performance
 

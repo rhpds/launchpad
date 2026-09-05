@@ -10,7 +10,7 @@ participant seats must remain usable concurrently:
 |---|---|---:|---|---|
 | 1 | `agentops-observability` | 25 | RED: five-seat Arena gate failed, limited to one seat | Arena after topology reduction/capacity repair |
 | 2 | `intel-llm-cpu-serving` | 25 | GREEN-live-25 on Arena | Oberon after re-certification |
-| 3 | `intel-xeon6-agent-201` | 25 | GREEN-live-25 on Arena | Brutus after onboarding and certification |
+| 3 | `intel-xeon6-agent-201` | 25 | GREEN-live-25 internal on Brutus | Brutus, placement-disabled pending event go/no-go |
 
 Provisioning is deliberately staggered. Request the next workshop only after
 the previous workshop is collectively Ready, but retain all three so 75
@@ -45,12 +45,12 @@ plane services that are already running.
 |---|---:|---:|---:|---:|
 | AgentOps, 25 seats | 62,500m | 179,200 MiB | 375 | 750 GiB |
 | Serve LLMs, 25 seats | 16,625m | 37,200 MiB | 50 | not declared by catalog |
-| Building an AI Agent, 25 seats | 10,375m | 22,800 MiB | 100 | not declared by catalog |
-| **Event total** | **89,500m** | **239,200 MiB** | **525** | **at least 750 GiB** |
+| Building an AI Agent, 25 seats | 10,375m | 22,800 MiB | 75 | not declared by catalog |
+| **Event total** | **89,500m** | **239,200 MiB** | **500** | **at least 750 GiB** |
 
 Admission must retain at least 20 percent additional headroom for scheduling,
 operator activity, model services, temporary rollout overlap, and measurement
-error. The protected target is therefore 107,400m CPU, 287,040 MiB memory, 630
+error. The protected target is therefore 107,400m CPU, 287,040 MiB memory, 600
 pod slots, and at least 900 GiB schedulable storage.
 
 These are reservations, not a statement of current availability. **The current
@@ -76,8 +76,8 @@ and `rhgnr1` are schedulable workers:
 | NFS free space reported | 6.5 TiB |
 
 CPU, memory, and NFS fit the event reservation. Pod slots do not. The current
-193 worker pods plus 525 declared event pods would require 718 slots; applying
-the event's 20 percent protection requires 823. One additional 250-pod worker
+193 worker pods plus 500 declared event pods would require 693 slots; applying
+the event's 20 percent protection requires 793. One additional 250-pod worker
 would provide 750 total slots and fit the unprotected estimate, but not the
 protected target, so the recommended event path is **two additional 250-pod
 workers**.
@@ -89,7 +89,7 @@ availability risk and needs its own load, eviction, API-latency, rollback, and
 failure certification. It must not be enabled as an incidental chart change.
 
 Scaling down unrelated deployments cannot solve this constraint: even an
-otherwise empty two-worker pool cannot place all 525 declared event pods.
+otherwise empty two-worker pool cannot retain headroom around all 500 declared event pods.
 Running the workshops sequentially also does not meet the
 requirement because all 75 participants must use the labs concurrently.
 
@@ -110,31 +110,34 @@ candidate fleet assignment:
 | Cluster | Schedulable pod slots | Active worker pods | Additional slots after reserve | Candidate event role |
 |---|---:|---:|---:|---|
 | Arena | 500 | 220 after cleanup | 180 | AgentOps only, after redesign or added stable capacity |
-| Brutus | 250 | 109 | 91 | Building an AI Agent; currently nine slots short of its 100-slot peak contract |
+| Brutus | 250 | 109 | 91 | Building an AI Agent; 75-pod contract passed the internal 25-seat gate |
 | Oberon | 500 | 361 | 39 | Serve LLMs; currently eleven slots short of its 50-slot peak contract |
 
 Brutus and Oberon are now registered with separate least-privilege Launchpad
-and Argo credentials but remain disabled for normal placement. After its
-one-seat gate, Brutus completed a warm five-seat Build-an-Agent run on September
-5. All seats were collectively ready 48 seconds after confirmation, five
-simultaneous three-tool advisor journeys returned HTTP 200 in 74.5–78.2
-seconds, each terminal retained only its seat namespace, and bulk reclaim
-restored the 109-pod baseline with zero namespaces, Argo applications, or PVs
-in 39 seconds. Brutus's integrated registry was then migrated to a retained
-100Gi `nfs-storage` claim; it remained healthy after restart and served all
-three exact pinned image digests with `imagePullPolicy: Always`. The run is
-still not promotion-eligible: the CA-verification regression needs a deployed
-live rerun and twenty-five seats remain unproven. Oberon is disabled for
-placement and must be re-certified before it hosts event seats. The preferred
-three-cluster path is therefore:
+and Argo credentials but remain disabled for normal placement. Brutus's compact
+Agent 201 topology uses three pods per seat by co-locating the tools process
+with the agent while preserving separate services and routes. It passed one,
+five, and 25 internal seats on September 5. The 25-seat workshop reached Ready
+in 168 seconds, deployed 75 pods/150 containers with zero restarts, completed
+25 simultaneous three-tool journeys with a 79.45-second p95, retained 16 pod
+slots below the protected ceiling, and reclaimed to the exact 109-pod baseline
+with zero namespaces, PVs, or Applications. A final one-seat regression rendered
+the corrected immutable v1.0.13 guide and completed the functional journey.
+The retained 100Gi registry stayed healthy throughout. Evidence is in
+`evidence/brutus-agent-201-three-pod-certification-2026-09-05.json`.
+
+This passes Brutus's internal 25-seat scale gate, but does not certify public
+access, Console OIDC, a 60-minute soak, or three consecutive scale runs. Brutus
+therefore remains disabled pending an explicit event go/no-go. Oberon is also
+disabled and must be re-certified before it hosts event seats. The preferred
+three-cluster path is now:
 
 1. Keep Arena dedicated to AgentOps and reduce the per-seat topology by moving
    DSPA, pipeline database, MinIO, Grafana, and other safe components to one
    workshop-scoped shared stack, or add stable worker capacity.
-2. Deploy and rerun the verified route-CA path on Brutus, and remove at least
-   nine baseline pod slots (or prove a lower per-seat pod contract) before its
-   25-seat certification. Its persistent-registry gate is GREEN-live in
-   `evidence/brutus-persistent-registry-2026-09-05.json`.
+2. Hold Brutus at the proven three-pod contract, complete the 60-minute soak
+   and two repeat 25-seat runs, then decide whether internal event placement
+   can be enabled. Keep public access and Console OIDC as separate gates.
 3. Re-enable Oberon only after removing at least eleven baseline pod slots and
    passing Serve LLMs 1 -> 5 -> 25 plus full reclaim.
 
@@ -144,10 +147,10 @@ and recent Ready-transition checks; aggregate cluster totals are insufficient.
 
 ## Critical path: AgentOps 1 -> 5 -> 25
 
-Serve LLMs and Building an AI Agent have earlier 25-seat evidence on Arena, but
-their candidate remote targets still need target-specific certification. The
-release critical path is AgentOps plus Brutus/Oberon 1 -> 5 -> 25 promotion;
-none may be promoted from another cluster's result.
+Building an AI Agent now has target-specific internal 25-seat evidence on
+Brutus. Serve LLMs still needs target-specific Oberon re-certification. The
+release critical path is AgentOps 1 -> 5 -> 25 plus Oberon Serve LLMs and the
+exact fleet rehearsal; no result may be promoted from another cluster.
 
 ### Gate A: one Launchpad-created AgentOps seat
 
