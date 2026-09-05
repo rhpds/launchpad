@@ -95,7 +95,7 @@ matrix:
     red: Live Argo authorization rejected ServiceMonitor creation
     green_local: pass
     green_integration: pass-server-dry-run-21-resources
-    green_live: blocked-rbac-not-applied
+    green_live: pass-permission-applied-no-workload-created
     evidence:
       - backend/tests/test_agentops_seat_chart.py
       - deploy/multicluster/arena-argocd-rbac.yaml
@@ -104,16 +104,16 @@ matrix:
 rubric:
   source_and_contract: {earned: 15, possible: 15}
   secret_boundary: {earned: 15, possible: 15}
-  namespace_and_rbac_isolation: {earned: 8, possible: 15}
+  namespace_and_rbac_isolation: {earned: 10, possible: 15}
   shared_service_readiness: {earned: 5, possible: 15}
   participant_tabs_and_journey: {earned: 5, possible: 15}
   cleanup_and_repeatability: {earned: 7, possible: 10}
   five_seat_certification: {earned: 0, possible: 5}
   twenty_five_seat_certification: {earned: 0, possible: 10}
-  total: {earned: 55, possible: 100}
+  total: {earned: 57, possible: 100}
 
 decision: >-
   Keep the catalog item draft. Source intake is valid, but the AgentOps
-  experience is not orderable until the Argo RBAC delta, missing shared Arena
-  services, protected participant routes, adapted eight-tab journey, and
-  complete reclaim are GREEN-live.
+  experience is not orderable until the missing shared Arena services,
+  protected participant routes, adapted eight-tab journey, and complete
+  reclaim are GREEN-live.

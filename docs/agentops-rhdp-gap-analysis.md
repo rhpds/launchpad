@@ -115,13 +115,12 @@ cluster services remain intact.
 ## Certification order
 
 1. Confirm shared Arena services and their routes/RBAC.
-2. Apply and verify the least-privilege Argo RBAC delta for ServiceMonitor.
-3. Adapt the Showroom to Launchpad identity, URLs, and
+2. Adapt the Showroom to Launchpad identity, URLs, and
    `granite-3.2-8b-tools`, then protect all participant routes.
-4. Complete one seat across all eight tabs, including traces, metrics, logs,
+3. Complete one seat across all eight tabs, including traces, metrics, logs,
    pipelines, access isolation, and zero-residue reclaim.
-5. Certify five seats with concurrent participant use.
-6. Certify 25 seats with staggered provisioning, concurrent participant use,
+4. Certify five seats with concurrent participant use.
+5. Certify 25 seats with staggered provisioning, concurrent participant use,
    model-load measurement, and bulk reclaim.
 
 The catalog remains `draft` until every one-seat requirement is GREEN-live.
@@ -153,8 +152,6 @@ The live check and render/dry-run gates established the remaining blockers:
   documents `qwen3-14b`, `wksp-user1`, and RHDP password authentication; and
 - direct Mortgage AI and Grafana Routes are not yet protected by the
   participant entitlement gateway; and
-- Arena's Argo service account needs the committed namespace-scoped
-  `ServiceMonitor` permission before it can apply the complete chart; and
 - the `launchpad-arena` Argo CD Application is Healthy but OutOfSync at
   `3b5a856dd01a3d30d91bc89e40fadb4267d4cca2`, so its drift must be reviewed
   rather than blindly synchronized.
@@ -164,6 +161,11 @@ provisioner can create namespaces and cannot create Applications in the
 central GitOps namespace, as intended. The local administrator kubeconfig is
 expired and is not a suitable runtime credential; Launchpad must continue to
 use its service-account identity.
+
+The remote Argo identity's least-privilege rule was updated on 2026-09-04. It
+can create namespaced `ServiceMonitor` and DSPA resources and remains unable to
+create cluster roles. This clears the chart's discovered authorization gap but
+does not substitute for a real one-seat deployment and functional journey.
 
 The sanitized live inventory is captured in
 `evidence/agentops-arena-prerequisites-2026-09-04.json`; the chart and permission

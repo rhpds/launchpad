@@ -151,18 +151,18 @@ The chart also receives workshop, seat, session, tenant, and cluster identity
 values and labels every resource with them.
 
 The chart renders no Secret or cluster-scoped resource. An Arena server-side
-dry run accepted all 21 rendered resources. The live Argo service account can
-create every rendered resource except `ServiceMonitor`; the required
-least-privilege rule is committed in `deploy/multicluster/arena-argocd-rbac.yaml`
-and must be applied and verified before live deployment.
+dry run accepted all 21 rendered resources. The least-privilege rule in
+`deploy/multicluster/arena-argocd-rbac.yaml` is applied: Arena verifies that the
+remote Argo service account can create namespaced `ServiceMonitor` and DSPA
+resources but cannot create cluster roles.
 
 The source contains roughly 34 MiB of instructional images and references a
 mutable `latest` Showroom theme, so content delivery and theme pinning are also
 explicit activation gates rather than hidden per-seat download costs.
 
 The item stays `gitops_ready: false`. A one-seat deployment is blocked until
-the Argo RBAC delta is applied, participant-protected routes are wired, the
-Showroom is adapted from its hard-coded `wksp-user1`/password and `qwen3-14b`
+participant-protected routes are wired, the Showroom is adapted from its
+hard-coded `wksp-user1`/password and `qwen3-14b`
 assumptions to Launchpad identity and `granite-3.2-8b-tools`, and Arena provides
 the expected MLflow and Logging/Loki experience. Only then can the eight-tab
 participant journey and zero-residue reclaim be certified.

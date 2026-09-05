@@ -31,12 +31,14 @@
     "argocd_can_create_core_workload_resources": true,
     "argocd_can_create_dspa": true,
     "argocd_can_create_servicemonitor_before_remediation": false,
+    "argocd_can_create_servicemonitor_after_remediation": true,
+    "argocd_can_create_dspa_after_remediation": true,
+    "argocd_can_create_clusterrole_after_remediation": false,
     "remediation": "deploy/multicluster/arena-argocd-rbac.yaml",
-    "remediation_applied": false
+    "remediation_applied": true
   },
   "decision": "blocked",
   "remaining_gates": [
-    "Apply and verify the Arena Argo ServiceMonitor permission",
     "Adapt Showroom variables and model narrative for Launchpad and Granite",
     "Protect Mortgage AI and Grafana routes with participant entitlement",
     "Provide and certify the expected MLflow and Logging/Loki experience",
