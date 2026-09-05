@@ -44,7 +44,10 @@ def test_fleet_candidate_preserves_headroom_and_fail_closed_targets():
     assert brutus_certification["five_seat_provisioning_seconds"] == 48
     assert brutus_certification["five_seat_functional_p95_seconds"] < 80
     assert brutus_certification["five_seat_reclaim_seconds"] == 39
-    assert brutus_certification["integrated_registry_storage"] == "emptyDir"
+    assert brutus_certification["integrated_registry_storage"] == (
+        "pvc:nfs-storage/launchpad-image-registry-storage"
+    )
+    assert brutus_certification["durable_registry_result"] == "GREEN-live"
     assert brutus_certification["promotion_eligible"] is False
     assert brutus_certification["public_access_certified"] is False
     assert evidence["candidate_assignment"] == {

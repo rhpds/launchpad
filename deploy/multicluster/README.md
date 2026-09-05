@@ -8,10 +8,11 @@ They must remain disabled until the complete procedure below and the catalog's
 As of 2026-09-05, Brutus has passed the one-seat gate and a warm five-seat
 functional run covering Showroom, terminals, simultaneous Build-an-Agent tool
 calling, namespace isolation, and zero-residue bulk reclaim. It remains
-disabled for normal placement because its integrated registry uses `emptyDir`,
-the CA-verification regression still needs a deployed live rerun, and the
-twenty-five-seat gate has not passed. Oberon remains at the infrastructure
-probe gate.
+disabled for normal placement because the CA-verification regression still
+needs a deployed live rerun and the twenty-five-seat gate has not passed. Its
+integrated registry now uses a retained 100Gi NFS claim and all three pinned
+images passed post-restart `Always` pull probes. Oberon remains at the
+infrastructure probe gate.
 
 Apply `arena-rbac.yaml` to the remote cluster, create a bound service-account
 token, and build a kubeconfig for that identity. Despite the historical
@@ -66,11 +67,12 @@ control plane:
 1. Launchpad and Argo credentials resolve and have only the documented access.
 2. Namespace, Route, PVC, workload, Showroom, validation, and reclaim target
    only the persisted remote `cluster_ref`.
-3. Durable external images pull without relying on another cluster's internal
-   image registry. Pre-seed and verify every immutable digest before opening an
+3. Durable images pull without relying on another execution cluster's internal
+   registry. Pre-seed and verify every immutable digest before opening an
    order; the Brutus one-seat run measured a 10m42s cold terminal-image mirror
-   and one resumable HTTP 408 while moving the agent image. The subsequent
-   five-seat warm run passed but did not satisfy this durability requirement.
+   and one resumable HTTP 408 while moving the agent image. Brutus now stores
+   its mirror on a retained NFS claim and has passed exact-digest pulls after a
+   registry restart; repeat that proof whenever the pinned image set changes.
 4. Every required model endpoint is reachable from the remote workload network
    and is explicitly registered; do not substitute Brutus's Granite 3.1 GPU
    endpoint for a Xeon CPU or Granite tools contract without a content and

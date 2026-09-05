@@ -102,7 +102,13 @@
     "tested_digests_present_before_run": 3,
     "warm_pull_result": "GREEN-live",
     "durable_registry_result": "RED",
-    "promotion_blocker": "Brutus integrated-registry data is lost if its registry pod is recreated."
+    "promotion_blocker": "Brutus integrated-registry data was not durable during this five-seat run.",
+    "remediation_after_run": {
+      "result": "GREEN-live",
+      "evidence": "evidence/brutus-persistent-registry-2026-09-05.json",
+      "storage": "pvc:nfs-storage/launchpad-image-registry-storage",
+      "post_restart_exact_digest_pulls": 3
+    }
   },
   "route_tls": {
     "collective_readiness_uses_verified_ca": true,

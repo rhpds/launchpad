@@ -1,7 +1,7 @@
 {
   "schema": "launchpad.redhat.com/fleet-placement-readiness/v1",
   "evidence_id": "EDD-FLEET-PLACEMENT-CANDIDATE-20260905",
-  "captured_at": "2026-09-05T16:47:48Z",
+  "captured_at": "2026-09-05T19:29:16Z",
   "result": "RED-readiness",
   "event_target": {
     "provisioning_mode": "staggered",
@@ -76,7 +76,9 @@
         "five_seat_provisioning_seconds": 48,
         "five_seat_functional_p95_seconds": 78.221507,
         "five_seat_reclaim_seconds": 39,
-        "integrated_registry_storage": "emptyDir",
+        "integrated_registry_storage": "pvc:nfs-storage/launchpad-image-registry-storage",
+        "durable_registry_result": "GREEN-live",
+        "durable_registry_evidence": "evidence/brutus-persistent-registry-2026-09-05.json",
         "promotion_eligible": false,
         "public_access_certified": false
       }
@@ -121,7 +123,6 @@
   "required_remediation": [
     "Reduce AgentOps to workshop-shared infrastructure or add stable Arena worker capacity.",
     "Add per-node admission, workload spreading, and a recent-Ready-transition circuit breaker.",
-    "Promote every workshop image to a durable external registry and cold-pull immutable digests before Brutus twenty-five-seat certification.",
     "Automate cluster ingress CA rotation and model trust distribution before the next Brutus certification run.",
     "Deploy and live-rerun verified route readiness, then prove Console/OIDC and twenty-five-seat concurrency with zero-residue reclaim on Brutus.",
     "Prove durable image pulls, storage deletion, private ingress, Showroom, terminal, Console/OIDC, and zero-residue reclaim on Oberon.",
@@ -132,7 +133,7 @@
     "placement_enabled": false,
     "brutus_status": "five-seat-functional-disabled",
     "oberon_status": "registered-disabled",
-    "next_gate": "durable image promotion, deployed CA-verification rerun, pod-headroom remediation, and Brutus twenty-five-seat certification"
+    "next_gate": "deployed CA-verification rerun, pod-headroom remediation, and Brutus twenty-five-seat certification"
   },
   "contains_plaintext_credentials": false
 }

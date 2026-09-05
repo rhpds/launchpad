@@ -120,18 +120,21 @@ one-seat gate, Brutus completed a warm five-seat Build-an-Agent run on September
 simultaneous three-tool advisor journeys returned HTTP 200 in 74.5–78.2
 seconds, each terminal retained only its seat namespace, and bulk reclaim
 restored the 109-pod baseline with zero namespaces, Argo applications, or PVs
-in 39 seconds. The run is not promotion-eligible: the Brutus integrated
-registry uses `emptyDir`, the CA-verification regression needs a deployed live
-rerun, and twenty-five seats remain unproven. Oberon is disabled for placement
-and must be re-certified before it hosts event seats. The preferred
+in 39 seconds. Brutus's integrated registry was then migrated to a retained
+100Gi `nfs-storage` claim; it remained healthy after restart and served all
+three exact pinned image digests with `imagePullPolicy: Always`. The run is
+still not promotion-eligible: the CA-verification regression needs a deployed
+live rerun and twenty-five seats remain unproven. Oberon is disabled for
+placement and must be re-certified before it hosts event seats. The preferred
 three-cluster path is therefore:
 
 1. Keep Arena dedicated to AgentOps and reduce the per-seat topology by moving
    DSPA, pipeline database, MinIO, Grafana, and other safe components to one
    workshop-scoped shared stack, or add stable worker capacity.
-2. Promote Brutus images to a durable registry, deploy and rerun the verified
-   route-CA path, and remove at least nine baseline pod slots (or prove a lower
-   per-seat pod contract) before its 25-seat certification.
+2. Deploy and rerun the verified route-CA path on Brutus, and remove at least
+   nine baseline pod slots (or prove a lower per-seat pod contract) before its
+   25-seat certification. Its persistent-registry gate is GREEN-live in
+   `evidence/brutus-persistent-registry-2026-09-05.json`.
 3. Re-enable Oberon only after removing at least eleven baseline pod slots and
    passing Serve LLMs 1 -> 5 -> 25 plus full reclaim.
 

@@ -1,0 +1,85 @@
+{
+  "schema": "launchpad.redhat.com/image-registry-durability/v1",
+  "evidence_id": "EDD-BRUTUS-PERSISTENT-REGISTRY-20260905",
+  "captured_at": "2026-09-05T19:29:16Z",
+  "source_commit": "05d53b3d3fa387bc8f2da2dd71d5621adab72af3",
+  "cluster_ref": "brutus",
+  "result": "GREEN-live",
+  "normal_placement_enabled_after_change": false,
+  "storage": {
+    "claim": "launchpad-image-registry-storage",
+    "storage_class": "nfs-storage",
+    "capacity": "100Gi",
+    "status": "Bound",
+    "access_mode": "ReadWriteMany",
+    "persistent_volume_reclaim_policy": "Retain"
+  },
+  "operator_conditions": {
+    "Available": true,
+    "Progressing": false,
+    "Degraded": false
+  },
+  "persistence_proof": {
+    "operator_storage": "pvc",
+    "deployment_claim": "launchpad-image-registry-storage",
+    "post_switch_restart_observed": true,
+    "registry_file_count": 170,
+    "registry_disk_usage": "1.4G"
+  },
+  "digest_pull_probes": {
+    "performed_after_registry_restart": true,
+    "image_pull_policy": "Always",
+    "results": [
+      {
+        "image": "partner-ai-launchpad/launchpad-showroom-git-cloner",
+        "expected_digest": "sha256:3ae8e259f03888ee90526fd7d76375c4a6340df31242ede6be423604c3fdc26d",
+        "resolved_image_id": "image-registry.openshift-image-registry.svc:5000/partner-ai-launchpad/launchpad-showroom-git-cloner@sha256:3ae8e259f03888ee90526fd7d76375c4a6340df31242ede6be423604c3fdc26d",
+        "phase": "Succeeded",
+        "output": "pull-ok"
+      },
+      {
+        "image": "partner-ai-launchpad/launchpad-showroom-terminal",
+        "expected_digest": "sha256:164aa93d20af95dc916aa695556a1cae2ec057385ee1b254157df9eead099d9b",
+        "resolved_image_id": "image-registry.openshift-image-registry.svc:5000/partner-ai-launchpad/launchpad-showroom-terminal@sha256:164aa93d20af95dc916aa695556a1cae2ec057385ee1b254157df9eead099d9b",
+        "phase": "Succeeded",
+        "output": "pull-ok"
+      },
+      {
+        "image": "partner-ai-launchpad/solution-agent-workshop",
+        "expected_digest": "sha256:6fcb7f37313fb7515aa8d6c2d5d293e5da4568be859ba971efbc56b24d2ca102",
+        "resolved_image_id": "image-registry.openshift-image-registry.svc:5000/partner-ai-launchpad/solution-agent-workshop@sha256:6fcb7f37313fb7515aa8d6c2d5d293e5da4568be859ba971efbc56b24d2ca102",
+        "phase": "Succeeded",
+        "output": "pull-ok"
+      }
+    ]
+  },
+  "cleanup": {
+    "migration_pods_remaining": 0,
+    "migration_network_policies_remaining": 0,
+    "digest_probe_pods_remaining": 0
+  },
+  "red_green_matrix": [
+    {
+      "id": "BRUTUS-REGISTRY-STORAGE-001",
+      "red": "The integrated registry used pod-local emptyDir storage and would lose its catalog images after pod recreation.",
+      "green": "The operator and deployment use a Bound 100Gi ReadWriteMany nfs-storage claim backed by a Retain persistent volume, and the registry returned healthy after a deliberate restart."
+    },
+    {
+      "id": "BRUTUS-REGISTRY-DIGEST-001",
+      "red": "The three immutable Agent 201 image digests had not been proven retrievable after registry recreation.",
+      "green": "Three post-restart pods using imagePullPolicy Always resolved and ran the exact cloner, terminal, and solution-agent digests."
+    },
+    {
+      "id": "BRUTUS-REGISTRY-CLEANUP-001",
+      "red": "An interrupted migration could leave temporary copy or probe resources behind.",
+      "green": "The migration pod, temporary ingress NetworkPolicy, and all digest-probe pods were absent after validation."
+    }
+  ],
+  "remaining_promotion_gates": [
+    "deployed live rerun of verified Showroom route CA handling",
+    "protected pod headroom for the four-pod-per-seat contract or a proven lower pod contract",
+    "twenty-five-seat workshop with full participant and zero-residue reclaim evidence",
+    "Brutus public access and OpenShift Console OIDC participant flow"
+  ],
+  "contains_plaintext_credentials": false
+}

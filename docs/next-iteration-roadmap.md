@@ -33,19 +33,23 @@ point. The current candidate path dedicates Arena to a reduced/shared-stack
 AgentOps workshop, uses Brutus for Building an AI Agent, and re-certifies
 Oberon for Serve LLMs. Brutus is registered and completed a warm five-seat
 functional run in 48 seconds, followed by five simultaneous three-tool model
-journeys and zero-residue reclaim in 39 seconds. It remains placement-disabled:
-its integrated registry uses `emptyDir`, the CA-verification regression needs a
-deployed live rerun, and its capacity preview supports only 22 seats at the
-four-pod contract. It therefore needs nine additional protected pod slots or a
-measured three-pod contract before the 25-seat gate. Oberon needs eleven
+journeys and zero-residue reclaim in 39 seconds. Its integrated registry now
+uses a retained 100Gi NFS claim and all three pinned digests passed `Always`
+pull probes after a deliberate registry restart. It remains placement-disabled
+because the CA-verification regression needs a deployed live rerun and its
+capacity preview supports only 22 seats at the four-pod contract. It therefore
+needs nine additional protected pod slots or a measured three-pod contract
+before the 25-seat gate. Oberon needs eleven
 additional protected slots before its live gate.
 
 The Brutus one-seat run also measured the fleet prerequisites that must move
 out of the ordering path: a 10m42s cold Showroom terminal-image mirror, a
 resumable registry HTTP 408 while moving the solution-agent image, execution
 cluster ingress-CA distribution, and a 300-second private model Route timeout.
-The warm five-seat run proved concurrency but not durable supply. All images
-must be promoted and cold-pull verified before the twenty-five-seat run.
+The warm five-seat run initially proved concurrency but not durable supply.
+That gate is now GREEN-live in
+`evidence/brutus-persistent-registry-2026-09-05.json`; the twenty-five-seat run
+still requires protected pod headroom and the deployed CA-verification rerun.
 
 ## Pathway 1: provisioning performance
 
