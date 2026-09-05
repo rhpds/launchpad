@@ -234,6 +234,7 @@ def _validate_contract(intake: dict[str, Any], errors: list[str]) -> None:
                         "generated_password",
                         "maas_api_key",
                         "maas_endpoint",
+                        "model_endpoint",
                         "requested_model",
                         "namespace",
                     }:
@@ -246,6 +247,13 @@ def _validate_contract(intake: dict[str, Any], errors: list[str]) -> None:
                             errors.append(
                                 f"Generated runtime field '{key}' length must be between 24 and 128"
                             )
+                    if (
+                        source == "model_endpoint"
+                        and not str(field_contract.get("model", "")).strip()
+                    ):
+                        errors.append(
+                            f"Runtime Secret field '{key}' using model_endpoint must declare model"
+                        )
                 if "template" in field_contract:
                     template = str(field_contract["template"])
                     fields = set(RUNTIME_TEMPLATE_FIELD.findall(template))

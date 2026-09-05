@@ -652,6 +652,9 @@ http {{
     ) -> dict[str, str]:
         """Resolve approved dynamic, generated, and composed runtime fields."""
         requested_models = list(resources.get("requested_models", []))
+        model_endpoints = resources.get("model_endpoints", {})
+        if not isinstance(model_endpoints, dict):
+            model_endpoints = {}
         available = {
             "maas_api_key": str(resources.get("maas_api_key", "")),
             "maas_endpoint": str(resources.get("maas_endpoint", "")),
@@ -699,6 +702,17 @@ http {{
                         f"Generated runtime field '{key}' length must be between 24 and 128"
                     )
                 result[key] = secrets.token_urlsafe(length)
+                continue
+            if source == "model_endpoint":
+                model_id = str(contract.get("model", "")).strip()
+                if not model_id:
+                    raise ValueError(
+                        f"Runtime Secret field '{key}' using model_endpoint must declare model"
+                    )
+                endpoint = str(model_endpoints.get(model_id, "")).strip()
+                if not endpoint:
+                    raise ValueError(f"Workload runtime model endpoint '{model_id}' is unavailable")
+                result[key] = endpoint
                 continue
             if source not in available:
                 raise ValueError(f"Unsupported workload runtime Secret source '{source}'")

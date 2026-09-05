@@ -515,6 +515,11 @@ class ProvisioningService:
                 "maas_endpoint": self._selected_model_endpoint(
                     preferred_cluster, selected_models
                 ),
+                "model_endpoints": (
+                    dict(self.cluster_registry.get(preferred_cluster).model_endpoints)
+                    if preferred_cluster and self.cluster_registry
+                    else {}
+                ),
                 "maas_api_key": maas_api_key,
                 "sandbox_data": sandbox_data,
             }

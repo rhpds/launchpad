@@ -63,6 +63,7 @@ runtime:
     - openshift
     - showroom
     - model_endpoint
+    - embedding_endpoint
     - agentops_observability_stack
     - rhoai
     - mlflow
@@ -142,9 +143,11 @@ runtime:
       LLM_MODEL: {source: requested_model}
       LLM_MODEL_FAST: {source: requested_model}
       LLM_MODEL_CAPABLE: {source: requested_model}
-      EMBEDDING_MODEL: {value: ""}
-      EMBEDDING_PROVIDER: {value: ""}
-      EMBEDDING_BASE_URL: {value: ""}
+      EMBEDDING_MODEL: {value: nomic-embed-text-v1.5}
+      EMBEDDING_PROVIDER: {value: openai_compatible}
+      EMBEDDING_BASE_URL:
+        source: model_endpoint
+        model: nomic-embed-text-v1.5
       MLFLOW_TRACKING_URI:
         value: "https://mlflow.redhat-ods-applications.svc.cluster.local:8443"
       MLFLOW_EXPERIMENT_NAME: {value: mortgage-ai}
@@ -191,10 +194,10 @@ certification:
       DataScienceCluster, user workload monitoring, and Data Science Pipelines
       were confirmed live on 2026-09-04.
     - >-
-      Deploy a shared, cached Arena embedding endpoint and inject it through a
-      cluster-specific runtime source. Local per-seat Nomic model loading did
-      not finish within 14 minutes; the generation-only endpoint does not
-      implement the OpenAI embeddings route.
+      Re-run the AgentOps seat through Launchpad with the shared Arena Nomic
+      endpoint and prove all seeded knowledge-base chunks receive vectors.
+      The private cached endpoint and cluster-specific runtime injection are
+      live, but the application ingestion path has not yet been re-certified.
     - >-
       Complete one-seat functional certification, including app, trace,
       metrics, logs, evaluation, Showroom, access isolation, and full reclaim.

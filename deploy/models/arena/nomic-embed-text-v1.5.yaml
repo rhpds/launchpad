@@ -1,0 +1,160 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: tei-nomic-cache
+  namespace: fleet-llm-d
+  labels:
+    app.kubernetes.io/managed-by: launchpad
+    app.kubernetes.io/part-of: partner-ai-launchpad
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: nfs-storage
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tei-nomic-embed
+  namespace: fleet-llm-d
+  labels:
+    app: tei-nomic-embed
+    app.kubernetes.io/name: tei-nomic-embed
+    app.kubernetes.io/component: embedding-server
+    app.kubernetes.io/managed-by: launchpad
+    app.kubernetes.io/part-of: partner-ai-launchpad
+spec:
+  replicas: 1
+  progressDeadlineSeconds: 1200
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: tei-nomic-embed
+  template:
+    metadata:
+      labels:
+        app: tei-nomic-embed
+        app.kubernetes.io/name: tei-nomic-embed
+        app.kubernetes.io/component: embedding-server
+        app.kubernetes.io/managed-by: launchpad
+        app.kubernetes.io/part-of: partner-ai-launchpad
+    spec:
+      nodeSelector:
+        node-role.kubernetes.io/worker-cpu-tuned: ""
+      terminationGracePeriodSeconds: 60
+      containers:
+        - name: embeddings
+          image: ghcr.io/huggingface/text-embeddings-inference@sha256:c26a226262ad4ff3330fb30b76653c1bb65da2fcf413b92284545a010e0a8a48
+          imagePullPolicy: IfNotPresent
+          args:
+            - --model-id=nomic-ai/nomic-embed-text-v1.5
+            - --revision=e5cf08aadaa33385f5990def41f7a23405aec398
+            - --served-model-name=nomic-embed-text-v1.5
+            - --port=8080
+            - --tokenization-workers=4
+            - --max-concurrent-requests=256
+            - --auto-truncate
+          env:
+            - {name: HOME, value: /tmp}
+            - {name: HUGGINGFACE_HUB_CACHE, value: /data}
+            - {name: OMP_NUM_THREADS, value: "8"}
+            - {name: TOKENIZERS_PARALLELISM, value: "false"}
+          ports:
+            - {name: http, containerPort: 8080}
+          startupProbe:
+            httpGet: {path: /health, port: http}
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 90
+          readinessProbe:
+            httpGet: {path: /health, port: http}
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            httpGet: {path: /health, port: http}
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+          resources:
+            requests: {cpu: "4", memory: 4Gi}
+            limits: {cpu: "16", memory: 8Gi}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+          volumeMounts:
+            - {name: model-cache, mountPath: /data}
+      volumes:
+        - name: model-cache
+          persistentVolumeClaim:
+            claimName: tei-nomic-cache
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tei-nomic-embed
+  namespace: fleet-llm-d
+  labels:
+    app.kubernetes.io/managed-by: launchpad
+    app.kubernetes.io/part-of: partner-ai-launchpad
+spec:
+  type: ClusterIP
+  selector:
+    app: tei-nomic-embed
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-launchpad-to-nomic-embed
+  namespace: fleet-llm-d
+  labels:
+    app.kubernetes.io/managed-by: launchpad
+    app.kubernetes.io/part-of: partner-ai-launchpad
+spec:
+  podSelector:
+    matchLabels:
+      app: tei-nomic-embed
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: partner-ai-launchpad
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: backend
+      ports:
+        - {protocol: TCP, port: 8080}
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              app.kubernetes.io/managed-by: launchpad
+      ports:
+        - {protocol: TCP, port: 8080}
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: openshift-dns
+        - ipBlock:
+            cidr: 172.30.0.10/32
+      ports:
+        - {protocol: UDP, port: 53}
+        - {protocol: TCP, port: 53}
+        - {protocol: UDP, port: 5353}
+        - {protocol: TCP, port: 5353}
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - {protocol: TCP, port: 443}

@@ -8,10 +8,11 @@ clusters:
     local: true
     priority: 10
     public_access_enabled: false
-    capabilities: [cpu, openshift, operators, openshift-ai, showroom, model_endpoint, control-plane]
+    capabilities: [cpu, openshift, operators, openshift-ai, showroom, model_endpoint, embedding_endpoint, control-plane]
     model_endpoints:
       granite-2b-cpu: https://ovms-granite-2b-fleet-llm-d.apps.arena.fm2aihpcsed.com/v1
       granite-3.2-8b-tools: http://vllm-granite-3-2-8b-tools.fleet-llm-d.svc:8080/v1
+      nomic-embed-text-v1.5: http://tei-nomic-embed.fleet-llm-d.svc:8080/v1
   - cluster_id: oberon
     display_name: Oberon Primary
     api_url: https://kubernetes.default.svc

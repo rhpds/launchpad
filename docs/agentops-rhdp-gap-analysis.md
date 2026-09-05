@@ -103,7 +103,6 @@ Install and certify shared Arena prerequisites once, outside an order:
 - user workload monitoring;
 - OpenShift Logging/Loki;
 - shared MLflow and its namespace authorization model;
-- a shared cached OpenAI-compatible embedding endpoint;
 - OpenShift GitOps; and
 - durable image mirroring or pre-pull policy.
 
@@ -157,8 +156,8 @@ The live check and render/dry-run gates established the remaining blockers:
 
 - there is no shared `rh-ai`/MLflow participant route matching the Showroom
   contract;
-- local per-seat Nomic embedding initialization exceeded 14 minutes and the
-  Granite generation route does not expose `/v1/embeddings`;
+- the shared Nomic embedding endpoint is live, but AgentOps knowledge-base
+  ingestion has not yet been re-run through a Launchpad-created seat;
 - Arena participant routes present a certificate chain that the external test
   client does not trust;
 - OpenShift Logging/Loki is not installed;
@@ -219,6 +218,28 @@ client, and the workload was deployed directly rather than through a Launchpad
 Showroom/entitlement order. The disposable release and its 123 namespaced
 resources were reclaimed in 64 seconds, leaving zero namespace, labeled
 resource, or Argo Application residue.
+
+## Shared embedding endpoint result
+
+The follow-up Arena component run on 2026-09-05 deployed a private, cached
+Text Embeddings Inference service for `nomic-embed-text-v1.5` in
+`fleet-llm-d`. The endpoint is registered as a cluster-specific runtime source,
+so AgentOps receives its URL in the generated runtime Secret rather than from
+catalog literals or Argo CD values. The service has no public Route and admits
+only the Launchpad backend and Launchpad-managed namespaces.
+
+The first RED run exposed two integration defects: the namespace default-deny
+policy blocked DNS/HTTPS egress, and the newest Nomic Transformers v5 config
+was incompatible with the pinned TEI parser. Explicit DNS/HTTPS egress and the
+immediately preceding immutable model revision corrected both failures. The
+first successful cache fill used 523 MiB and became ready in about 58 seconds.
+A restart loaded from the persistent cache and became ready in 40 seconds. A
+real `/v1/embeddings` request returned a 768-dimensional vector in 0.288
+seconds; the post-restart request completed in 0.164 seconds.
+
+This clears deployment of the shared endpoint itself. `LIVE-AGENTOPS-014`
+remains partial until a Launchpad-created AgentOps seat proves that all seeded
+knowledge-base chunks are embedded and searchable through the application.
 
 The sanitized live inventory is captured in
 `evidence/agentops-arena-prerequisites-2026-09-04.json`; the chart and permission

@@ -88,6 +88,7 @@ def test_active_ai_sandbox_has_an_eligible_cluster():
     assert set(registry.get("arena").model_endpoints) == {
         "granite-2b-cpu",
         "granite-3.2-8b-tools",
+        "nomic-embed-text-v1.5",
     }
 
 

@@ -84,6 +84,7 @@ def test_agentops_intake_captures_the_large_lab_runtime_contract():
         "openshift_logging",
         "data_science_pipelines",
     }
+    assert "embedding_endpoint" in runtime["required_capabilities"]
     assert runtime["required_models"] == ["granite-3.2-8b-tools"]
     assert [tab["id"] for tab in runtime["tabs"]] == [
         "openshift-console",
@@ -106,9 +107,11 @@ def test_agentops_intake_captures_the_large_lab_runtime_contract():
     assert migration_url.startswith("postgresql+asyncpg://")
     assert "{POSTGRES_PASSWORD}" in migration_url
     assert "{LENDING_DB_PASSWORD}" in secret_sources["DATABASE_URL"]["template"]
-    assert "{COMPLIANCE_DB_PASSWORD}" in secret_sources["COMPLIANCE_DATABASE_URL"][
-        "template"
-    ]
+    assert "{COMPLIANCE_DB_PASSWORD}" in secret_sources["COMPLIANCE_DATABASE_URL"]["template"]
+    assert secret_sources["EMBEDDING_BASE_URL"] == {
+        "source": "model_endpoint",
+        "model": "nomic-embed-text-v1.5",
+    }
     assert certification["promotion_sequence"] == [1, 5, 25]
     blockers = "\n".join(certification["activation_blockers"])
     assert "mutable latest UI bundle" not in blockers

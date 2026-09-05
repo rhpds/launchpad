@@ -212,6 +212,33 @@ def test_runtime_secret_resolver_generates_and_composes_credentials_without_cata
     assert resolved["MLFLOW_WORKSPACE"] == "launchpad-agentops-seat-1"
 
 
+def test_runtime_secret_resolver_uses_a_named_cluster_model_endpoint():
+    resolved = OpenShiftProvisioningAdapter._resolve_workload_runtime_secret(
+        {
+            "EMBEDDING_PROVIDER": {"value": "openai_compatible"},
+            "EMBEDDING_MODEL": {"value": "nomic-embed-text-v1.5"},
+            "EMBEDDING_BASE_URL": {
+                "source": "model_endpoint",
+                "model": "nomic-embed-text-v1.5",
+            },
+        },
+        {"model_endpoints": {"nomic-embed-text-v1.5": "http://tei-nomic.fleet-llm-d.svc:8080/v1"}},
+    )
+
+    assert resolved["EMBEDDING_BASE_URL"] == ("http://tei-nomic.fleet-llm-d.svc:8080/v1")
+
+    with pytest.raises(ValueError, match="is unavailable"):
+        OpenShiftProvisioningAdapter._resolve_workload_runtime_secret(
+            {
+                "EMBEDDING_BASE_URL": {
+                    "source": "model_endpoint",
+                    "model": "missing-embedding",
+                }
+            },
+            {"model_endpoints": {}},
+        )
+
+
 def test_runtime_secret_resolver_rejects_literal_sensitive_fields_and_unknown_templates():
     with pytest.raises(ValueError, match="Sensitive runtime field"):
         OpenShiftProvisioningAdapter._resolve_workload_runtime_secret(
