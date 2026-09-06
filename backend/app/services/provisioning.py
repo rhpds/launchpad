@@ -2360,6 +2360,9 @@ class ProvisioningService:
         return workshop
 
     def _reclaim_workshop_session(self, session_id: str) -> Optional[str]:
+        existing = self._sessions.get(session_id)
+        if existing and existing.status == SessionStatus.RECLAIMED:
+            return None
         try:
             reclaimed_session = self.reclaim_session(session_id)
             if reclaimed_session.status == SessionStatus.CLEANUP_FAILED:
@@ -2386,10 +2389,7 @@ class ProvisioningService:
             raise ValueError(f"Workshop {workshop_id} not found")
         if workshop.status == WorkshopStatus.RECLAIMING:
             return workshop
-        if workshop.status in {
-            WorkshopStatus.COMPLETED,
-            WorkshopStatus.COMPLETED_WITH_ERRORS,
-        }:
+        if workshop.status == WorkshopStatus.COMPLETED:
             return workshop
 
         workshop = self._link_persisted_workshop_sessions(workshop)

@@ -5,7 +5,7 @@ TDD: Cleanup hardening tests.
 from datetime import datetime, timedelta
 from unittest.mock import MagicMock
 
-from app.domain.enums import CatalogCategory, Persistence, SessionStatus
+from app.domain.enums import CatalogCategory, Persistence, SessionStatus, WorkshopStatus
 from app.domain.models import LabRequest, Workshop
 from app.services.provisioning import ProvisioningService
 
@@ -214,6 +214,28 @@ class TestWorkshopErrorTracking:
         reclaimed = svc.reclaim_workshop(provisioned.workshop_id)
         assert reclaimed.status == "completed_with_errors"
         assert len(reclaimed.metadata.get("failed_reclaims", [])) > 0
+
+    def test_completed_with_errors_can_be_requeued_after_cleanup_is_repaired(self):
+        svc = _svc()
+        workshop = svc.provision_workshop(Workshop(
+            tenant_id="ws-retry-cleanup-test",
+            catalog_item_id="inference-overdrive-quickstart",
+            num_users=1,
+            ttl="4h",
+        ))
+        session_id = workshop.session_ids[0]
+        session = svc._sessions.pop(session_id)
+
+        failed = svc.reclaim_workshop(workshop.workshop_id)
+        assert failed.status == WorkshopStatus.COMPLETED_WITH_ERRORS
+
+        svc._sessions[session_id] = session
+        queued = svc.queue_workshop_reclaim(workshop.workshop_id)
+        assert queued.status == WorkshopStatus.RECLAIMING
+
+        repaired = svc.reclaim_workshop(workshop.workshop_id)
+        assert repaired.status == WorkshopStatus.COMPLETED
+        assert repaired.metadata["failed_reclaims"] == []
 
     def test_workshop_does_not_hide_force_cleanup_failure(self):
         mock_cleanup = MagicMock()
