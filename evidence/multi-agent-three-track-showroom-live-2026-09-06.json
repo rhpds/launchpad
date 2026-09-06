@@ -1,0 +1,160 @@
+{
+  "schema": "launchpad.redhat.com/multi-agent-three-track-evidence/v1",
+  "evidence_id": "LIVE-MULTI-AGENT-003",
+  "captured_at": "2026-09-06T14:22:18Z",
+  "cluster_ref": "arena",
+  "result": "pass-one-lab-three-track-showroom",
+  "certification_boundary": "This run proves that one Multi-Agent Quickstart order creates one Arena participant environment whose Showroom exposes all three upstream learning tracks. It also repeats the certified Track 2 OpenShift runtime journey and cleanup checks. Track 1 is source-guided content, and Track 3 optional Kagenti and OpenTelemetry deployments are not runtime-certified by this run.",
+  "source": {
+    "upstream_repository": "https://github.com/jkershawrh/multi-agent-quickstart.git",
+    "upstream_revision": "8a8e0241265e69be81bf28060c4a96be38d5c244",
+    "three_track_content_commit": "ab79b6628d07c2a30caebc220d057a5bbaa99e1a",
+    "catalog_pin_commit": "bb0c25ff8acd0322aff4331ce6130d7f0ea72011",
+    "catalog_version": "0.2.0",
+    "backend_image_build": "launchpad-backend-98",
+    "backend_image_digest": "sha256:2c3fa6ec32927c3f728463262bc99065c9f989298d3cd4922b059c700d8bb0cf"
+  },
+  "order": {
+    "workshop_id": "06c0de58-39ba-49a8-a12a-c633fb7627dc",
+    "seat_id": "7a99a6d3-4f25-4544-8717-edcd3a741783",
+    "session_id": "df54a8e0-627d-44fe-9e34-9d1d98647d21",
+    "request_id": "5c2b3576-cacb-4b80-a39a-6e1066a1f135",
+    "namespace": "launchpad-smoke-test-tenant-multi-agent-7a99a6",
+    "catalog_item_id": "multi-agent-quickstart",
+    "seat_count": 1,
+    "environment_count": 1,
+    "exposure_policy": "internal",
+    "cluster_ref_persisted": true,
+    "readiness_failures": 0,
+    "seconds_from_provisioning_to_ready": 40.53,
+    "seconds_from_order_to_ready": 42.65,
+    "final_workshop_status": "completed",
+    "final_seat_status": "reclaimed",
+    "final_session_status": "reclaimed"
+  },
+  "tracks": [
+    {
+      "id": "track-1-local",
+      "title": "Run locally",
+      "showroom_http_status": 200,
+      "content_marker_present": true,
+      "delivery_mode": "source-guided",
+      "certification_status": "GREEN-live-content"
+    },
+    {
+      "id": "track-2-openshift",
+      "title": "Deploy to OpenShift",
+      "showroom_http_status": 200,
+      "content_marker_present": true,
+      "delivery_mode": "live-runtime",
+      "certification_status": "GREEN-live-runtime"
+    },
+    {
+      "id": "track-3-blueprint",
+      "title": "Advanced blueprint alignment",
+      "showroom_http_status": 200,
+      "content_marker_present": true,
+      "delivery_mode": "architecture-and-manifest-exploration",
+      "certification_status": "GREEN-live-content",
+      "optional_runtime_integrations_certified": false
+    }
+  ],
+  "checks": {
+    "one_lab_contract": {
+      "status": "pass",
+      "single_environment": true,
+      "track_count": 3,
+      "chooser_http_status": 200,
+      "chooser_marker_present": true
+    },
+    "track_2_runtime": {
+      "status": "pass",
+      "agents_discovered": 3,
+      "agents_expected": 3,
+      "multi_agent_steps": 3,
+      "mcp_steps": 3,
+      "workflow_errors": 0,
+      "semantic_routing_status": "ok",
+      "guardrail_blocked_steps": 3
+    },
+    "terminal_scope": {
+      "status": "pass",
+      "default_project_matches_seat": true,
+      "own_namespace_edit_allowed": true,
+      "cross_namespace_read_denied": true,
+      "node_list_denied": true
+    }
+  },
+  "cleanup": {
+    "status": "pass",
+    "seconds": 69.18,
+    "remaining_namespaces": 0,
+    "remaining_applications": 0,
+    "remaining_role_bindings": 0,
+    "remaining_persistent_volume_claims": 0,
+    "remaining_persistent_volumes": 0,
+    "remaining_routes": 0,
+    "remaining_secrets": 0,
+    "model_key_cleared": true
+  },
+  "red_green_matrix": [
+    {
+      "id": "MULTI-TRACK-CONTRACT-001",
+      "red": "The imported catalog did not explicitly describe the upstream three-track structure or prove that the tracks belonged to one environment.",
+      "green": "Catalog metadata now declares one environment and three ordered learning tracks, with contract tests for the metadata, navigation, and pages."
+    },
+    {
+      "id": "MULTI-TRACK-SHOWROOM-001",
+      "red": "The live Showroom had no explicit chooser or independently addressable pages for all three tracks.",
+      "green": "One fresh Arena seat returned HTTP 200 for the chooser and every Track 1, Track 2, and Track 3 page with the expected content markers."
+    },
+    {
+      "id": "MULTI-TRACK-SCOPE-001",
+      "red": "Presenting Track 3 without qualification could imply that optional Kagenti and OpenTelemetry components had been deployed and certified.",
+      "green": "Track 3 is explicitly labeled as architecture and manifest exploration and states that it is not an end-to-end validated optional deployment."
+    },
+    {
+      "id": "MULTI-DRIVER-PIPEFAIL-001",
+      "red": "A direct curl-to-grep pipeline could intermittently return curl exit 23 under pipefail after grep found the expected marker.",
+      "green": "A regression test requires the driver to capture the response before checking the content marker, eliminating the early-pipe-close failure."
+    }
+  ],
+  "validation_matrix": {
+    "single_environment_contract": "GREEN-local",
+    "three_track_catalog_metadata": "GREEN-local",
+    "three_track_antora_build": "GREEN-integration",
+    "track_chooser": "GREEN-live",
+    "track_1_content": "GREEN-live",
+    "track_2_content": "GREEN-live",
+    "track_2_runtime": "GREEN-live",
+    "track_3_content": "GREEN-live",
+    "track_3_optional_runtime": "RED-not-certified",
+    "namespace_isolation": "GREEN-live",
+    "reclaim": "GREEN-live",
+    "five_seat_scale": "RED-not-run",
+    "twenty_five_seat_scale": "RED-not-run",
+    "public_access": "RED-not-run"
+  },
+  "test_strategy": {
+    "TDD": "Three-track metadata, navigation, content, and driver behavior were introduced through failing contract tests before implementation.",
+    "EDD": "This hashed artifact records immutable source revisions, deployed image identity, lifecycle IDs, live page probes, runtime behavior, namespace denials, and zero-residue cleanup.",
+    "CDD": "The catalog contract declares single_environment, track_count, ordered learning_tracks, delivery modes, and certification states consumed by the deployed backend.",
+    "BDD": "Given one Multi-Agent order, when its single Arena seat becomes ready, then the participant can choose each of the three tracks in one Showroom and use the certified OpenShift runtime without receiving three separate labs.",
+    "CBT": "Catalog generation, Antora structure, Showroom HTTP pages, multi-agent runtime, RBAC isolation, and cleanup were checked separately and together."
+  },
+  "release_boundary": {
+    "one_lab_three_track_showroom": true,
+    "track_2_one_seat_runtime": true,
+    "track_3_optional_runtime": false,
+    "internal_five_seat_gate": false,
+    "internal_twenty_five_seat_gate": false,
+    "public_access_certified": false,
+    "general_availability": false
+  },
+  "security": {
+    "contains_plaintext_credentials": false,
+    "credential_values_logged": false,
+    "cross_namespace_access_denied": true,
+    "model_key_cleared_after_reclaim": true
+  }
+}

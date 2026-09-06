@@ -22,8 +22,8 @@ ui_host="$(oc get route multi-agent-ui -n "$namespace" -o jsonpath='{.spec.host}
 showroom_host="$(oc get route showroom -n "$namespace" -o jsonpath='{.spec.host}')"
 [[ "$(curl -fsSk -o /dev/null -w '%{http_code}' "https://${ui_host}/")" == "200" ]]
 [[ "$(curl -fsSk -o /dev/null -w '%{http_code}' "https://${showroom_host}/www/modules/index.html")" == "200" ]]
-curl -fsSk "https://${showroom_host}/www/modules/index.html" \
-  | grep -q 'Build Multi-Agent AI Systems'
+showroom_index="$(curl -fsSk "https://${showroom_host}/www/modules/index.html")"
+grep -q 'Build Multi-Agent AI Systems' <<<"$showroom_index"
 
 readiness="$(
   oc exec -n "$namespace" deployment/multi-agent -c orchestrator -- \
