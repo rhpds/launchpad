@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import copy
 import re
-from pathlib import Path
+from pathlib import Path, PurePath
 from typing import Any
 
 import yaml
@@ -39,6 +39,11 @@ def build_catalog_item(intake: dict[str, Any]) -> dict[str, Any]:
     references = intake.get("references", {})
     capacity_metadata = {}
     track_metadata = {}
+    certification_metadata = {}
+    if certification.get("proof_contract"):
+        certification_metadata["certification_proof_contract"] = certification[
+            "proof_contract"
+        ]
     if "learning_tracks" in runtime:
         tracks = copy.deepcopy(runtime.get("learning_tracks", []))
         track_metadata = {
@@ -99,6 +104,7 @@ def build_catalog_item(intake: dict[str, Any]) -> dict[str, Any]:
             "max_workshop_seats": certification["max_workshop_seats"],
             "promotion_sequence": certification["promotion_sequence"],
             "activation_blockers": certification["activation_blockers"],
+            **certification_metadata,
             "showroom_journey": catalog["catalog_item_id"],
             "showroom_title": catalog["display_name"],
             "namespace_slug": runtime.get("namespace_slug", catalog["catalog_item_id"]),
@@ -412,6 +418,16 @@ def _validate_contract(intake: dict[str, Any], errors: list[str]) -> None:
     blockers = certification.get("activation_blockers")
     if not isinstance(blockers, list):
         errors.append("certification.activation_blockers must be a list")
+    proof_contract = certification.get("proof_contract")
+    if proof_contract is not None and (
+        not isinstance(proof_contract, str)
+        or not proof_contract.startswith("certification/catalog/")
+        or not proof_contract.endswith(".yaml")
+        or ".." in PurePath(proof_contract).parts
+    ):
+        errors.append(
+            "certification.proof_contract must be a repository certification/catalog YAML path"
+        )
     sequence = certification.get("promotion_sequence")
     if not isinstance(sequence, list) or not sequence or sequence[0] != 1:
         errors.append("certification.promotion_sequence must begin with one seat")

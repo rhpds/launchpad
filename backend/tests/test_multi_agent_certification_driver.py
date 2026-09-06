@@ -1,6 +1,5 @@
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[2]
 DRIVER = ROOT / "scripts/certify-multi-agent-seat.sh"
 
@@ -20,6 +19,7 @@ def test_multi_agent_live_driver_is_arena_fail_closed_and_secret_safe():
 def test_multi_agent_live_driver_proves_function_not_just_pod_status():
     source = DRIVER.read_text()
 
+    assert 'result: "GREEN-live-internal-seat"' in source
     for proof in (
         "/ready",
         "agents_discovered",

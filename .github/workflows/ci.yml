@@ -114,7 +114,7 @@ jobs:
 
       - name: Install catalog and Antora validators
         run: |
-          pip install pyyaml
+          pip install pyyaml requests
           npm ci
 
       - name: Validate pinned onboarding sources and generated catalog
@@ -132,12 +132,26 @@ jobs:
               --report "test-receipts/catalog-onboarding-$catalog_id.json"
           done
 
+      - name: Validate reusable catalog certification contracts
+        run: |
+          mkdir -p test-receipts
+          for contract in certification/catalog/*.yaml; do
+            catalog_id="${contract##*/}"
+            catalog_id="${catalog_id%.yaml}"
+            python scripts/catalog_certification.py validate \
+              "$contract" \
+              --intake "catalog-onboarding/$catalog_id.yaml" \
+              > "test-receipts/catalog-certification-$catalog_id.json"
+          done
+
       - name: Upload onboarding evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: catalog-onboarding-receipts
-          path: test-receipts/catalog-onboarding-*.json
+          path: |
+            test-receipts/catalog-onboarding-*.json
+            test-receipts/catalog-certification-*.json
 
   frontend-check:
     name: Frontend TypeScript

@@ -2,11 +2,9 @@ from pathlib import Path
 
 import pytest
 import yaml
-
 from app.adapters.file.catalog import FileCatalogAdapter
 from app.domain.enums import CatalogStatus
 from app.services.catalog_onboarding import build_catalog_item, load_intake
-
 
 ROOT = Path(__file__).resolve().parents[2]
 INTAKE_PATH = ROOT / "catalog-onboarding/multi-agent-quickstart.yaml"
@@ -26,10 +24,14 @@ def test_multi_agent_quickstart_is_imported_as_a_distinct_fail_closed_item():
     assert catalog == build_catalog_item(intake)
     assert catalog["catalog_item_id"] == "multi-agent-quickstart"
     assert catalog["display_name"] == "Build Multi-Agent AI Systems with Open Protocols"
+    assert catalog["version"] == "0.2.1"
     assert catalog["status"] == "draft"
     assert catalog["metadata"]["onboarding_managed"] is True
     assert catalog["metadata"]["activation_blockers"]
     assert catalog["metadata"]["max_workshop_seats"] == 1
+    assert catalog["metadata"]["certification_proof_contract"] == (
+        "certification/catalog/multi-agent-quickstart.yaml"
+    )
 
 
 def test_multi_agent_quickstart_preserves_immutable_source_provenance():

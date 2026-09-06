@@ -10,7 +10,7 @@ catalog:
     advanced blueprint alignment with A2A, MCP, Kagenti, OpenTelemetry,
     guardrails, and service authentication on Intel infrastructure.
   category: guided_build
-  version: "0.2.0"
+  version: "0.2.1"
   supported_branding:
     - redhat-intel-default
     - intel-internal
@@ -115,6 +115,7 @@ runtime:
 certification:
   stage: one-seat-certified
   max_workshop_seats: 1
+  proof_contract: certification/catalog/multi-agent-quickstart.yaml
   promotion_sequence:
     - 1
     - 5

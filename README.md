@@ -126,6 +126,7 @@ backend/       FastAPI API, domain models, services, and adapters
 frontend/      Partner portal
 admin/         Internal operations UI
 catalog/       Active file-backed catalog definitions
+certification/ Declarative 1/5/25-seat proof contracts
 content/       Antora/AsciiDoc Showroom content
 content-*/      Catalog-specific Antora/AsciiDoc Showroom content
 demos/         Demo frontend, gateway, and sandbox image
@@ -149,6 +150,28 @@ cleanup. Follow the staged CI checklist in
 [docs/persona-onboarding.md](docs/persona-onboarding.md#content-integrator-ci-onboarding)
 and declare new sources through
 [docs/catalog-onboarding.md](docs/catalog-onboarding.md).
+
+Use the reusable certification runner to prove the same lifecycle for every
+onboarded catalog item. Planning is read-only; `run` creates one workshop order,
+waits for every seat, executes the lab-specific probe concurrently, reclaims the
+order, and writes sanitized JSON plus a SHA-256 manifest:
+
+```bash
+.venv/bin/python scripts/catalog_certification.py plan \
+  certification/catalog/<catalog-id>.yaml --seats 25
+
+KUBECONFIG=/path/to/arena-kubeconfig \
+LAUNCHPAD_ADMIN_API_KEY='set-outside-git' \
+.venv/bin/python scripts/catalog_certification.py run \
+  certification/catalog/<catalog-id>.yaml \
+  --seats 25 \
+  --api-base-url https://launchpad-api.apps.arena.fm2aihpcsed.com \
+  --tenant-id <certification-tenant> \
+  --owner-id <operator> \
+  --run-id <unique-proof-run>
+```
+
+Never put the API key in the command line, contract, logs, or evidence.
 
 Use Arena's dedicated kubeconfig for every cluster command; do not change the current kubeconfig context:
 

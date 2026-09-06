@@ -24,7 +24,7 @@ Each intake declares:
   resource costs;
 - the complete participant tab contract;
 - the current certification stage, supported seat ceiling, promotion sequence,
-  and every activation blocker.
+  every activation blocker, and an optional reusable proof-contract path.
 
 The corresponding `catalog/<catalog-id>/catalog-item.yaml` is generated from
 that contract. Intake-managed entries are always rendered as `draft`. Changing
@@ -82,7 +82,63 @@ The `Catalog Onboarding Contracts` CI job discovers every YAML file under
 5. builds the complete Showroom through Antora; and
 6. uploads a machine-readable validation receipt.
 
+When an intake declares `certification.proof_contract`, CI also validates the
+referenced `CatalogCertification` document. The proof contract must match the
+catalog ID and promotion sequence, use repository-contained probe paths, avoid
+shell command strings, define deterministic structural assertions, and carry a
+100-point fail-closed rubric.
+
 Adding another intake does not require a workflow change.
+
+## Repeatable certification runner
+
+The onboarding intake describes what Launchpad deploys. A corresponding file
+under `certification/catalog/` describes how the deployed workshop is proven.
+Multi-Agent Quickstart is the reference implementation.
+
+Each proof contract declares:
+
+- the single allowed execution cluster and exposure policies;
+- 1-, 5-, and 25-seat profiles, time budgets, probe concurrency, and required
+  consecutive passes;
+- Showroom page paths and stable content markers;
+- one argument-vector seat probe and structural JSON assertions;
+- the complete label-scoped cleanup resource set; and
+- a weighted release rubric totaling 100 points.
+
+Generate a non-mutating plan:
+
+```bash
+.venv/bin/python scripts/catalog_certification.py plan \
+  certification/catalog/<catalog-id>.yaml \
+  --seats 5
+```
+
+Execute a live Arena proof only with credentials supplied through environment
+variables:
+
+```bash
+KUBECONFIG=/path/to/arena-kubeconfig \
+LAUNCHPAD_ADMIN_API_KEY='set-outside-git' \
+.venv/bin/python scripts/catalog_certification.py run \
+  certification/catalog/<catalog-id>.yaml \
+  --seats 5 \
+  --api-base-url https://launchpad-api.apps.arena.fm2aihpcsed.com \
+  --tenant-id <certification-tenant> \
+  --owner-id <operator> \
+  --run-id <unique-proof-run>
+```
+
+The runner performs the capacity preview, creates exactly one workshop order,
+persists one cluster assignment, waits until all seats are ready, and then
+starts bounded concurrent participant probes. It always attempts group reclaim,
+counts every labeled cleanup resource, verifies model-key revocation, scores the
+rubric, and writes a sanitized evidence JSON file with a sibling SHA-256 file.
+
+Model prose is intentionally excluded from exact comparisons. Lab probes assert
+stable behavior such as response schema, agent sequence, tool use, routing,
+guardrail decisions, authorization, and error counts. This keeps live proof
+repeatable without replacing real inference with a mock.
 
 ## Promotion path
 
@@ -121,17 +177,15 @@ failing closed when that burst cannot fit.
 `multi-agent-quickstart` is registered as a distinct draft candidate from
 `jkershawrh/multi-agent-quickstart` at
 `8a8e0241265e69be81bf28060c4a96be38d5c244`. Its Launchpad-native Antora
-journey is pinned at `c9b3baa8a0126233a543cef9c5c337e54bda7668` and covers
+journey is pinned at `ab79b6628d07c2a30caebc220d057a5bbaa99e1a` and covers
 A2A discovery, semantic routing, MCP tool calls, guardrails, OpenTelemetry,
 namespace isolation, and customization.
 
-The source Helm chart passes package validation, but it currently deploys only
-the orchestrator, three agents, MCP server, and guardrails. It does not deploy
-the included Gradio UI, inject a MaaS API key, or apply Launchpad ownership
-labels. Its application image is mutable and unavailable from the declared
-public Quay location. The catalog therefore remains fail-closed at one seat
-until the workload is adapted and a full Arena participant journey and reclaim
-are GREEN-live. See
+The Launchpad seat chart now deploys the orchestrator, three agents, MCP server,
+guardrails, and Gradio UI with a runtime Secret and complete ownership labels.
+One clean Arena seat and all three Showroom tracks are GREEN-live. The catalog
+remains fail-closed at one seat until durable image supply, public access, and
+the measured 5- and 25-seat profiles pass. See
 [multi-agent-quickstart-import.md](multi-agent-quickstart-import.md).
 
 ## AgentOps intake status

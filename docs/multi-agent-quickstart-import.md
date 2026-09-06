@@ -54,9 +54,11 @@ runtime first reached the functional gate after a regression retry; a second,
 fresh order then reached `ready` on its first attempt without a live patch and
 reclaimed with zero labeled residue. The runs are recorded in
 `evidence/multi-agent-one-seat-live-2026-09-05.json` and
-`evidence/multi-agent-one-seat-clean-live-2026-09-05.json`. Together they
-certify the shared runtime and Track 2 internal one-seat gate, but not every
-optional Track 3 integration, public access, or workshop scale.
+`evidence/multi-agent-one-seat-clean-live-2026-09-05.json`. A subsequent fresh
+order proved the three-track chooser and every track page in one environment;
+see `evidence/multi-agent-three-track-showroom-live-2026-09-06.json`. Together
+they certify the shared runtime and Track 2 internal one-seat gate, but not
+every optional Track 3 integration, public access, or workshop scale.
 
 ## Repeatable onboarding and certification
 
@@ -70,10 +72,16 @@ cluster edits:
    `scripts/catalog_onboarding.py validate --fetch --build-showroom`.
 4. Run the local chart and onboarding contracts.
 5. Build the pinned image from the declared upstream revision.
-6. Provision one draft certification seat through the admin workshop API.
-7. Run `scripts/certify-multi-agent-seat.sh <namespace>` with an explicit Arena
-   `KUBECONFIG`.
-8. Reclaim through Launchpad and record hashed zero-residue evidence.
+6. Validate the reusable proof contract:
+   `scripts/catalog_certification.py validate
+   certification/catalog/multi-agent-quickstart.yaml`.
+7. Inspect the deterministic 1-, 5-, or 25-seat plan with
+   `scripts/catalog_certification.py plan`.
+8. Execute `scripts/catalog_certification.py run` with an explicit Arena
+   `KUBECONFIG` and the API key supplied only through the environment.
+9. The generic runner calls `scripts/certify-multi-agent-seat.sh` for every
+   ready namespace, then reclaims the whole workshop and records hashed
+   zero-residue evidence.
 
 ## Promotion gates
 

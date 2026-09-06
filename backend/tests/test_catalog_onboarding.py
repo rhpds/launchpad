@@ -310,6 +310,16 @@ def test_validator_rejects_invalid_workshop_provision_concurrency():
     )
 
 
+def test_validator_rejects_proof_contract_outside_certification_catalog():
+    intake = load_intake(INTAKE_PATH)
+    intake["certification"]["proof_contract"] = "../../unsafe.yaml"
+
+    report = validate_intake(intake)
+
+    assert report["validation_status"] == "fail"
+    assert any("certification.proof_contract" in error for error in report["errors"])
+
+
 def test_validator_rejects_invalid_transient_resource_contract():
     intake = load_intake(INTAKE_PATH)
     intake["runtime"]["transient_seat_resources"] = {

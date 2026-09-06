@@ -121,7 +121,7 @@ jq -cn \
   --argjson runtime_keys "$runtime_keys" \
   --argjson contains_sensitive_values "$contains_sensitive_values" \
   '{
-    result: "GREEN-live-internal-one-seat",
+    result: "GREEN-live-internal-seat",
     namespace: $namespace,
     cluster_ref: $cluster,
     readiness: $readiness,
