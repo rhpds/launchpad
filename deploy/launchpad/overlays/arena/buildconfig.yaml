@@ -168,3 +168,44 @@ spec:
   resources:
     requests: {cpu: "500m", memory: 1Gi, ephemeral-storage: 2Gi}
     limits: {cpu: "2", memory: 2Gi, ephemeral-storage: 8Gi}
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata: {name: multi-agent-quickstart}
+---
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata: {name: multi-agent-quickstart}
+spec:
+  runPolicy: SerialLatestOnly
+  source:
+    type: Git
+    git:
+      uri: "https://github.com/jkershawrh/multi-agent-quickstart.git"
+      ref: "8a8e0241265e69be81bf28060c4a96be38d5c244"
+    contextDir: src
+    dockerfile: |
+      FROM registry.access.redhat.com/ubi9/python-311@sha256:7b6cb58d3ff034df7b300800bd89a469d9bd2f739d43250d76b9c9e805307ab5
+      WORKDIR /opt/app-root/src
+      COPY . .
+      RUN pip install --no-cache-dir \
+          fastapi==0.128.8 uvicorn==0.39.0 httpx==0.28.1 pydantic==2.13.4 \
+          pyyaml==6.0.3 gradio==4.44.1 grpcio==1.80.0 protobuf==6.33.6 \
+          opentelemetry-api==1.41.1 opentelemetry-sdk==1.41.1 \
+          opentelemetry-exporter-otlp-proto-grpc==1.41.1
+      RUN sed -i '/^MODEL_NAME = /a MODEL_API_KEY = os.environ.get("MODEL_API_KEY", "")' agent.py orchestrator.py && \
+          sed -i '/f"{use_endpoint}\\/chat\\/completions",/a\                headers={"Authorization": f"Bearer {MODEL_API_KEY}"} if MODEL_API_KEY else {},' agent.py && \
+          sed -i '/f"{classify_endpoint}\\/chat\\/completions",/a\                    headers={"Authorization": f"Bearer {MODEL_API_KEY}"} if MODEL_API_KEY else {},' orchestrator.py && \
+          grep -q 'Bearer {MODEL_API_KEY}' agent.py && \
+          grep -q 'Bearer {MODEL_API_KEY}' orchestrator.py
+      USER 1001
+      EXPOSE 8000 8001 8002 8003 8004 8005 7860
+      CMD ["uvicorn", "orchestrator:app", "--host", "0.0.0.0", "--port", "8000"]
+  strategy:
+    type: Docker
+    dockerStrategy: {}
+  output:
+    to: {kind: ImageStreamTag, name: "multi-agent-quickstart:source-8a8e024"}
+  resources:
+    requests: {cpu: "1", memory: 2Gi, ephemeral-storage: 4Gi}
+    limits: {cpu: "4", memory: 4Gi, ephemeral-storage: 12Gi}

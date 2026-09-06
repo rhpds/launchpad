@@ -1,0 +1,28 @@
+identity:
+  sessionId: ""
+  workshopId: ""
+  seatId: ""
+  tenantId: ""
+  clusterId: ""
+
+runtime:
+  existingSecret: ""
+
+image:
+  repository: image-registry.openshift-image-registry.svc:5000/partner-ai-launchpad/multi-agent-quickstart
+  digest: ""
+  pullPolicy: IfNotPresent
+
+resources:
+  orchestrator:
+    requests: {cpu: 150m, memory: 192Mi}
+    limits: {cpu: "1", memory: 512Mi}
+  agent:
+    requests: {cpu: 150m, memory: 160Mi}
+    limits: {cpu: "1", memory: 384Mi}
+  support:
+    requests: {cpu: 50m, memory: 96Mi}
+    limits: {cpu: 250m, memory: 256Mi}
+  ui:
+    requests: {cpu: 100m, memory: 256Mi}
+    limits: {cpu: 500m, memory: 768Mi}

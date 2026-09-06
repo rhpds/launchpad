@@ -1,0 +1,234 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: multi-agent
+  labels:
+    {{- include "multiAgent.labels" . | nindent 4 }}
+automountServiceAccountToken: false
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: multi-agent
+  labels:
+    {{- include "multiAgent.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "multiAgent.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "multiAgent.labels" . | nindent 8 }}
+    spec:
+      serviceAccountName: multi-agent
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: orchestrator
+          image: {{ include "multiAgent.image" . | quote }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["uvicorn", "orchestrator:app", "--host", "0.0.0.0", "--port", "8000"]
+          ports:
+            - {name: orchestrator, containerPort: 8000}
+          env:
+            {{- include "multiAgent.modelEnv" . | nindent 12 }}
+            - {name: AGENT_URLS, value: "http://127.0.0.1:8001,http://127.0.0.1:8002,http://127.0.0.1:8003"}
+            - {name: AGENT_DISCOVERY_INTERVAL, value: "2"}
+            - {name: A2A_CLIENT_TIMEOUT, value: "180"}
+          readinessProbe:
+            httpGet: {path: /ready, port: orchestrator}
+            periodSeconds: 5
+            failureThreshold: 36
+          livenessProbe:
+            httpGet: {path: /health, port: orchestrator}
+            periodSeconds: 20
+            failureThreshold: 6
+          startupProbe:
+            httpGet: {path: /ready, port: orchestrator}
+            periodSeconds: 5
+            failureThreshold: 36
+          securityContext:
+            {{- include "multiAgent.containerSecurityContext" . | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources.orchestrator | nindent 12 }}
+          volumeMounts:
+            - {name: runtime-tmp, mountPath: /tmp}
+        {{- range $agent := list
+          (dict "name" "research" "port" 8001 "skills" "investigate,summarize")
+          (dict "name" "analyst" "port" 8002 "skills" "analyze,recommend")
+          (dict "name" "executor" "port" 8003 "skills" "execute,report")
+        }}
+        - name: {{ $agent.name }}
+          image: {{ include "multiAgent.image" $ | quote }}
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
+          command: ["uvicorn", "agent:app", "--host", "0.0.0.0", "--port", {{ $agent.port | quote }}]
+          ports:
+            - {name: {{ $agent.name }}, containerPort: {{ $agent.port }}}
+          env:
+            {{- include "multiAgent.modelEnv" $ | nindent 12 }}
+            - {name: AGENT_NAME, value: {{ $agent.name | quote }}}
+            - {name: AGENT_SKILLS, value: {{ $agent.skills | quote }}}
+            - {name: AGENT_PORT, value: {{ $agent.port | quote }}}
+            - {name: AGENT_PUBLIC_URL, value: {{ printf "http://multi-agent-%s:%d" $agent.name $agent.port | quote }}}
+            - {name: AGENT_LLM_TIMEOUT, value: "150"}
+            - {name: AGENT_MAX_TOKENS, value: "96"}
+            - {name: MCP_SERVER_URL, value: "http://127.0.0.1:8004"}
+            - {name: GUARDRAILS_URL, value: "http://127.0.0.1:8005"}
+            - {name: GUARDRAILS_FAIL_MODE, value: "closed"}
+          readinessProbe:
+            httpGet: {path: /health, port: {{ $agent.name }}}
+            periodSeconds: 5
+            failureThreshold: 24
+          livenessProbe:
+            httpGet: {path: /health, port: {{ $agent.name }}}
+            periodSeconds: 20
+            failureThreshold: 6
+          securityContext:
+            {{- include "multiAgent.containerSecurityContext" $ | nindent 12 }}
+          resources:
+            {{- toYaml $.Values.resources.agent | nindent 12 }}
+          volumeMounts:
+            - {name: runtime-tmp, mountPath: /tmp}
+        {{- end }}
+        - name: mcp-server
+          image: {{ include "multiAgent.image" . | quote }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["uvicorn", "mcp_server:app", "--host", "0.0.0.0", "--port", "8004"]
+          ports:
+            - {name: mcp, containerPort: 8004}
+          readinessProbe:
+            httpGet: {path: /health, port: mcp}
+            periodSeconds: 5
+          livenessProbe:
+            httpGet: {path: /health, port: mcp}
+            periodSeconds: 20
+          securityContext:
+            {{- include "multiAgent.containerSecurityContext" . | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources.support | nindent 12 }}
+          volumeMounts:
+            - {name: runtime-tmp, mountPath: /tmp}
+        - name: guardrails
+          image: {{ include "multiAgent.image" . | quote }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["uvicorn", "guardrails:app", "--host", "0.0.0.0", "--port", "8005"]
+          ports:
+            - {name: guardrails, containerPort: 8005}
+          readinessProbe:
+            httpGet: {path: /health, port: guardrails}
+            periodSeconds: 5
+          livenessProbe:
+            httpGet: {path: /health, port: guardrails}
+            periodSeconds: 20
+          securityContext:
+            {{- include "multiAgent.containerSecurityContext" . | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources.support | nindent 12 }}
+          volumeMounts:
+            - {name: runtime-tmp, mountPath: /tmp}
+        - name: participant-ui
+          image: {{ include "multiAgent.image" . | quote }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["python", "ui.py"]
+          ports:
+            - {name: ui, containerPort: 7860}
+          env:
+            - {name: ORCHESTRATOR_URL, value: "http://127.0.0.1:8000"}
+            - {name: MCP_SERVER_URL, value: "http://127.0.0.1:8004"}
+            - {name: GRADIO_TEMP_DIR, value: "/tmp/gradio"}
+            - {name: HOME, value: "/tmp"}
+          readinessProbe:
+            httpGet: {path: /, port: ui}
+            periodSeconds: 5
+            failureThreshold: 36
+          livenessProbe:
+            httpGet: {path: /, port: ui}
+            periodSeconds: 20
+            failureThreshold: 6
+          securityContext:
+            {{- include "multiAgent.containerSecurityContext" . | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources.ui | nindent 12 }}
+          volumeMounts:
+            - {name: runtime-tmp, mountPath: /tmp}
+      volumes:
+        - name: runtime-tmp
+          emptyDir: {}
+---
+{{- $services := list
+  (dict "name" "multi-agent" "port" 8000 "target" "orchestrator")
+  (dict "name" "multi-agent-research" "port" 8001 "target" "research")
+  (dict "name" "multi-agent-analyst" "port" 8002 "target" "analyst")
+  (dict "name" "multi-agent-executor" "port" 8003 "target" "executor")
+  (dict "name" "multi-agent-mcp" "port" 8004 "target" "mcp")
+  (dict "name" "multi-agent-guardrails" "port" 8005 "target" "guardrails")
+  (dict "name" "multi-agent-ui" "port" 7860 "target" "ui")
+}}
+{{- range $index, $service := $services }}
+{{- if $index }}
+---
+{{- end }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $service.name }}
+  labels:
+    {{- include "multiAgent.labels" $ | nindent 4 }}
+spec:
+  selector:
+    {{- include "multiAgent.selectorLabels" $ | nindent 4 }}
+  ports:
+    - name: http
+      port: {{ $service.port }}
+      targetPort: {{ $service.target }}
+{{- end }}
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: multi-agent
+  labels:
+    {{- include "multiAgent.labels" . | nindent 4 }}
+spec:
+  to: {kind: Service, name: multi-agent}
+  port: {targetPort: http}
+  tls: {termination: edge, insecureEdgeTerminationPolicy: Redirect}
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: multi-agent-ui
+  labels:
+    {{- include "multiAgent.labels" . | nindent 4 }}
+spec:
+  to: {kind: Service, name: multi-agent-ui}
+  port: {targetPort: http}
+  tls: {termination: edge, insecureEdgeTerminationPolicy: Redirect}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: multi-agent-ingress
+  labels:
+    {{- include "multiAgent.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "multiAgent.selectorLabels" . | nindent 6 }}
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - podSelector: {}
+        - namespaceSelector:
+            matchLabels:
+              network.openshift.io/policy-group: ingress
+      ports:
+        - {protocol: TCP, port: 8000}
+        - {protocol: TCP, port: 7860}
