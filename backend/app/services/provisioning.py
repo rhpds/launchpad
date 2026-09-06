@@ -746,6 +746,10 @@ class ProvisioningService:
             if p.request_id == session.request_id:
                 plan = p
                 break
+        plan_generated = plan is not None or any(
+            event.to_status == SessionStatus.PROVISIONING
+            for event in session.lifecycle_events
+        )
 
         catalog_item = self.catalog.get_item(session.catalog_item_id)
         version = catalog_item.version if catalog_item else "unknown"
@@ -767,7 +771,9 @@ class ProvisioningService:
             catalog_item_id=session.catalog_item_id,
             version=version,
             catalog_versioned=catalog_item is not None,
-            provisioning_plan_generated=plan is not None,
+            # Plans are currently process-local, but the transition into
+            # provisioning is persisted only after a plan is generated.
+            provisioning_plan_generated=plan_generated,
             validation_passed=validation_passed,
             # Repeatability is historical evidence. A successful reclaim must
             # not erase proof that the session reached a handoff-ready state.

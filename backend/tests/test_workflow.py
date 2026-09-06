@@ -355,10 +355,12 @@ def test_repeatability_score_remains_100_after_successful_reclaim():
     svc, session = _provision_to_ready()
     session = svc.reset_session(session.session_id)
     session = svc.reclaim_session(session.session_id)
+    svc._plans.clear()  # process-local plan cache is empty after a backend restart
 
     report = svc.get_repeatability_report(session.session_id)
 
     assert session.status == SessionStatus.RECLAIMED
+    assert report.provisioning_plan_generated is True
     assert report.handoff_generated is True
     assert report.repeatability_score == 100
 
