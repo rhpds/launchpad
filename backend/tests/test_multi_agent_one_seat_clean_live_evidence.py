@@ -44,6 +44,8 @@ def test_clean_one_seat_proved_ai_journey_isolation_and_secret_boundary():
     assert evidence["checks"]["terminal_scope"]["cross_namespace_read_denied"] is True
     assert evidence["checks"]["terminal_scope"]["node_list_denied"] is True
     assert evidence["checks"]["runtime_secret_boundary"]["secret_in_gitops"] is False
+    assert evidence["checks"]["launchpad_validation"]["repeatability_score_after_reclaim"] == 100
+    assert evidence["checks"]["launchpad_validation"]["repeatability_survives_backend_restart"] is True
 
 
 def test_clean_one_seat_reclaim_left_zero_labeled_residue():

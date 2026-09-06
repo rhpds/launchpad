@@ -1,7 +1,7 @@
 {
   "schema": "launchpad.redhat.com/multi-agent-live-seat-evidence/v1",
   "evidence_id": "LIVE-MULTI-AGENT-002",
-  "captured_at": "2026-09-06T02:52:00Z",
+  "captured_at": "2026-09-06T03:02:28Z",
   "cluster_ref": "arena",
   "result": "pass-internal-one-seat-clean-first-pass",
   "certification_boundary": "This run certifies one internally accessed Multi-Agent Quickstart seat created from the final deployed catalog contract, made ready without a retry or live patch, functionally exercised, namespace-isolated, and reclaimed through Launchpad on Arena. It does not certify public-code access, five seats, twenty-five seats, durable external image storage, or general availability.",
@@ -14,7 +14,10 @@
     "application_image_digest": "sha256:dd509328e0c8c22925d4ee10734c640cb42295bbb01e170d3bfe76c2d83e425a",
     "backend_image_digest": "sha256:237d85d7e50b1cddc2ea9ef54d62a3dfa1f2bcbc2c8cccc465986b25c72e53a6",
     "application_image_build": "multi-agent-quickstart-3",
-    "backend_image_build": "launchpad-backend-95"
+    "backend_image_build": "launchpad-backend-95",
+    "repeatability_fix_commit": "b6f2df4eac684b92dbf434c137a6b1d8de779937",
+    "repeatability_fix_image_digest": "sha256:78f089d66550459458ee5eed87fcbb0ce529b4f865078cff9bcebdcb465a60d1",
+    "repeatability_fix_image_build": "launchpad-backend-97"
   },
   "observed_at": {
     "order_created": "2026-09-06T02:45:48.904200Z",
@@ -135,8 +138,8 @@
       "pod_checks_passed": 2,
       "route_checks_passed": 3,
       "failed_checks": 0,
-      "repeatability_score_after_reclaim": 80,
-      "repeatability_note": "The current report computes handoff_generated from live session status, so its score falls from 100 to 80 after successful reclaim; the five platform checks and handoff fields were captured independently."
+      "repeatability_score_after_reclaim": 100,
+      "repeatability_survives_backend_restart": true
     }
   },
   "cleanup": {
@@ -172,6 +175,11 @@
       "id": "MULTI-CLEANUP-001",
       "red": "A ready seat did not prove that workshop reclaim removed its distributed resources and revoked its model key.",
       "green": "Reclaim completed in 63 seconds with zero labeled namespaces, Applications, RoleBindings, PVCs, PVs, Routes, or Secrets and a cleared model key."
+    },
+    {
+      "id": "MULTI-REPEATABILITY-001",
+      "red": "After reclaim and a backend restart, the repeatability report lost process-local plan state and reduced the completed session from 100 to 80.",
+      "green": "Persisted lifecycle history now proves plan creation and handoff readiness; the reclaimed session reports 100 after deployment of the fix and another backend restart."
     }
   ],
   "validation_matrix": {
