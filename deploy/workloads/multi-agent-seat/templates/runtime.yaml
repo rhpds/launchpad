@@ -39,6 +39,16 @@ spec:
             - {name: orchestrator, containerPort: 8000}
           env:
             {{- include "multiAgent.modelEnv" . | nindent 12 }}
+            - name: MODEL_SIMPLE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "multiAgent.runtimeSecret" . }}
+                  key: MODEL_NAME
+            - name: MODEL_COMPLEX
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "multiAgent.runtimeSecret" . }}
+                  key: MODEL_NAME
             - {name: AGENT_URLS, value: "http://127.0.0.1:8001,http://127.0.0.1:8002,http://127.0.0.1:8003"}
             - {name: AGENT_DISCOVERY_INTERVAL, value: "2"}
             - {name: A2A_CLIENT_TIMEOUT, value: "180"}

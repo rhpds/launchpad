@@ -180,6 +180,12 @@ def test_multi_agent_model_and_service_auth_come_only_from_the_runtime_secret():
                 "name": "multi-agent-runtime",
                 "key": key,
             }
+    orchestrator_env = _env(containers["orchestrator"])
+    for key in ("MODEL_SIMPLE", "MODEL_COMPLEX"):
+        assert orchestrator_env[key]["valueFrom"]["secretKeyRef"] == {
+            "name": "multi-agent-runtime",
+            "key": "MODEL_NAME",
+        }
     for name in ("orchestrator", "research", "analyst", "executor"):
         env = _env(containers[name])
         assert env["AGENT_AUTH_TOKEN"]["valueFrom"]["secretKeyRef"] == {
