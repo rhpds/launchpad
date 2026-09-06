@@ -1,0 +1,29 @@
+= Review and Next Steps
+
+== What You Proved
+
+You have now:
+
+* discovered three agents through A2A agent cards;
+* compared lightweight and comprehensive semantic routing paths;
+* executed a multi-agent workflow through the API and participant UI;
+* listed and called MCP tools;
+* verified a prompt-injection denial through guardrails;
+* connected namespace RBAC, service authentication, and model authorization; and
+* designed a new role without breaking the open protocol contract.
+
+== Production Path
+
+The source project is an educational quickstart. A production implementation should add supported identity federation, fine-grained service identity, durable telemetry, production guardrails, policy-controlled tool access, workload autoscaling, explicit data retention, and measured capacity limits.
+
+For this Launchpad catalog item, promotion requires a digest-pinned application image, secret-backed MaaS authentication, Launchpad ownership labels, an authorized participant UI route, inference-aware readiness, and live one-, five-, and twenty-five-seat evidence before the published seat ceiling is increased.
+
+== Continue Learning
+
+* Review the A2A and MCP OpenAPI contracts in the source repository.
+* Compare local, OpenShift, and advanced blueprint tracks.
+* Replace a generic role with an approved domain-specific role in your own fork.
+* Instrument one workflow with OpenTelemetry and inspect the trace boundaries.
+
+You have a reusable foundation for multi-agent systems built on open contracts rather than a single framework-specific integration.
+

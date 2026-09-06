@@ -1,0 +1,67 @@
+= Explore the Running System
+
+== Confirm Namespace Isolation
+
+[source,bash,role="execute",subs=attributes+]
+----
+test "$(oc project -q)" = "{project_name}"
+oc auth can-i get pods -n {project_name}
+oc auth can-i create deployments.apps -n {project_name}
+----
+
+Both authorization checks should return `yes`. Access to another participant namespace must return `no` or `Forbidden`.
+
+== Inspect the Components
+
+[source,bash,role="execute"]
+----
+oc get deployments
+oc get pods
+oc get services
+oc get routes
+----
+
+Identify the orchestrator, research, analyst, executor, MCP, guardrails, and participant UI components. All application resources are specific to your seat even though inference is supplied by the shared model service.
+
+Wait for all deployments to become available:
+
+[source,bash,role="execute"]
+----
+for deployment in $(oc get deployment -o name); do
+  oc rollout status "$deployment" --timeout=5m
+done
+----
+
+== Discover the Agents
+
+Forward the orchestrator service to your terminal session:
+
+[source,bash,role="execute"]
+----
+oc port-forward service/multi-agent-orchestrator 8000:8000 >/tmp/orchestrator-port-forward.log 2>&1 &
+PF_PID=$!
+trap 'kill "$PF_PID" 2>/dev/null || true' EXIT
+----
+
+Check orchestrator readiness:
+
+[source,bash,role="execute"]
+----
+curl -fsS http://127.0.0.1:8000/health | python3 -m json.tool
+----
+
+The response should report three discovered agents. Now inspect one A2A agent card directly:
+
+[source,bash,role="execute"]
+----
+oc port-forward service/multi-agent-research 8001:8001 >/tmp/research-port-forward.log 2>&1 &
+RESEARCH_PF_PID=$!
+curl -fsS http://127.0.0.1:8001/.well-known/agent-card.json | python3 -m json.tool
+kill "$RESEARCH_PF_PID"
+----
+
+Look for the agent name, supported skills, protocol version, and endpoint URL. This published contract is how compatible A2A clients discover the agent.
+
+[.next-nav]
+xref:03-run-workflows.adoc[Next: Run Multi-Agent Workflows ->]
+

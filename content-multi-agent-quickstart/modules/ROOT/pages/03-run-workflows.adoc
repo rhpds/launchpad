@@ -1,0 +1,56 @@
+= Run Multi-Agent Workflows
+
+== Open the Participant UI
+
+Select the *Multi-Agent Workspace* tab. Confirm the health panel reports three discovered agents before sending a request.
+
+Start with a simple fictional request:
+
+[source,text]
+----
+Create a short task to verify the health endpoint for a sample service.
+----
+
+Choose `auto` routing. Inspect:
+
+* the complexity label;
+* the selected workflow and model;
+* the agents involved;
+* the latency of each step; and
+* the AI-generated-content disclaimer.
+
+== Compare Workflow Depth
+
+Run this sanitized operations scenario:
+
+[source,text]
+----
+Investigate a fictional API error spike in the EMEA test environment,
+analyze likely causes, and create a remediation task.
+----
+
+Run it first as a lightweight workflow and then as a comprehensive workflow. The comprehensive path should involve research, analyst, and executor agents.
+
+== Call the API Directly
+
+If the earlier orchestrator port-forward is no longer running, recreate it as shown in the previous module. Then call the workflow API:
+
+[source,bash,role="execute"]
+----
+curl -fsS http://127.0.0.1:8000/api/v1/workflow \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "query": "Summarize a fictional service incident and recommend next steps",
+    "workflow_type": "comprehensive"
+  }' | python3 -m json.tool
+----
+
+The response must contain `steps`, `total_latency_ms`, `agents_involved`, and `ai_disclaimer`. Each step should name the responsible agent and report its own latency.
+
+== What to Notice
+
+The orchestration layer owns workflow state. Agents receive bounded tasks through A2A and return structured artifacts. MCP enrichment is a separate tool boundary, and model calls go through the Launchpad-provided endpoint. This separation lets each contract be tested and secured independently.
+
+[.next-nav]
+xref:04-tools-and-guardrails.adoc[Next: MCP Tools and Guardrails ->]
+

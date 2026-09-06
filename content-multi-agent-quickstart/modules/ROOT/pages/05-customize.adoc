@@ -1,0 +1,56 @@
+= Customize the System
+
+== Inspect the Source Contract
+
+The imported lab is derived from {source_repo} at immutable revision `{source_revision}`. Clone that exact source into the terminal if it is not already present:
+
+[source,bash,role="execute",subs=attributes+]
+----
+git clone {source_repo} multi-agent-quickstart
+git -C multi-agent-quickstart checkout {source_revision}
+----
+
+Review the research agent configuration and its A2A contract:
+
+[source,bash,role="execute"]
+----
+grep -R "AGENT_NAME\|AGENT_SKILLS" multi-agent-quickstart/chart \
+  | head -20
+sed -n '1,160p' multi-agent-quickstart/contracts/openapi/agent.yaml
+----
+
+== Design a New Role
+
+Choose a fictional domain. Define a fourth agent on paper before changing code:
+
+[cols="2,4",options="header"]
+|===
+| Field | Your Design
+| Agent name | A stable service identity
+| Skills | Two narrow verbs the agent can perform
+| Input | The A2A message content it accepts
+| Output | The artifact it returns
+| Tools | Only the MCP tools it needs
+| Guardrails | Input and output policy for the role
+|===
+
+Keep the A2A envelope unchanged. A new role should extend the system through its published skills, not create a private orchestration protocol.
+
+== Validate Before Deployment
+
+The source repository includes unit, contract, integration, benchmark, and publication tests. Its validation matrix follows CDD, TDD, EDD, BDD, and component-based testing. Run the local tests after making a change in your own fork:
+
+[source,bash,role="execute"]
+----
+cd multi-agent-quickstart
+python3 -m venv .venv
+. .venv/bin/activate
+python -m pip install -r src/requirements.txt pytest pytest-asyncio
+pytest -q tests/unit tests/contracts
+----
+
+Start with a failing test that describes the new behavior, implement the smallest change that makes it green, and retain the test as regression evidence.
+
+[.next-nav]
+xref:99-conclusion.adoc[Next: Review and Next Steps ->]
+

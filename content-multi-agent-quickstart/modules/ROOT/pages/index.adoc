@@ -1,0 +1,76 @@
+= Build Multi-Agent AI Systems with Open Protocols
+:navtitle: Welcome
+
+== What You Will Build
+
+In this lab you will explore and customize a working multi-agent system on Red Hat OpenShift. Three specialized agents cooperate through the Agent-to-Agent (A2A) protocol, call external tools through the Model Context Protocol (MCP), and use semantic routing to choose the right workflow for each request.
+
+The system is domain-agnostic. The research, analyst, and executor agents provide a starting point that can be adapted to operations, healthcare, finance, customer support, or another approved use case.
+
+By the end of the lab, you will be able to:
+
+* discover agents through A2A agent cards;
+* trace a request through one-agent and three-agent workflows;
+* call and inspect MCP tools;
+* observe semantic routing and model selection;
+* test input and output guardrails;
+* identify where authentication and OpenTelemetry belong; and
+* customize an agent role without changing the protocol contract.
+
+== Your Launchpad Environment
+
+Launchpad created one namespace for your participant seat on {cluster_display_name}. The terminal and OpenShift Console are authenticated as your ephemeral participant identity and restricted by namespace RBAC.
+
+IMPORTANT: Use only fictional or sanitized data. Do not submit confidential, regulated, export-controlled, personal, or customer-identifying information.
+
+[source,bash,role="execute",subs=attributes+]
+----
+oc whoami
+oc project {project_name}
+oc project -q
+----
+
+The final command must return `{project_name}`. Launchpad has already authenticated this terminal. Do not run `oc login` with a shared cluster credential.
+
+== What Is Pre-Deployed
+
+[cols="2,3",options="header"]
+|===
+| Component | Purpose
+
+| Orchestrator
+| Discovers agents and coordinates lightweight or comprehensive workflows.
+
+| Research, analyst, and executor agents
+| Publish A2A agent cards and perform role-specific steps.
+
+| MCP tool server
+| Offers record lookup, knowledge search, and task creation tools.
+
+| Guardrails service
+| Demonstrates PII, harmful-content, and prompt-injection screening.
+
+| Shared model endpoint
+| Provides OpenAI-compatible inference on Intel hardware through Launchpad MaaS.
+
+| Participant UI
+| Lets you run workflows and inspect routing, agent results, tools, and health.
+|===
+
+== Lab Flow
+
+This guided build takes about 60 minutes.
+
+[cols="1,3,1",options="header"]
+|===
+| Module | Activity | Time
+| 1 | Understand the A2A, MCP, routing, and inference architecture | 10 min
+| 2 | Inspect the OpenShift resources and agent discovery | 10 min
+| 3 | Run one-agent and three-agent workflows | 15 min
+| 4 | Exercise MCP tools and guardrails | 15 min
+| 5 | Customize an agent role and verify the contract | 10 min
+|===
+
+[.next-nav]
+xref:01-architecture.adoc[Start: Architecture and Open Protocols ->]
+

@@ -1,0 +1,74 @@
+= Architecture and Open Protocols
+
+== Why Multiple Agents?
+
+A single model can answer a prompt, but a multi-agent system divides a larger task into explicit roles. This lab uses three cooperating services:
+
+* the *research agent* investigates and summarizes;
+* the *analyst agent* analyzes evidence and recommends actions; and
+* the *executor agent* turns the result into an executable report or task.
+
+The orchestrator selects a workflow and passes structured A2A messages between these services. Every agent remains independently discoverable and testable.
+
+== Request Path
+
+[source,text]
+----
+Participant UI
+    |
+    v
+Orchestrator ----> Semantic routing ----> Shared Intel model endpoint
+    |
+    +---- A2A ----> Research agent ----+
+    +---- A2A ----> Analyst agent  ----+----> MCP tools
+    +---- A2A ----> Executor agent ----+
+                         |
+                         +----> Guardrails
+----
+
+The default Launchpad profile uses a shared, OpenAI-compatible MaaS endpoint instead of loading a model into every participant namespace. This keeps the application seats isolated while avoiding one CPU model-serving pod per participant.
+
+== Protocol Boundaries
+
+[cols="2,3,3",options="header"]
+|===
+| Boundary | Contract | Why It Matters
+
+| Agent discovery and delegation
+| A2A agent cards and JSON-RPC task messages
+| An orchestrator can discover compatible agents without importing their implementation.
+
+| External tools
+| MCP `tools/list` and `tools/call`
+| Tools remain separate from model inference and can enforce their own policy.
+
+| Model access
+| OpenAI-compatible chat completions
+| The application can use a Launchpad-managed model without owning its serving stack.
+
+| Telemetry
+| OpenTelemetry spans
+| Requests can be traced across orchestration, routing, agents, and tools.
+|===
+
+== Semantic Routing
+
+Semantic routing classifies a query as `SIMPLE`, `MEDIUM`, `COMPLEX`, or `REASONING`. The classification chooses a workflow depth and model tier. A simple request can go directly to the executor, while a complex request can use research, analysis, and execution.
+
+The routing result is an observable decision, not hidden model reasoning. You will inspect its label, selected workflow, selected model, and measured latency.
+
+== Trust Boundaries
+
+This educational system demonstrates several controls:
+
+* Launchpad participant identity and namespace RBAC;
+* a per-session MaaS credential injected at runtime rather than committed to Git;
+* optional bearer authentication between the orchestrator and agents;
+* guardrail checks before and after model calls; and
+* short-lived environments reclaimed at the order TTL.
+
+The regex guardrails in the source lab are demonstrations. They are not a replacement for a supported policy service such as TrustyAI Guardrails Orchestrator.
+
+[.next-nav]
+xref:02-explore.adoc[Next: Explore the Running System ->]
+
