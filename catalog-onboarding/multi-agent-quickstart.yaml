@@ -6,11 +6,11 @@ catalog:
   display_name: "Build Multi-Agent AI Systems with Open Protocols"
   description: >-
     Follow three learning tracks in one environment: study the local
-    multi-agent application pattern, operate it on OpenShift, and explore its
+    multi-agent application pattern, build and operate it on OpenShift, and explore its
     advanced blueprint alignment with A2A, MCP, Kagenti, OpenTelemetry,
     guardrails, and service authentication on Intel infrastructure.
   category: guided_build
-  version: "0.2.3"
+  version: "0.2.4"
   supported_branding:
     - redhat-intel-default
     - intel-internal
@@ -18,12 +18,12 @@ catalog:
 sources:
   showroom:
     repo_url: "https://github.com/rhpds/launchpad.git"
-    revision: "ab79b6628d07c2a30caebc220d057a5bbaa99e1a"
+    revision: "beb5ca39747937dd684a1d2e0ce55fe6165a89dc"
     playbook: site-multi-agent-quickstart.yml
     start_path: content-multi-agent-quickstart
   workload:
     repo_url: "https://github.com/rhpds/launchpad.git"
-    revision: "59d58982798019db426fad0843237f9c129faec1"
+    revision: "beb5ca39747937dd684a1d2e0ce55fe6165a89dc"
     deploy_path: deploy/workloads/multi-agent-seat
 
 references:
@@ -64,7 +64,7 @@ runtime:
       delivery_mode: source-guided
       certification_status: content-present
     - id: track-2-openshift
-      title: "Deploy to OpenShift"
+      title: "Build and operate on OpenShift"
       showroom_page: track-2-openshift.adoc
       delivery_mode: live-runtime
       certification_status: twenty-five-seat-certified
@@ -107,7 +107,7 @@ runtime:
       image:
         repository: >-
           image-registry.openshift-image-registry.svc:5000/partner-ai-launchpad/multi-agent-quickstart
-        digest: sha256:dd509328e0c8c22925d4ee10734c640cb42295bbb01e170d3bfe76c2d83e425a
+        digest: sha256:14ea7dfe1b1c018b0dfe473c0c640f3a2ec03015da7a8c5625ac8f224597d67d
     routes:
       ui: multi-agent-ui
       orchestrator: multi-agent

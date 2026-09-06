@@ -24,7 +24,7 @@ def test_multi_agent_quickstart_is_imported_as_a_distinct_fail_closed_item():
     assert catalog == build_catalog_item(intake)
     assert catalog["catalog_item_id"] == "multi-agent-quickstart"
     assert catalog["display_name"] == "Build Multi-Agent AI Systems with Open Protocols"
-    assert catalog["version"] == "0.2.3"
+    assert catalog["version"] == "0.2.4"
     assert catalog["status"] == "draft"
     assert catalog["metadata"]["onboarding_managed"] is True
     assert catalog["metadata"]["activation_blockers"]
@@ -49,7 +49,7 @@ def test_multi_agent_quickstart_preserves_immutable_source_provenance():
     }
     assert metadata["workload_repo"] == "https://github.com/rhpds/launchpad.git"
     assert metadata["workload_revision"] == (
-        "59d58982798019db426fad0843237f9c129faec1"
+        "beb5ca39747937dd684a1d2e0ce55fe6165a89dc"
     )
     assert metadata["workload_deploy_path"] == "deploy/workloads/multi-agent-seat"
     assert metadata["workload_source_kind"] == "launchpad-seat-chart"
@@ -70,7 +70,7 @@ def test_multi_agent_quickstart_preserves_immutable_source_provenance():
                 "partner-ai-launchpad/multi-agent-quickstart"
             ),
             "digest": (
-                "sha256:dd509328e0c8c22925d4ee10734c640cb42295bbb01e170d3bfe76c2d83e425a"
+                "sha256:14ea7dfe1b1c018b0dfe473c0c640f3a2ec03015da7a8c5625ac8f224597d67d"
             ),
         }
     }
@@ -112,7 +112,7 @@ def test_multi_agent_is_one_lab_with_all_three_upstream_tracks():
     assert [track["id"] for track in metadata["learning_tracks"]] == list(TRACKS)
     assert [track["title"] for track in metadata["learning_tracks"]] == [
         "Run locally",
-        "Deploy to OpenShift",
+        "Build and operate on OpenShift",
         "Advanced blueprint alignment",
     ]
 
