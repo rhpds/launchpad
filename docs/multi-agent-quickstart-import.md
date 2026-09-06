@@ -102,6 +102,12 @@ failed or empty remote JSON, emits a named probe stage, and persists only that
 safe stage marker on failure. The failed run reset the required consecutive
 25-seat promotion sequence to zero.
 
+The fifth attempt, `multi-agent-25seat-20260906-05`, is GREEN-live after that
+hardening and begins the new consecutive sequence. All 25 seats reached Ready
+in 706.337 seconds, all ten-concurrent participant probes passed, and cleanup
+reached zero residue in 381.098 seconds. The run scored 100/100 and is pass 1
+of 3 for promotion.
+
 ## Repeatable onboarding and certification
 
 Catalog onboarding is repository-driven rather than a collection of manual
