@@ -464,6 +464,9 @@ def sanitize_evidence(value: Any) -> Any:
         sanitized: dict[str, Any] = {}
         for key, child in value.items():
             normalized = str(key).lower()
+            if normalized == "authorization" and isinstance(child, dict):
+                sanitized[key] = sanitize_evidence(child)
+                continue
             if normalized in SENSITIVE_KEYS or normalized.endswith(SENSITIVE_SUFFIXES):
                 sanitized[key] = "[REDACTED]"
             else:

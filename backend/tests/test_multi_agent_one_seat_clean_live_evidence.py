@@ -6,7 +6,6 @@ from pathlib import Path
 
 import yaml
 
-
 ROOT = Path(__file__).resolve().parents[2]
 EVIDENCE = ROOT / "evidence/multi-agent-one-seat-clean-live-2026-09-05.json"
 CHECKSUM = ROOT / "evidence/multi-agent-one-seat-clean-live-2026-09-05.json.sha256"
@@ -68,12 +67,12 @@ def test_clean_one_seat_reclaim_left_zero_labeled_residue():
     assert evidence["security"]["credential_values_logged"] is False
 
 
-def test_clean_evidence_promotes_only_the_proven_one_seat_gate():
+def test_clean_one_seat_evidence_remains_valid_after_five_seat_promotion():
     evidence = _evidence()
     contract = yaml.safe_load(ONBOARDING.read_text())
 
-    assert contract["certification"]["stage"] == "one-seat-certified"
-    assert contract["certification"]["max_workshop_seats"] == 1
+    assert contract["certification"]["stage"] == "five-seat-certified"
+    assert contract["certification"]["max_workshop_seats"] == 5
     assert evidence["release_boundary"] == {
         "internal_one_seat_functional_gate": True,
         "clean_first_pass": True,

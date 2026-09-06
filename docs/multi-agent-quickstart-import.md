@@ -56,9 +56,12 @@ reclaimed with zero labeled residue. The runs are recorded in
 `evidence/multi-agent-one-seat-live-2026-09-05.json` and
 `evidence/multi-agent-one-seat-clean-live-2026-09-05.json`. A subsequent fresh
 order proved the three-track chooser and every track page in one environment;
-see `evidence/multi-agent-three-track-showroom-live-2026-09-06.json`. Together
-they certify the shared runtime and Track 2 internal one-seat gate, but not
-every optional Track 3 integration, public access, or workshop scale.
+see `evidence/multi-agent-three-track-showroom-live-2026-09-06.json`. The
+reusable framework then proved one five-seat workshop with concurrent checks on
+every seat, complete isolation, and zero-residue reclaim; see
+`evidence/runs/multi-agent-quickstart-5-seat-multi-agent-5seat-20260906-01.json`.
+Together they certify the shared runtime and Track 2 internal five-seat gate,
+but not every optional Track 3 integration, public access, or 25-seat scale.
 
 ## Repeatable onboarding and certification
 
@@ -89,8 +92,6 @@ cluster edits:
    durable external registry or durable control-plane mirror.
 2. Certify public-code participant authentication, route authorization, and
    cross-seat denial for this catalog item.
-3. Measure five seats, including concurrent model traffic and complete
-   zero-residue reclaim.
-4. Measure twenty-five seats before raising the supported workshop limit.
-5. Require three consecutive twenty-five-seat passes before general
+3. Measure twenty-five seats before raising the supported workshop limit.
+4. Require three consecutive twenty-five-seat passes before general
    availability.

@@ -81,12 +81,12 @@ def test_twenty_five_seat_plan_is_one_order_on_one_cluster():
     assert plan["probe_concurrency"] == 10
     assert plan["required_consecutive_runs"] == 3
     assert plan["showroom_pages_per_seat"] == 4
-    assert plan["current_certified_seats"] == 1
-    assert plan["next_promotion_target"] == 5
-    assert plan["execution_eligible"] is False
+    assert plan["current_certified_seats"] == 5
+    assert plan["next_promotion_target"] == 25
+    assert plan["execution_eligible"] is True
 
 
-def test_only_the_next_uncertified_scale_profile_can_execute():
+def test_only_certified_or_next_scale_profile_can_execute():
     contract = load_certification_contract(CONTRACT_PATH)
     intake = load_intake(INTAKE_PATH)
 
@@ -96,12 +96,17 @@ def test_only_the_next_uncertified_scale_profile_can_execute():
     five = build_certification_plan(
         contract, intake=intake, seats=5, exposure_policy="internal"
     )
+    twenty_five = build_certification_plan(
+        contract, intake=intake, seats=25, exposure_policy="internal"
+    )
 
     assert one["execution_eligible"] is True
     assert one["certification_override"] is False
     assert five["execution_eligible"] is True
-    assert five["certification_override"] is True
-    assert five["next_promotion_target"] == 5
+    assert five["certification_override"] is False
+    assert twenty_five["execution_eligible"] is True
+    assert twenty_five["certification_override"] is True
+    assert twenty_five["next_promotion_target"] == 25
 
 
 def test_contract_rejects_unsafe_or_nonrepeatable_configuration():
@@ -209,6 +214,36 @@ def test_evidence_bundle_is_sanitized_and_hashed(tmp_path: Path):
     assert hashlib.sha256(path.read_bytes()).hexdigest() == expected
 
 
+def test_evidence_sanitizer_preserves_authorization_rubric_metadata(
+    tmp_path: Path,
+):
+    path = tmp_path / "authorization-rubric.json"
+
+    write_evidence_bundle(
+        path,
+        {
+            "rubric": {
+                "categories": {
+                    "authorization": {
+                        "weight": 15,
+                        "awarded": 15,
+                        "passed": True,
+                    }
+                }
+            },
+            "request": {"authorization": "Bearer do-not-persist"},
+        },
+    )
+
+    saved = json.loads(path.read_text())
+    assert saved["rubric"]["categories"]["authorization"] == {
+        "awarded": 15,
+        "passed": True,
+        "weight": 15,
+    }
+    assert saved["request"]["authorization"] == "[REDACTED]"
+
+
 def test_cli_plan_is_machine_readable_and_non_mutating():
     result = subprocess.run(
         [
@@ -260,7 +295,7 @@ def test_generic_runner_places_probes_after_the_all_seat_barrier_and_reclaims(
         def create_order(self, body, *, idempotency_key):
             calls.append("create")
             assert body["num_users"] == 5
-            assert body["certification_override"] is True
+            assert body["certification_override"] is False
             assert idempotency_key.endswith(":repeatable-five")
             return {"workshop_id": "workshop-1", "cluster_ref": "arena"}
 

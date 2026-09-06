@@ -5,7 +5,7 @@ description: 'Follow three learning tracks in one environment: study the local m
   alignment with A2A, MCP, Kagenti, OpenTelemetry, guardrails, and service authentication
   on Intel infrastructure.'
 category: guided_build
-version: 0.2.1
+version: 0.2.2
 status: draft
 required_capabilities:
 - openshift
@@ -32,8 +32,8 @@ metadata:
   content_only: false
   onboarding_managed: true
   onboarding_contract: catalog-onboarding/multi-agent-quickstart.yaml
-  certification_stage: one-seat-certified
-  max_workshop_seats: 1
+  certification_stage: five-seat-certified
+  max_workshop_seats: 5
   promotion_sequence:
   - 1
   - 5
@@ -47,7 +47,7 @@ metadata:
   - Track 3 is currently an architecture and manifest exploration path; certify Kagenti
     and OpenTelemetry runtime integrations before presenting those optional blueprint
     components as deployed services.
-  - Complete measured five-seat and twenty-five-seat certification before raising
+  - Complete three consecutive measured twenty-five-seat certifications before raising
     the catalog workshop limit above the proven safe value.
   certification_proof_contract: certification/catalog/multi-agent-quickstart.yaml
   showroom_journey: multi-agent-quickstart
@@ -87,7 +87,7 @@ metadata:
     title: Deploy to OpenShift
     showroom_page: track-2-openshift.adoc
     delivery_mode: live-runtime
-    certification_status: one-seat-certified
+    certification_status: five-seat-certified
   - id: track-3-blueprint
     title: Advanced blueprint alignment
     showroom_page: track-3-blueprint.adoc
