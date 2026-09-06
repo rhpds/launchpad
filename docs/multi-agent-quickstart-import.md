@@ -83,6 +83,15 @@ while 20 namespaces were still terminating; an independent follow-up reached
 zero without intervention. The runner now polls all declared cleanup resource
 types to zero within the same cleanup SLO before scoring the cleanup gate.
 
+The third attempt, `multi-agent-25seat-20260906-03`, is the first countable
+25-seat GREEN-live run. One workshop placed all 25 seats on Arena, all seats
+reached Ready in 1,678.402 seconds, and ten concurrent probes verified every
+Showroom track, the real three-agent workflow, namespace isolation, and secret
+safety. Reclaim completed in 380.651 seconds with model keys revoked and every
+declared resource count at zero. The run scored 100/100 and is pass 1 of the 3
+consecutive GREEN-live runs required for 25-seat promotion. Its hashed evidence
+is under `evidence/runs/`.
+
 ## Repeatable onboarding and certification
 
 Catalog onboarding is repository-driven rather than a collection of manual
