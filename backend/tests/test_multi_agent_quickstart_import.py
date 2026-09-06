@@ -24,7 +24,7 @@ def test_multi_agent_quickstart_is_imported_as_a_distinct_fail_closed_item():
     assert catalog == build_catalog_item(intake)
     assert catalog["catalog_item_id"] == "multi-agent-quickstart"
     assert catalog["display_name"] == "Build Multi-Agent AI Systems with Open Protocols"
-    assert catalog["version"] == "0.2.4"
+    assert catalog["version"] == "0.2.5"
     assert catalog["status"] == "draft"
     assert catalog["metadata"]["onboarding_managed"] is True
     assert catalog["metadata"]["activation_blockers"]
@@ -49,7 +49,7 @@ def test_multi_agent_quickstart_preserves_immutable_source_provenance():
     }
     assert metadata["workload_repo"] == "https://github.com/rhpds/launchpad.git"
     assert metadata["workload_revision"] == (
-        "beb5ca39747937dd684a1d2e0ce55fe6165a89dc"
+        "24d73e87efa3546a1e0118d8d01f67f278b9e8fb"
     )
     assert metadata["workload_deploy_path"] == "deploy/workloads/multi-agent-seat"
     assert metadata["workload_source_kind"] == "launchpad-seat-chart"
@@ -70,7 +70,7 @@ def test_multi_agent_quickstart_preserves_immutable_source_provenance():
                 "partner-ai-launchpad/multi-agent-quickstart"
             ),
             "digest": (
-                "sha256:14ea7dfe1b1c018b0dfe473c0c640f3a2ec03015da7a8c5625ac8f224597d67d"
+                "sha256:ec2952fa2812fdbcbbb28e02c0aded65f0507058e728ab5b68c5015b634b4629"
             ),
         }
     }

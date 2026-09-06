@@ -5,7 +5,7 @@ description: 'Follow three learning tracks in one environment: study the local m
   blueprint alignment with A2A, MCP, Kagenti, OpenTelemetry, guardrails, and service
   authentication on Intel infrastructure.'
 category: guided_build
-version: 0.2.4
+version: 0.2.5
 status: draft
 required_capabilities:
 - openshift
@@ -52,7 +52,7 @@ metadata:
   showroom_title: Build Multi-Agent AI Systems with Open Protocols
   namespace_slug: multi-agent
   showroom_content_repo_url: https://github.com/rhpds/launchpad.git
-  showroom_content_ref: beb5ca39747937dd684a1d2e0ce55fe6165a89dc
+  showroom_content_ref: 24d73e87efa3546a1e0118d8d01f67f278b9e8fb
   showroom_content_playbook: site-multi-agent-quickstart.yml
   showroom_content_start_path: content-multi-agent-quickstart
   showroom_terminal_storage: false
@@ -97,7 +97,7 @@ metadata:
   workshop_node_headroom_pods: 0
   workshop_node_required_labels: {}
   workload_repo: https://github.com/rhpds/launchpad.git
-  workload_revision: beb5ca39747937dd684a1d2e0ce55fe6165a89dc
+  workload_revision: 24d73e87efa3546a1e0118d8d01f67f278b9e8fb
   workload_deploy_type: helm
   workload_deployment_scope: seat
   workload_deploy_path: deploy/workloads/multi-agent-seat
@@ -107,7 +107,7 @@ metadata:
   workload_helm_values:
     image:
       repository: image-registry.openshift-image-registry.svc:5000/partner-ai-launchpad/multi-agent-quickstart
-      digest: sha256:14ea7dfe1b1c018b0dfe473c0c640f3a2ec03015da7a8c5625ac8f224597d67d
+      digest: sha256:ec2952fa2812fdbcbbb28e02c0aded65f0507058e728ab5b68c5015b634b4629
   workload_ignore_differences: []
   workload_runtime_secret_name: multi-agent-runtime
   workload_runtime_secret_sources:
@@ -127,7 +127,7 @@ metadata:
     orchestrator: multi-agent
   workload_readiness: []
   source_content_repo: https://github.com/rhpds/launchpad.git
-  source_content_revision: beb5ca39747937dd684a1d2e0ce55fe6165a89dc
+  source_content_revision: 24d73e87efa3546a1e0118d8d01f67f278b9e8fb
   source_references:
     original_lab:
       repo_url: https://github.com/jkershawrh/multi-agent-quickstart.git
