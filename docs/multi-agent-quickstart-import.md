@@ -108,6 +108,11 @@ in 706.337 seconds, all ten-concurrent participant probes passed, and cleanup
 reached zero residue in 381.098 seconds. The run scored 100/100 and is pass 1
 of 3 for promotion.
 
+The sixth attempt, `multi-agent-25seat-20260906-06`, repeated the hardened
+GREEN-live result. All 25 seats reached Ready in 779.949 seconds, every
+participant probe passed at ten-way concurrency, and cleanup reached zero
+residue in 380.507 seconds. It scored 100/100 and is consecutive pass 2 of 3.
+
 ## Repeatable onboarding and certification
 
 Catalog onboarding is repository-driven rather than a collection of manual
