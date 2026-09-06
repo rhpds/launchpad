@@ -194,8 +194,8 @@ spec:
           opentelemetry-api==1.41.1 opentelemetry-sdk==1.41.1 \
           opentelemetry-exporter-otlp-proto-grpc==1.41.1
       RUN sed -i '/^MODEL_NAME = /a MODEL_API_KEY = os.environ.get("MODEL_API_KEY", "")' agent.py orchestrator.py && \
-          sed -i '/f"{use_endpoint}\\/chat\\/completions",/a\                headers={"Authorization": f"Bearer {MODEL_API_KEY}"} if MODEL_API_KEY else {},' agent.py && \
-          sed -i '/f"{classify_endpoint}\\/chat\\/completions",/a\                    headers={"Authorization": f"Bearer {MODEL_API_KEY}"} if MODEL_API_KEY else {},' orchestrator.py && \
+          sed -i '/f"{use_endpoint}\/chat\/completions",/a\                headers={"Authorization": f"Bearer {MODEL_API_KEY}"} if MODEL_API_KEY else {},' agent.py && \
+          sed -i '/f"{classify_endpoint}\/chat\/completions",/a\                    headers={"Authorization": f"Bearer {MODEL_API_KEY}"} if MODEL_API_KEY else {},' orchestrator.py && \
           grep -q 'Bearer {MODEL_API_KEY}' agent.py && \
           grep -q 'Bearer {MODEL_API_KEY}' orchestrator.py
       USER 1001
