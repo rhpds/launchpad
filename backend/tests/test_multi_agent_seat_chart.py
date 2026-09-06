@@ -6,7 +6,6 @@ from typing import Any
 
 import yaml
 
-
 ROOT = Path(__file__).resolve().parents[2]
 CHART = ROOT / "deploy/workloads/multi-agent-seat"
 BUILD_CONFIG = ROOT / "deploy/launchpad/overlays/arena/buildconfig.yaml"
@@ -192,6 +191,15 @@ def test_multi_agent_model_and_service_auth_come_only_from_the_runtime_secret():
             "name": "multi-agent-runtime",
             "key": "AGENT_AUTH_TOKEN",
         }
+    participant_ui_env = _env(containers["participant-ui"])
+    assert participant_ui_env["AGENT_AUTH_TOKEN"]["valueFrom"]["secretKeyRef"] == {
+        "name": "multi-agent-runtime",
+        "key": "AGENT_AUTH_TOKEN",
+    }
+    assert participant_ui_env["UI_WORKFLOW_TIMEOUT"] == {
+        "name": "UI_WORKFLOW_TIMEOUT",
+        "value": "300",
+    }
 
 
 def test_multi_agent_services_routes_and_network_boundary_are_complete():
@@ -243,6 +251,10 @@ def test_multi_agent_arena_build_is_pinned_and_adds_model_bearer_support():
     assert "python-311@sha256:" in dockerfile
     assert "MODEL_API_KEY" in dockerfile
     assert "Authorization" in dockerfile
+    assert "AGENT_AUTH_TOKEN" in dockerfile
+    assert "UI_WORKFLOW_TIMEOUT" in dockerfile
+    assert 'headers={"Authorization": f"Bearer {AGENT_AUTH_TOKEN}"}' in dockerfile
+    assert "ui.py" in dockerfile
     assert 'huggingface-hub==0.25.2' in dockerfile
     assert '"/ready"' in dockerfile
     assert "auth.py" in dockerfile

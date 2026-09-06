@@ -5,7 +5,7 @@
 Across one participant environment, the three tracks let you:
 
 * use Track 1 to understand the local application topology and request flow;
-* use Track 2 to operate the same application in a namespace-scoped OpenShift environment; and
+* use Track 2 to apply, verify, and roll back an agent policy in a namespace-scoped OpenShift environment; and
 * use Track 3 to distinguish live services from optional Kagenti, OpenTelemetry, identity, and governance targets.
 
 You also discovered three agents through A2A cards, compared semantic routing

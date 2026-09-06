@@ -37,13 +37,23 @@ If the earlier orchestrator port-forward is no longer running, recreate it as sh
 
 [source,bash,role="execute"]
 ----
+AGENT_AUTH_TOKEN="$(
+  oc get secret multi-agent-runtime \
+    -o go-template='{{index .data "AGENT_AUTH_TOKEN" | base64decode}}'
+)"
 curl -fsS http://127.0.0.1:8000/api/v1/workflow \
+  -H "Authorization: Bearer ${AGENT_AUTH_TOKEN}" \
   -H 'Content-Type: application/json' \
   -d '{
     "query": "Summarize a fictional service incident and recommend next steps",
     "workflow_type": "comprehensive"
   }' | python3 -m json.tool
+unset AGENT_AUTH_TOKEN
 ----
+
+The token is read into a shell variable and never printed. It authorizes this
+seat's UI and orchestrator request; the orchestrator uses the same protected
+service boundary when it delegates A2A tasks.
 
 The response must contain `steps`, `total_latency_ms`, `agents_involved`, and `ai_disclaimer`. Each step should name the responsible agent and report its own latency.
 

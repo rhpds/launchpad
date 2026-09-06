@@ -3,7 +3,7 @@
 
 .Choose Your Track
 * xref:track-1-local.adoc[Track 1: Run Locally]
-* xref:track-2-openshift.adoc[Track 2: Deploy to OpenShift]
+* xref:track-2-openshift.adoc[Track 2: Build and Operate on OpenShift]
 * xref:track-3-blueprint.adoc[Track 3: Blueprint Alignment]
 
 .Shared Hands-On Exercises

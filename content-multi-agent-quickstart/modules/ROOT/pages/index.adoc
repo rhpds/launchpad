@@ -18,8 +18,8 @@ do not order three separate environments.
 | Source-guided exercises use the same pre-provisioned application so every participant starts consistently.
 
 | 2
-| xref:track-2-openshift.adoc[Deploy to OpenShift]
-| Inspect and operate the application as a namespace-scoped OpenShift workload.
+| xref:track-2-openshift.adoc[Build and operate on OpenShift]
+| Run the agentic workflow, apply an executor policy, verify it, and roll it back.
 | Fully live in your assigned Arena namespace; this is the currently certified runtime path.
 
 | 3
@@ -46,7 +46,7 @@ By the end of the lab, you will be able to:
 * observe semantic routing and model selection;
 * test input and output guardrails;
 * identify where authentication and OpenTelemetry belong; and
-* customize an agent role without changing the protocol contract.
+* apply and roll back an agent policy without changing the protocol contract.
 
 == Your Launchpad Environment
 
@@ -99,7 +99,7 @@ This guided build takes about 60 minutes.
 | 2 | Inspect the OpenShift resources and agent discovery | 10 min
 | 3 | Run one-agent and three-agent workflows | 15 min
 | 4 | Exercise MCP tools and guardrails | 15 min
-| 5 | Customize an agent role and verify the contract | 10 min
+| 5 | Apply an agent policy, verify the workflow, and roll it back | 10 min
 |===
 
 [.next-nav]

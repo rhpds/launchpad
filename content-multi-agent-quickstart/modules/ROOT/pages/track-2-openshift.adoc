@@ -1,15 +1,27 @@
 [[track-2-openshift]]
-= Track 2: Deploy to OpenShift
+= Track 2: Build and Operate on OpenShift
 
 == Purpose
 
-Track 2 runs the Multi-Agent application as a real OpenShift workload. Launchpad
-has already deployed it to your assigned namespace, injected a short-lived MaaS
-credential, configured service authentication, and connected the Showroom
-terminal to your participant identity.
+Track 2 turns the architecture into an observable, changeable agentic
+workflow. Launchpad has deployed a safe baseline to your assigned namespace,
+injected a short-lived MaaS credential, configured service authentication, and
+connected the Showroom terminal to your participant identity. You will run the
+baseline, apply a non-secret executor policy, prove that the workflow still
+works, and roll the change back.
 
-This is the live path covered by the current internal one-seat certification.
-You operate the deployment; you do not need cluster-administrator credentials.
+You operate only your deployment. Cluster-administrator credentials are not
+needed and must not be used.
+
+== Learning Outcomes
+
+After this track, you can:
+
+* identify the OpenShift resources behind a multi-agent request;
+* trace research, analysis, execution, MCP, and model boundaries;
+* apply a configuration policy to one agent using namespace-scoped RBAC;
+* validate the changed system through participant-visible behavior; and
+* roll back safely while retaining evidence of what changed.
 
 == Verify Your Boundary
 
@@ -25,13 +37,15 @@ oc auth can-i get nodes
 The first two authorization checks must return `yes`. The final two checks must
 return `no` or `Forbidden`; they prove the seat is not a cluster-wide identity.
 
-== Inspect the Deployment
+== Inspect the Deployed Baseline
 
 [source,bash,role="execute"]
 ----
 oc get deployments,pods,services,routes
 oc get deployment multi-agent \
   -o jsonpath='{range .spec.template.spec.containers[*]}{.name}{"\n"}{end}'
+oc rollout status deployment/multi-agent --timeout=5m
+oc rollout status deployment/showroom --timeout=5m
 ----
 
 The workload pod contains the orchestrator, research, analyst, executor, MCP,
@@ -39,31 +53,106 @@ guardrails, and participant UI containers. A separate Showroom pod supplies
 this guide and terminal. The model remains a shared Launchpad MaaS service; it
 is not loaded once per participant namespace.
 
-Confirm both deployments are available:
+Open the *Multi-Agent Workspace*, choose `comprehensive`, and run this
+sanitized baseline request:
+
+[source,text]
+----
+Investigate a fictional API error spike, analyze likely causes,
+and create a remediation task.
+----
+
+Record the three agents, step count, routing choice, and whether MCP tool data
+appears. This is the behavior your change must preserve.
+
+== Apply an Executor Policy
+
+The runtime Secret contains credentials. Do not edit or print it. Put
+non-secret operational policy in a ConfigMap instead. This policy lowers the
+executor's generation bound and explicitly retains fail-closed guardrails.
 
 [source,bash,role="execute"]
 ----
+oc create configmap workflow-policy \
+  --from-literal=AGENT_MAX_TOKENS=48 \
+  --from-literal=GUARDRAILS_FAIL_MODE=closed \
+  --dry-run=client -o yaml | oc apply -f -
+
+oc set env deployment/multi-agent -c executor \
+  --from=configmap/workflow-policy
 oc rollout status deployment/multi-agent --timeout=5m
-oc rollout status deployment/showroom --timeout=5m
 ----
 
-== Operate the OpenShift Path
+Verify that OpenShift applied the policy only to the executor container:
 
-Continue with these shared exercises:
+[source,bash,role="execute"]
+----
+oc set env deployment/multi-agent -c executor --list \
+  | grep -E 'AGENT_MAX_TOKENS|GUARDRAILS_FAIL_MODE'
+oc get configmap workflow-policy -o yaml
+----
+
+Run the same comprehensive request again in the *Multi-Agent Workspace*.
+Confirm that research, analyst, and executor still complete in order, MCP data
+is present, and no workflow step reports an error. Then inspect the executor's
+recent operational output without printing any Secret:
+
+[source,bash,role="execute"]
+----
+oc logs deployment/multi-agent -c executor --since=5m | tail -20
+----
+
+This is a real deployment change: OpenShift created a new rollout revision and
+the agent process read the policy when it restarted. The A2A and MCP contracts
+did not change, so the orchestrator could continue using the agent.
+
+== Roll Back and Clean Up
+
+Return the seat to its certified baseline before continuing:
+
+[source,bash,role="execute"]
+----
+oc rollout undo deployment/multi-agent
+oc rollout status deployment/multi-agent --timeout=5m
+oc delete configmap workflow-policy
+test "$(oc get configmap workflow-policy --ignore-not-found)" = ""
+----
+
+Because the compact workshop topology co-locates all runtime containers in one
+pod, changing one container rolls that pod once. A production design may split
+agents into independently scaled deployments when isolation and rollout
+independence are more important than workshop pod efficiency.
+
+== Learner Evidence
+
+[cols="2,2,2",options="header"]
+|===
+| Check | Baseline | After policy
+| Agents involved | research, analyst, executor | research, analyst, executor
+| Workflow errors | 0 | 0
+| MCP tool data | present | present
+| Executor token bound | 96 | 48
+| ConfigMap after cleanup | absent | absent
+|===
+
+Your values are the evidence that you changed an agent's operating policy
+without changing its protocol contract or escaping your namespace.
+
+== Continue the OpenShift Path
+
+Use these shared exercises to inspect every boundary in more depth:
 
 * xref:01-architecture.adoc[Architecture and Open Protocols]
 * xref:02-explore.adoc[Explore the Running System]
 * xref:03-run-workflows.adoc[Run Multi-Agent Workflows]
 * xref:04-tools-and-guardrails.adoc[MCP Tools and Guardrails]
-
-Together they verify route access, A2A discovery, model-backed workflows, MCP
-tool calls, semantic routing, and expected guardrail denials.
+* xref:05-customize.adoc[Design an Additional Agent Role]
 
 == Track 2 Checkpoint
 
-Track 2 is complete when all workload containers are ready, the Workspace can
-run a three-agent request, and your terminal can change resources only inside
-its assigned namespace.
+Track 2 is complete when you have captured the baseline, applied the executor
+policy, repeated the three-agent workflow successfully, restored the original
+deployment, and proved the temporary ConfigMap is gone.
 
 [.next-nav]
 xref:track-3-blueprint.adoc[Continue to Track 3: Blueprint Alignment ->]

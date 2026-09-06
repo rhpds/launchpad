@@ -141,6 +141,12 @@ def test_structural_json_assertions_do_not_compare_model_prose():
         "path": "result",
         "equals": "GREEN-live-internal-seat",
     }
+    for expected in (
+        {"path": "participant_ui_journey.http_error", "equals": False},
+        {"path": "participant_ui_journey.executor_present", "equals": True},
+        {"path": "participant_ui_journey.step_count_one", "equals": True},
+    ):
+        assert expected in assertions
     result = {
         "result": "GREEN-live-internal-seat",
         "cluster_ref": "arena",
@@ -150,6 +156,11 @@ def test_structural_json_assertions_do_not_compare_model_prose():
             "mcp_steps": ["research", "analyst", "executor"],
             "errors": [],
             "answer": "Nondeterministic model prose is intentionally ignored.",
+        },
+        "participant_ui_journey": {
+            "http_error": False,
+            "executor_present": True,
+            "step_count_one": True,
         },
         "guardrails": {"blocked_steps": ["research", "analyst", "executor"]},
         "terminal_scope": [

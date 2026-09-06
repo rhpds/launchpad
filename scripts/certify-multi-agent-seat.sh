@@ -79,6 +79,17 @@ printf '%s' "$journey" | jq -e '
   and (.errors | length) == 0
 ' >/dev/null
 
+stage="participant-ui-workflow"
+participant_ui_journey="$(
+  oc_exec_json participant-ui \
+    'import json,ui; routing,agents,tools=ui.run_workflow("Create a short status task","lightweight"); print(json.dumps({"http_error":routing.startswith("HTTP error") or routing.startswith("Connection error"),"executor_present":"executor" in (routing+agents).lower(),"step_count_one":"Steps:           1" in routing}))'
+)"
+printf '%s' "$participant_ui_journey" | jq -e '
+  .http_error == false
+  and .executor_present == true
+  and .step_count_one == true
+' >/dev/null
+
 stage="guardrails"
 guardrails="$(
   oc_exec_json orchestrator \
@@ -153,6 +164,7 @@ jq -cn \
   --arg cluster "$actual_cluster" \
   --argjson readiness "$readiness" \
   --argjson journey "$journey" \
+  --argjson participant_ui_journey "$participant_ui_journey" \
   --argjson guardrails "$guardrails" \
   --argjson semantic "$semantic" \
   --arg terminal_scope "$terminal_scope" \
@@ -164,6 +176,7 @@ jq -cn \
     cluster_ref: $cluster,
     readiness: $readiness,
     multi_agent_journey: $journey,
+    participant_ui_journey: $participant_ui_journey,
     guardrails: $guardrails,
     semantic_routing: $semantic,
     terminal_scope: ($terminal_scope | split("\n")),

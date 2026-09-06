@@ -134,7 +134,14 @@ def test_multi_agent_track_scope_is_explicit_and_does_not_overclaim_track_three(
 
     assert "Docker Compose" in track_1
     assert "pre-provisioned OpenShift runtime" in track_1
+    assert "Track 2: Build and Operate on OpenShift" in track_2
     assert "oc auth can-i" in track_2
+    assert "oc create configmap workflow-policy" in track_2
+    assert "oc set env deployment/multi-agent -c executor" in track_2
+    assert "oc rollout undo deployment/multi-agent" in track_2
+    for agent in ("research", "analyst", "executor"):
+        assert agent in track_2
+    assert "Learner Evidence" in track_2
     assert "Kagenti" in track_3
     assert "OpenTelemetry" in track_3
     assert "not an end-to-end validated deployment" in track_3

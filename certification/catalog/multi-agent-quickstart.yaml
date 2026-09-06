@@ -43,7 +43,7 @@ spec:
       - id: track-2-openshift
         track_id: track-2-openshift
         path: /www/modules/track-2-openshift.html
-        marker: "Track 2: Deploy to OpenShift"
+        marker: "Track 2: Build and Operate on OpenShift"
       - id: track-3-blueprint
         track_id: track-3-blueprint
         path: /www/modules/track-3-blueprint.html
@@ -74,6 +74,12 @@ spec:
         length_equals: 3
       - path: multi_agent_journey.errors
         length_equals: 0
+      - path: participant_ui_journey.http_error
+        equals: false
+      - path: participant_ui_journey.executor_present
+        equals: true
+      - path: participant_ui_journey.step_count_one
+        equals: true
       - path: guardrails.blocked_steps
         length_equals: 3
       - path: terminal_scope
