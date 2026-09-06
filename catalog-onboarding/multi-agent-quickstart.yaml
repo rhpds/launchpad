@@ -22,7 +22,7 @@ sources:
     start_path: content-multi-agent-quickstart
   workload:
     repo_url: "https://github.com/rhpds/launchpad.git"
-    revision: "db8ff9cf775df07ebddb1eac2566cfebde462676"
+    revision: "59d58982798019db426fad0843237f9c129faec1"
     deploy_path: deploy/workloads/multi-agent-seat
 
 references:
