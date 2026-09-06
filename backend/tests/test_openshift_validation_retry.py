@@ -67,6 +67,32 @@ def test_successfully_completed_pod_is_valid():
     assert "completed successfully" in results[0].message
 
 
+def test_terminating_failed_rollout_pod_does_not_fail_healthy_replacement():
+    """Operators may briefly retain a failed, deleting ReplicaSet pod."""
+    adapter = OpenShiftValidationAdapter.__new__(OpenShiftValidationAdapter)
+    adapter._core_v1 = Mock()
+    adapter._core_v1.list_namespaced_pod.return_value.items = [
+        SimpleNamespace(
+            metadata=SimpleNamespace(
+                name="ds-pipeline-old", deletion_timestamp="2026-09-06T00:02:00Z"
+            ),
+            status=SimpleNamespace(phase="Failed", container_statuses=[]),
+        ),
+        SimpleNamespace(
+            metadata=SimpleNamespace(name="ds-pipeline-current", deletion_timestamp=None),
+            status=SimpleNamespace(
+                phase="Running",
+                container_statuses=[SimpleNamespace(ready=True)],
+            ),
+        ),
+    ]
+
+    results = adapter._check_pod_status("s1", "lab-ns")
+
+    assert [result.check_name for result in results] == ["pod-ds-pipeline-current"]
+    assert results[0].result == ValidationResultStatus.PASS
+
+
 def test_running_unready_pod_is_a_transient_failure():
     adapter = OpenShiftValidationAdapter.__new__(OpenShiftValidationAdapter)
     adapter._sleep = Mock()

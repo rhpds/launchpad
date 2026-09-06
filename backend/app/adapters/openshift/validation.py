@@ -100,7 +100,11 @@ class OpenShiftValidationAdapter:
         results: List[ValidationResult] = []
         try:
             pod_list = self._core_v1.list_namespaced_pod(namespace)
-            pods = pod_list.items or []
+            pods = [
+                pod
+                for pod in (pod_list.items or [])
+                if not getattr(getattr(pod, "metadata", None), "deletion_timestamp", None)
+            ]
 
             if not pods:
                 results.append(
@@ -108,7 +112,7 @@ class OpenShiftValidationAdapter:
                         session_id=session_id,
                         check_name="pod-status",
                         result=ValidationResultStatus.FAIL,
-                        message=f"No pods found in namespace {namespace}",
+                        message=f"No active pods found in namespace {namespace}",
                     )
                 )
                 return results
