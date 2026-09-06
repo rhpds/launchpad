@@ -351,6 +351,18 @@ def test_repeatability_score_100_for_complete():
     assert report.validation_passed is True
 
 
+def test_repeatability_score_remains_100_after_successful_reclaim():
+    svc, session = _provision_to_ready()
+    session = svc.reset_session(session.session_id)
+    session = svc.reclaim_session(session.session_id)
+
+    report = svc.get_repeatability_report(session.session_id)
+
+    assert session.status == SessionStatus.RECLAIMED
+    assert report.handoff_generated is True
+    assert report.repeatability_score == 100
+
+
 def test_repeatability_score_partial_for_incomplete():
     svc = ProvisioningService(validator=MockFailingValidationAdapter())
     req = svc.submit_request(_make_request())

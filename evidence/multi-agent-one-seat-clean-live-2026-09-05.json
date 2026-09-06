@@ -1,0 +1,237 @@
+{
+  "schema": "launchpad.redhat.com/multi-agent-live-seat-evidence/v1",
+  "evidence_id": "LIVE-MULTI-AGENT-002",
+  "captured_at": "2026-09-06T02:52:00Z",
+  "cluster_ref": "arena",
+  "result": "pass-internal-one-seat-clean-first-pass",
+  "certification_boundary": "This run certifies one internally accessed Multi-Agent Quickstart seat created from the final deployed catalog contract, made ready without a retry or live patch, functionally exercised, namespace-isolated, and reclaimed through Launchpad on Arena. It does not certify public-code access, five seats, twenty-five seats, durable external image storage, or general availability.",
+  "source": {
+    "upstream_repository": "https://github.com/jkershawrh/multi-agent-quickstart.git",
+    "upstream_revision": "8a8e0241265e69be81bf28060c4a96be38d5c244",
+    "seat_chart_revision": "59d58982798019db426fad0843237f9c129faec1",
+    "observed_control_plane_commit": "391835a48605286c97066d07ed37fea04968e9f2",
+    "showroom_content_revision": "c9b3baa8a0126233a543cef9c5c337e54bda7668",
+    "application_image_digest": "sha256:dd509328e0c8c22925d4ee10734c640cb42295bbb01e170d3bfe76c2d83e425a",
+    "backend_image_digest": "sha256:237d85d7e50b1cddc2ea9ef54d62a3dfa1f2bcbc2c8cccc465986b25c72e53a6",
+    "application_image_build": "multi-agent-quickstart-3",
+    "backend_image_build": "launchpad-backend-95"
+  },
+  "observed_at": {
+    "order_created": "2026-09-06T02:45:48.904200Z",
+    "provisioning_started": "2026-09-06T02:45:56.293149Z",
+    "provisioning_complete": "2026-09-06T02:46:37.375775Z",
+    "ready": "2026-09-06T02:46:37.873305Z",
+    "reclaim_started": "2026-09-06T02:49:08.172130Z",
+    "reclaimed": "2026-09-06T02:50:11.484572Z"
+  },
+  "order": {
+    "workshop_id": "548a207c-275d-42da-9bed-7c23f1fb4ba9",
+    "seat_id": "3558606f-5cf0-4018-a178-051fdb19a603",
+    "session_id": "653947f0-1d2c-4583-aa4d-3ab342949c84",
+    "request_id": "9857a81f-841f-4ffa-bdb8-5ddea60898e2",
+    "namespace": "launchpad-smoke-test-tenant-multi-agent-355860",
+    "catalog_item_id": "multi-agent-quickstart",
+    "seat_count": 1,
+    "exposure_policy": "internal",
+    "cluster_ref_persisted": true,
+    "provisioning_attempts": 1,
+    "retry_count": 0,
+    "live_patch_count": 0,
+    "seconds_from_provisioning_to_ready": 41.58,
+    "seconds_from_order_to_ready": 48.97,
+    "final_workshop_status": "completed",
+    "final_seat_status": "reclaimed",
+    "final_session_status": "reclaimed"
+  },
+  "capacity_preview": {
+    "can_provision": true,
+    "safe_seats": 90,
+    "requested_seats": 1,
+    "estimated_cpu_millicores": 1200,
+    "estimated_memory_mib": 2048,
+    "estimated_pods": 2,
+    "headroom_percent": 20,
+    "placement_reason": "Entire workshop assigned to arena; seats will not be split"
+  },
+  "checks": {
+    "workload_health": {
+      "status": "pass",
+      "pods": 2,
+      "running_pods": 2,
+      "containers": 11,
+      "ready_containers": 11,
+      "container_restarts": 0,
+      "scheduled_node": "rhgnr1",
+      "workload_application": "Synced/Healthy",
+      "showroom_application": "Synced/Healthy"
+    },
+    "showroom_and_ui": {
+      "status": "pass",
+      "showroom_http_status": 200,
+      "participant_ui_http_status": 200,
+      "expected_content_rendered": true,
+      "routes_admitted": 3
+    },
+    "readiness": {
+      "status": "pass",
+      "http_status": 200,
+      "agents_discovered": 3,
+      "agents_expected": 3,
+      "agent_names": [
+        "research",
+        "analyst",
+        "executor"
+      ]
+    },
+    "multi_agent_journey": {
+      "status": "pass",
+      "agents": [
+        "research",
+        "analyst",
+        "executor"
+      ],
+      "steps": 3,
+      "mcp_steps": 3,
+      "errors": 0,
+      "latency_ms": 35338.34,
+      "model_backed_steps": 3
+    },
+    "semantic_routing": {
+      "status": "ok",
+      "classifier": "llm-fallback",
+      "selected_workflow": "standard",
+      "selected_model": "simple",
+      "steps": 2,
+      "errors": 0,
+      "latency_ms": 22554.31
+    },
+    "guardrails": {
+      "status": "pass",
+      "blocked_steps": 3,
+      "latency_ms": 63.55
+    },
+    "terminal_scope": {
+      "status": "pass",
+      "default_project_matches_seat": true,
+      "own_namespace_edit_allowed": true,
+      "cross_namespace_read_denied": true,
+      "node_list_denied": true
+    },
+    "runtime_secret_boundary": {
+      "status": "pass",
+      "secret_name": "multi-agent-runtime",
+      "keys": [
+        "AGENT_AUTH_TOKEN",
+        "MODEL_API_KEY",
+        "MODEL_ENDPOINT",
+        "MODEL_NAME"
+      ],
+      "identity_labels_exact": true,
+      "secret_in_gitops": false,
+      "model_key_cleared_after_reclaim": true
+    },
+    "launchpad_validation": {
+      "status": "pass",
+      "pod_checks_passed": 2,
+      "route_checks_passed": 3,
+      "failed_checks": 0,
+      "repeatability_score_after_reclaim": 80,
+      "repeatability_note": "The current report computes handoff_generated from live session status, so its score falls from 100 to 80 after successful reclaim; the five platform checks and handoff fields were captured independently."
+    }
+  },
+  "cleanup": {
+    "status": "pass",
+    "seconds": 63,
+    "remaining_namespaces": 0,
+    "remaining_applications": 0,
+    "remaining_role_bindings": 0,
+    "remaining_persistent_volume_claims": 0,
+    "remaining_persistent_volumes": 0,
+    "remaining_routes": 0,
+    "remaining_secrets": 0,
+    "session_status": "reclaimed",
+    "model_key_cleared": true
+  },
+  "red_green_matrix": [
+    {
+      "id": "MULTI-CLEAN-FIRST-PASS-001",
+      "red": "The first live run required an image correction, a readiness correction, and an explicit validation retry.",
+      "green": "A new Launchpad order from the final deployed contract reached ready on its first provisioning attempt in 41.58 seconds without a retry or live resource patch."
+    },
+    {
+      "id": "MULTI-FUNCTION-001",
+      "red": "Catalog source and pod readiness alone did not prove inference, A2A coordination, MCP enrichment, semantic routing, or guardrail denial.",
+      "green": "The reusable live driver proved three model-backed agent steps, MCP data in all steps, successful semantic routing, and guardrail denial for all three agents."
+    },
+    {
+      "id": "MULTI-ISOLATION-001",
+      "red": "A running terminal did not prove the seat identity was confined to its assigned namespace.",
+      "green": "The terminal could edit the assigned namespace while cross-namespace access and node listing were denied."
+    },
+    {
+      "id": "MULTI-CLEANUP-001",
+      "red": "A ready seat did not prove that workshop reclaim removed its distributed resources and revoked its model key.",
+      "green": "Reclaim completed in 63 seconds with zero labeled namespaces, Applications, RoleBindings, PVCs, PVs, Routes, or Secrets and a cleared model key."
+    }
+  ],
+  "validation_matrix": {
+    "chart_contract": "GREEN-local",
+    "image_build": "GREEN-live",
+    "cluster_placement": "GREEN-live",
+    "showroom_content": "GREEN-live",
+    "participant_ui": "GREEN-live",
+    "a2a_workflow": "GREEN-live",
+    "mcp_enrichment": "GREEN-live",
+    "semantic_routing": "GREEN-live",
+    "guardrail_denial": "GREEN-live",
+    "terminal_isolation": "GREEN-live",
+    "secret_boundary": "GREEN-live",
+    "reclaim": "GREEN-live",
+    "clean_first_pass": "GREEN-live",
+    "five_seat_scale": "RED-not-run",
+    "twenty_five_seat_scale": "RED-not-run",
+    "public_access": "RED-not-run",
+    "durable_image_supply": "RED-not-implemented"
+  },
+  "internal_candidate_rubric": {
+    "score": 90,
+    "possible": 100,
+    "runtime_and_readiness": 20,
+    "functional_ai_journey": 25,
+    "authorization_and_secret_boundary": 20,
+    "cleanup_and_evidence": 15,
+    "clean_first_pass": 10,
+    "durable_image_supply": 0,
+    "release_threshold": 100
+  },
+  "test_strategy": {
+    "TDD": "The clean-run evidence and promotion contract first failed because the evidence artifact did not exist and the catalog still identified a runtime candidate.",
+    "EDD": "This hashed artifact records immutable commits and image digests, lifecycle identifiers and timestamps, participant-facing probes, functional AI behavior, authorization denials, and labeled-resource cleanup evidence.",
+    "CDD": "The deployed backend consumed the repository onboarding contract and generated the same Helm identity, runtime Secret, route, model, and cleanup contracts exercised live.",
+    "BDD": "Given one internal Multi-Agent seat targeted to Arena, when the final catalog contract is confirmed, then it becomes ready without intervention, the participant can complete a coordinated model-backed journey, the terminal remains namespace-confined, and reclaim leaves zero labeled residue.",
+    "CBT": "Image construction, Helm rendering, readiness, UI, A2A, MCP, semantic routing, guardrails, RBAC, Secret handling, Argo state, Launchpad lifecycle, and cleanup were proven independently and together."
+  },
+  "release_boundary": {
+    "internal_one_seat_functional_gate": true,
+    "clean_first_pass": true,
+    "internal_five_seat_gate": false,
+    "internal_twenty_five_seat_gate": false,
+    "public_access_certified": false,
+    "general_availability": false
+  },
+  "remaining_release_gates": [
+    "Mirror the candidate image to durable external or control-plane registry storage",
+    "Run the five-seat functional, namespace-isolation, concurrency, and zero-residue gate",
+    "Measure per-seat CPU, memory, model throughput, and p95 workflow latency under five-seat concurrency",
+    "Run the twenty-five-seat functional and cleanup gate without exceeding protected Arena headroom",
+    "Certify public-code login, participant entitlement, cross-seat denial, and gateway protection for this catalog item",
+    "Run three consecutive successful twenty-five-seat certification cycles before general availability"
+  ],
+  "security": {
+    "contains_plaintext_credentials": false,
+    "credential_values_logged": false,
+    "runtime_secret_absent_from_gitops": true,
+    "cross_namespace_access_denied": true,
+    "model_key_cleared_after_reclaim": true
+  }
+}

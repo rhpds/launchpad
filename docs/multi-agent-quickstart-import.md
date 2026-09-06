@@ -30,11 +30,13 @@ the selected model endpoint, model identifier, MaaS key, and generated service
 token. The Secret is applied directly to Arena and only its name is passed to
 Argo CD.
 
-The catalog remains a fail-closed draft with a one-seat ceiling. The first live
-run reached the functional one-seat gate after a regression retry and then
-reclaimed with zero residue. That run is recorded in
-`evidence/multi-agent-one-seat-live-2026-09-05.json`; it does not certify a
-clean first pass, public access, or workshop scale.
+The catalog remains a fail-closed draft with a one-seat ceiling. The corrected
+runtime first reached the functional gate after a regression retry; a second,
+fresh order then reached `ready` on its first attempt without a live patch and
+reclaimed with zero labeled residue. The runs are recorded in
+`evidence/multi-agent-one-seat-live-2026-09-05.json` and
+`evidence/multi-agent-one-seat-clean-live-2026-09-05.json`. Together they
+certify the internal one-seat gate, but not public access or workshop scale.
 
 ## Repeatable onboarding and certification
 
@@ -55,14 +57,12 @@ cluster edits:
 
 ## Promotion gates
 
-1. Run a fresh order from the final corrected catalog and require a clean
-   first-pass ready result.
-2. Mirror the digest-pinned image from Arena's certification registry to a
+1. Mirror the digest-pinned image from Arena's certification registry to a
    durable external registry or durable control-plane mirror.
-3. Certify public-code participant authentication, route authorization, and
+2. Certify public-code participant authentication, route authorization, and
    cross-seat denial for this catalog item.
-4. Measure five seats, including concurrent model traffic and complete
+3. Measure five seats, including concurrent model traffic and complete
    zero-residue reclaim.
-5. Measure twenty-five seats before raising the supported workshop limit.
-6. Require three consecutive twenty-five-seat passes before general
+4. Measure twenty-five seats before raising the supported workshop limit.
+5. Require three consecutive twenty-five-seat passes before general
    availability.

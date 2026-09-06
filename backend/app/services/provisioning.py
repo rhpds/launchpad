@@ -754,6 +754,13 @@ class ProvisioningService:
             len(session.validation_results) > 0
             and all(r.result.value != "fail" for r in session.validation_results)
         )
+        reached_handoff_state = session.status in (
+            SessionStatus.READY,
+            SessionStatus.ACTIVE,
+        ) or any(
+            event.to_status in (SessionStatus.READY, SessionStatus.ACTIVE)
+            for event in session.lifecycle_events
+        )
 
         return RepeatabilityReport(
             session_id=session.session_id,
@@ -762,7 +769,9 @@ class ProvisioningService:
             catalog_versioned=catalog_item is not None,
             provisioning_plan_generated=plan is not None,
             validation_passed=validation_passed,
-            handoff_generated=session.status in (SessionStatus.READY, SessionStatus.ACTIVE),
+            # Repeatability is historical evidence. A successful reclaim must
+            # not erase proof that the session reached a handoff-ready state.
+            handoff_generated=reached_handoff_state,
             showback_generated=True,
             cleanup_defined=True,
         )
