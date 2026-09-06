@@ -122,6 +122,24 @@ participant and isolation probe passed, model keys were revoked, and cleanup
 reached zero residue in 381.444 seconds. It scored 100/100 and is consecutive
 pass 3 of 3, making the internal 25-seat catalog limit eligible for promotion.
 
+Catalog v0.2.5 adds a genuinely hands-on Track 2 and fixes participant UI
+authentication. The first delta proof, `multi-agent-track2-learning-20260906-01`,
+proved the UI bearer-token path. The next run,
+`multi-agent-track2-learning-20260906-02`, is retained as RED evidence because
+directly changing the Argo CD-owned Deployment was reconciled away. The final
+design uses an optional, learner-owned `workflow-policy` ConfigMap instead.
+`multi-agent-track2-learning-20260906-03` proved that path GREEN-live on Arena:
+the learner policy changed the executor token limit from 96 to 48, the workflow
+completed through the participant UI, deletion restored the 96-token baseline,
+and reclaim left zero declared resources. The run scored 100/100 and its hashed
+evidence is under `evidence/runs/`.
+
+The existing 25-seat runs prove Arena topology, capacity, concurrent workflow,
+isolation, and cleanup at scale. Because v0.2.5 changes the runtime digest, one
+exact-image 25-seat regression remains required before using this hands-on
+revision for the September event; the one-seat delta proof is not represented
+as a replacement for that scale run.
+
 ## Repeatable onboarding and certification
 
 Catalog onboarding is repository-driven rather than a collection of manual
