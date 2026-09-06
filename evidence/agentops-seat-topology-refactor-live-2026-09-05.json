@@ -1,0 +1,201 @@
+{
+  "schema_version": "1.0",
+  "evidence_id": "EDD-AGENTOPS-SEAT-TOPOLOGY-2026-09-05",
+  "captured_at": "2026-09-06T01:03:30Z",
+  "contains_plaintext_credentials": false,
+  "scope": "Internal five-seat AgentOps topology, interruption recovery, functional scale, and cleanup retry on Arena",
+  "outcome": "green_for_internal_five_seat_candidate",
+  "release_boundary": "This evidence does not certify 25 AgentOps seats, public-code access, trusted public TLS, a 60-minute soak, or the exact September three-workshop fleet rehearsal.",
+  "source": {
+    "repository": "https://github.com/rhpds/launchpad.git",
+    "topology_commit": "8596c9e979c76562b5e1239eec2c96e15305568b",
+    "chart_pin_commit": "857d50a34ba442ce82622e139520348bd9f29397",
+    "terminating_pod_validation_commit": "90b8b02608f68d8b46052b4c196da892d4ed05f1",
+    "session_revalidation_commit": "a38530013e733315db39855f9ceca9a9ededfd4b",
+    "namespace_reuse_commit": "afbc883999b38443f70165829fd0b49f0173c966",
+    "seat_relink_commit": "be3167ebd5d06fa092d9ca0c0625009f30181e62",
+    "cleanup_retry_commit": "fd93be046354e6d4385f06973256b26efecd124a",
+    "catalog_version": "0.1.4",
+    "chart_version": "0.1.1"
+  },
+  "deployment": {
+    "cluster": "arena",
+    "final_build": "launchpad-backend-92",
+    "final_image_digest": "sha256:776a6adbd8e4bed0ea09b79b15452bc3dc4abe256105e8e74cd61240def15239",
+    "backend_ready": true,
+    "public_gateway_ready": true
+  },
+  "capacity_contract": {
+    "steady_per_seat": {
+      "cpu_millicores": 2500,
+      "memory_mib": 7168,
+      "pods": 12
+    },
+    "transient_per_provisioning_seat": {
+      "pods": 4
+    },
+    "provisioning_concurrency": 2,
+    "one_seat_estimated_pods": 16,
+    "five_seat_estimated_pods": 68,
+    "five_seat_steady_pods": 60,
+    "twenty_five_seat_estimated_pods": 308,
+    "live_max_seats": 11,
+    "live_max_by_cpu": 11,
+    "live_max_by_memory": 63,
+    "live_max_by_pods": 12,
+    "headroom_percent": 20,
+    "twenty_five_seat_admission": "rejected_before_mutation"
+  },
+  "one_seat_gate": {
+    "workshop_id": "fa96ca68-4939-4461-a3c2-63c9714a7ae1",
+    "session_id": "a46fb91f-e677-47a9-a509-c4de8a684bce",
+    "namespace": "launchpad-smoke-test-tenant-agentops-181fd6",
+    "active_pods": 12,
+    "all_containers_ready": true,
+    "container_restarts": 0,
+    "showroom_module_pages_http_200": 11,
+    "mortgage_app_http_200": true,
+    "grafana_http_200": true,
+    "terminal_default_project_matches_namespace": true,
+    "terminal_own_namespace_edit_allowed": true,
+    "terminal_cross_namespace_read_denied": true,
+    "agent_websocket_terminal_event": "done",
+    "agent_websocket_answer_characters": 449,
+    "session_status_after_revalidation": "ready",
+    "reclaim_status": "completed",
+    "post_reclaim_namespaces": 0,
+    "post_reclaim_applications": 0,
+    "post_reclaim_persistent_volumes": 0
+  },
+  "five_seat_gate": {
+    "workshop_id": "a1a08ab4-568f-4e3a-8365-a96ceb627f06",
+    "cluster_ref": "arena",
+    "created_at": "2026-09-06T00:26:05.802079Z",
+    "final_recovery_started_at": "2026-09-06T00:41:38.977271Z",
+    "final_seat_ready_at": "2026-09-06T00:42:52.545751Z",
+    "final_recovery_seconds": 73.568,
+    "collective_status": "ready",
+    "unique_ready_seats": 5,
+    "unique_namespaces": 5,
+    "active_pods": 60,
+    "ready_active_pods": 60,
+    "terminating_pods": 0,
+    "container_restarts": 0,
+    "healthy_synced_argocd_applications": 10,
+    "dspa_ready": 5,
+    "session_validation_checks": 77,
+    "session_validation_failures": 0,
+    "participant_routes_http_200": 15,
+    "participant_routes_expected": 15,
+    "showroom_pages_http_200": 55,
+    "showroom_pages_expected": 55,
+    "terminal_default_project_matches_seat": 5,
+    "terminal_own_namespace_edit_allowed": 5,
+    "terminal_cross_seat_read_denied": 5,
+    "concurrent_agent_journeys": {
+      "attempted": 5,
+      "terminal_done": 5,
+      "answer_characters": [279, 411, 383, 534, 775],
+      "seconds": [11.850, 15.331, 15.807, 20.857, 22.458],
+      "maximum_seconds": 22.458
+    }
+  },
+  "fault_injection_and_recovery": {
+    "trigger": "Arena worker rhgnr1 temporarily reported NotReady while the single Launchpad backend was provisioning the second seat wave",
+    "backend_restart_count": 1,
+    "ready_seats_preserved": 2,
+    "partial_namespaces_reconciled": 2,
+    "initial_recovery_result": "four ready seats and one failed seat",
+    "initial_failure": "a deterministic seat namespace was reused while its prior incarnation was still Terminating",
+    "recovery_after_fix": "only the failed seat was requeued; the four ready seats were retained; five of five became ready",
+    "cleanup_defect": "a stale interrupted session could replace the current seat link and cause duplicate Argo cleanup",
+    "cleanup_recovery": "current seat links are now authoritative and completed_with_errors cleanup can be retried idempotently"
+  },
+  "cleanup": {
+    "requested_at": "2026-09-06T00:49:53Z",
+    "initial_completed_at": "2026-09-06T00:51:14.988245Z",
+    "initial_status": "completed_with_errors",
+    "initial_cluster_residue": 0,
+    "initial_record_error": "duplicate cleanup of a stale relinked session observed an already deleted Argo application",
+    "final_status_after_build_92_retry": "completed",
+    "failed_reclaims": 0,
+    "seat_statuses_reclaimed": 5,
+    "historical_retry_sessions_reclaimed": 8,
+    "remaining_namespaces": 0,
+    "remaining_applications": 0,
+    "remaining_persistent_volumes_by_label": 0,
+    "remaining_persistent_volumes_by_claim_namespace": 0,
+    "credentials_scrubbed": true,
+    "manual_cluster_resource_deletion_required": false
+  },
+  "red_green_matrix": [
+    {
+      "requirement": "bounded steady and transient capacity accounting",
+      "red": "legacy multiplication counted rollout pods as steady per-seat demand",
+      "green_local": "capacity and catalog contract tests pass",
+      "green_live": "five-seat preview reports 60 steady plus eight bounded transient pods; 25 reports 308 and rejects admission"
+    },
+    {
+      "requirement": "validation follows the active rollout generation",
+      "red": "a terminating old DSPA pod caused a false validation failure",
+      "green_local": "terminating-pod validation regression passes",
+      "green_live": "all five sessions reached ready with zero failed validation checks"
+    },
+    {
+      "requirement": "failed session retries must revalidate",
+      "red": "an existing validation_failed session could be promoted to a ready seat without another validation",
+      "green_local": "session revalidation regression passes",
+      "green_live": "the one-seat session was revalidated to ready before workshop completion"
+    },
+    {
+      "requirement": "interrupted deterministic namespaces are not reused while terminating",
+      "red": "live recovery received NamespaceTerminating while creating the participant RoleBinding",
+      "green_local": "recovery waits for confirmed namespace absence",
+      "green_live": "the failed fourth seat reprovisioned into the same deterministic namespace only after deletion and reached ready"
+    },
+    {
+      "requirement": "reclaim preserves the current session for each seat",
+      "red": "a stale retry session overwrote a ready seat and generated duplicate cleanup",
+      "green_local": "stale-session relink regression and cleanup suites pass",
+      "green_live": "build-92 retry retained five current seat links and completed with zero failed reclaims"
+    },
+    {
+      "requirement": "failed cleanup is operator-retryable",
+      "red": "completed_with_errors was terminal and DELETE could not retry it",
+      "green_local": "cleanup retry regression passes",
+      "green_live": "the same order moved completed_with_errors to reclaiming to completed without recreating resources"
+    }
+  ],
+  "test_strategy": {
+    "TDD": "Every live defect was reproduced by a failing regression before implementation.",
+    "EDD": "This manifest records source revisions, immutable image digest, order and session identifiers, capacity, participant functionality, interruption behavior, and zero-residue cleanup.",
+    "CDD": "Capacity resource_breakdown, immutable workload revision, workshop retry, session validation, and cleanup-retry contracts remain backward compatible for internal orders.",
+    "BDD": "Given a five-seat internal AgentOps order, when Arena interrupts the control-plane worker, completed seats remain assigned, incomplete work is reconciled and retried, every participant journey succeeds, and reclaim leaves no resources.",
+    "CBT": "Catalog, Helm topology, capacity, Argo, DSPA, routes, Antora, terminal RBAC, AI WebSockets, retry, credential scrubbing, and cleanup were independently checked before the integrated journey.",
+    "focused_tests": {
+      "passed": 68,
+      "failed": 0
+    },
+    "non_local_regression": {
+      "passed": 1053,
+      "failed": 0,
+      "deselected_environment_dependent": 13
+    }
+  },
+  "gate_rubric": {
+    "capacity_contract": {"earned": 15, "possible": 15},
+    "functional_five_seat_scale": {"earned": 25, "possible": 25},
+    "namespace_and_cross_seat_isolation": {"earned": 20, "possible": 20},
+    "interruption_and_retry_recovery": {"earned": 20, "possible": 20},
+    "cleanup_and_credential_scrubbing": {"earned": 20, "possible": 20},
+    "score": 100,
+    "required": 100
+  },
+  "release_decision": {
+    "internal_five_seat": "GREEN",
+    "catalog_max_seats": 5,
+    "twenty_five_seat": "BLOCKED_CAPACITY",
+    "public_access": "NOT_IN_SCOPE",
+    "next_gate": "add and qualify at least one additional 250-pod AgentOps worker, then run 25-seat internal certification"
+  }
+}
