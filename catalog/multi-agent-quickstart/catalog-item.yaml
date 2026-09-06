@@ -31,22 +31,16 @@ metadata:
   content_only: false
   onboarding_managed: true
   onboarding_contract: catalog-onboarding/multi-agent-quickstart.yaml
-  certification_stage: source-import
+  certification_stage: one-seat-runtime-candidate
   max_workshop_seats: 1
   promotion_sequence:
   - 1
   - 5
   - 25
   activation_blockers:
-  - Publish the application image in a durable registry and replace every mutable
-    or inaccessible image reference with an immutable digest.
-  - Add the Gradio participant UI to the OpenShift chart with a Service and Route
-    compatible with the Launchpad entitlement gateway.
-  - Add a runtime Secret contract for the per-session MaaS endpoint and key; inject
-    credentials into the orchestrator and agent pods without placing secret values
-    in Git or Argo CD Application values.
-  - Label every workload resource with its workshop, seat, session, tenant, and cluster
-    identity and prove cleanup targets only the persisted cluster.
+  - Mirror the Arena-built, digest-pinned candidate image to a durable external registry
+    or durable control-plane mirror before production; Arena's internal registry is
+    sufficient only for certification.
   - Add inference-aware readiness and validate a real three-agent A2A workflow, MCP
     tool enrichment, semantic routing, and guardrail denial.
   - Complete one-seat participant authorization, cross-seat denial, and zero-residue
@@ -74,31 +68,41 @@ metadata:
   required_models:
   - granite-3.2-8b-tools
   inference_endpoint: litellm
-  seat_cpu_millicores: 4500
+  seat_cpu_millicores: 1200
   seat_memory_mib: 2048
-  seat_pods: 8
+  seat_pods: 2
   seat_storage_gib: 0
   workshop_provision_concurrency: 2
   workshop_node_spread: false
   workshop_node_min_ready_seconds: 900
   workshop_node_headroom_pods: 0
   workshop_node_required_labels: {}
-  workload_repo: https://github.com/jkershawrh/multi-agent-quickstart.git
-  workload_revision: 8a8e0241265e69be81bf28060c4a96be38d5c244
+  workload_repo: https://github.com/rhpds/launchpad.git
+  workload_revision: db8ff9cf775df07ebddb1eac2566cfebde462676
   workload_deploy_type: helm
   workload_deployment_scope: seat
-  workload_deploy_path: chart
-  workload_source_kind: upstream-helm-chart
-  workload_gitops_ready: false
+  workload_deploy_path: deploy/workloads/multi-agent-seat
+  workload_source_kind: launchpad-seat-chart
+  workload_gitops_ready: true
   workload_release_name: multi-agent
   workload_helm_values:
-    model:
-      deploy: false
+    image:
+      repository: image-registry.openshift-image-registry.svc:5000/partner-ai-launchpad/multi-agent-quickstart
+      digest: sha256:7acdbc1ca0fb38aa415da7a3eaa940c4f3b9ab5c5097ca87c0ee99c8fd363b34
   workload_ignore_differences: []
-  workload_runtime_secret_name: ''
-  workload_runtime_secret_sources: {}
-  workload_runtime_secret_value_path: ''
-  workload_identity_value_path: ''
+  workload_runtime_secret_name: multi-agent-runtime
+  workload_runtime_secret_sources:
+    MODEL_ENDPOINT:
+      source: maas_endpoint
+    MODEL_API_KEY:
+      source: maas_api_key
+    MODEL_NAME:
+      source: requested_model
+    AGENT_AUTH_TOKEN:
+      source: generated_password
+      length: 48
+  workload_runtime_secret_value_path: runtime.existingSecret
+  workload_identity_value_path: identity
   workload_routes:
     ui: multi-agent-ui
     orchestrator: multi-agent

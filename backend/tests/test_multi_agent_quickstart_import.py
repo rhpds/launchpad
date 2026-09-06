@@ -37,14 +37,33 @@ def test_multi_agent_quickstart_preserves_immutable_source_provenance():
         "revision": "8a8e0241265e69be81bf28060c4a96be38d5c244",
         "path": ".",
     }
-    assert metadata["workload_repo"] == (
-        "https://github.com/jkershawrh/multi-agent-quickstart.git"
-    )
+    assert metadata["workload_repo"] == "https://github.com/rhpds/launchpad.git"
     assert metadata["workload_revision"] == (
-        "8a8e0241265e69be81bf28060c4a96be38d5c244"
+        "db8ff9cf775df07ebddb1eac2566cfebde462676"
     )
-    assert metadata["workload_deploy_path"] == "chart"
-    assert metadata["workload_gitops_ready"] is False
+    assert metadata["workload_deploy_path"] == "deploy/workloads/multi-agent-seat"
+    assert metadata["workload_source_kind"] == "launchpad-seat-chart"
+    assert metadata["workload_gitops_ready"] is True
+    assert metadata["workload_identity_value_path"] == "identity"
+    assert metadata["workload_runtime_secret_name"] == "multi-agent-runtime"
+    assert metadata["workload_runtime_secret_value_path"] == "runtime.existingSecret"
+    assert metadata["workload_runtime_secret_sources"] == {
+        "MODEL_ENDPOINT": {"source": "maas_endpoint"},
+        "MODEL_API_KEY": {"source": "maas_api_key"},
+        "MODEL_NAME": {"source": "requested_model"},
+        "AGENT_AUTH_TOKEN": {"source": "generated_password", "length": 48},
+    }
+    assert metadata["workload_helm_values"] == {
+        "image": {
+            "repository": (
+                "image-registry.openshift-image-registry.svc:5000/"
+                "partner-ai-launchpad/multi-agent-quickstart"
+            ),
+            "digest": (
+                "sha256:7acdbc1ca0fb38aa415da7a3eaa940c4f3b9ab5c5097ca87c0ee99c8fd363b34"
+            ),
+        }
+    }
 
 
 def test_multi_agent_showroom_is_native_launchpad_content():

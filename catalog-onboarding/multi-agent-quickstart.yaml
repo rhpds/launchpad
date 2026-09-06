@@ -21,9 +21,9 @@ sources:
     playbook: site-multi-agent-quickstart.yml
     start_path: content-multi-agent-quickstart
   workload:
-    repo_url: "https://github.com/jkershawrh/multi-agent-quickstart.git"
-    revision: "8a8e0241265e69be81bf28060c4a96be38d5c244"
-    deploy_path: chart
+    repo_url: "https://github.com/rhpds/launchpad.git"
+    revision: "db8ff9cf775df07ebddb1eac2566cfebde462676"
+    deploy_path: deploy/workloads/multi-agent-seat
 
 references:
   original_lab:
@@ -56,10 +56,11 @@ runtime:
   required_models:
     - granite-3.2-8b-tools
   seat_resources:
-    # Six upstream services plus the planned UI and one Showroom pod.
-    cpu_millicores: 4500
+    # One seven-container workload pod plus one Showroom pod. The envelope
+    # includes measured Showroom requests and headroom above the chart's 800m.
+    cpu_millicores: 1200
     memory_mib: 2048
-    pods: 8
+    pods: 2
     storage_gib: 0
   workshop_provision_concurrency: 2
   tabs:
@@ -73,18 +74,28 @@ runtime:
       title: OpenShift Console
       source: cluster.console_url
   workload:
-    source_kind: upstream-helm-chart
-    gitops_ready: false
+    source_kind: launchpad-seat-chart
+    gitops_ready: true
     release_name: multi-agent
+    identity_value_path: identity
+    runtime_secret_name: multi-agent-runtime
+    runtime_secret_value_path: runtime.existingSecret
+    runtime_secret_sources:
+      MODEL_ENDPOINT: {source: maas_endpoint}
+      MODEL_API_KEY: {source: maas_api_key}
+      MODEL_NAME: {source: requested_model}
+      AGENT_AUTH_TOKEN: {source: generated_password, length: 48}
     helm_values:
-      model:
-        deploy: false
+      image:
+        repository: >-
+          image-registry.openshift-image-registry.svc:5000/partner-ai-launchpad/multi-agent-quickstart
+        digest: sha256:7acdbc1ca0fb38aa415da7a3eaa940c4f3b9ab5c5097ca87c0ee99c8fd363b34
     routes:
       ui: multi-agent-ui
       orchestrator: multi-agent
 
 certification:
-  stage: source-import
+  stage: one-seat-runtime-candidate
   max_workshop_seats: 1
   promotion_sequence:
     - 1
@@ -92,18 +103,9 @@ certification:
     - 25
   activation_blockers:
     - >-
-      Publish the application image in a durable registry and replace every
-      mutable or inaccessible image reference with an immutable digest.
-    - >-
-      Add the Gradio participant UI to the OpenShift chart with a Service and
-      Route compatible with the Launchpad entitlement gateway.
-    - >-
-      Add a runtime Secret contract for the per-session MaaS endpoint and key;
-      inject credentials into the orchestrator and agent pods without placing
-      secret values in Git or Argo CD Application values.
-    - >-
-      Label every workload resource with its workshop, seat, session, tenant,
-      and cluster identity and prove cleanup targets only the persisted cluster.
+      Mirror the Arena-built, digest-pinned candidate image to a durable
+      external registry or durable control-plane mirror before production;
+      Arena's internal registry is sufficient only for certification.
     - >-
       Add inference-aware readiness and validate a real three-agent A2A
       workflow, MCP tool enrichment, semantic routing, and guardrail denial.
