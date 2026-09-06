@@ -158,6 +158,11 @@ def test_multi_agent_chart_uses_one_pod_for_the_complete_participant_runtime():
     }
     for name in ("research", "analyst", "executor"):
         assert containers[name]["readinessProbe"]["httpGet"]["path"] == "/health"
+    assert containers["executor"]["envFrom"] == [
+        {"configMapRef": {"name": "workflow-policy", "optional": True}}
+    ]
+    assert "envFrom" not in containers["research"]
+    assert "envFrom" not in containers["analyst"]
     assert containers["participant-ui"]["readinessProbe"]["httpGet"] == {
         "path": "/",
         "port": "ui",
@@ -253,6 +258,7 @@ def test_multi_agent_arena_build_is_pinned_and_adds_model_bearer_support():
     assert "Authorization" in dockerfile
     assert "AGENT_AUTH_TOKEN" in dockerfile
     assert "UI_WORKFLOW_TIMEOUT" in dockerfile
+    assert "AGENT_MAX_TOKENS_OVERRIDE" in dockerfile
     assert 'headers={"Authorization": f"Bearer {AGENT_AUTH_TOKEN}"}' in dockerfile
     assert "ui.py" in dockerfile
     assert 'huggingface-hub==0.25.2' in dockerfile

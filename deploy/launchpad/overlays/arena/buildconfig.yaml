@@ -201,10 +201,12 @@ spec:
           sed -i '/f"{classify_endpoint}\/chat\/completions",/a\                    headers={"Authorization": f"Bearer {MODEL_API_KEY}"} if MODEL_API_KEY else {},' orchestrator.py && \
           sed -i '/f"{ORCHESTRATOR_URL}\/api\/v1\/workflow",/a\            headers={"Authorization": f"Bearer {AGENT_AUTH_TOKEN}"} if AGENT_AUTH_TOKEN else {},' ui.py && \
           sed -i 's/timeout=120.0/timeout=UI_WORKFLOW_TIMEOUT/' ui.py && \
+          sed -i 's|AGENT_MAX_TOKENS = int(os.environ.get("AGENT_MAX_TOKENS", "64"))|AGENT_MAX_TOKENS = int(os.environ.get("AGENT_MAX_TOKENS_OVERRIDE", os.environ.get("AGENT_MAX_TOKENS", "64")))|' agent.py && \
           grep -q 'Bearer {MODEL_API_KEY}' agent.py && \
           grep -q 'Bearer {MODEL_API_KEY}' orchestrator.py && \
           grep -q 'Bearer {AGENT_AUTH_TOKEN}' ui.py && \
           grep -q 'timeout=UI_WORKFLOW_TIMEOUT' ui.py && \
+          grep -q 'AGENT_MAX_TOKENS_OVERRIDE' agent.py && \
           grep -q '"/ready"' auth.py
       USER 1001
       EXPOSE 8000 8001 8002 8003 8004 8005 7860

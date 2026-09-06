@@ -5,7 +5,19 @@ namespace="${1:?usage: certify-multi-agent-seat.sh <namespace>}"
 : "${KUBECONFIG:?KUBECONFIG must point to the Arena execution cluster credential}"
 
 stage="bootstrap"
+policy_config_created=false
+
+cleanup_learner_policy() {
+  if [[ "$policy_config_created" == "true" ]]; then
+    oc delete configmap workflow-policy -n "$namespace" --ignore-not-found >/dev/null
+    oc rollout restart deployment/multi-agent -n "$namespace" >/dev/null
+    oc rollout status deployment/multi-agent -n "$namespace" --timeout=5m >/dev/null
+  fi
+  policy_config_created=false
+}
+
 trap 'rc=$?; printf "seat_probe_failure stage=${stage} exit_code=${rc}\n" >&2' ERR
+trap 'cleanup_learner_policy >/dev/null 2>&1 || true' EXIT
 
 oc_exec_json() {
   local container="${1:?container is required}"
@@ -90,6 +102,55 @@ printf '%s' "$participant_ui_journey" | jq -e '
   and .step_count_one == true
 ' >/dev/null
 
+stage="learner-policy-apply"
+oc create configmap workflow-policy -n "$namespace" \
+  --from-literal=AGENT_MAX_TOKENS_OVERRIDE=48 \
+  --dry-run=client -o yaml \
+  | oc apply -f - >/dev/null
+policy_config_created=true
+oc rollout restart deployment/multi-agent -n "$namespace" >/dev/null
+oc rollout status deployment/multi-agent -n "$namespace" --timeout=5m >/dev/null
+
+applied_max_tokens="$(
+  oc exec deployment/multi-agent -c executor -n "$namespace" -- \
+    python -c 'import agent; print(agent.AGENT_MAX_TOKENS)'
+)"
+[[ "$applied_max_tokens" == "48" ]]
+
+stage="learner-policy-workflow"
+policy_ui_journey="$(
+  oc_exec_json participant-ui \
+    'import json,ui; routing,agents,tools=ui.run_workflow("Create a bounded status task","lightweight"); print(json.dumps({"http_error":routing.startswith("HTTP error") or routing.startswith("Connection error"),"executor_present":"executor" in (routing+agents).lower(),"step_count_one":"Steps:           1" in routing}))'
+)"
+printf '%s' "$policy_ui_journey" | jq -e '
+  .http_error == false
+  and .executor_present == true
+  and .step_count_one == true
+' >/dev/null
+
+stage="learner-policy-rollback"
+cleanup_learner_policy
+[[ -z "$(oc get configmap workflow-policy -n "$namespace" --ignore-not-found -o name)" ]]
+baseline_max_tokens="$(
+  oc exec deployment/multi-agent -c executor -n "$namespace" -- \
+    python -c 'import agent; print(agent.AGENT_MAX_TOKENS)'
+)"
+[[ "$baseline_max_tokens" == "96" ]]
+learner_policy="$(
+  jq -cn \
+    --argjson policy_ui_journey "$policy_ui_journey" \
+    '{
+      applied_max_tokens: 48,
+      workflow_passed: (
+        ($policy_ui_journey.http_error == false)
+        and ($policy_ui_journey.executor_present == true)
+        and ($policy_ui_journey.step_count_one == true)
+      ),
+      rollback_restored_baseline: true,
+      configmap_removed: true
+    }'
+)"
+
 stage="guardrails"
 guardrails="$(
   oc_exec_json orchestrator \
@@ -165,6 +226,7 @@ jq -cn \
   --argjson readiness "$readiness" \
   --argjson journey "$journey" \
   --argjson participant_ui_journey "$participant_ui_journey" \
+  --argjson learner_policy "$learner_policy" \
   --argjson guardrails "$guardrails" \
   --argjson semantic "$semantic" \
   --arg terminal_scope "$terminal_scope" \
@@ -177,6 +239,7 @@ jq -cn \
     readiness: $readiness,
     multi_agent_journey: $journey,
     participant_ui_journey: $participant_ui_journey,
+    learner_policy: $learner_policy,
     guardrails: $guardrails,
     semantic_routing: $semantic,
     terminal_scope: ($terminal_scope | split("\n")),

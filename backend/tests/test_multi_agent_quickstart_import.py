@@ -137,8 +137,8 @@ def test_multi_agent_track_scope_is_explicit_and_does_not_overclaim_track_three(
     assert "Track 2: Build and Operate on OpenShift" in track_2
     assert "oc auth can-i" in track_2
     assert "oc create configmap workflow-policy" in track_2
-    assert "oc set env deployment/multi-agent -c executor" in track_2
-    assert "oc rollout undo deployment/multi-agent" in track_2
+    assert "AGENT_MAX_TOKENS_OVERRIDE=48" in track_2
+    assert "oc rollout restart deployment/multi-agent" in track_2
     for agent in ("research", "analyst", "executor"):
         assert agent in track_2
     assert "Learner Evidence" in track_2
@@ -152,3 +152,18 @@ def test_multi_agent_quickstart_cannot_activate_with_import_blockers():
 
     with pytest.raises(ValueError, match="activation blocker"):
         adapter.set_status("multi-agent-quickstart", CatalogStatus.ACTIVE)
+
+
+def test_track_two_certification_executes_and_cleans_the_learner_change():
+    probe = (ROOT / "scripts/certify-multi-agent-seat.sh").read_text()
+
+    for command in (
+        'stage="learner-policy-apply"',
+        "oc create configmap workflow-policy",
+        "oc rollout restart deployment/multi-agent",
+        "import agent; print(agent.AGENT_MAX_TOKENS)",
+        "oc delete configmap workflow-policy",
+    ):
+        assert command in probe
+    assert "rollback_restored_baseline" in probe
+    assert "configmap_removed" in probe

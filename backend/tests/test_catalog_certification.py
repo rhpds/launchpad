@@ -145,6 +145,10 @@ def test_structural_json_assertions_do_not_compare_model_prose():
         {"path": "participant_ui_journey.http_error", "equals": False},
         {"path": "participant_ui_journey.executor_present", "equals": True},
         {"path": "participant_ui_journey.step_count_one", "equals": True},
+        {"path": "learner_policy.applied_max_tokens", "equals": 48},
+        {"path": "learner_policy.workflow_passed", "equals": True},
+        {"path": "learner_policy.rollback_restored_baseline", "equals": True},
+        {"path": "learner_policy.configmap_removed", "equals": True},
     ):
         assert expected in assertions
     result = {
@@ -161,6 +165,12 @@ def test_structural_json_assertions_do_not_compare_model_prose():
             "http_error": False,
             "executor_present": True,
             "step_count_one": True,
+        },
+        "learner_policy": {
+            "applied_max_tokens": 48,
+            "workflow_passed": True,
+            "rollback_restored_baseline": True,
+            "configmap_removed": True,
         },
         "guardrails": {"blocked_steps": ["research", "analyst", "executor"]},
         "terminal_scope": [

@@ -67,30 +67,32 @@ appears. This is the behavior your change must preserve.
 
 == Apply an Executor Policy
 
-The runtime Secret contains credentials. Do not edit or print it. Put
-non-secret operational policy in a ConfigMap instead. This policy lowers the
-executor's generation bound and explicitly retains fail-closed guardrails.
+The runtime Secret contains credentials. Do not edit or print it. The certified
+Deployment provides a GitOps-safe, optional ConfigMap extension point for
+non-secret learner policy. This policy lowers the executor's generation bound
+without patching an Argo CD-managed Deployment field.
 
 [source,bash,role="execute"]
 ----
 oc create configmap workflow-policy \
-  --from-literal=AGENT_MAX_TOKENS=48 \
-  --from-literal=GUARDRAILS_FAIL_MODE=closed \
+  --from-literal=AGENT_MAX_TOKENS_OVERRIDE=48 \
   --dry-run=client -o yaml | oc apply -f -
 
-oc set env deployment/multi-agent -c executor \
-  --from=configmap/workflow-policy
+oc rollout restart deployment/multi-agent
 oc rollout status deployment/multi-agent --timeout=5m
 ----
 
-Verify that OpenShift applied the policy only to the executor container:
+Verify that the restarted executor process read the override:
 
 [source,bash,role="execute"]
 ----
-oc set env deployment/multi-agent -c executor --list \
-  | grep -E 'AGENT_MAX_TOKENS|GUARDRAILS_FAIL_MODE'
+oc exec deployment/multi-agent -c executor -- \
+  python -c 'import agent; print(agent.AGENT_MAX_TOKENS)'
 oc get configmap workflow-policy -o yaml
 ----
+
+The Python command must print `48`. The ConfigMap is referenced only by the
+executor container and contains no credential.
 
 Run the same comprehensive request again in the *Multi-Agent Workspace*.
 Confirm that research, analyst, and executor still complete in order, MCP data
@@ -102,9 +104,9 @@ recent operational output without printing any Secret:
 oc logs deployment/multi-agent -c executor --since=5m | tail -20
 ----
 
-This is a real deployment change: OpenShift created a new rollout revision and
-the agent process read the policy when it restarted. The A2A and MCP contracts
-did not change, so the orchestrator could continue using the agent.
+This is a real runtime change: OpenShift restarted the compact workload pod and
+the executor read the optional policy. The Deployment specification remains
+owned by Git, while the A2A and MCP contracts stay unchanged.
 
 == Roll Back and Clean Up
 
@@ -112,10 +114,12 @@ Return the seat to its certified baseline before continuing:
 
 [source,bash,role="execute"]
 ----
-oc rollout undo deployment/multi-agent
-oc rollout status deployment/multi-agent --timeout=5m
 oc delete configmap workflow-policy
+oc rollout restart deployment/multi-agent
+oc rollout status deployment/multi-agent --timeout=5m
 test "$(oc get configmap workflow-policy --ignore-not-found)" = ""
+test "$(oc exec deployment/multi-agent -c executor -- \
+  python -c 'import agent; print(agent.AGENT_MAX_TOKENS)')" = "96"
 ----
 
 Because the compact workshop topology co-locates all runtime containers in one
@@ -132,7 +136,7 @@ independence are more important than workshop pod efficiency.
 | Workflow errors | 0 | 0
 | MCP tool data | present | present
 | Executor token bound | 96 | 48
-| ConfigMap after cleanup | absent | absent
+| ConfigMap after cleanup | absent | removed after verification
 |===
 
 Your values are the evidence that you changed an agent's operating policy

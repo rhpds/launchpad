@@ -80,6 +80,14 @@ spec:
         equals: true
       - path: participant_ui_journey.step_count_one
         equals: true
+      - path: learner_policy.applied_max_tokens
+        equals: 48
+      - path: learner_policy.workflow_passed
+        equals: true
+      - path: learner_policy.rollback_restored_baseline
+        equals: true
+      - path: learner_policy.configmap_removed
+        equals: true
       - path: guardrails.blocked_steps
         length_equals: 3
       - path: terminal_scope
