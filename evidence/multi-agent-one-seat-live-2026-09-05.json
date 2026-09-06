@@ -1,0 +1,235 @@
+{
+  "schema": "launchpad.redhat.com/multi-agent-live-seat-evidence/v1",
+  "evidence_id": "LIVE-MULTI-AGENT-001",
+  "captured_at": "2026-09-06T02:40:00Z",
+  "cluster_ref": "arena",
+  "result": "pass-internal-one-seat-after-regression-retry",
+  "certification_boundary": "This run certifies one internally accessed Multi-Agent Quickstart seat created, functionally exercised, isolated, and reclaimed through Launchpad on Arena. The initial validation attempt failed while two live defects were corrected, so it does not certify a clean first-pass provision, public-code access, five seats, twenty-five seats, durable external image storage, or general availability.",
+  "source": {
+    "upstream_repository": "https://github.com/jkershawrh/multi-agent-quickstart.git",
+    "upstream_revision": "8a8e0241265e69be81bf28060c4a96be38d5c244",
+    "seat_chart_revision": "59d58982798019db426fad0843237f9c129faec1",
+    "final_catalog_contract_commit": "45d93d42d2b0a3798382bbc3ff0743e09c3fb82b",
+    "order_backend_commit": "f2412714e0cfe4d5b39eca7dc3271cda96ffbe5a",
+    "showroom_content_revision": "c9b3baa8a0126233a543cef9c5c337e54bda7668",
+    "application_image_digest": "sha256:dd509328e0c8c22925d4ee10734c640cb42295bbb01e170d3bfe76c2d83e425a",
+    "backend_image_digest": "sha256:66d113580efa678debdf1baf01cb921397381cd8bbba95c4715b27d96a934ca0",
+    "image_build": "multi-agent-quickstart-3",
+    "image_build_seconds": 89
+  },
+  "observed_at": {
+    "requested": "2026-09-06T02:17:27.214940Z",
+    "provisioning_complete": "2026-09-06T02:17:55.141148Z",
+    "initial_validation_failed": "2026-09-06T02:23:12.480206Z",
+    "validation_retried": "2026-09-06T02:31:48.626538Z",
+    "ready": "2026-09-06T02:31:48.687486Z",
+    "reclaim_started": "2026-09-06T02:37:38.719829Z",
+    "reclaimed": "2026-09-06T02:38:43.089895Z"
+  },
+  "order": {
+    "workshop_id": "784ed903-2185-4fe8-95fd-cc872f3e7fc1",
+    "seat_id": "b74a493a-d4b4-4e59-991e-5f24ff5d3317",
+    "session_id": "024cf5ce-990f-45b2-9f91-871a068bd31b",
+    "namespace": "launchpad-smoke-test-tenant-multi-agent-b74a49",
+    "catalog_item_id": "multi-agent-quickstart",
+    "seat_count": 1,
+    "exposure_policy": "internal",
+    "cluster_ref_persisted": true,
+    "final_workshop_status": "completed",
+    "final_seat_status": "reclaimed",
+    "final_session_status": "reclaimed"
+  },
+  "capacity_preview": {
+    "can_provision": true,
+    "safe_seats": 91,
+    "requested_seats": 1,
+    "estimated_cpu_millicores": 1200,
+    "estimated_memory_mib": 2048,
+    "estimated_pods": 2,
+    "headroom_percent": 20
+  },
+  "checks": {
+    "workload_health": {
+      "status": "pass",
+      "pods": 2,
+      "running_pods": 2,
+      "containers": 11,
+      "ready_containers": 11,
+      "container_restarts": 0,
+      "workload_application": "Synced/Healthy",
+      "showroom_application": "Synced/Healthy"
+    },
+    "showroom_and_ui": {
+      "status": "pass",
+      "showroom_http_status": 200,
+      "participant_ui_http_status": 200,
+      "expected_content_rendered": true
+    },
+    "readiness": {
+      "status": "pass",
+      "http_status": 200,
+      "agents_discovered": 3,
+      "agents_expected": 3,
+      "agent_names": [
+        "research",
+        "analyst",
+        "executor"
+      ]
+    },
+    "multi_agent_journey": {
+      "status": "pass",
+      "agents": [
+        "research",
+        "analyst",
+        "executor"
+      ],
+      "steps": 3,
+      "mcp_steps": 3,
+      "errors": 0,
+      "latency_ms": 35370.22,
+      "model_backed_steps": 3
+    },
+    "semantic_routing": {
+      "status": "ok",
+      "classifier": "llm-fallback",
+      "selected_workflow": "standard",
+      "selected_model": "simple",
+      "steps": 2,
+      "errors": 0,
+      "latency_ms": 22264.35
+    },
+    "guardrails": {
+      "status": "pass",
+      "blocked_steps": 3,
+      "latency_ms": 52.61
+    },
+    "terminal_scope": {
+      "status": "pass",
+      "default_project_matches_seat": true,
+      "own_namespace_edit_allowed": true,
+      "cross_namespace_read_denied": true,
+      "node_list_denied": true
+    },
+    "runtime_secret_boundary": {
+      "status": "pass",
+      "secret_name": "multi-agent-runtime",
+      "keys": [
+        "AGENT_AUTH_TOKEN",
+        "MODEL_API_KEY",
+        "MODEL_ENDPOINT",
+        "MODEL_NAME"
+      ],
+      "identity_labels_exact": true,
+      "secret_in_gitops": false,
+      "model_key_cleared_after_reclaim": true
+    },
+    "launchpad_validation": {
+      "status": "pass",
+      "repeatability_score": 100,
+      "pod_checks_passed": 2,
+      "route_checks_passed": 3
+    }
+  },
+  "cleanup": {
+    "status": "pass",
+    "seconds": 69,
+    "remaining_namespaces": 0,
+    "remaining_applications": 0,
+    "remaining_persistent_volumes": 0,
+    "remaining_image_pull_bindings": 0,
+    "session_status": "reclaimed",
+    "model_key_cleared": true
+  },
+  "red_green_matrix": [
+    {
+      "id": "MULTI-IMAGE-001",
+      "red": "The first immutable image build failed because the source adaptation pattern was over-escaped.",
+      "green": "Build 3 compiled the exact upstream revision, applied bearer-token support, pinned a compatible UI dependency, and published an immutable digest."
+    },
+    {
+      "id": "MULTI-READY-001",
+      "red": "The first live pod blocked its own readiness probe with service authentication.",
+      "green": "The corrected image leaves /ready unauthenticated while keeping workflow endpoints authenticated; the live readiness response reported all three agents."
+    },
+    {
+      "id": "MULTI-UI-001",
+      "red": "Gradio crashed because its upstream-compatible API expected HfFolder, removed by the unconstrained Hugging Face client.",
+      "green": "The client is pinned to 0.25.2 and the participant UI returned HTTP 200 with zero container restarts in the certified pod."
+    },
+    {
+      "id": "MULTI-ROUTING-001",
+      "red": "Semantic classification used the upstream default Qwen identifier and received model-not-found responses.",
+      "green": "MODEL_SIMPLE and MODEL_COMPLEX now reference the selected per-seat MODEL_NAME; live classification returned status ok and selected a standard workflow."
+    },
+    {
+      "id": "MULTI-FUNCTION-001",
+      "red": "A source import did not prove model inference, A2A coordination, MCP enrichment, or guardrail denial on Arena.",
+      "green": "The repeatable live driver proved three model-backed agent steps, MCP data in all steps, semantic routing, and three guardrail denials."
+    },
+    {
+      "id": "MULTI-CLEANUP-001",
+      "red": "No Launchpad-created Multi-Agent seat had zero-residue reclaim evidence.",
+      "green": "Workshop reclaim completed in 69 seconds with zero namespaces, Argo Applications, PVs, or image-pull bindings and a scrubbed model key."
+    }
+  ],
+  "validation_matrix": {
+    "chart_contract": "GREEN-local",
+    "image_build": "GREEN-live",
+    "cluster_placement": "GREEN-live",
+    "showroom_content": "GREEN-live",
+    "participant_ui": "GREEN-live",
+    "a2a_workflow": "GREEN-live",
+    "mcp_enrichment": "GREEN-live",
+    "semantic_routing": "GREEN-live",
+    "guardrail_denial": "GREEN-live",
+    "terminal_isolation": "GREEN-live",
+    "secret_boundary": "GREEN-live",
+    "reclaim": "GREEN-live",
+    "clean_first_pass": "RED-live",
+    "five_seat_scale": "RED-not-run",
+    "twenty_five_seat_scale": "RED-not-run",
+    "public_access": "RED-not-run"
+  },
+  "internal_candidate_rubric": {
+    "score": 80,
+    "possible": 100,
+    "runtime_and_readiness": 20,
+    "functional_ai_journey": 25,
+    "authorization_and_secret_boundary": 20,
+    "cleanup_and_evidence": 15,
+    "clean_first_pass": 0,
+    "durable_image_supply": 0,
+    "release_threshold": 100
+  },
+  "test_strategy": {
+    "TDD": "Failing chart, build, readiness, UI dependency, routing, certification-driver, and evidence contracts preceded each correction.",
+    "EDD": "This hashed artifact records immutable commits and image digests, lifecycle identifiers and timestamps, participant-facing probes, functional AI behavior, isolation denials, and cleanup residue.",
+    "CDD": "The onboarding intake generates the catalog item and drives the same Helm identity, runtime Secret, route, model, and cleanup contracts used live.",
+    "BDD": "Given one internal Multi-Agent seat on Arena, when Launchpad provisions and retries it after corrected runtime deployment, the participant can follow the Showroom, use the UI, run coordinated agents and tools, and cannot read another namespace; reclaim removes every generated resource.",
+    "CBT": "Image construction, Helm rendering, readiness, UI, A2A, MCP, semantic routing, guardrails, RBAC, Secret handling, Argo state, Launchpad lifecycle, and cleanup were proven independently and together."
+  },
+  "release_boundary": {
+    "internal_one_seat_functional_gate": true,
+    "clean_first_pass": false,
+    "internal_five_seat_gate": false,
+    "internal_twenty_five_seat_gate": false,
+    "public_access_certified": false,
+    "general_availability": false
+  },
+  "remaining_release_gates": [
+    "Run a new one-seat order from the final catalog contract and require a clean first-pass ready result",
+    "Mirror the candidate image to durable external or control-plane registry storage",
+    "Run the five-seat functional, isolation, and zero-residue gate",
+    "Measure per-seat CPU, memory, model throughput, and p95 workflow latency under five-seat concurrency",
+    "Run the twenty-five-seat functional and cleanup gate without exceeding protected Arena headroom",
+    "Certify public-code login, participant entitlement, and gateway protection for this catalog item",
+    "Run three consecutive successful twenty-five-seat certification cycles before general availability"
+  ],
+  "security": {
+    "contains_plaintext_credentials": false,
+    "credential_values_logged": false,
+    "runtime_secret_absent_from_gitops": true,
+    "cross_namespace_access_denied": true,
+    "model_key_cleared_after_reclaim": true
+  }
+}
