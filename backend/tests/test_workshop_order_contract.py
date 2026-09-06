@@ -503,6 +503,63 @@ def test_interrupted_reclaim_recovers_session_created_before_seat_link():
     cleanup.assert_called_once_with(order.workshop_id)
 
 
+def test_reclaim_relink_does_not_replace_a_ready_seat_with_stale_session():
+    service = ProvisioningService()
+    order = service.create_workshop_order(
+        Workshop(
+            tenant_id="relink-current-session-tenant",
+            catalog_item_id="inference-overdrive-quickstart",
+            num_users=1,
+        )
+    )
+    seat = order.seats[0]
+
+    def save_session(status: SessionStatus) -> LabSession:
+        request = LabRequest(
+            tenant_id=order.tenant_id,
+            requester_id=seat.participant_id,
+            catalog_item_id=order.catalog_item_id,
+            requested_mode=CatalogCategory.QUICK_START,
+            metadata={"workshop_id": order.workshop_id, "seat_id": seat.seat_id},
+        )
+        service._save_request(request)
+        session = LabSession(
+            request_id=request.request_id,
+            tenant_id=order.tenant_id,
+            catalog_item_id=order.catalog_item_id,
+            namespace="launchpad-reused-seat-namespace",
+            cluster_ref="arena",
+            status=status,
+        )
+        service._save_session(session)
+        return session
+
+    current = save_session(SessionStatus.READY)
+    stale = save_session(SessionStatus.RECLAIMED)
+    linked_order = order.model_copy(
+        update={
+            "status": WorkshopStatus.READY,
+            "session_ids": [current.session_id],
+            "seats": [
+                seat.model_copy(
+                    update={
+                        "status": WorkshopSeatStatus.READY,
+                        "session_id": current.session_id,
+                        "request_id": current.request_id,
+                    }
+                )
+            ],
+        }
+    )
+
+    relinked = service._link_persisted_workshop_sessions(linked_order)
+
+    assert stale.session_id not in relinked.session_ids
+    assert relinked.session_ids == [current.session_id]
+    assert relinked.seats[0].session_id == current.session_id
+    assert relinked.seats[0].request_id == current.request_id
+
+
 def test_queue_reclaim_recovers_session_created_before_failed_seat_link():
     service = ProvisioningService()
     order = service.create_workshop_order(

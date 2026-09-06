@@ -1333,26 +1333,47 @@ class ProvisioningService:
 
     def _link_persisted_workshop_sessions(self, workshop: Workshop) -> Workshop:
         """Recover seat links when provisioning stopped after session persistence."""
-        session_ids = list(workshop.session_ids)
         seats = list(workshop.seats)
         seats_by_id = {seat.seat_id: index for index, seat in enumerate(seats)}
-        for session in self._sessions.values():
+        session_ids = [
+            seat.session_id
+            for seat in seats
+            if seat.session_id
+        ]
+        candidates: dict[int, list[tuple[int, LabSession, LabRequest]]] = {}
+        for position, session in enumerate(self._sessions.values()):
             request = self._requests.get(session.request_id)
             request_metadata = request.metadata if request else {}
             if request_metadata.get("workshop_id") != workshop.workshop_id:
                 continue
-            if session.session_id not in session_ids:
-                session_ids.append(session.session_id)
             seat_index = seats_by_id.get(request_metadata.get("seat_id"))
-            if seat_index is not None:
-                seats[seat_index] = seats[seat_index].model_copy(
-                    update={
-                        "status": WorkshopSeatStatus.RECLAIMING,
-                        "session_id": session.session_id,
-                        "request_id": request.request_id,
-                        "updated_at": datetime.utcnow(),
-                    }
-                )
+            if seat_index is None or seats[seat_index].session_id:
+                continue
+            candidates.setdefault(seat_index, []).append((position, session, request))
+
+        def recovery_rank(candidate: tuple[int, LabSession, LabRequest]):
+            position, session, _request = candidate
+            latest_event = max(
+                (event.timestamp for event in session.lifecycle_events),
+                default=datetime.min,
+            )
+            return (
+                session.status != SessionStatus.RECLAIMED,
+                latest_event,
+                position,
+            )
+
+        for seat_index, seat_candidates in candidates.items():
+            _position, session, request = max(seat_candidates, key=recovery_rank)
+            session_ids.append(session.session_id)
+            seats[seat_index] = seats[seat_index].model_copy(
+                update={
+                    "status": WorkshopSeatStatus.RECLAIMING,
+                    "session_id": session.session_id,
+                    "request_id": request.request_id,
+                    "updated_at": datetime.utcnow(),
+                }
+            )
         return workshop.model_copy(update={"session_ids": session_ids, "seats": seats})
 
     def _cleanup_interrupted_workshop_sessions(self, workshop: Workshop) -> Workshop:
