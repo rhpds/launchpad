@@ -313,6 +313,32 @@ def test_api_transport_recovers_from_connection_loss_and_gateway_unavailability(
     assert calls == ["request", "request", "request"]
 
 
+def test_cleanup_observation_waits_for_zero_residue(monkeypatch):
+    runner = _runner_module()
+    snapshots = [
+        {"namespaces": 20, "secrets": 40},
+        {"namespaces": 0, "secrets": 0},
+    ]
+
+    monkeypatch.setattr(
+        runner,
+        "_resource_counts",
+        lambda *_args, **_kwargs: snapshots.pop(0),
+    )
+
+    counts, elapsed = runner._wait_for_zero_resources(
+        ["namespaces", "secrets"],
+        workshop_id="workshop-1",
+        kubeconfig="arena-kubeconfig",
+        timeout_seconds=1,
+        interval_seconds=0,
+    )
+
+    assert counts == {"namespaces": 0, "secrets": 0}
+    assert snapshots == []
+    assert elapsed >= 0
+
+
 def test_generic_runner_places_probes_after_the_all_seat_barrier_and_reclaims(
     tmp_path: Path, monkeypatch, capsys
 ):

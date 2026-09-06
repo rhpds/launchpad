@@ -75,6 +75,14 @@ residue. The generic runner now retries bounded connection and 502/503/504
 failures so a transient control-plane interruption does not discard its live
 observation window. See the run and fault records under `evidence/runs/`.
 
+The second attempt, `multi-agent-25seat-20260906-02`, brought all 25 seats to
+Ready and passed every participant, Showroom, agent workflow, isolation,
+secret-safety, and model-key revocation check. It remains RED and uncounted
+because the first residue sample ran immediately after workshop completion,
+while 20 namespaces were still terminating; an independent follow-up reached
+zero without intervention. The runner now polls all declared cleanup resource
+types to zero within the same cleanup SLO before scoring the cleanup gate.
+
 ## Repeatable onboarding and certification
 
 Catalog onboarding is repository-driven rather than a collection of manual

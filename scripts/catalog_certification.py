@@ -356,6 +356,30 @@ def _resource_counts(
     return counts
 
 
+def _wait_for_zero_resources(
+    resources: list[str],
+    *,
+    workshop_id: str,
+    kubeconfig: str,
+    timeout_seconds: float,
+    interval_seconds: float,
+) -> tuple[dict[str, int], float]:
+    """Wait for asynchronous namespace garbage collection within the cleanup SLO."""
+    started = time.monotonic()
+    while True:
+        counts = _resource_counts(
+            resources,
+            workshop_id=workshop_id,
+            kubeconfig=kubeconfig,
+        )
+        elapsed = time.monotonic() - started
+        if counts and all(count == 0 for count in counts.values()):
+            return counts, elapsed
+        if elapsed >= timeout_seconds:
+            return counts, elapsed
+        time.sleep(interval_seconds)
+
+
 def _load_history(
     directory: Path,
     *,
@@ -610,11 +634,18 @@ def _run_command(args: argparse.Namespace) -> int:
             except Exception as exc:  # noqa: BLE001 - preserve evidence on cleanup defects
                 errors.append(f"cleanup {type(exc).__name__}: {exc}")
                 cleanup_status = "error"
-            cleanup_counts = _resource_counts(
+            remaining_cleanup_seconds = max(
+                0,
+                profile["maximum_cleanup_seconds"] - (cleanup_seconds or 0),
+            )
+            cleanup_counts, residue_seconds = _wait_for_zero_resources(
                 contract["spec"]["cleanup"]["resources"],
                 workshop_id=workshop_id,
                 kubeconfig=kubeconfig,
+                timeout_seconds=remaining_cleanup_seconds,
+                interval_seconds=args.poll_interval,
             )
+            cleanup_seconds = (cleanup_seconds or 0) + residue_seconds
             try:
                 final_sessions = [
                     api.session(str(session["session_id"])) for session in sessions
