@@ -1,0 +1,102 @@
+{
+  "schema": "launchpad.redhat.com/catalog-promotion-evidence/v1",
+  "evidence_id": "MULTI-AGENT-QUICKSTART-25-SEAT-PROMOTION-20260906",
+  "observed_at": "2026-09-06T18:59:43Z",
+  "result": "GREEN-live-internal",
+  "cluster_id": "arena",
+  "source_revision": "650630bf65d2ac3a6bf27c317e96809e16a13649",
+  "build": {
+    "name": "launchpad-backend-101",
+    "phase": "Complete",
+    "started_at": "2026-09-06T18:56:53Z",
+    "completed_at": "2026-09-06T18:58:18Z",
+    "image_digest": "sha256:c9da374e1ca61b53a519ad744347192d4fc08fa16619ce5cc02b6e770bda723d"
+  },
+  "deployment": {
+    "namespace": "partner-ai-launchpad",
+    "name": "backend",
+    "rollout_status": "success",
+    "ready_replicas": 1,
+    "desired_replicas": 1,
+    "source_revision_annotation": "650630bf65d2ac3a6bf27c317e96809e16a13649",
+    "image": "image-registry.openshift-image-registry.svc:5000/partner-ai-launchpad/launchpad-backend@sha256:c9da374e1ca61b53a519ad744347192d4fc08fa16619ce5cc02b6e770bda723d"
+  },
+  "live_health": {
+    "http_status": 200,
+    "service_status": "ok",
+    "service": "launchpad"
+  },
+  "catalog": {
+    "catalog_item_id": "multi-agent-quickstart",
+    "version": "0.2.3",
+    "status": "draft",
+    "certification_stage": "twenty-five-seat-certified",
+    "max_workshop_seats": 25
+  },
+  "capacity_preview": {
+    "http_status": 200,
+    "can_provision": true,
+    "selected_cluster": "arena",
+    "placement_reason": "Entire workshop assigned to arena; seats will not be split",
+    "seats_requested": 25,
+    "catalog_seat_limit": 25,
+    "certification_override": false,
+    "estimated_resources": {
+      "cpu_millicores": 30000,
+      "memory_mib": 51200,
+      "pods": 50
+    }
+  },
+  "promotion_sequence": {
+    "required_consecutive_green_live_runs": 3,
+    "consecutive_green_live_runs": 3,
+    "runs": [
+      "evidence/runs/multi-agent-quickstart-25-seat-multi-agent-25seat-20260906-05.json",
+      "evidence/runs/multi-agent-quickstart-25-seat-multi-agent-25seat-20260906-06.json",
+      "evidence/runs/multi-agent-quickstart-25-seat-multi-agent-25seat-20260906-07.json"
+    ],
+    "all_rubric_scores": 100,
+    "all_seats_ready": true,
+    "all_participant_journeys_passed": true,
+    "all_namespace_isolation_checks_passed": true,
+    "all_cleanup_checks_passed": true
+  },
+  "quality_gates": {
+    "non_local_tests": {
+      "passed": 1113,
+      "deselected": 13,
+      "failed": 0
+    },
+    "focused_promotion_contracts": {
+      "passed": 29,
+      "failed": 0
+    },
+    "changed_python_ruff": "pass",
+    "git_diff_check": "pass",
+    "hardcoded_secret_scan": "pass",
+    "catalog_intake_contract": "pass",
+    "showroom_structure": "pass",
+    "workload_structure": "pass",
+    "source_fetch": "pass",
+    "local_antora_build": "not-run-antora-executable-unavailable",
+    "live_showroom_pages": "pass-all-pages-all-seats-in-three-promotion-runs"
+  },
+  "residue_workshop_id": "193edf55-dbc8-4cef-9334-3f00b941c422",
+  "residue_audit": {
+    "namespaces": 0,
+    "argocd_applications": 0,
+    "role_bindings": 0,
+    "persistent_volume_claims": 0,
+    "persistent_volumes": 0,
+    "routes": 0,
+    "secrets": 0
+  },
+  "public_access_certified": false,
+  "production_activation": "blocked",
+  "remaining_activation_blockers": [
+    "durable external registry or durable control-plane image mirror",
+    "public-code participant access and cross-seat authorization certification",
+    "optional Track 3 Kagenti and OpenTelemetry runtime certification"
+  ],
+  "scope_statement": "This receipt promotes only the internal Arena workshop limit. It does not certify public access or production activation."
+}
