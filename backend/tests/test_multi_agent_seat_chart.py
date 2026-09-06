@@ -237,6 +237,9 @@ def test_multi_agent_arena_build_is_pinned_and_adds_model_bearer_support():
     assert "python-311@sha256:" in dockerfile
     assert "MODEL_API_KEY" in dockerfile
     assert "Authorization" in dockerfile
+    assert 'huggingface-hub==0.25.2' in dockerfile
+    assert '"/ready"' in dockerfile
+    assert "auth.py" in dockerfile
     assert "requirements.txt" not in dockerfile
     assert ":latest" not in dockerfile
     assert build["spec"]["output"]["to"]["name"] == (
