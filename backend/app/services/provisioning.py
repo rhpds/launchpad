@@ -1575,13 +1575,48 @@ class ProvisioningService:
             if seat.status == WorkshopSeatStatus.READY and seat.session_id:
                 session_ids.append(seat.session_id)
                 continue
-            if seat.session_id and self._sessions.get(seat.session_id):
-                workshop.seats[i] = seat.model_copy(update={
-                    "status": WorkshopSeatStatus.READY,
-                    "error": None,
-                    "updated_at": datetime.utcnow(),
-                })
-                session_ids.append(seat.session_id)
+            existing_session = (
+                self._sessions.get(seat.session_id) if seat.session_id else None
+            )
+            if existing_session:
+                try:
+                    if existing_session.status == SessionStatus.VALIDATION_FAILED:
+                        existing_session = self.validate_session(
+                            existing_session.session_id
+                        )
+                except Exception as exc:
+                    logger.warning(
+                        "Workshop %s seat %d revalidation failed: %s",
+                        workshop.workshop_id,
+                        i + 1,
+                        exc,
+                    )
+                    workshop.seats[i] = seat.model_copy(update={
+                        "status": WorkshopSeatStatus.FAILED,
+                        "error": f"seat revalidation failed: {exc}",
+                        "updated_at": datetime.utcnow(),
+                    })
+                    continue
+
+                if existing_session.status in {
+                    SessionStatus.READY,
+                    SessionStatus.ACTIVE,
+                }:
+                    workshop.seats[i] = seat.model_copy(update={
+                        "status": WorkshopSeatStatus.READY,
+                        "error": None,
+                        "updated_at": datetime.utcnow(),
+                    })
+                    session_ids.append(existing_session.session_id)
+                else:
+                    workshop.seats[i] = seat.model_copy(update={
+                        "status": WorkshopSeatStatus.FAILED,
+                        "error": (
+                            "existing seat session is not ready: "
+                            f"{existing_session.status.value}"
+                        ),
+                        "updated_at": datetime.utcnow(),
+                    })
                 continue
             workshop.seats[i] = seat.model_copy(update={
                 "status": WorkshopSeatStatus.PROVISIONING,

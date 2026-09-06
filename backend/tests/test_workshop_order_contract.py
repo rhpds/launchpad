@@ -3,13 +3,19 @@ import os
 import threading
 import time
 from types import SimpleNamespace
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import pytest
 from app.domain.clusters import ClusterTarget
-from app.domain.enums import CatalogCategory, SessionStatus, WorkshopSeatStatus, WorkshopStatus
+from app.domain.enums import (
+    CatalogCategory,
+    SessionStatus,
+    ValidationResultStatus,
+    WorkshopSeatStatus,
+    WorkshopStatus,
+)
 from app.domain.lifecycle import transition
-from app.domain.models import LabRequest, LabSession, Workshop, WorkshopSeat
+from app.domain.models import LabRequest, LabSession, ValidationResult, Workshop, WorkshopSeat
 from app.auth.oauth import User, get_current_user
 from app.api.deps import provisioning_service as api_provisioning_service
 from app.main import app
@@ -860,6 +866,47 @@ def test_collective_readiness_retry_reuses_existing_session():
 
     assert retried.status == WorkshopStatus.READY
     assert retried.seats[0].session_id == original_session_id
+    assert len(service._sessions) == 1
+
+
+def test_failed_seat_retry_revalidates_existing_validation_failed_session():
+    validator = Mock()
+    validator.validate.side_effect = [
+        [
+            ValidationResult(
+                session_id="session",
+                check_name="operator-rollout",
+                result=ValidationResultStatus.FAIL,
+                message="terminating rollout pod observed",
+            )
+        ],
+        [
+            ValidationResult(
+                session_id="session",
+                check_name="operator-rollout",
+                result=ValidationResultStatus.PASS,
+                message="healthy replacement is ready",
+            )
+        ],
+    ]
+    service = ProvisioningService(validator=validator)
+    workshop = Workshop(
+        tenant_id="validation-retry-tenant",
+        catalog_item_id="inference-overdrive-quickstart",
+        num_users=1,
+    )
+
+    first = service.provision_workshop(workshop)
+    original_session_id = first.seats[0].session_id
+    assert service.get_session(original_session_id).status == SessionStatus.VALIDATION_FAILED
+
+    queued = service.queue_failed_workshop_seats(first.workshop_id)
+    retried = service.provision_workshop(queued)
+
+    assert retried.status == WorkshopStatus.READY
+    assert retried.seats[0].session_id == original_session_id
+    assert service.get_session(original_session_id).status == SessionStatus.READY
+    assert validator.validate.call_count == 2
     assert len(service._sessions) == 1
 
 
