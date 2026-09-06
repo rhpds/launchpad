@@ -60,7 +60,7 @@ def test_multi_agent_quickstart_preserves_immutable_source_provenance():
                 "partner-ai-launchpad/multi-agent-quickstart"
             ),
             "digest": (
-                "sha256:7acdbc1ca0fb38aa415da7a3eaa940c4f3b9ab5c5097ca87c0ee99c8fd363b34"
+                "sha256:dd509328e0c8c22925d4ee10734c640cb42295bbb01e170d3bfe76c2d83e425a"
             ),
         }
     }
