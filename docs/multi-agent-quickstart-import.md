@@ -92,6 +92,16 @@ declared resource count at zero. The run scored 100/100 and is pass 1 of the 3
 consecutive GREEN-live runs required for 25-seat promotion. Its hashed evidence
 is under `evidence/runs/`.
 
+The fourth attempt, `multi-agent-25seat-20260906-04`, reached all 25 Ready in
+777.405 seconds and reclaimed with zero residue, but is intentionally RED and
+uncounted. Twenty-two seat probes passed; three probes exited with status 4
+after receiving an empty/non-JSON result in the ten-concurrent remote-exec
+phase. The prior runner retained only the exit status, so it could not identify
+the exact failing substage. The RED→GREEN change adds bounded retries for
+failed or empty remote JSON, emits a named probe stage, and persists only that
+safe stage marker on failure. The failed run reset the required consecutive
+25-seat promotion sequence to zero.
+
 ## Repeatable onboarding and certification
 
 Catalog onboarding is repository-driven rather than a collection of manual

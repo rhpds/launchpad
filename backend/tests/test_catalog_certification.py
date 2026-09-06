@@ -339,6 +339,59 @@ def test_cleanup_observation_waits_for_zero_residue(monkeypatch):
     assert elapsed >= 0
 
 
+def test_failed_seat_probe_preserves_safe_stage_diagnostic(monkeypatch):
+    runner = _runner_module()
+    contract = load_certification_contract(CONTRACT_PATH)
+
+    monkeypatch.setattr(
+        runner,
+        "_showroom_checks",
+        lambda *_args, **_kwargs: [{"id": "track-chooser", "passed": True}],
+    )
+    monkeypatch.setattr(
+        runner.subprocess,
+        "run",
+        lambda *_args, **_kwargs: SimpleNamespace(
+            returncode=4,
+            stdout="",
+            stderr=(
+                "transport details that must not be persisted\n"
+                "seat_probe_failure stage=semantic-routing exit_code=4\n"
+            ),
+        ),
+    )
+
+    result = runner._seat_probe(
+        seat={
+            "seat_number": 2,
+            "seat_id": "seat-2",
+            "session_id": "session-2",
+            "showroom_url": "https://showroom.example",
+        },
+        session={"namespace": "seat-2", "cluster_ref": "arena"},
+        contract=contract,
+        verify=True,
+    )
+
+    assert result["probe"] == {
+        "passed": False,
+        "exit_code": 4,
+        "failure_stage": "semantic-routing",
+        "assertion_failures": ["seat probe exited with status 4"],
+        "duration_seconds": result["probe"]["duration_seconds"],
+    }
+    assert "transport details" not in json.dumps(result)
+
+
+def test_multi_agent_probe_retries_remote_json_and_reports_failure_stage():
+    probe = (ROOT / "scripts/certify-multi-agent-seat.sh").read_text()
+
+    assert "oc_exec_json()" in probe
+    assert "for attempt in 1 2 3" in probe
+    assert probe.count("oc_exec_json orchestrator") == 4
+    assert 'seat_probe_failure stage=${stage} exit_code=${rc}' in probe
+
+
 def test_generic_runner_places_probes_after_the_all_seat_barrier_and_reclaims(
     tmp_path: Path, monkeypatch, capsys
 ):

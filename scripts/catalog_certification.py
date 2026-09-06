@@ -7,6 +7,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import subprocess
 import sys
 import time
@@ -37,6 +38,9 @@ from app.services.catalog_onboarding import load_intake
 TERMINAL_WORKSHOP_STATUSES = {"ready", "active", "partially_ready", "failed"}
 TERMINAL_CLEANUP_STATUSES = {"completed", "cleanup_failed"}
 CLUSTER_SCOPED_RESOURCES = {"namespaces", "persistentvolumes"}
+PROBE_FAILURE_STAGE = re.compile(
+    r"(?:^|\s)seat_probe_failure stage=([a-z0-9-]+) exit_code=\d+(?:\s|$)"
+)
 
 
 def _utc_now() -> str:
@@ -285,7 +289,7 @@ def _seat_probe(
             timeout=probe["timeout_seconds"],
         )
         if completed.returncode != 0:
-            result["probe"] = {
+            failed_probe = {
                 "passed": False,
                 "exit_code": completed.returncode,
                 "assertion_failures": [
@@ -293,6 +297,10 @@ def _seat_probe(
                 ],
                 "duration_seconds": round(time.monotonic() - started, 3),
             }
+            stages = PROBE_FAILURE_STAGE.findall(completed.stderr or "")
+            if stages:
+                failed_probe["failure_stage"] = stages[-1]
+            result["probe"] = failed_probe
             return result
         try:
             payload = json.loads(completed.stdout)

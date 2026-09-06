@@ -1,0 +1,2822 @@
+{
+  "capacity_preview": {
+    "can_provision": true,
+    "catalog_seat_limit": 5,
+    "certification_override": true,
+    "certification_target_seats": 25,
+    "estimated_resources": {
+      "cpu_millicores": 30000,
+      "memory_mib": 51200,
+      "pods": 50
+    },
+    "placement_reason": "Entire workshop assigned to arena; seats will not be split",
+    "reason": "Cluster can support 92 seats (CPU: 184, Memory: 478, Pods: 92; Eligible nodes: 2; 20.0% headroom)",
+    "resource_breakdown": {
+      "per_seat": {
+        "cpu_millicores": 1200,
+        "memory_mib": 2048,
+        "pods": 2
+      },
+      "shared": {
+        "cpu_millicores": 0,
+        "memory_mib": 0,
+        "pods": 0
+      },
+      "transient": {
+        "concurrent_seats": 2,
+        "cpu_millicores": 0,
+        "memory_mib": 0,
+        "pods": 0
+      }
+    },
+    "seats_requested": 25,
+    "selected_cluster": "arena"
+  },
+  "catalog_item_id": "multi-agent-quickstart",
+  "cleanup": {
+    "model_keys_revoked": true,
+    "resource_counts": {
+      "applications.argoproj.io": 0,
+      "namespaces": 0,
+      "persistentvolumeclaims": 0,
+      "persistentvolumes": 0,
+      "rolebindings.rbac.authorization.k8s.io": 0,
+      "routes.route.openshift.io": 0,
+      "secrets": 0
+    },
+    "seconds": 372.864,
+    "status": "completed"
+  },
+  "completed_at": "2026-09-06T17:24:58.724929Z",
+  "contract": {
+    "catalog_version": "0.2.2",
+    "git_commit": "474f9d5e9dc0848925b5c5624d217774a1e9cd10",
+    "intake_path": "catalog-onboarding/multi-agent-quickstart.yaml",
+    "path": "certification/catalog/multi-agent-quickstart.yaml",
+    "sha256": "0c6afc021c49e97db49b558068552becd1f9858c582308032d7319c1ba8975d8"
+  },
+  "errors": [],
+  "gates": {
+    "all_seats_ready": true,
+    "capacity_passed": true,
+    "cleanup_completed": true,
+    "contract_valid": true,
+    "evidence_hashed": true,
+    "model_keys_revoked": true,
+    "namespace_isolation_passed": false,
+    "ready_within_limit": true,
+    "seat_probes_passed": false,
+    "sensitive_values_absent": false,
+    "showroom_pages_passed": true,
+    "single_cluster_assignment": true,
+    "zero_residue_cleanup": true
+  },
+  "order": {
+    "cluster_ref": "arena",
+    "namespaces": [
+      "launchpad-smoke-test-tenant-multi-agent-a17228",
+      "launchpad-smoke-test-tenant-multi-agent-9345ab",
+      "launchpad-smoke-test-tenant-multi-agent-005d89",
+      "launchpad-smoke-test-tenant-multi-agent-f765d6",
+      "launchpad-smoke-test-tenant-multi-agent-9f9e37",
+      "launchpad-smoke-test-tenant-multi-agent-ae7b2d",
+      "launchpad-smoke-test-tenant-multi-agent-7caa97",
+      "launchpad-smoke-test-tenant-multi-agent-2e106f",
+      "launchpad-smoke-test-tenant-multi-agent-4dc546",
+      "launchpad-smoke-test-tenant-multi-agent-fc5266",
+      "launchpad-smoke-test-tenant-multi-agent-68a935",
+      "launchpad-smoke-test-tenant-multi-agent-f1bf35",
+      "launchpad-smoke-test-tenant-multi-agent-7a9216",
+      "launchpad-smoke-test-tenant-multi-agent-6b4654",
+      "launchpad-smoke-test-tenant-multi-agent-b25546",
+      "launchpad-smoke-test-tenant-multi-agent-79acf4",
+      "launchpad-smoke-test-tenant-multi-agent-0e46fd",
+      "launchpad-smoke-test-tenant-multi-agent-07103c",
+      "launchpad-smoke-test-tenant-multi-agent-9ea2a5",
+      "launchpad-smoke-test-tenant-multi-agent-f9d415",
+      "launchpad-smoke-test-tenant-multi-agent-dfcc05",
+      "launchpad-smoke-test-tenant-multi-agent-08007c",
+      "launchpad-smoke-test-tenant-multi-agent-e2438e",
+      "launchpad-smoke-test-tenant-multi-agent-2643e5",
+      "launchpad-smoke-test-tenant-multi-agent-918ed6"
+    ],
+    "ready_seconds": 777.405,
+    "seat_count": 25,
+    "session_ids": [
+      "514bfa84-9baa-4533-b717-bc7f3d8baadf",
+      "8eccf116-639d-4a16-84b0-c546195e4d87",
+      "008ecea9-fcae-4458-88c2-29013b206cbd",
+      "1d8b0dfd-d9e7-407a-9abf-f0432f55d736",
+      "cffdae3d-69cd-4e5f-a9d8-ed0c64c90db5",
+      "e880ae88-ddc4-46bb-abcd-415223e22afe",
+      "593ccabd-c8e1-4614-8b45-d465ae2d1d4e",
+      "b9239ba0-23e0-46ae-a3c5-c2f21d7cc9a5",
+      "888d39ec-8546-4038-9c1b-5d02e274a9ef",
+      "d05b4ef8-9468-428c-8c08-b8366783f36b",
+      "5dfc3525-edef-4a2a-b0d0-003ce66bb431",
+      "84e26c03-4267-4c54-b8c4-58b1e4060e46",
+      "8f7c24f4-bb0c-4009-9108-836d06833fa7",
+      "38242977-370c-4d2d-a21f-a7b740d076da",
+      "1c68309f-bf3b-4006-a5e7-be494423f480",
+      "04c8a971-7385-4f8d-a3b0-c309369e27be",
+      "312cd4fc-42eb-4c50-a005-faae069680c3",
+      "230c29ea-f49b-4947-b465-3eceb47d3e92",
+      "840e4576-98e7-4a19-b6b7-fb040cee68f8",
+      "0883e46b-e3fa-4fcd-ab11-2f3e97f71793",
+      "cb2bdde9-c042-495c-946a-8c2245e3a8fc",
+      "321beee7-76b3-4374-bb10-166e20e3aca1",
+      "e9336661-c623-49da-91e1-91d2c278b559",
+      "03042898-cc30-466d-aa6b-9857fcd1f794",
+      "88ca3e50-38c7-4177-a569-9cd95ed1f5ab"
+    ],
+    "status_before_reclaim": "ready",
+    "workshop_id": "6a05fe9c-fd46-4701-a21d-7fe9ced4be89"
+  },
+  "plan": {
+    "all_seats_same_cluster": true,
+    "catalog_item_id": "multi-agent-quickstart",
+    "certification_override": true,
+    "cluster_ref": "arena",
+    "current_certified_seats": 5,
+    "execution_eligible": true,
+    "exposure_policy": "internal",
+    "kubeconfig_server": "https://api.arena.fm2aihpcsed.com:6443",
+    "maximum_cleanup_seconds": 1200,
+    "maximum_ready_seconds": 2400,
+    "mutates_cluster": true,
+    "next_promotion_target": 25,
+    "probe_concurrency": 10,
+    "provision_concurrency": 2,
+    "required_consecutive_runs": 3,
+    "seat_probe_count": 25,
+    "seats": 25,
+    "showroom_pages_per_seat": 4,
+    "workshop_orders": 1
+  },
+  "promotion": {
+    "consecutive_passing_runs": 0,
+    "eligible": false,
+    "required_consecutive_runs": 3
+  },
+  "proof_strategy": {
+    "BDD": "Given one workshop order, all seats must become ready before concurrent participant journeys run, and reclaim must leave zero residue.",
+    "CBT": "Contract parsing, API lifecycle, Showroom checks, lab-specific probes, isolation, rubric scoring, and cleanup are independently observable components.",
+    "CDD": "The versioned CatalogCertification document defines scale, Showroom, probe, cleanup, and promotion interfaces.",
+    "EDD": "The run writes immutable source identity, lifecycle timing, per-seat results, cleanup counts, rubric decisions, and a SHA-256 manifest.",
+    "TDD": "Contract, planner, assertion, runner, cleanup, and evidence behavior are protected by failing-then-passing tests."
+  },
+  "result": "RED-live",
+  "rubric": {
+    "categories": {
+      "authorization": {
+        "awarded": 0,
+        "passed": false,
+        "requires": [
+          "namespace_isolation_passed",
+          "sensitive_values_absent"
+        ],
+        "weight": 15
+      },
+      "cleanup": {
+        "awarded": 15,
+        "passed": true,
+        "requires": [
+          "cleanup_completed",
+          "zero_residue_cleanup",
+          "model_keys_revoked"
+        ],
+        "weight": 15
+      },
+      "contract_integrity": {
+        "awarded": 10,
+        "passed": true,
+        "requires": [
+          "contract_valid",
+          "evidence_hashed"
+        ],
+        "weight": 10
+      },
+      "participant_function": {
+        "awarded": 0,
+        "passed": false,
+        "requires": [
+          "showroom_pages_passed",
+          "seat_probes_passed"
+        ],
+        "weight": 25
+      },
+      "placement_capacity": {
+        "awarded": 15,
+        "passed": true,
+        "requires": [
+          "capacity_passed",
+          "single_cluster_assignment"
+        ],
+        "weight": 15
+      },
+      "provisioning_readiness": {
+        "awarded": 20,
+        "passed": true,
+        "requires": [
+          "all_seats_ready",
+          "ready_within_limit"
+        ],
+        "weight": 20
+      }
+    },
+    "passed": false,
+    "required": 100,
+    "score": 60
+  },
+  "run_id": "multi-agent-25seat-20260906-04",
+  "schema": "launchpad.redhat.com/catalog-certification-evidence/v1",
+  "seat_results": [
+    {
+      "cluster_ref": "arena",
+      "namespace": "launchpad-smoke-test-tenant-multi-agent-a17228",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 98.895,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "cluster_ref": "arena",
+          "contains_sensitive_values": false,
+          "guardrails": {
+            "blocked_steps": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "latency_ms": 85.92
+          },
+          "multi_agent_journey": {
+            "agents": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "errors": [],
+            "latency_ms": 49389.55,
+            "mcp_steps": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "steps": 3
+          },
+          "namespace": "launchpad-smoke-test-tenant-multi-agent-a17228",
+          "participant_ui_http_status": 200,
+          "readiness": {
+            "agent_names": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "agents_discovered": 3,
+            "agents_expected": 3,
+            "http_status": 200,
+            "status": "ready"
+          },
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "AGENT_AUTH_TOKEN",
+            "MODEL_API_KEY",
+            "MODEL_ENDPOINT",
+            "MODEL_NAME"
+          ],
+          "semantic_routing": {
+            "classification_status": "ok",
+            "classifier": "llm-fallback",
+            "errors": [],
+            "latency_ms": 27308.31,
+            "selected_model": "simple",
+            "selected_workflow": "standard",
+            "steps": 2
+          },
+          "showroom_http_status": 200,
+          "terminal_scope": [
+            "project=launchpad-smoke-test-tenant-multi-agent-a17228",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "a17228d7-7ca3-427d-bfc2-19376b5b3b72",
+      "seat_number": 1,
+      "session_id": "514bfa84-9baa-4533-b717-bc7f3d8baadf",
+      "showroom": [
+        {
+          "duration_seconds": 0.581,
+          "http_status": 200,
+          "id": "track-chooser",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.362,
+          "http_status": 200,
+          "id": "track-1-local",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-1-local"
+        },
+        {
+          "duration_seconds": 0.329,
+          "http_status": 200,
+          "id": "track-2-openshift",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-2-openshift"
+        },
+        {
+          "duration_seconds": 0.313,
+          "http_status": 200,
+          "id": "track-3-blueprint",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-3-blueprint"
+        }
+      ]
+    },
+    {
+      "cluster_ref": "arena",
+      "namespace": "launchpad-smoke-test-tenant-multi-agent-9345ab",
+      "probe": {
+        "assertion_failures": [
+          "seat probe exited with status 4"
+        ],
+        "duration_seconds": 58.12,
+        "exit_code": 4,
+        "passed": false
+      },
+      "seat_id": "9345ab98-d3e2-461b-8fe4-fbb4463789d9",
+      "seat_number": 2,
+      "session_id": "8eccf116-639d-4a16-84b0-c546195e4d87",
+      "showroom": [
+        {
+          "duration_seconds": 0.532,
+          "http_status": 200,
+          "id": "track-chooser",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.365,
+          "http_status": 200,
+          "id": "track-1-local",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-1-local"
+        },
+        {
+          "duration_seconds": 0.297,
+          "http_status": 200,
+          "id": "track-2-openshift",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-2-openshift"
+        },
+        {
+          "duration_seconds": 0.31,
+          "http_status": 200,
+          "id": "track-3-blueprint",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-3-blueprint"
+        }
+      ]
+    },
+    {
+      "cluster_ref": "arena",
+      "namespace": "launchpad-smoke-test-tenant-multi-agent-005d89",
+      "probe": {
+        "assertion_failures": [
+          "seat probe exited with status 4"
+        ],
+        "duration_seconds": 55.148,
+        "exit_code": 4,
+        "passed": false
+      },
+      "seat_id": "005d8998-14c5-44ac-9198-dff5e4dd2699",
+      "seat_number": 3,
+      "session_id": "008ecea9-fcae-4458-88c2-29013b206cbd",
+      "showroom": [
+        {
+          "duration_seconds": 0.516,
+          "http_status": 200,
+          "id": "track-chooser",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.369,
+          "http_status": 200,
+          "id": "track-1-local",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-1-local"
+        },
+        {
+          "duration_seconds": 0.296,
+          "http_status": 200,
+          "id": "track-2-openshift",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-2-openshift"
+        },
+        {
+          "duration_seconds": 0.341,
+          "http_status": 200,
+          "id": "track-3-blueprint",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-3-blueprint"
+        }
+      ]
+    },
+    {
+      "cluster_ref": "arena",
+      "namespace": "launchpad-smoke-test-tenant-multi-agent-f765d6",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 98.829,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "cluster_ref": "arena",
+          "contains_sensitive_values": false,
+          "guardrails": {
+            "blocked_steps": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "latency_ms": 86.42
+          },
+          "multi_agent_journey": {
+            "agents": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "errors": [],
+            "latency_ms": 50222.95,
+            "mcp_steps": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "steps": 3
+          },
+          "namespace": "launchpad-smoke-test-tenant-multi-agent-f765d6",
+          "participant_ui_http_status": 200,
+          "readiness": {
+            "agent_names": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "agents_discovered": 3,
+            "agents_expected": 3,
+            "http_status": 200,
+            "status": "ready"
+          },
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "AGENT_AUTH_TOKEN",
+            "MODEL_API_KEY",
+            "MODEL_ENDPOINT",
+            "MODEL_NAME"
+          ],
+          "semantic_routing": {
+            "classification_status": "ok",
+            "classifier": "llm-fallback",
+            "errors": [],
+            "latency_ms": 27560.72,
+            "selected_model": "simple",
+            "selected_workflow": "standard",
+            "steps": 2
+          },
+          "showroom_http_status": 200,
+          "terminal_scope": [
+            "project=launchpad-smoke-test-tenant-multi-agent-f765d6",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "f765d651-1aca-49b5-8071-1f6d4a15a8c0",
+      "seat_number": 4,
+      "session_id": "1d8b0dfd-d9e7-407a-9abf-f0432f55d736",
+      "showroom": [
+        {
+          "duration_seconds": 0.623,
+          "http_status": 200,
+          "id": "track-chooser",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.359,
+          "http_status": 200,
+          "id": "track-1-local",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-1-local"
+        },
+        {
+          "duration_seconds": 0.297,
+          "http_status": 200,
+          "id": "track-2-openshift",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-2-openshift"
+        },
+        {
+          "duration_seconds": 0.32,
+          "http_status": 200,
+          "id": "track-3-blueprint",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-3-blueprint"
+        }
+      ]
+    },
+    {
+      "cluster_ref": "arena",
+      "namespace": "launchpad-smoke-test-tenant-multi-agent-9f9e37",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 96.595,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "cluster_ref": "arena",
+          "contains_sensitive_values": false,
+          "guardrails": {
+            "blocked_steps": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "latency_ms": 81.19
+          },
+          "multi_agent_journey": {
+            "agents": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "errors": [],
+            "latency_ms": 50149.87,
+            "mcp_steps": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "steps": 3
+          },
+          "namespace": "launchpad-smoke-test-tenant-multi-agent-9f9e37",
+          "participant_ui_http_status": 200,
+          "readiness": {
+            "agent_names": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "agents_discovered": 3,
+            "agents_expected": 3,
+            "http_status": 200,
+            "status": "ready"
+          },
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "AGENT_AUTH_TOKEN",
+            "MODEL_API_KEY",
+            "MODEL_ENDPOINT",
+            "MODEL_NAME"
+          ],
+          "semantic_routing": {
+            "classification_status": "ok",
+            "classifier": "llm-fallback",
+            "errors": [],
+            "latency_ms": 26077.27,
+            "selected_model": "simple",
+            "selected_workflow": "standard",
+            "steps": 2
+          },
+          "showroom_http_status": 200,
+          "terminal_scope": [
+            "project=launchpad-smoke-test-tenant-multi-agent-9f9e37",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "9f9e37a6-7b62-42d9-a077-12b41979a4da",
+      "seat_number": 5,
+      "session_id": "cffdae3d-69cd-4e5f-a9d8-ed0c64c90db5",
+      "showroom": [
+        {
+          "duration_seconds": 0.619,
+          "http_status": 200,
+          "id": "track-chooser",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.315,
+          "http_status": 200,
+          "id": "track-1-local",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-1-local"
+        },
+        {
+          "duration_seconds": 0.295,
+          "http_status": 200,
+          "id": "track-2-openshift",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-2-openshift"
+        },
+        {
+          "duration_seconds": 0.325,
+          "http_status": 200,
+          "id": "track-3-blueprint",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-3-blueprint"
+        }
+      ]
+    },
+    {
+      "cluster_ref": "arena",
+      "namespace": "launchpad-smoke-test-tenant-multi-agent-ae7b2d",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 96.627,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "cluster_ref": "arena",
+          "contains_sensitive_values": false,
+          "guardrails": {
+            "blocked_steps": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "latency_ms": 75.11
+          },
+          "multi_agent_journey": {
+            "agents": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "errors": [],
+            "latency_ms": 48724.14,
+            "mcp_steps": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "steps": 3
+          },
+          "namespace": "launchpad-smoke-test-tenant-multi-agent-ae7b2d",
+          "participant_ui_http_status": 200,
+          "readiness": {
+            "agent_names": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "agents_discovered": 3,
+            "agents_expected": 3,
+            "http_status": 200,
+            "status": "ready"
+          },
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "AGENT_AUTH_TOKEN",
+            "MODEL_API_KEY",
+            "MODEL_ENDPOINT",
+            "MODEL_NAME"
+          ],
+          "semantic_routing": {
+            "classification_status": "ok",
+            "classifier": "llm-fallback",
+            "errors": [],
+            "latency_ms": 26658.8,
+            "selected_model": "simple",
+            "selected_workflow": "standard",
+            "steps": 2
+          },
+          "showroom_http_status": 200,
+          "terminal_scope": [
+            "project=launchpad-smoke-test-tenant-multi-agent-ae7b2d",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "ae7b2ddd-9777-4d57-8a1d-be50693d13e5",
+      "seat_number": 6,
+      "session_id": "e880ae88-ddc4-46bb-abcd-415223e22afe",
+      "showroom": [
+        {
+          "duration_seconds": 0.557,
+          "http_status": 200,
+          "id": "track-chooser",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.363,
+          "http_status": 200,
+          "id": "track-1-local",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-1-local"
+        },
+        {
+          "duration_seconds": 0.3,
+          "http_status": 200,
+          "id": "track-2-openshift",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-2-openshift"
+        },
+        {
+          "duration_seconds": 0.322,
+          "http_status": 200,
+          "id": "track-3-blueprint",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-3-blueprint"
+        }
+      ]
+    },
+    {
+      "cluster_ref": "arena",
+      "namespace": "launchpad-smoke-test-tenant-multi-agent-7caa97",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 97.807,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "cluster_ref": "arena",
+          "contains_sensitive_values": false,
+          "guardrails": {
+            "blocked_steps": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "latency_ms": 103.27
+          },
+          "multi_agent_journey": {
+            "agents": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "errors": [],
+            "latency_ms": 50329.43,
+            "mcp_steps": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "steps": 3
+          },
+          "namespace": "launchpad-smoke-test-tenant-multi-agent-7caa97",
+          "participant_ui_http_status": 200,
+          "readiness": {
+            "agent_names": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "agents_discovered": 3,
+            "agents_expected": 3,
+            "http_status": 200,
+            "status": "ready"
+          },
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "AGENT_AUTH_TOKEN",
+            "MODEL_API_KEY",
+            "MODEL_ENDPOINT",
+            "MODEL_NAME"
+          ],
+          "semantic_routing": {
+            "classification_status": "ok",
+            "classifier": "llm-fallback",
+            "errors": [],
+            "latency_ms": 25983.11,
+            "selected_model": "simple",
+            "selected_workflow": "standard",
+            "steps": 2
+          },
+          "showroom_http_status": 200,
+          "terminal_scope": [
+            "project=launchpad-smoke-test-tenant-multi-agent-7caa97",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "7caa9741-d33d-4e65-a6d7-2d72582ebac1",
+      "seat_number": 7,
+      "session_id": "593ccabd-c8e1-4614-8b45-d465ae2d1d4e",
+      "showroom": [
+        {
+          "duration_seconds": 0.647,
+          "http_status": 200,
+          "id": "track-chooser",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.336,
+          "http_status": 200,
+          "id": "track-1-local",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-1-local"
+        },
+        {
+          "duration_seconds": 0.291,
+          "http_status": 200,
+          "id": "track-2-openshift",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-2-openshift"
+        },
+        {
+          "duration_seconds": 0.341,
+          "http_status": 200,
+          "id": "track-3-blueprint",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-3-blueprint"
+        }
+      ]
+    },
+    {
+      "cluster_ref": "arena",
+      "namespace": "launchpad-smoke-test-tenant-multi-agent-2e106f",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 95.912,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "cluster_ref": "arena",
+          "contains_sensitive_values": false,
+          "guardrails": {
+            "blocked_steps": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "latency_ms": 66.54
+          },
+          "multi_agent_journey": {
+            "agents": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "errors": [],
+            "latency_ms": 49734.03,
+            "mcp_steps": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "steps": 3
+          },
+          "namespace": "launchpad-smoke-test-tenant-multi-agent-2e106f",
+          "participant_ui_http_status": 200,
+          "readiness": {
+            "agent_names": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "agents_discovered": 3,
+            "agents_expected": 3,
+            "http_status": 200,
+            "status": "ready"
+          },
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "AGENT_AUTH_TOKEN",
+            "MODEL_API_KEY",
+            "MODEL_ENDPOINT",
+            "MODEL_NAME"
+          ],
+          "semantic_routing": {
+            "classification_status": "ok",
+            "classifier": "llm-fallback",
+            "errors": [],
+            "latency_ms": 25672.4,
+            "selected_model": "simple",
+            "selected_workflow": "standard",
+            "steps": 2
+          },
+          "showroom_http_status": 200,
+          "terminal_scope": [
+            "project=launchpad-smoke-test-tenant-multi-agent-2e106f",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "2e106f89-33d7-4635-b583-6b39c3afa614",
+      "seat_number": 8,
+      "session_id": "b9239ba0-23e0-46ae-a3c5-c2f21d7cc9a5",
+      "showroom": [
+        {
+          "duration_seconds": 0.672,
+          "http_status": 200,
+          "id": "track-chooser",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.347,
+          "http_status": 200,
+          "id": "track-1-local",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-1-local"
+        },
+        {
+          "duration_seconds": 0.309,
+          "http_status": 200,
+          "id": "track-2-openshift",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-2-openshift"
+        },
+        {
+          "duration_seconds": 0.295,
+          "http_status": 200,
+          "id": "track-3-blueprint",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-3-blueprint"
+        }
+      ]
+    },
+    {
+      "cluster_ref": "arena",
+      "namespace": "launchpad-smoke-test-tenant-multi-agent-4dc546",
+      "probe": {
+        "assertion_failures": [
+          "seat probe exited with status 4"
+        ],
+        "duration_seconds": 55.047,
+        "exit_code": 4,
+        "passed": false
+      },
+      "seat_id": "4dc54655-cd79-4c61-8250-2baa530e49c9",
+      "seat_number": 9,
+      "session_id": "888d39ec-8546-4038-9c1b-5d02e274a9ef",
+      "showroom": [
+        {
+          "duration_seconds": 0.667,
+          "http_status": 200,
+          "id": "track-chooser",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.328,
+          "http_status": 200,
+          "id": "track-1-local",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-1-local"
+        },
+        {
+          "duration_seconds": 0.326,
+          "http_status": 200,
+          "id": "track-2-openshift",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-2-openshift"
+        },
+        {
+          "duration_seconds": 0.3,
+          "http_status": 200,
+          "id": "track-3-blueprint",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-3-blueprint"
+        }
+      ]
+    },
+    {
+      "cluster_ref": "arena",
+      "namespace": "launchpad-smoke-test-tenant-multi-agent-fc5266",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 98.482,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "cluster_ref": "arena",
+          "contains_sensitive_values": false,
+          "guardrails": {
+            "blocked_steps": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "latency_ms": 80.78
+          },
+          "multi_agent_journey": {
+            "agents": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "errors": [],
+            "latency_ms": 50213.45,
+            "mcp_steps": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "steps": 3
+          },
+          "namespace": "launchpad-smoke-test-tenant-multi-agent-fc5266",
+          "participant_ui_http_status": 200,
+          "readiness": {
+            "agent_names": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "agents_discovered": 3,
+            "agents_expected": 3,
+            "http_status": 200,
+            "status": "ready"
+          },
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "AGENT_AUTH_TOKEN",
+            "MODEL_API_KEY",
+            "MODEL_ENDPOINT",
+            "MODEL_NAME"
+          ],
+          "semantic_routing": {
+            "classification_status": "ok",
+            "classifier": "llm-fallback",
+            "errors": [],
+            "latency_ms": 26738.3,
+            "selected_model": "simple",
+            "selected_workflow": "standard",
+            "steps": 2
+          },
+          "showroom_http_status": 200,
+          "terminal_scope": [
+            "project=launchpad-smoke-test-tenant-multi-agent-fc5266",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "fc5266a6-a174-4c21-a576-9a08d370aa90",
+      "seat_number": 10,
+      "session_id": "d05b4ef8-9468-428c-8c08-b8366783f36b",
+      "showroom": [
+        {
+          "duration_seconds": 0.668,
+          "http_status": 200,
+          "id": "track-chooser",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.327,
+          "http_status": 200,
+          "id": "track-1-local",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-1-local"
+        },
+        {
+          "duration_seconds": 0.281,
+          "http_status": 200,
+          "id": "track-2-openshift",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-2-openshift"
+        },
+        {
+          "duration_seconds": 0.317,
+          "http_status": 200,
+          "id": "track-3-blueprint",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-3-blueprint"
+        }
+      ]
+    },
+    {
+      "cluster_ref": "arena",
+      "namespace": "launchpad-smoke-test-tenant-multi-agent-68a935",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 92.411,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "cluster_ref": "arena",
+          "contains_sensitive_values": false,
+          "guardrails": {
+            "blocked_steps": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "latency_ms": 61.86
+          },
+          "multi_agent_journey": {
+            "agents": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "errors": [],
+            "latency_ms": 40335.54,
+            "mcp_steps": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "steps": 3
+          },
+          "namespace": "launchpad-smoke-test-tenant-multi-agent-68a935",
+          "participant_ui_http_status": 200,
+          "readiness": {
+            "agent_names": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "agents_discovered": 3,
+            "agents_expected": 3,
+            "http_status": 200,
+            "status": "ready"
+          },
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "AGENT_AUTH_TOKEN",
+            "MODEL_API_KEY",
+            "MODEL_ENDPOINT",
+            "MODEL_NAME"
+          ],
+          "semantic_routing": {
+            "classification_status": "ok",
+            "classifier": "llm-fallback",
+            "errors": [],
+            "latency_ms": 29379.35,
+            "selected_model": "simple",
+            "selected_workflow": "standard",
+            "steps": 2
+          },
+          "showroom_http_status": 200,
+          "terminal_scope": [
+            "project=launchpad-smoke-test-tenant-multi-agent-68a935",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "68a93567-3c5c-4dda-985e-0eeaccc35d9c",
+      "seat_number": 11,
+      "session_id": "5dfc3525-edef-4a2a-b0d0-003ce66bb431",
+      "showroom": [
+        {
+          "duration_seconds": 0.711,
+          "http_status": 200,
+          "id": "track-chooser",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.385,
+          "http_status": 200,
+          "id": "track-1-local",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-1-local"
+        },
+        {
+          "duration_seconds": 0.429,
+          "http_status": 200,
+          "id": "track-2-openshift",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-2-openshift"
+        },
+        {
+          "duration_seconds": 0.486,
+          "http_status": 200,
+          "id": "track-3-blueprint",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-3-blueprint"
+        }
+      ]
+    },
+    {
+      "cluster_ref": "arena",
+      "namespace": "launchpad-smoke-test-tenant-multi-agent-f1bf35",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 88.87,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "cluster_ref": "arena",
+          "contains_sensitive_values": false,
+          "guardrails": {
+            "blocked_steps": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "latency_ms": 59.83
+          },
+          "multi_agent_journey": {
+            "agents": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "errors": [],
+            "latency_ms": 39278.03,
+            "mcp_steps": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "steps": 3
+          },
+          "namespace": "launchpad-smoke-test-tenant-multi-agent-f1bf35",
+          "participant_ui_http_status": 200,
+          "readiness": {
+            "agent_names": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "agents_discovered": 3,
+            "agents_expected": 3,
+            "http_status": 200,
+            "status": "ready"
+          },
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "AGENT_AUTH_TOKEN",
+            "MODEL_API_KEY",
+            "MODEL_ENDPOINT",
+            "MODEL_NAME"
+          ],
+          "semantic_routing": {
+            "classification_status": "ok",
+            "classifier": "llm-fallback",
+            "errors": [],
+            "latency_ms": 29129.92,
+            "selected_model": "simple",
+            "selected_workflow": "standard",
+            "steps": 2
+          },
+          "showroom_http_status": 200,
+          "terminal_scope": [
+            "project=launchpad-smoke-test-tenant-multi-agent-f1bf35",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "f1bf3579-50e4-4e8d-b5e1-26074fd18bdb",
+      "seat_number": 12,
+      "session_id": "84e26c03-4267-4c54-b8c4-58b1e4060e46",
+      "showroom": [
+        {
+          "duration_seconds": 0.718,
+          "http_status": 200,
+          "id": "track-chooser",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.426,
+          "http_status": 200,
+          "id": "track-1-local",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-1-local"
+        },
+        {
+          "duration_seconds": 0.43,
+          "http_status": 200,
+          "id": "track-2-openshift",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-2-openshift"
+        },
+        {
+          "duration_seconds": 0.494,
+          "http_status": 200,
+          "id": "track-3-blueprint",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-3-blueprint"
+        }
+      ]
+    },
+    {
+      "cluster_ref": "arena",
+      "namespace": "launchpad-smoke-test-tenant-multi-agent-7a9216",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 93.129,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "cluster_ref": "arena",
+          "contains_sensitive_values": false,
+          "guardrails": {
+            "blocked_steps": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "latency_ms": 89.26
+          },
+          "multi_agent_journey": {
+            "agents": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "errors": [],
+            "latency_ms": 41795.71,
+            "mcp_steps": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "steps": 3
+          },
+          "namespace": "launchpad-smoke-test-tenant-multi-agent-7a9216",
+          "participant_ui_http_status": 200,
+          "readiness": {
+            "agent_names": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "agents_discovered": 3,
+            "agents_expected": 3,
+            "http_status": 200,
+            "status": "ready"
+          },
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "AGENT_AUTH_TOKEN",
+            "MODEL_API_KEY",
+            "MODEL_ENDPOINT",
+            "MODEL_NAME"
+          ],
+          "semantic_routing": {
+            "classification_status": "ok",
+            "classifier": "llm-fallback",
+            "errors": [],
+            "latency_ms": 30179.02,
+            "selected_model": "simple",
+            "selected_workflow": "standard",
+            "steps": 2
+          },
+          "showroom_http_status": 200,
+          "terminal_scope": [
+            "project=launchpad-smoke-test-tenant-multi-agent-7a9216",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "7a921611-ad28-48bb-ab71-a9f1f5af80b2",
+      "seat_number": 13,
+      "session_id": "8f7c24f4-bb0c-4009-9108-836d06833fa7",
+      "showroom": [
+        {
+          "duration_seconds": 0.943,
+          "http_status": 200,
+          "id": "track-chooser",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.328,
+          "http_status": 200,
+          "id": "track-1-local",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-1-local"
+        },
+        {
+          "duration_seconds": 0.304,
+          "http_status": 200,
+          "id": "track-2-openshift",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-2-openshift"
+        },
+        {
+          "duration_seconds": 0.323,
+          "http_status": 200,
+          "id": "track-3-blueprint",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-3-blueprint"
+        }
+      ]
+    },
+    {
+      "cluster_ref": "arena",
+      "namespace": "launchpad-smoke-test-tenant-multi-agent-6b4654",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 86.88,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "cluster_ref": "arena",
+          "contains_sensitive_values": false,
+          "guardrails": {
+            "blocked_steps": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "latency_ms": 78.91
+          },
+          "multi_agent_journey": {
+            "agents": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "errors": [],
+            "latency_ms": 46756.92,
+            "mcp_steps": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "steps": 3
+          },
+          "namespace": "launchpad-smoke-test-tenant-multi-agent-6b4654",
+          "participant_ui_http_status": 200,
+          "readiness": {
+            "agent_names": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "agents_discovered": 3,
+            "agents_expected": 3,
+            "http_status": 200,
+            "status": "ready"
+          },
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "AGENT_AUTH_TOKEN",
+            "MODEL_API_KEY",
+            "MODEL_ENDPOINT",
+            "MODEL_NAME"
+          ],
+          "semantic_routing": {
+            "classification_status": "ok",
+            "classifier": "llm-fallback",
+            "errors": [],
+            "latency_ms": 27584.98,
+            "selected_model": "simple",
+            "selected_workflow": "standard",
+            "steps": 2
+          },
+          "showroom_http_status": 200,
+          "terminal_scope": [
+            "project=launchpad-smoke-test-tenant-multi-agent-6b4654",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "6b4654ee-1f1f-408c-829f-b1cd40b97701",
+      "seat_number": 14,
+      "session_id": "38242977-370c-4d2d-a21f-a7b740d076da",
+      "showroom": [
+        {
+          "duration_seconds": 0.563,
+          "http_status": 200,
+          "id": "track-chooser",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.363,
+          "http_status": 200,
+          "id": "track-1-local",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-1-local"
+        },
+        {
+          "duration_seconds": 0.314,
+          "http_status": 200,
+          "id": "track-2-openshift",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-2-openshift"
+        },
+        {
+          "duration_seconds": 0.356,
+          "http_status": 200,
+          "id": "track-3-blueprint",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-3-blueprint"
+        }
+      ]
+    },
+    {
+      "cluster_ref": "arena",
+      "namespace": "launchpad-smoke-test-tenant-multi-agent-b25546",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 87.906,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "cluster_ref": "arena",
+          "contains_sensitive_values": false,
+          "guardrails": {
+            "blocked_steps": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "latency_ms": 86.72
+          },
+          "multi_agent_journey": {
+            "agents": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "errors": [],
+            "latency_ms": 47185.14,
+            "mcp_steps": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "steps": 3
+          },
+          "namespace": "launchpad-smoke-test-tenant-multi-agent-b25546",
+          "participant_ui_http_status": 200,
+          "readiness": {
+            "agent_names": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "agents_discovered": 3,
+            "agents_expected": 3,
+            "http_status": 200,
+            "status": "ready"
+          },
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "AGENT_AUTH_TOKEN",
+            "MODEL_API_KEY",
+            "MODEL_ENDPOINT",
+            "MODEL_NAME"
+          ],
+          "semantic_routing": {
+            "classification_status": "ok",
+            "classifier": "llm-fallback",
+            "errors": [],
+            "latency_ms": 27463.8,
+            "selected_model": "simple",
+            "selected_workflow": "standard",
+            "steps": 2
+          },
+          "showroom_http_status": 200,
+          "terminal_scope": [
+            "project=launchpad-smoke-test-tenant-multi-agent-b25546",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "b2554628-2328-4d98-ad1f-3fcb5f041203",
+      "seat_number": 15,
+      "session_id": "1c68309f-bf3b-4006-a5e7-be494423f480",
+      "showroom": [
+        {
+          "duration_seconds": 0.428,
+          "http_status": 200,
+          "id": "track-chooser",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.304,
+          "http_status": 200,
+          "id": "track-1-local",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-1-local"
+        },
+        {
+          "duration_seconds": 0.366,
+          "http_status": 200,
+          "id": "track-2-openshift",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-2-openshift"
+        },
+        {
+          "duration_seconds": 0.319,
+          "http_status": 200,
+          "id": "track-3-blueprint",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-3-blueprint"
+        }
+      ]
+    },
+    {
+      "cluster_ref": "arena",
+      "namespace": "launchpad-smoke-test-tenant-multi-agent-79acf4",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 81.215,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "cluster_ref": "arena",
+          "contains_sensitive_values": false,
+          "guardrails": {
+            "blocked_steps": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "latency_ms": 72.87
+          },
+          "multi_agent_journey": {
+            "agents": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "errors": [],
+            "latency_ms": 41600.55,
+            "mcp_steps": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "steps": 3
+          },
+          "namespace": "launchpad-smoke-test-tenant-multi-agent-79acf4",
+          "participant_ui_http_status": 200,
+          "readiness": {
+            "agent_names": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "agents_discovered": 3,
+            "agents_expected": 3,
+            "http_status": 200,
+            "status": "ready"
+          },
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "AGENT_AUTH_TOKEN",
+            "MODEL_API_KEY",
+            "MODEL_ENDPOINT",
+            "MODEL_NAME"
+          ],
+          "semantic_routing": {
+            "classification_status": "ok",
+            "classifier": "llm-fallback",
+            "errors": [],
+            "latency_ms": 24582.45,
+            "selected_model": "simple",
+            "selected_workflow": "standard",
+            "steps": 2
+          },
+          "showroom_http_status": 200,
+          "terminal_scope": [
+            "project=launchpad-smoke-test-tenant-multi-agent-79acf4",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "79acf445-3015-437e-921d-f0129bf07979",
+      "seat_number": 16,
+      "session_id": "04c8a971-7385-4f8d-a3b0-c309369e27be",
+      "showroom": [
+        {
+          "duration_seconds": 0.51,
+          "http_status": 200,
+          "id": "track-chooser",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.348,
+          "http_status": 200,
+          "id": "track-1-local",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-1-local"
+        },
+        {
+          "duration_seconds": 0.327,
+          "http_status": 200,
+          "id": "track-2-openshift",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-2-openshift"
+        },
+        {
+          "duration_seconds": 0.348,
+          "http_status": 200,
+          "id": "track-3-blueprint",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-3-blueprint"
+        }
+      ]
+    },
+    {
+      "cluster_ref": "arena",
+      "namespace": "launchpad-smoke-test-tenant-multi-agent-0e46fd",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 87.597,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "cluster_ref": "arena",
+          "contains_sensitive_values": false,
+          "guardrails": {
+            "blocked_steps": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "latency_ms": 64.24
+          },
+          "multi_agent_journey": {
+            "agents": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "errors": [],
+            "latency_ms": 45607.3,
+            "mcp_steps": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "steps": 3
+          },
+          "namespace": "launchpad-smoke-test-tenant-multi-agent-0e46fd",
+          "participant_ui_http_status": 200,
+          "readiness": {
+            "agent_names": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "agents_discovered": 3,
+            "agents_expected": 3,
+            "http_status": 200,
+            "status": "ready"
+          },
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "AGENT_AUTH_TOKEN",
+            "MODEL_API_KEY",
+            "MODEL_ENDPOINT",
+            "MODEL_NAME"
+          ],
+          "semantic_routing": {
+            "classification_status": "ok",
+            "classifier": "llm-fallback",
+            "errors": [],
+            "latency_ms": 27332.15,
+            "selected_model": "simple",
+            "selected_workflow": "standard",
+            "steps": 2
+          },
+          "showroom_http_status": 200,
+          "terminal_scope": [
+            "project=launchpad-smoke-test-tenant-multi-agent-0e46fd",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "0e46fdd8-5f30-4556-8b39-41fd88c53278",
+      "seat_number": 17,
+      "session_id": "312cd4fc-42eb-4c50-a005-faae069680c3",
+      "showroom": [
+        {
+          "duration_seconds": 0.347,
+          "http_status": 200,
+          "id": "track-chooser",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.317,
+          "http_status": 200,
+          "id": "track-1-local",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-1-local"
+        },
+        {
+          "duration_seconds": 0.419,
+          "http_status": 200,
+          "id": "track-2-openshift",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-2-openshift"
+        },
+        {
+          "duration_seconds": 0.314,
+          "http_status": 200,
+          "id": "track-3-blueprint",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-3-blueprint"
+        }
+      ]
+    },
+    {
+      "cluster_ref": "arena",
+      "namespace": "launchpad-smoke-test-tenant-multi-agent-07103c",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 87.101,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "cluster_ref": "arena",
+          "contains_sensitive_values": false,
+          "guardrails": {
+            "blocked_steps": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "latency_ms": 88.55
+          },
+          "multi_agent_journey": {
+            "agents": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "errors": [],
+            "latency_ms": 47015.12,
+            "mcp_steps": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "steps": 3
+          },
+          "namespace": "launchpad-smoke-test-tenant-multi-agent-07103c",
+          "participant_ui_http_status": 200,
+          "readiness": {
+            "agent_names": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "agents_discovered": 3,
+            "agents_expected": 3,
+            "http_status": 200,
+            "status": "ready"
+          },
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "AGENT_AUTH_TOKEN",
+            "MODEL_API_KEY",
+            "MODEL_ENDPOINT",
+            "MODEL_NAME"
+          ],
+          "semantic_routing": {
+            "classification_status": "ok",
+            "classifier": "llm-fallback",
+            "errors": [],
+            "latency_ms": 25623.24,
+            "selected_model": "simple",
+            "selected_workflow": "standard",
+            "steps": 2
+          },
+          "showroom_http_status": 200,
+          "terminal_scope": [
+            "project=launchpad-smoke-test-tenant-multi-agent-07103c",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "07103c28-f65c-4877-918a-d91b9dc33ad0",
+      "seat_number": 18,
+      "session_id": "230c29ea-f49b-4947-b465-3eceb47d3e92",
+      "showroom": [
+        {
+          "duration_seconds": 0.429,
+          "http_status": 200,
+          "id": "track-chooser",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.314,
+          "http_status": 200,
+          "id": "track-1-local",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-1-local"
+        },
+        {
+          "duration_seconds": 0.265,
+          "http_status": 200,
+          "id": "track-2-openshift",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-2-openshift"
+        },
+        {
+          "duration_seconds": 0.275,
+          "http_status": 200,
+          "id": "track-3-blueprint",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-3-blueprint"
+        }
+      ]
+    },
+    {
+      "cluster_ref": "arena",
+      "namespace": "launchpad-smoke-test-tenant-multi-agent-9ea2a5",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 86.603,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "cluster_ref": "arena",
+          "contains_sensitive_values": false,
+          "guardrails": {
+            "blocked_steps": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "latency_ms": 113.29
+          },
+          "multi_agent_journey": {
+            "agents": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "errors": [],
+            "latency_ms": 44092.81,
+            "mcp_steps": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "steps": 3
+          },
+          "namespace": "launchpad-smoke-test-tenant-multi-agent-9ea2a5",
+          "participant_ui_http_status": 200,
+          "readiness": {
+            "agent_names": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "agents_discovered": 3,
+            "agents_expected": 3,
+            "http_status": 200,
+            "status": "ready"
+          },
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "AGENT_AUTH_TOKEN",
+            "MODEL_API_KEY",
+            "MODEL_ENDPOINT",
+            "MODEL_NAME"
+          ],
+          "semantic_routing": {
+            "classification_status": "ok",
+            "classifier": "llm-fallback",
+            "errors": [],
+            "latency_ms": 27724.3,
+            "selected_model": "simple",
+            "selected_workflow": "standard",
+            "steps": 2
+          },
+          "showroom_http_status": 200,
+          "terminal_scope": [
+            "project=launchpad-smoke-test-tenant-multi-agent-9ea2a5",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "9ea2a5bc-31b1-485f-be50-a1629e52744c",
+      "seat_number": 19,
+      "session_id": "840e4576-98e7-4a19-b6b7-fb040cee68f8",
+      "showroom": [
+        {
+          "duration_seconds": 0.41,
+          "http_status": 200,
+          "id": "track-chooser",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.261,
+          "http_status": 200,
+          "id": "track-1-local",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-1-local"
+        },
+        {
+          "duration_seconds": 0.306,
+          "http_status": 200,
+          "id": "track-2-openshift",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-2-openshift"
+        },
+        {
+          "duration_seconds": 0.273,
+          "http_status": 200,
+          "id": "track-3-blueprint",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-3-blueprint"
+        }
+      ]
+    },
+    {
+      "cluster_ref": "arena",
+      "namespace": "launchpad-smoke-test-tenant-multi-agent-f9d415",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 86.558,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "cluster_ref": "arena",
+          "contains_sensitive_values": false,
+          "guardrails": {
+            "blocked_steps": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "latency_ms": 65.78
+          },
+          "multi_agent_journey": {
+            "agents": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "errors": [],
+            "latency_ms": 46831.11,
+            "mcp_steps": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "steps": 3
+          },
+          "namespace": "launchpad-smoke-test-tenant-multi-agent-f9d415",
+          "participant_ui_http_status": 200,
+          "readiness": {
+            "agent_names": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "agents_discovered": 3,
+            "agents_expected": 3,
+            "http_status": 200,
+            "status": "ready"
+          },
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "AGENT_AUTH_TOKEN",
+            "MODEL_API_KEY",
+            "MODEL_ENDPOINT",
+            "MODEL_NAME"
+          ],
+          "semantic_routing": {
+            "classification_status": "ok",
+            "classifier": "llm-fallback",
+            "errors": [],
+            "latency_ms": 25454.74,
+            "selected_model": "simple",
+            "selected_workflow": "standard",
+            "steps": 2
+          },
+          "showroom_http_status": 200,
+          "terminal_scope": [
+            "project=launchpad-smoke-test-tenant-multi-agent-f9d415",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "f9d4158a-62ea-4634-89ad-9bfe4052c93e",
+      "seat_number": 20,
+      "session_id": "0883e46b-e3fa-4fcd-ab11-2f3e97f71793",
+      "showroom": [
+        {
+          "duration_seconds": 0.407,
+          "http_status": 200,
+          "id": "track-chooser",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.269,
+          "http_status": 200,
+          "id": "track-1-local",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-1-local"
+        },
+        {
+          "duration_seconds": 0.275,
+          "http_status": 200,
+          "id": "track-2-openshift",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-2-openshift"
+        },
+        {
+          "duration_seconds": 0.309,
+          "http_status": 200,
+          "id": "track-3-blueprint",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-3-blueprint"
+        }
+      ]
+    },
+    {
+      "cluster_ref": "arena",
+      "namespace": "launchpad-smoke-test-tenant-multi-agent-dfcc05",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 86.43,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "cluster_ref": "arena",
+          "contains_sensitive_values": false,
+          "guardrails": {
+            "blocked_steps": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "latency_ms": 72.11
+          },
+          "multi_agent_journey": {
+            "agents": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "errors": [],
+            "latency_ms": 39608.98,
+            "mcp_steps": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "steps": 3
+          },
+          "namespace": "launchpad-smoke-test-tenant-multi-agent-dfcc05",
+          "participant_ui_http_status": 200,
+          "readiness": {
+            "agent_names": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "agents_discovered": 3,
+            "agents_expected": 3,
+            "http_status": 200,
+            "status": "ready"
+          },
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "AGENT_AUTH_TOKEN",
+            "MODEL_API_KEY",
+            "MODEL_ENDPOINT",
+            "MODEL_NAME"
+          ],
+          "semantic_routing": {
+            "classification_status": "ok",
+            "classifier": "llm-fallback",
+            "errors": [],
+            "latency_ms": 26491.27,
+            "selected_model": "simple",
+            "selected_workflow": "standard",
+            "steps": 2
+          },
+          "showroom_http_status": 200,
+          "terminal_scope": [
+            "project=launchpad-smoke-test-tenant-multi-agent-dfcc05",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "dfcc0515-d1a1-4fc7-8769-b5dfa4e8db08",
+      "seat_number": 21,
+      "session_id": "cb2bdde9-c042-495c-946a-8c2245e3a8fc",
+      "showroom": [
+        {
+          "duration_seconds": 1.053,
+          "http_status": 200,
+          "id": "track-chooser",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.54,
+          "http_status": 200,
+          "id": "track-1-local",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-1-local"
+        },
+        {
+          "duration_seconds": 0.473,
+          "http_status": 200,
+          "id": "track-2-openshift",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-2-openshift"
+        },
+        {
+          "duration_seconds": 0.472,
+          "http_status": 200,
+          "id": "track-3-blueprint",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-3-blueprint"
+        }
+      ]
+    },
+    {
+      "cluster_ref": "arena",
+      "namespace": "launchpad-smoke-test-tenant-multi-agent-08007c",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 84.863,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "cluster_ref": "arena",
+          "contains_sensitive_values": false,
+          "guardrails": {
+            "blocked_steps": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "latency_ms": 85.85
+          },
+          "multi_agent_journey": {
+            "agents": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "errors": [],
+            "latency_ms": 41387.44,
+            "mcp_steps": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "steps": 3
+          },
+          "namespace": "launchpad-smoke-test-tenant-multi-agent-08007c",
+          "participant_ui_http_status": 200,
+          "readiness": {
+            "agent_names": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "agents_discovered": 3,
+            "agents_expected": 3,
+            "http_status": 200,
+            "status": "ready"
+          },
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "AGENT_AUTH_TOKEN",
+            "MODEL_API_KEY",
+            "MODEL_ENDPOINT",
+            "MODEL_NAME"
+          ],
+          "semantic_routing": {
+            "classification_status": "ok",
+            "classifier": "llm-fallback",
+            "errors": [],
+            "latency_ms": 25529.88,
+            "selected_model": "simple",
+            "selected_workflow": "standard",
+            "steps": 2
+          },
+          "showroom_http_status": 200,
+          "terminal_scope": [
+            "project=launchpad-smoke-test-tenant-multi-agent-08007c",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "08007cd5-e58a-4045-b91a-b54bc05365f5",
+      "seat_number": 22,
+      "session_id": "321beee7-76b3-4374-bb10-166e20e3aca1",
+      "showroom": [
+        {
+          "duration_seconds": 0.5,
+          "http_status": 200,
+          "id": "track-chooser",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.313,
+          "http_status": 200,
+          "id": "track-1-local",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-1-local"
+        },
+        {
+          "duration_seconds": 0.42,
+          "http_status": 200,
+          "id": "track-2-openshift",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-2-openshift"
+        },
+        {
+          "duration_seconds": 0.362,
+          "http_status": 200,
+          "id": "track-3-blueprint",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-3-blueprint"
+        }
+      ]
+    },
+    {
+      "cluster_ref": "arena",
+      "namespace": "launchpad-smoke-test-tenant-multi-agent-e2438e",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 84.302,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "cluster_ref": "arena",
+          "contains_sensitive_values": false,
+          "guardrails": {
+            "blocked_steps": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "latency_ms": 109.45
+          },
+          "multi_agent_journey": {
+            "agents": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "errors": [],
+            "latency_ms": 41592.61,
+            "mcp_steps": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "steps": 3
+          },
+          "namespace": "launchpad-smoke-test-tenant-multi-agent-e2438e",
+          "participant_ui_http_status": 200,
+          "readiness": {
+            "agent_names": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "agents_discovered": 3,
+            "agents_expected": 3,
+            "http_status": 200,
+            "status": "ready"
+          },
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "AGENT_AUTH_TOKEN",
+            "MODEL_API_KEY",
+            "MODEL_ENDPOINT",
+            "MODEL_NAME"
+          ],
+          "semantic_routing": {
+            "classification_status": "ok",
+            "classifier": "llm-fallback",
+            "errors": [],
+            "latency_ms": 25315.95,
+            "selected_model": "simple",
+            "selected_workflow": "standard",
+            "steps": 2
+          },
+          "showroom_http_status": 200,
+          "terminal_scope": [
+            "project=launchpad-smoke-test-tenant-multi-agent-e2438e",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "e2438e5c-dee2-4f9e-8540-ebe2b3afb9e7",
+      "seat_number": 23,
+      "session_id": "e9336661-c623-49da-91e1-91d2c278b559",
+      "showroom": [
+        {
+          "duration_seconds": 0.399,
+          "http_status": 200,
+          "id": "track-chooser",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.478,
+          "http_status": 200,
+          "id": "track-1-local",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-1-local"
+        },
+        {
+          "duration_seconds": 0.488,
+          "http_status": 200,
+          "id": "track-2-openshift",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-2-openshift"
+        },
+        {
+          "duration_seconds": 0.367,
+          "http_status": 200,
+          "id": "track-3-blueprint",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-3-blueprint"
+        }
+      ]
+    },
+    {
+      "cluster_ref": "arena",
+      "namespace": "launchpad-smoke-test-tenant-multi-agent-2643e5",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 83.93,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "cluster_ref": "arena",
+          "contains_sensitive_values": false,
+          "guardrails": {
+            "blocked_steps": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "latency_ms": 77.85
+          },
+          "multi_agent_journey": {
+            "agents": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "errors": [],
+            "latency_ms": 40606.92,
+            "mcp_steps": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "steps": 3
+          },
+          "namespace": "launchpad-smoke-test-tenant-multi-agent-2643e5",
+          "participant_ui_http_status": 200,
+          "readiness": {
+            "agent_names": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "agents_discovered": 3,
+            "agents_expected": 3,
+            "http_status": 200,
+            "status": "ready"
+          },
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "AGENT_AUTH_TOKEN",
+            "MODEL_API_KEY",
+            "MODEL_ENDPOINT",
+            "MODEL_NAME"
+          ],
+          "semantic_routing": {
+            "classification_status": "ok",
+            "classifier": "llm-fallback",
+            "errors": [],
+            "latency_ms": 24331.34,
+            "selected_model": "simple",
+            "selected_workflow": "standard",
+            "steps": 2
+          },
+          "showroom_http_status": 200,
+          "terminal_scope": [
+            "project=launchpad-smoke-test-tenant-multi-agent-2643e5",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "2643e5a9-679d-4521-a4d2-7b8d0e063e70",
+      "seat_number": 24,
+      "session_id": "03042898-cc30-466d-aa6b-9857fcd1f794",
+      "showroom": [
+        {
+          "duration_seconds": 0.641,
+          "http_status": 200,
+          "id": "track-chooser",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.44,
+          "http_status": 200,
+          "id": "track-1-local",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-1-local"
+        },
+        {
+          "duration_seconds": 0.531,
+          "http_status": 200,
+          "id": "track-2-openshift",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-2-openshift"
+        },
+        {
+          "duration_seconds": 0.419,
+          "http_status": 200,
+          "id": "track-3-blueprint",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-3-blueprint"
+        }
+      ]
+    },
+    {
+      "cluster_ref": "arena",
+      "namespace": "launchpad-smoke-test-tenant-multi-agent-918ed6",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 81.264,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "cluster_ref": "arena",
+          "contains_sensitive_values": false,
+          "guardrails": {
+            "blocked_steps": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "latency_ms": 68.19
+          },
+          "multi_agent_journey": {
+            "agents": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "errors": [],
+            "latency_ms": 36910.96,
+            "mcp_steps": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "steps": 3
+          },
+          "namespace": "launchpad-smoke-test-tenant-multi-agent-918ed6",
+          "participant_ui_http_status": 200,
+          "readiness": {
+            "agent_names": [
+              "research",
+              "analyst",
+              "executor"
+            ],
+            "agents_discovered": 3,
+            "agents_expected": 3,
+            "http_status": 200,
+            "status": "ready"
+          },
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "AGENT_AUTH_TOKEN",
+            "MODEL_API_KEY",
+            "MODEL_ENDPOINT",
+            "MODEL_NAME"
+          ],
+          "semantic_routing": {
+            "classification_status": "ok",
+            "classifier": "llm-fallback",
+            "errors": [],
+            "latency_ms": 23842.19,
+            "selected_model": "simple",
+            "selected_workflow": "standard",
+            "steps": 2
+          },
+          "showroom_http_status": 200,
+          "terminal_scope": [
+            "project=launchpad-smoke-test-tenant-multi-agent-918ed6",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "918ed68e-aefc-4cba-bac4-c8aef80133fc",
+      "seat_number": 25,
+      "session_id": "88ca3e50-38c7-4177-a569-9cd95ed1f5ab",
+      "showroom": [
+        {
+          "duration_seconds": 0.498,
+          "http_status": 200,
+          "id": "track-chooser",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.418,
+          "http_status": 200,
+          "id": "track-1-local",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-1-local"
+        },
+        {
+          "duration_seconds": 0.369,
+          "http_status": 200,
+          "id": "track-2-openshift",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-2-openshift"
+        },
+        {
+          "duration_seconds": 0.369,
+          "http_status": 200,
+          "id": "track-3-blueprint",
+          "marker_present": true,
+          "passed": true,
+          "track_id": "track-3-blueprint"
+        }
+      ]
+    }
+  ],
+  "security": {
+    "contains_plaintext_credentials": false,
+    "credential_values_logged": false
+  },
+  "started_at": "2026-09-06T17:01:09.370812Z",
+  "validation_matrix": {
+    "all_seats_ready": "GREEN-live",
+    "capacity_passed": "GREEN-live",
+    "cleanup_completed": "GREEN-live",
+    "contract_valid": "GREEN-live",
+    "evidence_hashed": "GREEN-live",
+    "model_keys_revoked": "GREEN-live",
+    "namespace_isolation_passed": "RED-live",
+    "ready_within_limit": "GREEN-live",
+    "seat_probes_passed": "RED-live",
+    "sensitive_values_absent": "RED-live",
+    "showroom_pages_passed": "GREEN-live",
+    "single_cluster_assignment": "GREEN-live",
+    "zero_residue_cleanup": "GREEN-live"
+  }
+}

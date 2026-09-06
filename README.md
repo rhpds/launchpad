@@ -87,7 +87,7 @@ order flow until runtime and live certification gates pass:
 | ID | Name | Current gate |
 |---|---|---|
 | `agentops-observability` | AgentOps in Production: End-to-End Observability with Red Hat AI | Five internal seats are GREEN-live with isolated concurrent journeys and zero-residue normal/fault reclaim; 25-seat capacity, public access, and production Logging/TLS remain gated |
-| `multi-agent-quickstart` | Build Multi-Agent AI Systems with Open Protocols | One lab containing local, OpenShift, and advanced blueprint tracks; the shared runtime and OpenShift track are internally certified for five Arena seats, and the first of three required 25-seat GREEN-live runs is complete. Optional advanced integrations, durable image supply, public access, and two more consecutive 25-seat runs remain gated |
+| `multi-agent-quickstart` | Build Multi-Agent AI Systems with Open Protocols | One lab containing local, OpenShift, and advanced blueprint tracks; the shared runtime and OpenShift track are internally certified for five Arena seats. A 25-seat GREEN-live proof exists, but a subsequent concurrent-probe transport RED reset the required three-pass sequence. Optional advanced integrations, durable image supply, public access, and three new consecutive 25-seat runs remain gated |
 
 ## Architecture
 
