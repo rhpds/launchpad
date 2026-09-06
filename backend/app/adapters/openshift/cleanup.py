@@ -115,6 +115,10 @@ class OpenShiftCleanupAdapter:
             f"Namespace '{namespace}' stuck in Terminating after {timeout}s — manual intervention required"
         )
 
+    def wait_until_absent(self, namespace: str, timeout: int = 60) -> None:
+        """Block until a previously deleted namespace can safely be reused."""
+        self._wait_for_deletion(namespace, timeout=timeout)
+
     def _cleanup_role_binding(self, namespace: str) -> None:
         binding_name = f"{namespace}-image-puller"
         try:

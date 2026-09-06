@@ -1386,6 +1386,18 @@ class ProvisioningService:
                         f"Interrupted seat cleanup failed for {session.session_id}: "
                         f"{cleanup_error}"
                     )
+            cleanup_adapter = self._get_cleanup(session.cluster_ref)
+            wait_until_absent = getattr(cleanup_adapter, "wait_until_absent", None)
+            if session.namespace and callable(wait_until_absent):
+                delete_timeout = max(
+                    1,
+                    int(
+                        os.environ.get(
+                            "WORKSHOP_RETRY_NAMESPACE_DELETE_TIMEOUT", "180"
+                        )
+                    ),
+                )
+                wait_until_absent(session.namespace, timeout=delete_timeout)
             if session.session_id in session_ids:
                 session_ids.remove(session.session_id)
             seats[seat_index] = seats[seat_index].model_copy(

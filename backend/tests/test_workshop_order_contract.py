@@ -400,8 +400,10 @@ def test_interrupted_workshop_is_automatically_recovered():
     assert all(seat.status == WorkshopSeatStatus.READY for seat in completed.seats)
 
 
-def test_interrupted_seat_reclaims_persisted_partial_session_before_retry():
-    service = ProvisioningService()
+def test_interrupted_seat_reclaims_persisted_partial_session_before_retry(monkeypatch):
+    cleanup = Mock()
+    service = ProvisioningService(cleanup=cleanup)
+    monkeypatch.setenv("WORKSHOP_RETRY_NAMESPACE_DELETE_TIMEOUT", "7")
     order = service.create_workshop_order(
         Workshop(
             tenant_id="interrupted-seat-tenant",
@@ -442,6 +444,7 @@ def test_interrupted_seat_reclaims_persisted_partial_session_before_retry():
     completed = service.get_workshop(order.workshop_id)
 
     assert recovered == [order.workshop_id]
+    cleanup.wait_until_absent.assert_called_once_with(partial.namespace, timeout=7)
     assert service.get_session(partial.session_id).status == SessionStatus.RECLAIMED
     assert completed.status == WorkshopStatus.READY
     assert completed.seats[0].session_id != partial.session_id
