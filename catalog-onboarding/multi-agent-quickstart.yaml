@@ -1,0 +1,115 @@
+api_version: launchpad.redhat.com/v1alpha1
+onboarding_contract: catalog-onboarding/multi-agent-quickstart.yaml
+
+catalog:
+  catalog_item_id: multi-agent-quickstart
+  display_name: "Build Multi-Agent AI Systems with Open Protocols"
+  description: >-
+    Build and inspect three cooperating A2A agents with semantic routing, MCP
+    tool calling, guardrails, service authentication, and OpenTelemetry on
+    Intel infrastructure and Red Hat OpenShift.
+  category: guided_build
+  version: "0.1.0"
+  supported_branding:
+    - redhat-intel-default
+    - intel-internal
+
+sources:
+  showroom:
+    repo_url: "https://github.com/rhpds/launchpad.git"
+    revision: "c9b3baa8a0126233a543cef9c5c337e54bda7668"
+    playbook: site-multi-agent-quickstart.yml
+    start_path: content-multi-agent-quickstart
+  workload:
+    repo_url: "https://github.com/jkershawrh/multi-agent-quickstart.git"
+    revision: "8a8e0241265e69be81bf28060c4a96be38d5c244"
+    deploy_path: chart
+
+references:
+  original_lab:
+    repo_url: "https://github.com/jkershawrh/multi-agent-quickstart.git"
+    revision: "8a8e0241265e69be81bf28060c4a96be38d5c244"
+    path: .
+
+runtime:
+  namespace_slug: multi-agent
+  deployment_type: helm
+  deployment_scope: seat
+  showroom_terminal_storage: false
+  provisioner_refs:
+    - helm-workload
+    - showroom
+  validation_refs:
+    - pod-ready
+    - route-accessible
+    - inference-health
+    - multi-agent-journey
+  observability_profile: multi-agent-open-protocols
+  default_hardware_profile: xeon-basic
+  default_quota_profile: large
+  default_ttl: "4h"
+  inference_endpoint: litellm
+  required_capabilities:
+    - openshift
+    - showroom
+    - model_endpoint
+  required_models:
+    - granite-3.2-8b-tools
+  seat_resources:
+    # Six upstream services plus the planned UI and one Showroom pod.
+    cpu_millicores: 4500
+    memory_mib: 2048
+    pods: 8
+    storage_gib: 0
+  workshop_provision_concurrency: 2
+  tabs:
+    - id: terminal
+      title: Terminal
+      source: showroom.terminal
+    - id: workspace
+      title: Multi-Agent Workspace
+      source: workload.route.ui
+    - id: openshift-console
+      title: OpenShift Console
+      source: cluster.console_url
+  workload:
+    source_kind: upstream-helm-chart
+    gitops_ready: false
+    release_name: multi-agent
+    helm_values:
+      model:
+        deploy: false
+    routes:
+      ui: multi-agent-ui
+      orchestrator: multi-agent
+
+certification:
+  stage: source-import
+  max_workshop_seats: 1
+  promotion_sequence:
+    - 1
+    - 5
+    - 25
+  activation_blockers:
+    - >-
+      Publish the application image in a durable registry and replace every
+      mutable or inaccessible image reference with an immutable digest.
+    - >-
+      Add the Gradio participant UI to the OpenShift chart with a Service and
+      Route compatible with the Launchpad entitlement gateway.
+    - >-
+      Add a runtime Secret contract for the per-session MaaS endpoint and key;
+      inject credentials into the orchestrator and agent pods without placing
+      secret values in Git or Argo CD Application values.
+    - >-
+      Label every workload resource with its workshop, seat, session, tenant,
+      and cluster identity and prove cleanup targets only the persisted cluster.
+    - >-
+      Add inference-aware readiness and validate a real three-agent A2A
+      workflow, MCP tool enrichment, semantic routing, and guardrail denial.
+    - >-
+      Complete one-seat participant authorization, cross-seat denial, and
+      zero-residue reclaim evidence on Arena before activation.
+    - >-
+      Complete measured five-seat and twenty-five-seat certification before
+      raising the catalog workshop limit above the proven safe value.

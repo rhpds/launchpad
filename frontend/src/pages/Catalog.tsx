@@ -4,6 +4,7 @@ import { api } from '../api/client';
 import type { CatalogItem } from '../api/types';
 import StatusBadge from '../components/StatusBadge';
 import { catalogLaunchPath } from '../catalogNavigation';
+import { participantCatalog } from '../catalogVisibility';
 
 const CATEGORY_LABELS: Record<string, string> = {
   quick_start: 'Quick Start',
@@ -24,7 +25,10 @@ export default function Catalog() {
   const filter = searchParams.get('category') || 'all';
 
   useEffect(() => {
-    api.listCatalog().then((data) => { setItems(data); setLoading(false); });
+    api.listCatalog().then((data) => {
+      setItems(participantCatalog(data));
+      setLoading(false);
+    });
   }, []);
 
   const filtered = filter === 'all' ? items : items.filter((i) => i.category === filter);

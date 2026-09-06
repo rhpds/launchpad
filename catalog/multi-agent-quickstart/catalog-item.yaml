@@ -1,0 +1,112 @@
+catalog_item_id: multi-agent-quickstart
+display_name: Build Multi-Agent AI Systems with Open Protocols
+description: Build and inspect three cooperating A2A agents with semantic routing,
+  MCP tool calling, guardrails, service authentication, and OpenTelemetry on Intel
+  infrastructure and Red Hat OpenShift.
+category: guided_build
+version: 0.1.0
+status: draft
+required_capabilities:
+- openshift
+- showroom
+- model_endpoint
+default_hardware_profile: xeon-basic
+default_quota_profile: large
+default_ttl: 4h
+provisioner_refs:
+- helm-workload
+- showroom
+validation_refs:
+- pod-ready
+- route-accessible
+- inference-health
+- multi-agent-journey
+observability_profile: multi-agent-open-protocols
+supported_branding:
+- redhat-intel-default
+- intel-internal
+metadata:
+  showroom: true
+  operator_workshop: true
+  content_only: false
+  onboarding_managed: true
+  onboarding_contract: catalog-onboarding/multi-agent-quickstart.yaml
+  certification_stage: source-import
+  max_workshop_seats: 1
+  promotion_sequence:
+  - 1
+  - 5
+  - 25
+  activation_blockers:
+  - Publish the application image in a durable registry and replace every mutable
+    or inaccessible image reference with an immutable digest.
+  - Add the Gradio participant UI to the OpenShift chart with a Service and Route
+    compatible with the Launchpad entitlement gateway.
+  - Add a runtime Secret contract for the per-session MaaS endpoint and key; inject
+    credentials into the orchestrator and agent pods without placing secret values
+    in Git or Argo CD Application values.
+  - Label every workload resource with its workshop, seat, session, tenant, and cluster
+    identity and prove cleanup targets only the persisted cluster.
+  - Add inference-aware readiness and validate a real three-agent A2A workflow, MCP
+    tool enrichment, semantic routing, and guardrail denial.
+  - Complete one-seat participant authorization, cross-seat denial, and zero-residue
+    reclaim evidence on Arena before activation.
+  - Complete measured five-seat and twenty-five-seat certification before raising
+    the catalog workshop limit above the proven safe value.
+  showroom_journey: multi-agent-quickstart
+  showroom_title: Build Multi-Agent AI Systems with Open Protocols
+  namespace_slug: multi-agent
+  showroom_content_repo_url: https://github.com/rhpds/launchpad.git
+  showroom_content_ref: c9b3baa8a0126233a543cef9c5c337e54bda7668
+  showroom_content_playbook: site-multi-agent-quickstart.yml
+  showroom_content_start_path: content-multi-agent-quickstart
+  showroom_terminal_storage: false
+  showroom_tabs:
+  - id: terminal
+    title: Terminal
+    source: showroom.terminal
+  - id: workspace
+    title: Multi-Agent Workspace
+    source: workload.route.ui
+  - id: openshift-console
+    title: OpenShift Console
+    source: cluster.console_url
+  required_models:
+  - granite-3.2-8b-tools
+  inference_endpoint: litellm
+  seat_cpu_millicores: 4500
+  seat_memory_mib: 2048
+  seat_pods: 8
+  seat_storage_gib: 0
+  workshop_provision_concurrency: 2
+  workshop_node_spread: false
+  workshop_node_min_ready_seconds: 900
+  workshop_node_headroom_pods: 0
+  workshop_node_required_labels: {}
+  workload_repo: https://github.com/jkershawrh/multi-agent-quickstart.git
+  workload_revision: 8a8e0241265e69be81bf28060c4a96be38d5c244
+  workload_deploy_type: helm
+  workload_deployment_scope: seat
+  workload_deploy_path: chart
+  workload_source_kind: upstream-helm-chart
+  workload_gitops_ready: false
+  workload_release_name: multi-agent
+  workload_helm_values:
+    model:
+      deploy: false
+  workload_ignore_differences: []
+  workload_runtime_secret_name: ''
+  workload_runtime_secret_sources: {}
+  workload_runtime_secret_value_path: ''
+  workload_identity_value_path: ''
+  workload_routes:
+    ui: multi-agent-ui
+    orchestrator: multi-agent
+  workload_readiness: []
+  source_content_repo: https://github.com/rhpds/launchpad.git
+  source_content_revision: c9b3baa8a0126233a543cef9c5c337e54bda7668
+  source_references:
+    original_lab:
+      repo_url: https://github.com/jkershawrh/multi-agent-quickstart.git
+      revision: 8a8e0241265e69be81bf28060c4a96be38d5c244
+      path: .

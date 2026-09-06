@@ -87,6 +87,7 @@ order flow until runtime and live certification gates pass:
 | ID | Name | Current gate |
 |---|---|---|
 | `agentops-observability` | AgentOps in Production: End-to-End Observability with Red Hat AI | Five internal seats are GREEN-live with isolated concurrent journeys and zero-residue normal/fault reclaim; 25-seat capacity, public access, and production Logging/TLS remain gated |
+| `multi-agent-quickstart` | Build Multi-Agent AI Systems with Open Protocols | Showroom and immutable source intake pass; application image, participant UI route, runtime MaaS Secret, identity labels, and live one-seat certification remain gated |
 
 ## Architecture
 
@@ -115,6 +116,8 @@ remains repository capability and a useful source contract for importing labs;
 it is not the runtime control plane for the internal Intel deployment. The
 AgentOps import analysis is in
 [docs/agentops-rhdp-gap-analysis.md](docs/agentops-rhdp-gap-analysis.md).
+The native Multi-Agent Quickstart intake and promotion gates are in
+[docs/multi-agent-quickstart-import.md](docs/multi-agent-quickstart-import.md).
 
 ## Repository layout
 

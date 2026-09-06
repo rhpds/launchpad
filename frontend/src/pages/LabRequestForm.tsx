@@ -4,6 +4,7 @@ import { api } from '../api/client';
 import { useBranding } from '../context/BrandingContext';
 import type { AvailableModel, BrandingProfile, CatalogItem, Tenant } from '../api/types';
 import { defaultModelSelection, toggleModelSelection } from '../modelAccessContract';
+import { participantCatalog } from '../catalogVisibility';
 
 export default function LabRequestForm({ embedded = false }: { embedded?: boolean }) {
   const navigate = useNavigate();
@@ -42,12 +43,15 @@ export default function LabRequestForm({ embedded = false }: { embedded?: boolea
   useEffect(() => {
     Promise.all([api.listCatalog(), api.listTenants(), api.listBrandingProfiles()]).then(
       ([cats, tens, brands]) => {
-        setCatalogs(cats);
+        const orderableCatalog = participantCatalog(cats);
+        setCatalogs(orderableCatalog);
         setTenants(tens);
         setBrandings(brands);
         setLoading(false);
 
-        const selected = cats.find((c) => c.catalog_item_id === form.catalog_item_id);
+        const selected = orderableCatalog.find(
+          (c) => c.catalog_item_id === form.catalog_item_id,
+        );
         if (selected && !form.hardware_profile) {
           setForm((f) => ({
             ...f,

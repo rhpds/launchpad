@@ -5,6 +5,7 @@ import { api } from '../api/client';
 import type { CatalogItem } from '../api/types';
 import { useBranding } from '../context/BrandingContext';
 import StatusBadge from '../components/StatusBadge';
+import { participantCatalog } from '../catalogVisibility';
 
 const DEMO_CATALOG_IDS = [
   'qs-rag-chatbot',
@@ -74,7 +75,7 @@ export default function Demos() {
 
   useEffect(() => {
     api.listCatalog().then((data) => {
-      const demoItems = data
+      const demoItems = participantCatalog(data)
         .filter((item) => DEMO_CATALOG_IDS.includes(item.catalog_item_id))
         .sort((a, b) => {
           const aOfficial = (a.metadata?.official_quickstart as boolean) ? 0 : 1;

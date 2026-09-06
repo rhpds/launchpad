@@ -116,6 +116,24 @@ the shared, steady per-seat, and bounded-transient breakdown. This prevents a
 short rollout burst from being multiplied across every seat while still
 failing closed when that burst cannot fit.
 
+## Multi-Agent Quickstart intake status
+
+`multi-agent-quickstart` is registered as a distinct draft candidate from
+`jkershawrh/multi-agent-quickstart` at
+`8a8e0241265e69be81bf28060c4a96be38d5c244`. Its Launchpad-native Antora
+journey is pinned at `c9b3baa8a0126233a543cef9c5c337e54bda7668` and covers
+A2A discovery, semantic routing, MCP tool calls, guardrails, OpenTelemetry,
+namespace isolation, and customization.
+
+The source Helm chart passes package validation, but it currently deploys only
+the orchestrator, three agents, MCP server, and guardrails. It does not deploy
+the included Gradio UI, inject a MaaS API key, or apply Launchpad ownership
+labels. Its application image is mutable and unavailable from the declared
+public Quay location. The catalog therefore remains fail-closed at one seat
+until the workload is adapted and a full Arena participant journey and reclaim
+are GREEN-live. See
+[multi-agent-quickstart-import.md](multi-agent-quickstart-import.md).
+
 ## AgentOps intake status
 
 The detailed RHDP topology and Launchpad adaptation decisions are recorded in

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { api } from '../api/client';
 import type { CatalogItem, LabSession, ShowbackRecord } from '../api/types';
 import StatusBadge from '../components/StatusBadge';
+import { participantCatalog } from '../catalogVisibility';
 
 export default function PortalDashboard() {
   const [catalog, setCatalog] = useState<CatalogItem[]>([]);
@@ -14,7 +15,7 @@ export default function PortalDashboard() {
   useEffect(() => {
     Promise.all([api.listCatalog(), api.listSessions()])
       .then(async ([catalogItems, labSessions]) => {
-        setCatalog(catalogItems);
+        setCatalog(participantCatalog(catalogItems));
         setSessions(labSessions);
         const active = labSessions.filter((session) => session.status !== 'reclaimed');
         const usage = await Promise.all(
