@@ -1,0 +1,56 @@
+{
+  "completed_at": "2026-09-06T15:39:36Z",
+  "failure": {
+    "backend_node": "rhgnr1",
+    "backend_route_http_status": 503,
+    "backend_unavailable": true,
+    "image_registry_endpoint_missing": true,
+    "image_registry_node": "rhgnr1",
+    "kueue_controller_ready_replicas": 0,
+    "kueue_controller_replicas": 2,
+    "kueue_controllers_colocated_on_node": "rhgnr1",
+    "kueue_visibility_api_reason": "MissingEndpoints",
+    "node": "rhgnr1",
+    "node_ready_transition": "NodeStatusUnknown",
+    "ready_seats_before_interruption": 24,
+    "remaining_seat_status": "provisioning"
+  },
+  "promotion_counted": false,
+  "recovery": {
+    "backend_image_digest": "sha256:34e5b17cf920d4cb3e9dbcbcf928d242aa6da24c47596ebc4caaebcac1a00186",
+    "backend_rescheduled_node": "gnr2.fm2aihpcsed.com",
+    "backend_route_healthy": true,
+    "forced_stale_deleting_pod_records": 4,
+    "kueue_controller_replacement_node": "gnr2.fm2aihpcsed.com",
+    "kueue_visibility_apis_available": true,
+    "resource_counts": {
+      "applications.argoproj.io": 0,
+      "namespaces": 0,
+      "persistentvolumeclaims": 0,
+      "persistentvolumes": 0,
+      "rolebindings.rbac.authorization.k8s.io": 0,
+      "routes.route.openshift.io": 0,
+      "secrets": 0
+    },
+    "workshop_status": "completed"
+  },
+  "remaining_risks": {
+    "backend_replicas": 1,
+    "image_registry_replicas": 1,
+    "image_registry_storage": "EmptyDir",
+    "kueue_anti_affinity": "preferred-not-required"
+  },
+  "result": "RED-live-infrastructure",
+  "run_evidence": {
+    "path": "evidence/runs/multi-agent-quickstart-25-seat-multi-agent-25seat-20260906-01.json",
+    "sha256": "88104216b2de21037ae287dee4c32ddadc3aaefeeb065a51c69021fb36b7b2de"
+  },
+  "run_id": "multi-agent-25seat-20260906-01",
+  "schema": "launchpad.redhat.com/catalog-certification-fault-evidence/v1",
+  "security": {
+    "contains_plaintext_credentials": false,
+    "credential_values_logged": false
+  },
+  "source_commit": "299542572a0ddac525d06f4c4007a7f2e2444266",
+  "workshop_id": "29d49664-e1d5-487c-b083-a58a08664a7c"
+}

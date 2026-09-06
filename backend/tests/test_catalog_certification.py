@@ -277,6 +277,42 @@ def test_api_transport_does_not_shadow_the_session_lookup_method():
     assert callable(client.session)
 
 
+def test_api_transport_recovers_from_connection_loss_and_gateway_unavailability(
+    monkeypatch,
+):
+    runner = _runner_module()
+    calls = []
+
+    class Response:
+        def __init__(self, status_code, payload):
+            self.status_code = status_code
+            self._payload = payload
+            self.ok = 200 <= status_code < 300
+
+        def json(self):
+            return self._payload
+
+    client = runner.LaunchpadApi(
+        "https://launchpad.example",
+        "not-a-real-key",
+        transient_retry_seconds=1,
+        retry_interval_seconds=0,
+    )
+
+    def request(*_args, **_kwargs):
+        calls.append("request")
+        if len(calls) == 1:
+            raise runner.requests.ConnectionError("node disappeared")
+        if len(calls) == 2:
+            return Response(503, {"detail": "no ready backend endpoint"})
+        return Response(200, {"status": "ready"})
+
+    monkeypatch.setattr(client._http, "request", request)
+
+    assert client.workshop("workshop-1") == {"status": "ready"}
+    assert calls == ["request", "request", "request"]
+
+
 def test_generic_runner_places_probes_after_the_all_seat_barrier_and_reclaims(
     tmp_path: Path, monkeypatch, capsys
 ):

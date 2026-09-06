@@ -79,21 +79,47 @@ def _kubeconfig_server(kubeconfig: str) -> str:
 
 
 class LaunchpadApi:
-    def __init__(self, base_url: str, api_key: str, *, verify: bool | str = True):
+    def __init__(
+        self,
+        base_url: str,
+        api_key: str,
+        *,
+        verify: bool | str = True,
+        transient_retry_seconds: float = 300,
+        retry_interval_seconds: float = 5,
+    ):
         root = base_url.rstrip("/")
         self.base_url = root if root.endswith("/api/v1") else f"{root}/api/v1"
         self.verify = verify
+        self.transient_retry_seconds = max(0, transient_retry_seconds)
+        self.retry_interval_seconds = max(0, retry_interval_seconds)
         self._http = requests.Session()
         self._http.headers.update({"X-API-Key": api_key})
 
     def request(self, method: str, path: str, **kwargs: Any) -> dict[str, Any]:
-        response = self._http.request(
-            method,
-            f"{self.base_url}{path}",
-            timeout=kwargs.pop("timeout", 60),
-            verify=self.verify,
-            **kwargs,
-        )
+        request_timeout = float(kwargs.pop("timeout", 60))
+        retry_deadline = time.monotonic() + self.transient_retry_seconds
+        while True:
+            remaining = retry_deadline - time.monotonic()
+            try:
+                response = self._http.request(
+                    method,
+                    f"{self.base_url}{path}",
+                    timeout=min(request_timeout, max(1, remaining)),
+                    verify=self.verify,
+                    **kwargs,
+                )
+            except requests.RequestException:
+                if time.monotonic() >= retry_deadline:
+                    raise
+                time.sleep(min(self.retry_interval_seconds, max(0, remaining)))
+                continue
+            if response.status_code in {502, 503, 504}:
+                if time.monotonic() >= retry_deadline:
+                    break
+                time.sleep(min(self.retry_interval_seconds, max(0, remaining)))
+                continue
+            break
         if not response.ok:
             try:
                 detail = response.json().get("detail", "request failed")

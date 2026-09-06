@@ -1,0 +1,205 @@
+{
+  "capacity_preview": {
+    "can_provision": true,
+    "catalog_seat_limit": 5,
+    "certification_override": true,
+    "certification_target_seats": 25,
+    "estimated_resources": {
+      "cpu_millicores": 30000,
+      "memory_mib": 51200,
+      "pods": 50
+    },
+    "placement_reason": "Entire workshop assigned to arena; seats will not be split",
+    "reason": "Cluster can support 92 seats (CPU: 184, Memory: 478, Pods: 92; Eligible nodes: 2; 20.0% headroom)",
+    "resource_breakdown": {
+      "per_seat": {
+        "cpu_millicores": 1200,
+        "memory_mib": 2048,
+        "pods": 2
+      },
+      "shared": {
+        "cpu_millicores": 0,
+        "memory_mib": 0,
+        "pods": 0
+      },
+      "transient": {
+        "concurrent_seats": 2,
+        "cpu_millicores": 0,
+        "memory_mib": 0,
+        "pods": 0
+      }
+    },
+    "seats_requested": 25,
+    "selected_cluster": "arena"
+  },
+  "catalog_item_id": "multi-agent-quickstart",
+  "cleanup": {
+    "model_keys_revoked": false,
+    "resource_counts": {
+      "applications.argoproj.io": 30,
+      "namespaces": 25,
+      "persistentvolumeclaims": 0,
+      "persistentvolumes": 0,
+      "rolebindings.rbac.authorization.k8s.io": 0,
+      "routes.route.openshift.io": 30,
+      "secrets": 50
+    },
+    "seconds": null,
+    "status": "error"
+  },
+  "completed_at": "2026-09-06T15:26:35.128473Z",
+  "contract": {
+    "catalog_version": "0.2.2",
+    "git_commit": "299542572a0ddac525d06f4c4007a7f2e2444266",
+    "intake_path": "catalog-onboarding/multi-agent-quickstart.yaml",
+    "path": "certification/catalog/multi-agent-quickstart.yaml",
+    "sha256": "0c6afc021c49e97db49b558068552becd1f9858c582308032d7319c1ba8975d8"
+  },
+  "errors": [
+    "ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
+    "cleanup ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
+  ],
+  "gates": {
+    "all_seats_ready": false,
+    "capacity_passed": true,
+    "cleanup_completed": false,
+    "contract_valid": true,
+    "evidence_hashed": true,
+    "model_keys_revoked": false,
+    "namespace_isolation_passed": false,
+    "ready_within_limit": false,
+    "seat_probes_passed": false,
+    "sensitive_values_absent": false,
+    "showroom_pages_passed": false,
+    "single_cluster_assignment": true,
+    "zero_residue_cleanup": false
+  },
+  "order": {
+    "cluster_ref": "arena",
+    "namespaces": [],
+    "ready_seconds": null,
+    "seat_count": 25,
+    "session_ids": [],
+    "status_before_reclaim": "awaiting_confirmation",
+    "workshop_id": "29d49664-e1d5-487c-b083-a58a08664a7c"
+  },
+  "plan": {
+    "all_seats_same_cluster": true,
+    "catalog_item_id": "multi-agent-quickstart",
+    "certification_override": true,
+    "cluster_ref": "arena",
+    "current_certified_seats": 5,
+    "execution_eligible": true,
+    "exposure_policy": "internal",
+    "kubeconfig_server": "https://api.arena.fm2aihpcsed.com:6443",
+    "maximum_cleanup_seconds": 1200,
+    "maximum_ready_seconds": 2400,
+    "mutates_cluster": true,
+    "next_promotion_target": 25,
+    "probe_concurrency": 10,
+    "provision_concurrency": 2,
+    "required_consecutive_runs": 3,
+    "seat_probe_count": 25,
+    "seats": 25,
+    "showroom_pages_per_seat": 4,
+    "workshop_orders": 1
+  },
+  "promotion": {
+    "consecutive_passing_runs": 0,
+    "eligible": false,
+    "required_consecutive_runs": 3
+  },
+  "proof_strategy": {
+    "BDD": "Given one workshop order, all seats must become ready before concurrent participant journeys run, and reclaim must leave zero residue.",
+    "CBT": "Contract parsing, API lifecycle, Showroom checks, lab-specific probes, isolation, rubric scoring, and cleanup are independently observable components.",
+    "CDD": "The versioned CatalogCertification document defines scale, Showroom, probe, cleanup, and promotion interfaces.",
+    "EDD": "The run writes immutable source identity, lifecycle timing, per-seat results, cleanup counts, rubric decisions, and a SHA-256 manifest.",
+    "TDD": "Contract, planner, assertion, runner, cleanup, and evidence behavior are protected by failing-then-passing tests."
+  },
+  "result": "RED-live",
+  "rubric": {
+    "categories": {
+      "authorization": {
+        "awarded": 0,
+        "passed": false,
+        "requires": [
+          "namespace_isolation_passed",
+          "sensitive_values_absent"
+        ],
+        "weight": 15
+      },
+      "cleanup": {
+        "awarded": 0,
+        "passed": false,
+        "requires": [
+          "cleanup_completed",
+          "zero_residue_cleanup",
+          "model_keys_revoked"
+        ],
+        "weight": 15
+      },
+      "contract_integrity": {
+        "awarded": 10,
+        "passed": true,
+        "requires": [
+          "contract_valid",
+          "evidence_hashed"
+        ],
+        "weight": 10
+      },
+      "participant_function": {
+        "awarded": 0,
+        "passed": false,
+        "requires": [
+          "showroom_pages_passed",
+          "seat_probes_passed"
+        ],
+        "weight": 25
+      },
+      "placement_capacity": {
+        "awarded": 15,
+        "passed": true,
+        "requires": [
+          "capacity_passed",
+          "single_cluster_assignment"
+        ],
+        "weight": 15
+      },
+      "provisioning_readiness": {
+        "awarded": 0,
+        "passed": false,
+        "requires": [
+          "all_seats_ready",
+          "ready_within_limit"
+        ],
+        "weight": 20
+      }
+    },
+    "passed": false,
+    "required": 100,
+    "score": 25
+  },
+  "run_id": "multi-agent-25seat-20260906-01",
+  "schema": "launchpad.redhat.com/catalog-certification-evidence/v1",
+  "seat_results": [],
+  "security": {
+    "contains_plaintext_credentials": false,
+    "credential_values_logged": false
+  },
+  "started_at": "2026-09-06T15:12:26.995125Z",
+  "validation_matrix": {
+    "all_seats_ready": "RED-live",
+    "capacity_passed": "GREEN-live",
+    "cleanup_completed": "RED-live",
+    "contract_valid": "GREEN-live",
+    "evidence_hashed": "GREEN-live",
+    "model_keys_revoked": "RED-live",
+    "namespace_isolation_passed": "RED-live",
+    "ready_within_limit": "RED-live",
+    "seat_probes_passed": "RED-live",
+    "sensitive_values_absent": "RED-live",
+    "showroom_pages_passed": "RED-live",
+    "single_cluster_assignment": "GREEN-live",
+    "zero_residue_cleanup": "RED-live"
+  }
+}

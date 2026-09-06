@@ -63,6 +63,18 @@ every seat, complete isolation, and zero-residue reclaim; see
 Together they certify the shared runtime and Track 2 internal five-seat gate,
 but not every optional Track 3 integration, public access, or 25-seat scale.
 
+The first 25-seat attempt, `multi-agent-25seat-20260906-01`, is intentionally
+retained as RED evidence and does not count toward promotion. Arena worker
+`rhgnr1` stopped reporting after 24 seats were ready; the Launchpad backend,
+single-replica internal registry, and both Kueue controller replicas were all
+concentrated on that worker. The API returned 503, the registry temporarily had
+no endpoint, and stale Kueue discovery initially blocked namespace deletion.
+Persisted workshop recovery completed reclaim after the node returned, the
+Kueue visibility APIs were restored, and an independent audit reached zero
+residue. The generic runner now retries bounded connection and 502/503/504
+failures so a transient control-plane interruption does not discard its live
+observation window. See the run and fault records under `evidence/runs/`.
+
 ## Repeatable onboarding and certification
 
 Catalog onboarding is repository-driven rather than a collection of manual
