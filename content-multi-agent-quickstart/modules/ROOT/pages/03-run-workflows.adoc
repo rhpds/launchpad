@@ -53,4 +53,3 @@ The orchestration layer owns workflow state. Agents receive bounded tasks throug
 
 [.next-nav]
 xref:04-tools-and-guardrails.adoc[Next: MCP Tools and Guardrails ->]
-

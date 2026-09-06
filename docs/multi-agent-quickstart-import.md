@@ -37,4 +37,3 @@ Launchpad workload contract and live evidence are complete.
 7. Certify and reclaim one seat with zero residue.
 8. Measure five seats and then twenty-five seats before raising the supported
    workshop limit.
-

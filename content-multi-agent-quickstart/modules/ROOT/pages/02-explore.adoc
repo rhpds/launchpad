@@ -64,4 +64,3 @@ Look for the agent name, supported skills, protocol version, and endpoint URL. T
 
 [.next-nav]
 xref:03-run-workflows.adoc[Next: Run Multi-Agent Workflows ->]
-

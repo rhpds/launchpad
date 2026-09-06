@@ -26,4 +26,3 @@ For this Launchpad catalog item, promotion requires a digest-pinned application 
 * Instrument one workflow with OpenTelemetry and inspect the trace boundaries.
 
 You have a reusable foundation for multi-agent systems built on open contracts rather than a single framework-specific integration.
-

@@ -53,4 +53,3 @@ Start with a failing test that describes the new behavior, implement the smalles
 
 [.next-nav]
 xref:99-conclusion.adoc[Next: Review and Next Steps ->]
-

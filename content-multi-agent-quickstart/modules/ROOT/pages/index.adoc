@@ -73,4 +73,3 @@ This guided build takes about 60 minutes.
 
 [.next-nav]
 xref:01-architecture.adoc[Start: Architecture and Open Protocols ->]
-

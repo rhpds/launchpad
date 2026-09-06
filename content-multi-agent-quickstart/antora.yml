@@ -19,4 +19,3 @@ asciidoc:
     maas_model: '%maas_model%'
     source_repo: 'https://github.com/jkershawrh/multi-agent-quickstart.git'
     source_revision: '8a8e0241265e69be81bf28060c4a96be38d5c244'
-

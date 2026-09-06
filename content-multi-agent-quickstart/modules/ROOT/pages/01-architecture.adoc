@@ -71,4 +71,3 @@ The regex guardrails in the source lab are demonstrations. They are not a replac
 
 [.next-nav]
 xref:02-explore.adoc[Next: Explore the Running System ->]
-

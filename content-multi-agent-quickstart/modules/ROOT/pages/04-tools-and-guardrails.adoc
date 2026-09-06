@@ -66,4 +66,3 @@ OpenTelemetry connects these boundaries with trace context so an operator can fo
 
 [.next-nav]
 xref:05-customize.adoc[Next: Customize the System ->]
-
