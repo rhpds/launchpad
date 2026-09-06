@@ -10,7 +10,7 @@ catalog:
     advanced blueprint alignment with A2A, MCP, Kagenti, OpenTelemetry,
     guardrails, and service authentication on Intel infrastructure.
   category: guided_build
-  version: "0.2.2"
+  version: "0.2.3"
   supported_branding:
     - redhat-intel-default
     - intel-internal
@@ -67,7 +67,7 @@ runtime:
       title: "Deploy to OpenShift"
       showroom_page: track-2-openshift.adoc
       delivery_mode: live-runtime
-      certification_status: five-seat-certified
+      certification_status: twenty-five-seat-certified
     - id: track-3-blueprint
       title: "Advanced blueprint alignment"
       showroom_page: track-3-blueprint.adoc
@@ -113,8 +113,8 @@ runtime:
       orchestrator: multi-agent
 
 certification:
-  stage: five-seat-certified
-  max_workshop_seats: 5
+  stage: twenty-five-seat-certified
+  max_workshop_seats: 25
   proof_contract: certification/catalog/multi-agent-quickstart.yaml
   promotion_sequence:
     - 1
@@ -132,6 +132,3 @@ certification:
       Track 3 is currently an architecture and manifest exploration path;
       certify Kagenti and OpenTelemetry runtime integrations before presenting
       those optional blueprint components as deployed services.
-    - >-
-      Complete three consecutive measured twenty-five-seat certifications
-      before raising the catalog workshop limit above the proven safe value.

@@ -49,8 +49,9 @@ the selected model endpoint, model identifier, MaaS key, and generated service
 token. The Secret is applied directly to Arena and only its name is passed to
 Argo CD.
 
-The catalog remains a fail-closed draft with a one-seat ceiling. The corrected
-runtime first reached the functional gate after a regression retry; a second,
+The catalog remains a fail-closed draft for production/public activation, while
+its certified internal workshop ceiling is now 25 seats. The corrected runtime
+first reached the functional gate after a regression retry; a second,
 fresh order then reached `ready` on its first attempt without a live patch and
 reclaimed with zero labeled residue. The runs are recorded in
 `evidence/multi-agent-one-seat-live-2026-09-05.json` and
@@ -60,8 +61,9 @@ see `evidence/multi-agent-three-track-showroom-live-2026-09-06.json`. The
 reusable framework then proved one five-seat workshop with concurrent checks on
 every seat, complete isolation, and zero-residue reclaim; see
 `evidence/runs/multi-agent-quickstart-5-seat-multi-agent-5seat-20260906-01.json`.
-Together they certify the shared runtime and Track 2 internal five-seat gate,
-but not every optional Track 3 integration, public access, or 25-seat scale.
+At that point they certified the shared runtime and Track 2 internal five-seat
+gate, but not every optional Track 3 integration, public access, or 25-seat
+scale. The later sequence below closes the internal 25-seat scale gate.
 
 The first 25-seat attempt, `multi-agent-25seat-20260906-01`, is intentionally
 retained as RED evidence and does not count toward promotion. Arena worker
@@ -113,6 +115,12 @@ GREEN-live result. All 25 seats reached Ready in 779.949 seconds, every
 participant probe passed at ten-way concurrency, and cleanup reached zero
 residue in 380.507 seconds. It scored 100/100 and is consecutive pass 2 of 3.
 
+The seventh attempt, `multi-agent-25seat-20260906-07`, completed the promotion
+sequence. All 25 seats reached Ready in 831.206 seconds, every concurrent
+participant and isolation probe passed, model keys were revoked, and cleanup
+reached zero residue in 381.444 seconds. It scored 100/100 and is consecutive
+pass 3 of 3, making the internal 25-seat catalog limit eligible for promotion.
+
 ## Repeatable onboarding and certification
 
 Catalog onboarding is repository-driven rather than a collection of manual
@@ -142,6 +150,9 @@ cluster edits:
    durable external registry or durable control-plane mirror.
 2. Certify public-code participant authentication, route authorization, and
    cross-seat denial for this catalog item.
-3. Measure twenty-five seats before raising the supported workshop limit.
-4. Require three consecutive twenty-five-seat passes before general
-   availability.
+3. Certify the optional Kagenti and OpenTelemetry Track 3 integrations before
+   presenting them as deployed participant services.
+
+The internal 25-seat scale gate is complete. Production/public activation
+still requires every remaining blocker above; internal scale evidence does not
+certify public ingress, public identity, or a durable image supply chain.

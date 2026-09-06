@@ -183,9 +183,10 @@ namespace isolation, and customization.
 
 The Launchpad seat chart now deploys the orchestrator, three agents, MCP server,
 guardrails, and Gradio UI with a runtime Secret and complete ownership labels.
-One clean Arena seat, all three Showroom tracks, and one five-seat workshop are
-GREEN-live. The catalog is fail-closed at five seats until durable image supply,
-public access, and three consecutive measured 25-seat profiles pass. See
+One clean Arena seat, all three Showroom tracks, a five-seat workshop, and three
+consecutive 25-seat workshops are GREEN-live. The catalog is certified for up
+to 25 internal Arena seats while durable image supply, public access, and the
+optional Track 3 runtime integrations remain fail-closed. See
 [multi-agent-quickstart-import.md](multi-agent-quickstart-import.md).
 
 ## AgentOps intake status

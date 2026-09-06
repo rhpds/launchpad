@@ -91,7 +91,9 @@ Measured baseline for 25 seats on 2026-08-26:
 
 ## Pathway 4: scale graduation
 
-- Repeat 25-seat visual certification three times.
+- Completed: three consecutive internal 25-seat functional/Showroom
+  certifications on Arena, each scoring 100/100 with zero-residue cleanup.
+- Keep public browser/identity certification as a separate release gate.
 - Certify 50 seats on Arena only after retained capacity headroom is measured.
 - Certify 75 seats on Arena only after the 50-seat gate passes.
 - Continue toward the fleet goals in `docs/three-by-seventy-five-capacity-plan.md`.

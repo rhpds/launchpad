@@ -24,12 +24,14 @@ def test_multi_agent_quickstart_is_imported_as_a_distinct_fail_closed_item():
     assert catalog == build_catalog_item(intake)
     assert catalog["catalog_item_id"] == "multi-agent-quickstart"
     assert catalog["display_name"] == "Build Multi-Agent AI Systems with Open Protocols"
-    assert catalog["version"] == "0.2.2"
+    assert catalog["version"] == "0.2.3"
     assert catalog["status"] == "draft"
     assert catalog["metadata"]["onboarding_managed"] is True
     assert catalog["metadata"]["activation_blockers"]
-    assert catalog["metadata"]["certification_stage"] == "five-seat-certified"
-    assert catalog["metadata"]["max_workshop_seats"] == 5
+    assert catalog["metadata"]["certification_stage"] == (
+        "twenty-five-seat-certified"
+    )
+    assert catalog["metadata"]["max_workshop_seats"] == 25
     assert catalog["metadata"]["certification_proof_contract"] == (
         "certification/catalog/multi-agent-quickstart.yaml"
     )

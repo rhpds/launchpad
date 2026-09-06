@@ -81,8 +81,8 @@ def test_twenty_five_seat_plan_is_one_order_on_one_cluster():
     assert plan["probe_concurrency"] == 10
     assert plan["required_consecutive_runs"] == 3
     assert plan["showroom_pages_per_seat"] == 4
-    assert plan["current_certified_seats"] == 5
-    assert plan["next_promotion_target"] == 25
+    assert plan["current_certified_seats"] == 25
+    assert plan["next_promotion_target"] is None
     assert plan["execution_eligible"] is True
 
 
@@ -105,8 +105,8 @@ def test_only_certified_or_next_scale_profile_can_execute():
     assert five["execution_eligible"] is True
     assert five["certification_override"] is False
     assert twenty_five["execution_eligible"] is True
-    assert twenty_five["certification_override"] is True
-    assert twenty_five["next_promotion_target"] == 25
+    assert twenty_five["certification_override"] is False
+    assert twenty_five["next_promotion_target"] is None
 
 
 def test_contract_rejects_unsafe_or_nonrepeatable_configuration():

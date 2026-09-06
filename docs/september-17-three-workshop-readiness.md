@@ -49,6 +49,12 @@ plane services that are already running.
 | Building an AI Agent, 25 seats | 10,375m | 22,800 MiB | 75 | not declared by catalog |
 | **Event total** | **89,500m** | **239,200 MiB** | **433** | **at least 750 GiB** |
 
+The immutable September 5 readiness manifest retains the original conservative
+**550**-pod event reservation (660 with headroom). The 433-pod total above is
+the current measured contract after the AgentOps topology reduction and is the
+number used for current placement planning; the older figure remains recorded
+for evidence traceability rather than being silently rewritten.
+
 Admission must retain at least 20 percent additional headroom for scheduling,
 operator activity, model services, temporary rollout overlap, and measurement
 error. The protected target is therefore 107,400m CPU, 287,040 MiB memory, 520

@@ -18,6 +18,11 @@ RUNS = [
         2,
         False,
     ),
+    (
+        "multi-agent-quickstart-25-seat-multi-agent-25seat-20260906-07.json",
+        3,
+        True,
+    ),
 ]
 
 
