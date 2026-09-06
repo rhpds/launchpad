@@ -21,8 +21,9 @@ quickstart inside one Showroom and one provisioned participant environment:
 1. **Track 1 — Run locally:** source-guided study of the application topology,
    A2A discovery, routing, MCP, and guardrails. In Launchpad, participants use
    the pre-provisioned application rather than starting nested Docker Compose.
-2. **Track 2 — Deploy to OpenShift:** live operation of the application in the
-   participant's namespace. This is the currently certified runtime path.
+2. **Track 2 — Build and Operate on OpenShift:** run the live agentic workflow,
+   apply a non-secret executor policy in the participant namespace, verify the
+   changed behavior, and roll back cleanly. This is the certified runtime path.
 3. **Track 3 — Advanced blueprint alignment:** architecture and manifest
    exploration for Kagenti, OpenTelemetry, workload identity, policy, and
    supported guardrails. Optional components are not presented as deployed

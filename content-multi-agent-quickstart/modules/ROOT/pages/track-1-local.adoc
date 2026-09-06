@@ -74,4 +74,4 @@ You have completed Track 1 when you can explain:
 * where input and output guardrails run.
 
 [.next-nav]
-xref:track-2-openshift.adoc[Continue to Track 2: Deploy to OpenShift ->]
+xref:track-2-openshift.adoc[Continue to Track 2: Build and Operate on OpenShift ->]
