@@ -2,15 +2,15 @@
 
 == What You Proved
 
-You have now:
+Across one participant environment, the three tracks let you:
 
-* discovered three agents through A2A agent cards;
-* compared lightweight and comprehensive semantic routing paths;
-* executed a multi-agent workflow through the API and participant UI;
-* listed and called MCP tools;
-* verified a prompt-injection denial through guardrails;
-* connected namespace RBAC, service authentication, and model authorization; and
-* designed a new role without breaking the open protocol contract.
+* use Track 1 to understand the local application topology and request flow;
+* use Track 2 to operate the same application in a namespace-scoped OpenShift environment; and
+* use Track 3 to distinguish live services from optional Kagenti, OpenTelemetry, identity, and governance targets.
+
+You also discovered three agents through A2A cards, compared semantic routing
+paths, executed model-backed workflows, called MCP tools, verified a guardrail
+denial, and connected namespace RBAC with service and model authorization.
 
 == Production Path
 
@@ -21,7 +21,7 @@ For this Launchpad catalog item, promotion requires a digest-pinned application 
 == Continue Learning
 
 * Review the A2A and MCP OpenAPI contracts in the source repository.
-* Compare local, OpenShift, and advanced blueprint tracks.
+* Revisit any of the local, OpenShift, and advanced blueprint tracks from the Showroom navigation.
 * Replace a generic role with an approved domain-specific role in your own fork.
 * Instrument one workflow with OpenTelemetry and inspect the trace boundaries.
 

@@ -1,5 +1,12 @@
 .Build Multi-Agent AI Systems
 * xref:index.adoc[Welcome]
+
+.Choose Your Track
+* xref:track-1-local.adoc[Track 1: Run Locally]
+* xref:track-2-openshift.adoc[Track 2: Deploy to OpenShift]
+* xref:track-3-blueprint.adoc[Track 3: Blueprint Alignment]
+
+.Shared Hands-On Exercises
 * xref:01-architecture.adoc[Architecture and Open Protocols]
 * xref:02-explore.adoc[Explore the Running System]
 * xref:03-run-workflows.adoc[Run Multi-Agent Workflows]

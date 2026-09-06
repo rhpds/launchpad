@@ -13,6 +13,25 @@ cluster values are rendered for each seat.
 This is a separate catalog item from the legacy `agent-swarm` visualization
 and the larger `agentops-observability` workshop.
 
+## One lab, three tracks
+
+The catalog item preserves the three learning tracks from the upstream
+quickstart inside one Showroom and one provisioned participant environment:
+
+1. **Track 1 — Run locally:** source-guided study of the application topology,
+   A2A discovery, routing, MCP, and guardrails. In Launchpad, participants use
+   the pre-provisioned application rather than starting nested Docker Compose.
+2. **Track 2 — Deploy to OpenShift:** live operation of the application in the
+   participant's namespace. This is the currently certified runtime path.
+3. **Track 3 — Advanced blueprint alignment:** architecture and manifest
+   exploration for Kagenti, OpenTelemetry, workload identity, policy, and
+   supported guardrails. Optional components are not presented as deployed
+   unless the target cluster has separately certified them.
+
+These are learning paths, not separate catalog records, seats, or model
+deployments. The Showroom welcome page is the track chooser, and all tracks use
+the same terminal, Workspace, namespace, and TTL.
+
 ## Launchpad seat topology
 
 The upstream source remains immutable. Launchpad builds that exact revision,
@@ -36,7 +55,8 @@ fresh order then reached `ready` on its first attempt without a live patch and
 reclaimed with zero labeled residue. The runs are recorded in
 `evidence/multi-agent-one-seat-live-2026-09-05.json` and
 `evidence/multi-agent-one-seat-clean-live-2026-09-05.json`. Together they
-certify the internal one-seat gate, but not public access or workshop scale.
+certify the shared runtime and Track 2 internal one-seat gate, but not every
+optional Track 3 integration, public access, or workshop scale.
 
 ## Repeatable onboarding and certification
 

@@ -1,0 +1,69 @@
+[[track-2-openshift]]
+= Track 2: Deploy to OpenShift
+
+== Purpose
+
+Track 2 runs the Multi-Agent application as a real OpenShift workload. Launchpad
+has already deployed it to your assigned namespace, injected a short-lived MaaS
+credential, configured service authentication, and connected the Showroom
+terminal to your participant identity.
+
+This is the live path covered by the current internal one-seat certification.
+You operate the deployment; you do not need cluster-administrator credentials.
+
+== Verify Your Boundary
+
+[source,bash,role="execute",subs=attributes+]
+----
+test "$(oc project -q)" = "{project_name}"
+oc auth can-i get pods -n {project_name}
+oc auth can-i create deployments.apps -n {project_name}
+oc auth can-i get pods -n partner-ai-launchpad
+oc auth can-i get nodes
+----
+
+The first two authorization checks must return `yes`. The final two checks must
+return `no` or `Forbidden`; they prove the seat is not a cluster-wide identity.
+
+== Inspect the Deployment
+
+[source,bash,role="execute"]
+----
+oc get deployments,pods,services,routes
+oc get deployment multi-agent \
+  -o jsonpath='{range .spec.template.spec.containers[*]}{.name}{"\n"}{end}'
+----
+
+The workload pod contains the orchestrator, research, analyst, executor, MCP,
+guardrails, and participant UI containers. A separate Showroom pod supplies
+this guide and terminal. The model remains a shared Launchpad MaaS service; it
+is not loaded once per participant namespace.
+
+Confirm both deployments are available:
+
+[source,bash,role="execute"]
+----
+oc rollout status deployment/multi-agent --timeout=5m
+oc rollout status deployment/showroom --timeout=5m
+----
+
+== Operate the OpenShift Path
+
+Continue with these shared exercises:
+
+* xref:01-architecture.adoc[Architecture and Open Protocols]
+* xref:02-explore.adoc[Explore the Running System]
+* xref:03-run-workflows.adoc[Run Multi-Agent Workflows]
+* xref:04-tools-and-guardrails.adoc[MCP Tools and Guardrails]
+
+Together they verify route access, A2A discovery, model-backed workflows, MCP
+tool calls, semantic routing, and expected guardrail denials.
+
+== Track 2 Checkpoint
+
+Track 2 is complete when all workload containers are ready, the Workspace can
+run a three-agent request, and your terminal can change resources only inside
+its assigned namespace.
+
+[.next-nav]
+xref:track-3-blueprint.adoc[Continue to Track 3: Blueprint Alignment ->]

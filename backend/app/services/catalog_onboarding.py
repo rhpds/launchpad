@@ -38,6 +38,14 @@ def build_catalog_item(intake: dict[str, Any]) -> dict[str, Any]:
     workload_contract = runtime.get("workload", {})
     references = intake.get("references", {})
     capacity_metadata = {}
+    track_metadata = {}
+    if "learning_tracks" in runtime:
+        tracks = copy.deepcopy(runtime.get("learning_tracks", []))
+        track_metadata = {
+            "single_environment": bool(runtime.get("single_environment", False)),
+            "track_count": len(tracks),
+            "learning_tracks": tracks,
+        }
     if transient_resources:
         capacity_metadata.update({
             "seat_transient_cpu_millicores": transient_resources["cpu_millicores"],
@@ -109,6 +117,7 @@ def build_catalog_item(intake: dict[str, Any]) -> dict[str, Any]:
             "seat_pods": resources["pods"],
             "seat_storage_gib": resources["storage_gib"],
             **capacity_metadata,
+            **track_metadata,
             "workshop_provision_concurrency": int(
                 runtime.get("workshop_provision_concurrency", 5)
             ),
@@ -211,6 +220,30 @@ def _validate_contract(intake: dict[str, Any], errors: list[str]) -> None:
         errors.append("runtime.required_capabilities must be a list")
     if not isinstance(runtime.get("required_models"), list):
         errors.append("runtime.required_models must be a list")
+    learning_tracks = runtime.get("learning_tracks")
+    if learning_tracks is not None:
+        if not runtime.get("single_environment"):
+            errors.append(
+                "runtime.single_environment must be true when learning_tracks are declared"
+            )
+        if not isinstance(learning_tracks, list) or not learning_tracks:
+            errors.append("runtime.learning_tracks must be a non-empty list")
+        else:
+            track_ids = []
+            for index, track in enumerate(learning_tracks):
+                location = f"runtime.learning_tracks[{index}]"
+                if not isinstance(track, dict):
+                    errors.append(f"{location} must be a mapping")
+                    continue
+                for key in ("id", "title", "showroom_page", "delivery_mode", "certification_status"):
+                    if not str(track.get(key, "")).strip():
+                        errors.append(f"{location}.{key} is required")
+                track_id = str(track.get("id", ""))
+                if track_id and not CATALOG_ID.fullmatch(track_id):
+                    errors.append(f"{location}.id must be a DNS-safe kebab-case ID")
+                track_ids.append(track_id)
+            if len(track_ids) != len(set(track_ids)):
+                errors.append("runtime.learning_tracks IDs must be unique")
     if runtime.get("deployment_scope", "seat") not in {"seat", "workshop"}:
         errors.append("runtime.deployment_scope must be seat or workshop")
     concurrency = runtime.get("workshop_provision_concurrency", 5)

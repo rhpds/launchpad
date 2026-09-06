@@ -1,0 +1,90 @@
+[[track-3-blueprint]]
+= Track 3: Advanced Blueprint Alignment
+
+== Purpose and Boundary
+
+Track 3 maps the working application to an advanced cloud-native agent
+blueprint. It covers Kagenti agent resources, OpenTelemetry trace boundaries,
+service identity, policy-controlled tools, and production guardrails.
+
+As in the upstream quickstart, this track is a target architecture and
+exploration path, *not an end-to-end validated deployment*. Do not interpret an
+example manifest as proof that its operator or backend is installed in your
+cluster.
+
+== Inspect the Blueprint Assets
+
+If you did not clone the source during Track 1, do so now:
+
+[source,bash,role="execute",subs=attributes+]
+----
+test -d multi-agent-quickstart || git clone {source_repo} multi-agent-quickstart
+git -C multi-agent-quickstart checkout {source_revision}
+----
+
+Review the advanced manifests and architecture comparison:
+
+[source,bash,role="execute"]
+----
+find multi-agent-quickstart/deploy/kagenti -maxdepth 1 -type f -print | sort
+sed -n '1,240p' multi-agent-quickstart/docs/track-architecture-and-event-flows.md
+grep -R "OTEL_\|OpenTelemetry" multi-agent-quickstart/src multi-agent-quickstart/chart | head -30
+----
+
+The Kagenti manifests describe agent identities and endpoints using custom
+resources. They are examples for comparing the current Deployments and
+Services with an operator-managed lifecycle.
+
+== Discover Available Platform Capabilities
+
+[source,bash,role="execute"]
+----
+oc api-resources | grep -Ei 'kagenti|agent' || true
+oc get deployment multi-agent -o yaml \
+  | grep -E 'OTEL_|AGENT_AUTH|MODEL_' \
+  | sed -E 's/(value:).*/\1 <redacted>/'
+----
+
+No secret values should appear. An empty Kagenti result means the optional
+operator API is not installed or not visible to the participant; it is not a
+failure of the Track 2 application.
+
+== Map Current and Target State
+
+[cols="2,2,3",options="header"]
+|===
+| Concern | Current lab | Advanced target
+
+| Agent interoperability
+| Live A2A cards and task messages
+| Operator-managed agent registration and lifecycle
+
+| Tools
+| Live MCP server with constrained schemas
+| Policy-controlled tool discovery, identity, and audit
+
+| Telemetry
+| Observable per-step latency and documented span boundaries
+| OpenTelemetry Collector plus durable traces and correlated dashboards
+
+| Service security
+| Runtime Secret and bearer authentication
+| Workload identity, rotation, fine-grained authorization, and policy enforcement
+
+| Guardrails
+| Demonstration input and output filters
+| Supported guardrail service with governed policies and audit evidence
+|===
+
+Use xref:05-customize.adoc[Customize the System] to design a new agent role
+while preserving these contracts. Installing cluster-scoped operators or CRDs
+is outside the participant role and outside this lab's current certification.
+
+== Track 3 Checkpoint
+
+Track 3 is complete when you can identify which components are live, which are
+example manifests, and what must be added to move the educational application
+toward a supported production architecture.
+
+[.next-nav]
+xref:99-conclusion.adoc[Finish: Review and Next Steps ->]

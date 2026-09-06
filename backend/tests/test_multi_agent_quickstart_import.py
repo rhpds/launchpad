@@ -12,6 +12,11 @@ ROOT = Path(__file__).resolve().parents[2]
 INTAKE_PATH = ROOT / "catalog-onboarding/multi-agent-quickstart.yaml"
 CATALOG_PATH = ROOT / "catalog/multi-agent-quickstart/catalog-item.yaml"
 CONTENT_ROOT = ROOT / "content-multi-agent-quickstart"
+TRACKS = {
+    "track-1-local": "track-1-local.adoc",
+    "track-2-openshift": "track-2-openshift.adoc",
+    "track-3-blueprint": "track-3-blueprint.adoc",
+}
 
 
 def test_multi_agent_quickstart_is_imported_as_a_distinct_fail_closed_item():
@@ -88,6 +93,46 @@ def test_multi_agent_showroom_is_native_launchpad_content():
         "OpenTelemetry",
     ):
         assert concept in guide
+
+
+def test_multi_agent_is_one_lab_with_all_three_upstream_tracks():
+    catalog = yaml.safe_load(CATALOG_PATH.read_text())
+    metadata = catalog["metadata"]
+    pages = CONTENT_ROOT / "modules/ROOT/pages"
+    nav = (CONTENT_ROOT / "modules/ROOT/nav.adoc").read_text()
+    index = (pages / "index.adoc").read_text()
+
+    assert metadata["single_environment"] is True
+    assert metadata["track_count"] == 3
+    assert [track["id"] for track in metadata["learning_tracks"]] == list(TRACKS)
+    assert [track["title"] for track in metadata["learning_tracks"]] == [
+        "Run locally",
+        "Deploy to OpenShift",
+        "Advanced blueprint alignment",
+    ]
+
+    for track_id, filename in TRACKS.items():
+        assert (pages / filename).is_file()
+        assert f"xref:{filename}" in nav
+        assert f"xref:{filename}" in index
+        assert track_id in (pages / filename).read_text()
+
+    assert "one catalog item" in index
+    assert "one participant environment" in index
+
+
+def test_multi_agent_track_scope_is_explicit_and_does_not_overclaim_track_three():
+    pages = CONTENT_ROOT / "modules/ROOT/pages"
+    track_1 = (pages / TRACKS["track-1-local"]).read_text()
+    track_2 = (pages / TRACKS["track-2-openshift"]).read_text()
+    track_3 = (pages / TRACKS["track-3-blueprint"]).read_text()
+
+    assert "Docker Compose" in track_1
+    assert "pre-provisioned OpenShift runtime" in track_1
+    assert "oc auth can-i" in track_2
+    assert "Kagenti" in track_3
+    assert "OpenTelemetry" in track_3
+    assert "not an end-to-end validated deployment" in track_3
 
 
 def test_multi_agent_quickstart_cannot_activate_with_import_blockers():

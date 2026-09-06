@@ -1,0 +1,77 @@
+[[track-1-local]]
+= Track 1: Run Locally
+
+== Purpose
+
+Track 1 teaches the application pattern before adding platform concerns. The
+upstream quickstart runs the orchestrator, three A2A agents, the MCP server,
+guardrails, and participant UI with Docker Compose and an optional local model.
+
+In a Launchpad workshop you already have a *pre-provisioned OpenShift runtime*
+containing the same application services. You will inspect the local source
+contract and exercise the same request flow without starting a second copy of
+the stack inside your seat. This keeps one lab consistent for every
+participant while preserving the learning objectives of the local track.
+
+== Inspect the Local Topology
+
+Clone the exact source revision used to construct this lab:
+
+[source,bash,role="execute",subs=attributes+]
+----
+git clone {source_repo} multi-agent-quickstart
+git -C multi-agent-quickstart checkout {source_revision}
+cd multi-agent-quickstart
+----
+
+Inspect the Docker Compose topology and application entry points:
+
+[source,bash,role="execute"]
+----
+grep -E '^  (orchestrator|research-agent|analyst-agent|executor-agent|mcp-server|guardrails|ui):' docker-compose.yml
+sed -n '1,180p' src/orchestrator.py
+sed -n '1,160p' src/agent.py
+----
+
+Notice that each agent has its own service boundary. The orchestrator discovers
+agents through A2A cards, MCP tools remain separate from inference, and
+guardrails are called before and after model work.
+
+== Follow the Local Request Flow
+
+Open the *Multi-Agent Workspace* tab and run these two sanitized requests:
+
+[source,text]
+----
+Create a short task to verify a fictional service health endpoint.
+----
+
+[source,text]
+----
+Research a fictional API latency increase, analyze likely causes, and create a remediation task.
+----
+
+Use `auto` routing for both. The first request should choose a shorter path;
+the second should involve research, analyst, and executor roles. Then continue
+through xref:03-run-workflows.adoc[Run Multi-Agent Workflows] and
+xref:04-tools-and-guardrails.adoc[MCP Tools and Guardrails].
+
+== Optional Run Outside Launchpad
+
+Docker Compose is the upstream local execution method. Run it on your own
+workstation only after the workshop if you want to reproduce the local
+topology. The pinned source README contains the required CPU, memory, model,
+and environment setup. Do not try to run a nested Docker Compose stack inside
+the Launchpad terminal.
+
+== Track 1 Checkpoint
+
+You have completed Track 1 when you can explain:
+
+* why each agent is independently discoverable;
+* how semantic routing changes workflow depth;
+* why MCP tools are separate from the model; and
+* where input and output guardrails run.
+
+[.next-nav]
+xref:track-2-openshift.adoc[Continue to Track 2: Deploy to OpenShift ->]

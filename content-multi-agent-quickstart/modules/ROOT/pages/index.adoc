@@ -1,6 +1,37 @@
 = Build Multi-Agent AI Systems with Open Protocols
 :navtitle: Welcome
 
+== One Lab, Three Tracks
+
+This is *one catalog item* and *one participant environment*. Your order gives
+you one namespace, one Showroom, one terminal, and one Multi-Agent Workspace.
+Inside that lab you can follow any or all three upstream learning tracks; you
+do not order three separate environments.
+
+[cols="1,2,3,2",options="header"]
+|===
+| Track | Start | Focus | Launchpad delivery
+
+| 1
+| xref:track-1-local.adoc[Run locally]
+| Learn the application pattern, agent discovery, routing, MCP, and guardrails.
+| Source-guided exercises use the same pre-provisioned application so every participant starts consistently.
+
+| 2
+| xref:track-2-openshift.adoc[Deploy to OpenShift]
+| Inspect and operate the application as a namespace-scoped OpenShift workload.
+| Fully live in your assigned Arena namespace; this is the currently certified runtime path.
+
+| 3
+| xref:track-3-blueprint.adoc[Advanced blueprint alignment]
+| Map the application to Kagenti, OpenTelemetry, service identity, and governance.
+| Architecture and manifest exploration; optional platform integrations are identified explicitly when they are not installed.
+|===
+
+If this is your first time with the project, follow Tracks 1, 2, and 3 in
+order. Experienced OpenShift users can begin with Track 2, while platform
+architects can begin with Track 3 and return to the shared exercises as needed.
+
 == What You Will Build
 
 In this lab you will explore and customize a working multi-agent system on Red Hat OpenShift. Three specialized agents cooperate through the Agent-to-Agent (A2A) protocol, call external tools through the Model Context Protocol (MCP), and use semantic routing to choose the right workflow for each request.
@@ -57,7 +88,7 @@ The final command must return `{project_name}`. Launchpad has already authentica
 | Lets you run workflows and inspect routing, agent results, tools, and health.
 |===
 
-== Lab Flow
+== Shared Lab Flow
 
 This guided build takes about 60 minutes.
 
@@ -72,4 +103,4 @@ This guided build takes about 60 minutes.
 |===
 
 [.next-nav]
-xref:01-architecture.adoc[Start: Architecture and Open Protocols ->]
+xref:track-1-local.adoc[Start Track 1: Run Locally ->]
