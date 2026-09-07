@@ -14,6 +14,15 @@ spec:
         kubernetes.io/hostname: gnr2.fm2aihpcsed.com
       containers:
         - name: backend
+          # Workshop state, validation results, and concurrent Kubernetes
+          # clients exceeded the base 512Mi limit at the second 25-seat order.
+          resources:
+            requests:
+              cpu: 250m
+              memory: 1Gi
+            limits:
+              cpu: "1"
+              memory: 2Gi
           env:
             # Scaled operator workshops can queue transient rollout pods while
             # RHOAI reconciles. Retry only transient readiness failures for up

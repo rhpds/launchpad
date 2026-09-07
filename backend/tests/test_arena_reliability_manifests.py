@@ -121,6 +121,15 @@ def test_backend_single_replica_limit_is_explicit():
     assert annotations["launchpad.redhat.com/ha-blocker"] == (
         "in-memory-session-cache-must-be-externalized-before-replicas-exceed-one"
     )
+    container = next(
+        item
+        for item in backend["spec"]["template"]["spec"]["containers"]
+        if item["name"] == "backend"
+    )
+    assert container["resources"] == {
+        "requests": {"cpu": "250m", "memory": "1Gi"},
+        "limits": {"cpu": "1", "memory": "2Gi"},
+    }
 
 
 def test_arena_backend_runs_on_the_stable_execution_worker():
