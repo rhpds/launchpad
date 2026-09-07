@@ -20,6 +20,7 @@ def _documents(name: str) -> list[dict]:
 def test_arena_overlay_installs_reliability_resources():
     kustomization = yaml.safe_load((OVERLAY / "kustomization.yaml").read_text())
     assert "reliability.yaml" in kustomization["resources"]
+    assert "argocd-monitoring-rbac.yaml" in kustomization["resources"]
 
     documents = _documents("reliability.yaml")
     rules = next(item for item in documents if item["kind"] == "PrometheusRule")
@@ -49,6 +50,34 @@ def test_arena_overlay_installs_reliability_resources():
         "public-access-gateway",
     }
     assert all(item["spec"]["minAvailable"] == 1 for item in pdbs)
+
+
+def test_argocd_monitoring_access_is_namespace_scoped_and_least_privilege():
+    documents = _documents("argocd-monitoring-rbac.yaml")
+    role = next(item for item in documents if item["kind"] == "Role")
+    binding = next(item for item in documents if item["kind"] == "RoleBinding")
+
+    assert role["metadata"]["namespace"] == "partner-ai-launchpad"
+    assert role["rules"] == [
+        {
+            "apiGroups": ["monitoring.coreos.com"],
+            "resources": ["prometheusrules"],
+            "verbs": ["get", "list", "watch", "create", "update", "patch", "delete"],
+        }
+    ]
+    assert binding["metadata"]["namespace"] == "partner-ai-launchpad"
+    assert binding["roleRef"] == {
+        "apiGroup": "rbac.authorization.k8s.io",
+        "kind": "Role",
+        "name": "launchpad-argocd-prometheusrules",
+    }
+    assert binding["subjects"] == [
+        {
+            "kind": "ServiceAccount",
+            "name": "openshift-gitops-argocd-application-controller",
+            "namespace": "openshift-gitops",
+        }
+    ]
 
 
 def test_arena_stateless_frontends_are_spread_across_workers():

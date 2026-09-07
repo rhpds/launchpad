@@ -1,0 +1,32 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: launchpad-argocd-prometheusrules
+  namespace: partner-ai-launchpad
+rules:
+  - apiGroups:
+      - monitoring.coreos.com
+    resources:
+      - prometheusrules
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: launchpad-argocd-prometheusrules
+  namespace: partner-ai-launchpad
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: launchpad-argocd-prometheusrules
+subjects:
+  - kind: ServiceAccount
+    name: openshift-gitops-argocd-application-controller
+    namespace: openshift-gitops

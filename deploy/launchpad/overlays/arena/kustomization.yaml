@@ -8,6 +8,7 @@ resources:
   - buildconfig.yaml
   - operations-automation.yaml
   - reliability.yaml
+  - argocd-monitoring-rbac.yaml
   - arena-clusters.yaml
 
 patches:
