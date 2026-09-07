@@ -21,5 +21,11 @@
     "production_blockers_retained": true,
     "max_workshop_seats": 25
   },
+  "arena_build": {
+    "name": "launchpad-backend-106",
+    "source_revision": "0bd859ea32370f77356ff57ade614175f0c58905",
+    "phase": "Complete",
+    "image_digest": "sha256:1b16195f7573f22e71bfdc2e95f7bfd24b213303c4940d0ce49255f35849a1ce"
+  },
   "production_boundary": "Internal activation does not certify public access, a durable external image registry, or optional Track 3 runtime integrations."
 }
