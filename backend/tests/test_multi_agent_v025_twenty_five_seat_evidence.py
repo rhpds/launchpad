@@ -1,4 +1,4 @@
-"""Release contract for the v0.2.5 hands-on 25-seat regression."""
+"""Release contract for the v0.2.5 hands-on 25-seat promotion sequence."""
 
 from __future__ import annotations
 
@@ -7,15 +7,33 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-EVIDENCE = (
-    ROOT
-    / "evidence/runs/"
-    "multi-agent-quickstart-25-seat-multi-agent-v025-25seat-20260906-01.json"
-)
+RUNS = [
+    (
+        "multi-agent-quickstart-25-seat-multi-agent-v025-25seat-20260906-01.json",
+        1,
+        False,
+    ),
+    (
+        "multi-agent-quickstart-25-seat-multi-agent-v025-25seat-20260906-02.json",
+        2,
+        False,
+    ),
+    (
+        "multi-agent-quickstart-25-seat-multi-agent-v025-25seat-20260906-03.json",
+        3,
+        True,
+    ),
+]
 
 
-def test_v025_hands_on_twenty_five_seat_regression_is_green():
-    evidence = json.loads(EVIDENCE.read_text())
+def test_v025_hands_on_twenty_five_seat_sequence_is_green():
+    for filename, consecutive, eligible in RUNS:
+        _assert_green_run(filename, consecutive, eligible)
+
+
+def _assert_green_run(filename: str, consecutive: int, eligible: bool) -> None:
+    evidence_path = ROOT / "evidence/runs" / filename
+    evidence = json.loads(evidence_path.read_text())
 
     assert evidence["schema"] == (
         "launchpad.redhat.com/catalog-certification-evidence/v1"
@@ -69,6 +87,11 @@ def test_v025_hands_on_twenty_five_seat_regression_is_green():
     assert set(evidence["validation_matrix"].values()) == {"GREEN-live"}
     assert evidence["rubric"]["score"] == 100
     assert evidence["rubric"]["passed"] is True
+    assert evidence["promotion"] == {
+        "consecutive_passing_runs": consecutive,
+        "eligible": eligible,
+        "required_consecutive_runs": 3,
+    }
     assert evidence["cleanup"]["status"] == "completed"
     assert evidence["cleanup"]["seconds"] <= 1200
     assert evidence["cleanup"]["model_keys_revoked"] is True
@@ -81,9 +104,13 @@ def test_v025_hands_on_twenty_five_seat_regression_is_green():
     }
 
 
-def test_v025_hands_on_twenty_five_seat_evidence_checksum_is_valid():
-    manifest = EVIDENCE.with_name(EVIDENCE.name + ".sha256")
-    expected, filename = manifest.read_text().strip().split("  ", maxsplit=1)
+def test_v025_hands_on_twenty_five_seat_evidence_checksums_are_valid():
+    for filename, _, _ in RUNS:
+        evidence_path = ROOT / "evidence/runs" / filename
+        manifest = evidence_path.with_name(evidence_path.name + ".sha256")
+        expected, manifest_filename = manifest.read_text().strip().split(
+            "  ", maxsplit=1
+        )
 
-    assert filename == EVIDENCE.name
-    assert hashlib.sha256(EVIDENCE.read_bytes()).hexdigest() == expected
+        assert manifest_filename == evidence_path.name
+        assert hashlib.sha256(evidence_path.read_bytes()).hexdigest() == expected

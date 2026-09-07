@@ -135,14 +135,16 @@ and reclaim left zero declared resources. The run scored 100/100 and its hashed
 evidence is under `evidence/runs/`.
 
 The existing 25-seat runs prove Arena topology, capacity, concurrent workflow,
-isolation, and cleanup at scale. The exact-image v0.2.5 regression,
-`multi-agent-v025-25seat-20260906-01`, then provisioned one 25-seat workshop on
-Arena in 727.864 seconds. All 25 concurrent participant probes passed the UI,
+isolation, and cleanup at scale. Three consecutive exact-image v0.2.5 runs,
+`multi-agent-v025-25seat-20260906-01` through `-03`, then repeated the complete
+25-seat workshop on Arena. Readiness completed in 727.864, 729.792, and 754.999
+seconds. Across all three runs, all 75 participant probes passed the UI,
 three-agent, MCP, guardrail, semantic-routing, namespace-isolation, and
 hands-on policy checks. Every seat applied the 48-token override, ran the
 workflow, removed the ConfigMap, and restored the 96-token baseline. Reclaim
-completed in 565.917 seconds with model keys revoked and zero declared
-residue. This closes the exact-image 25-seat regression required for event use.
+completed in 565.917, 385.880, and 510.159 seconds with model keys revoked and
+zero declared residue each time. Run 3 recorded consecutive pass 3 of 3 and
+made the v0.2.5 promotion result eligible for internal 25-seat use.
 
 ## Repeatable onboarding and certification
 
