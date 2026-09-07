@@ -1415,6 +1415,55 @@ class ProvisioningService:
             )
         return workshop.model_copy(update={"session_ids": session_ids, "seats": seats})
 
+    def _authoritative_workshop_stop_state(
+        self, workshop_id: str
+    ) -> Optional[Workshop]:
+        """Return a persisted state that forbids publishing more seat results.
+
+        A backend replacement can briefly leave an old process finishing a
+        Kubernetes mutation while the replacement process reclaims the same
+        workshop.  The database, rather than either process-local cache, is
+        authoritative for stop states.  Late workers must observe that state
+        and reclaim any unlinked session they just created.
+        """
+        stop_states = {
+            WorkshopStatus.RECLAIMING,
+            WorkshopStatus.COMPLETED,
+            WorkshopStatus.COMPLETED_WITH_ERRORS,
+        }
+        current = self._workshops.get(workshop_id)
+        store = getattr(self.db, "workshops", None) if self.db else None
+        get_persisted = getattr(store, "get", None)
+        if callable(get_persisted):
+            persisted = get_persisted(workshop_id)
+            if persisted and persisted.status in stop_states:
+                self._workshops[workshop_id] = persisted
+                return persisted
+        return current if current and current.status in stop_states else None
+
+    def _discard_late_workshop_session(
+        self, workshop: Workshop, session_id: Optional[str]
+    ) -> Workshop:
+        """Reclaim a seat result produced after workshop shutdown began."""
+        if not session_id or session_id in workshop.session_ids:
+            return workshop
+        error = self._reclaim_workshop_session(session_id)
+        if not error:
+            return workshop
+        failed = list(workshop.metadata.get("failed_late_seat_reclaims", []))
+        failed.append({"session_id": session_id, "error": error})
+        updated = workshop.model_copy(
+            update={
+                "status": WorkshopStatus.COMPLETED_WITH_ERRORS,
+                "metadata": {
+                    **workshop.metadata,
+                    "failed_late_seat_reclaims": failed,
+                },
+            }
+        )
+        self._save_workshop(updated)
+        return updated
+
     def _cleanup_interrupted_workshop_sessions(self, workshop: Workshop) -> Workshop:
         """Remove every partial seat session before retrying an interrupted order.
 
@@ -1728,6 +1777,19 @@ class ProvisioningService:
                         "updated_at": datetime.utcnow(),
                     })
                     session_id = None
+
+                # A different backend process may have reclaimed this order
+                # while this worker was blocked in a cluster API call.  Never
+                # overwrite that durable stop state or strand the late seat.
+                stopped = self._authoritative_workshop_stop_state(
+                    workshop.workshop_id
+                )
+                if stopped:
+                    workshop = self._discard_late_workshop_session(
+                        stopped, session_id
+                    )
+                    continue
+
                 workshop.seats[i] = updated_seat
                 if session_id:
                     session_ids.append(session_id)
@@ -1743,7 +1805,7 @@ class ProvisioningService:
                     })
                 self._save_workshop(workshop)
 
-        current = self._workshops.get(workshop.workshop_id)
+        current = self._authoritative_workshop_stop_state(workshop.workshop_id)
         if current and current.status == WorkshopStatus.RECLAIMING:
             workshop = current.model_copy(update={
                 "seats": workshop.seats,
@@ -1757,6 +1819,9 @@ class ProvisioningService:
             self._save_workshop(workshop)
             provision_event.set()
             return workshop
+        if current:
+            provision_event.set()
+            return current
 
         readiness_failures = self._wait_for_workshop_stability(workshop.seats)
         if readiness_failures:

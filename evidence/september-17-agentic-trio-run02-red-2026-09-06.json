@@ -1,0 +1,209 @@
+{
+  "schema": "launchpad.redhat.com/event-certification/v1",
+  "evidence_id": "CERT-SEPTEMBER-17-AGENTIC-TRIO-RUN02-RED-20260906",
+  "generated_at": "2026-09-07T04:03:37Z",
+  "event_date": "2026-09-17",
+  "cluster_id": "arena",
+  "access_scope": "internal-vpn",
+  "source_revision": "18e7d63a22ce1af44da65e8c0883140d05069715",
+  "backend_image": {
+    "build": "launchpad-backend-108",
+    "digest": "sha256:9871ae33f0728968ea0c88381d841784c878d3a56603b22a14231933fab73b59"
+  },
+  "overall_status": "RED",
+  "workshops": [
+    {
+      "provision_order": 1,
+      "workshop_id": "2b005a29-220c-439f-a219-b8db05edcb2d",
+      "catalog_item_id": "multi-agent-quickstart",
+      "catalog_version": "0.2.5",
+      "seats_requested": 25,
+      "seats_ready": 25,
+      "provisioning_seconds_approximate": 543,
+      "placement": {
+        "gnr2.fm2aihpcsed.com": {
+          "seat_namespaces": 13,
+          "active_seat_pods": 26
+        },
+        "rhgnr1": {
+          "seat_namespaces": 12,
+          "active_seat_pods": 24
+        }
+      },
+      "cleanup_status": "completed",
+      "reclaimed_seats": 25,
+      "cleanup_completed_at": "2026-09-07T03:49:24.754976Z"
+    },
+    {
+      "provision_order": 2,
+      "workshop_id": "4e3b2e5f-8987-42a1-943f-aa3d36aebdea",
+      "catalog_item_id": "intel-llm-cpu-serving",
+      "catalog_version": "1.0.0",
+      "seats_requested": 25,
+      "seats_ready_before_abort": 0,
+      "persisted_sessions_started": 7,
+      "sessions_linked_during_initial_reclaim": 5,
+      "late_sessions_reconciled": 2,
+      "cleanup_status": "completed",
+      "reclaimed_seat_records": 25,
+      "cleanup_completed_at": "2026-09-07T03:44:50.007711Z",
+      "late_session_cleanup_completed_at": "2026-09-07T03:59:06.242717Z"
+    },
+    {
+      "provision_order": 3,
+      "workshop_id": null,
+      "catalog_item_id": "intel-xeon6-agent-201",
+      "catalog_version": "1.0.2",
+      "seats_requested": 25,
+      "created": false,
+      "reason": "run stopped after critical control-plane and worker failures"
+    }
+  ],
+  "placement_proof": {
+    "workshop_node_spread_enabled": true,
+    "workshop_node_min_ready_seconds": 900,
+    "multi_agent_distribution_balanced": true,
+    "result": "GREEN-live"
+  },
+  "control_plane_failure": {
+    "component": "backend",
+    "failure": "OOMKilled",
+    "exit_code": 137,
+    "observed_limit": "512Mi",
+    "occurred_during": "second 25-seat workshop provisioning",
+    "live_remediation": {
+      "memory_request": "1Gi",
+      "memory_limit": "2Gi",
+      "backend_node": "gnr2.fm2aihpcsed.com"
+    },
+    "finding": "The original backend memory envelope was not sufficient for overlapping workshop recovery, validation state, and Kubernetes clients."
+  },
+  "execution_worker_failure": {
+    "node": "rhgnr1",
+    "node_ready_condition": true,
+    "showroom_pods_stalled_during_startup": true,
+    "affected_second_workshop_namespaces": 2,
+    "finding": "The node remained API-visible as Ready while new Showroom pods did not make deterministic startup progress; node Ready alone is not a sufficient admission signal."
+  },
+  "cancellation_race": {
+    "backend_replacement_during_recovery": true,
+    "completed_workshop_received_late_sessions": 2,
+    "late_session_ids": [
+      "ba9d638d-7086-431e-8bdd-b318230f9fd5",
+      "2cbc5f9e-c076-43d1-846e-0819925cd8ba"
+    ],
+    "late_namespaces": [
+      "launchpad-smoke-test-tenant-intel-llm-cpu-serv-1be438",
+      "launchpad-smoke-test-tenant-intel-llm-cpu-serv-78dcab"
+    ],
+    "initial_automatic_cleanup_complete": false,
+    "manual_targeted_reconciliation_required": true,
+    "result": "RED"
+  },
+  "reconciler_failure": {
+    "scheduled_job": "launchpad-resource-reconciler-29812545",
+    "database_connection_timed_out": true,
+    "orphan_deletion_skipped_fail_closed": true,
+    "root_cause": "the standalone CronJob pod lacked the managed-by label required by the rendered PostgreSQL ingress NetworkPolicy",
+    "result": "RED"
+  },
+  "cleanup": {
+    "workshops_completed": 2,
+    "reclaimed_seat_records": 50,
+    "late_sessions_reclaimed": 2,
+    "remaining_namespaces": 0,
+    "remaining_argocd_applications": 0,
+    "zero_residue_observed_at": "2026-09-07T04:03:37Z",
+    "result": "GREEN-live-after-targeted-reconciliation"
+  },
+  "tdd_red_green_proof": {
+    "red_tests_observed": [
+      "test_stale_worker_reclaims_late_seat_after_another_process_completes_order",
+      "test_backend_single_replica_limit_is_explicit",
+      "test_arena_reconciler_is_admitted_by_postgres_network_policy",
+      "test_reconcile_reclaims_active_session_owned_by_completed_workshop",
+      "test_configured_database_connection_failure_is_not_silent",
+      "test_session_write_failure_is_not_downgraded_to_memory_only"
+    ],
+    "green_regression_suite": {
+      "passed": 1135,
+      "deselected_local": 13,
+      "failed": 0
+    }
+  },
+  "red_green_matrix": [
+    {
+      "gate": "exact-catalog-revisions",
+      "status": "GREEN-live"
+    },
+    {
+      "gate": "balanced-seat-node-placement",
+      "status": "GREEN-live"
+    },
+    {
+      "gate": "first-25-seat-workshop-ready",
+      "status": "GREEN-live"
+    },
+    {
+      "gate": "second-25-seat-workshop-ready",
+      "status": "RED"
+    },
+    {
+      "gate": "third-25-seat-workshop-ready",
+      "status": "NOT-RUN-AFTER-RED"
+    },
+    {
+      "gate": "75-concurrent-ready-environments",
+      "status": "NOT-RUN-AFTER-RED"
+    },
+    {
+      "gate": "75-participant-functional-journeys",
+      "status": "NOT-RUN-AFTER-RED"
+    },
+    {
+      "gate": "cross-seat-and-node-authorization",
+      "status": "NOT-RUN-AFTER-RED"
+    },
+    {
+      "gate": "sixty-minute-soak",
+      "status": "NOT-RUN-AFTER-RED"
+    },
+    {
+      "gate": "automatic-reclaim-and-zero-residue",
+      "status": "RED"
+    },
+    {
+      "gate": "targeted-repair-and-zero-residue",
+      "status": "GREEN-live"
+    }
+  ],
+  "rubric": {
+    "score": 45,
+    "required": 100,
+    "categories": {
+      "immutable_contracts_and_artifacts": "15/15",
+      "placement_and_capacity": "15/15",
+      "provisioning_and_readiness": "10/20",
+      "participant_functionality": "0/25",
+      "authorization_and_isolation": "0/15",
+      "cleanup_and_repeatability": "5/10"
+    },
+    "critical_failure_overrides_score": true
+  },
+  "post_run_fixes": [
+    "Raised the Arena backend request to 1Gi and limit to 2Gi",
+    "Made stale seat workers reread persisted stop state and immediately reclaim late unlinked sessions",
+    "Added completed-workshop late-session repair to resource reconciliation",
+    "Made configured PostgreSQL connection and critical lifecycle write failures fail closed",
+    "Changed the singleton Arena backend rollout strategy to Recreate until a distributed workshop lease exists",
+    "Added the NetworkPolicy-compatible label to the Arena resource reconciler"
+  ],
+  "required_before_run03": [
+    "Deploy the corrected backend image and Arena GitOps manifests",
+    "Prove the scheduled reconciler can reach PostgreSQL and completes without errors",
+    "Repair or exclude rhgnr1 using a workload-start admission canary rather than Ready status alone",
+    "Repeat staggered 25 plus 25 plus 25 provisioning without restarting the backend",
+    "Complete all 75 participant journeys, isolation checks, real LLM calls, 60-minute soak, automatic reclaim, and zero-residue verification"
+  ],
+  "release_decision": "not-certified"
+}

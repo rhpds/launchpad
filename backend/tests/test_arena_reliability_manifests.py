@@ -121,6 +121,7 @@ def test_backend_single_replica_limit_is_explicit():
     assert annotations["launchpad.redhat.com/ha-blocker"] == (
         "in-memory-session-cache-must-be-externalized-before-replicas-exceed-one"
     )
+    assert backend["spec"]["strategy"] == {"type": "Recreate"}
     container = next(
         item
         for item in backend["spec"]["template"]["spec"]["containers"]
@@ -169,6 +170,21 @@ def test_arena_reconciler_runs_on_the_stable_execution_worker():
     assert reconciler["spec"]["jobTemplate"]["spec"]["template"]["spec"][
         "nodeSelector"
     ] == {"kubernetes.io/hostname": "gnr2.fm2aihpcsed.com"}
+
+
+def test_arena_reconciler_is_admitted_by_postgres_network_policy():
+    reconciler = next(
+        item
+        for item in _documents("operations-automation.yaml")
+        if item["kind"] == "CronJob"
+        and item["metadata"]["name"] == "launchpad-resource-reconciler"
+    )
+
+    labels = reconciler["spec"]["jobTemplate"]["spec"]["template"][
+        "metadata"
+    ]["labels"]
+    assert labels["app.kubernetes.io/managed-by"] == "kustomize"
+    assert labels["app.kubernetes.io/part-of"] == "partner-ai-launchpad"
 
 
 def test_cpu_model_readiness_does_not_flap_during_a_participant_burst():

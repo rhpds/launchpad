@@ -13,6 +13,9 @@ spec:
       template:
         metadata:
           labels:
+            # postgres-ingress is rendered with this selector by the base
+            # kustomization, so standalone overlay Jobs must carry it too.
+            app.kubernetes.io/managed-by: kustomize
             app.kubernetes.io/part-of: partner-ai-launchpad
             app.kubernetes.io/name: launchpad-resource-reconciler
         spec:

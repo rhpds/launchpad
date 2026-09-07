@@ -60,7 +60,7 @@ def test_event_readiness_manifest_keeps_the_exact_workshop_target_and_budget():
     assert readiness["public_access_certified"] is False
     assert readiness["overall_status"] == "RED"
     assert readiness["next_gate"] == (
-        "arena-stability-validation-then-exact-agentic-trio-run02"
+        "deploy-run02-remediation-then-exact-agentic-trio-run03"
     )
     assert readiness["supersedes"] == (
         "evidence/september-17-three-workshop-readiness-2026-09-05.json"
@@ -75,7 +75,7 @@ def test_event_readiness_manifest_keeps_the_exact_workshop_target_and_budget():
         "evidence/multi-agent-quickstart-25-seat-promotion-2026-09-06.json"
     )
     assert readiness["latest_exact_trio_evidence"] == (
-        "evidence/september-17-agentic-trio-run01-red-2026-09-06.json"
+        "evidence/september-17-agentic-trio-run02-red-2026-09-06.json"
     )
     assert readiness["capacity_status"]["active_worker_pods"] == 216
     assert readiness["capacity_status"]["available_slots_after_reserve"] == 184
@@ -104,6 +104,8 @@ def test_event_runbook_names_every_gate_and_does_not_overclaim_capacity():
         "184",
         "evidence/arena-staggered-three-workshops-2026-09-04.json",
         "Exact-trio run 01 — RED",
+        "Exact-trio run 02 — RED",
+        "evidence/september-17-agentic-trio-run02-red-2026-09-06.json",
     ):
         assert value in runbook
 

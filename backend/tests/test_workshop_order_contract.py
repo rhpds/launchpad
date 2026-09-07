@@ -196,6 +196,9 @@ class InMemoryWorkshopStore:
     def list_all(self):
         return list(self.items.values())
 
+    def get(self, workshop_id):
+        return self.items.get(workshop_id)
+
 
 def test_idempotency_survives_service_restart():
     store = InMemoryWorkshopStore()
@@ -1092,6 +1095,80 @@ def test_reclaim_waits_for_inflight_provisioning_without_status_overwrite():
     )
 
 
+def test_stale_worker_reclaims_late_seat_after_another_process_completes_order():
+    """A rolling replacement must not let the old worker recreate an order.
+
+    The persisted workshop is authoritative across backend processes.  This
+    models one process completing reclaim while a stale process finishes a
+    seat that already mutated the execution cluster.
+    """
+    store = InMemoryWorkshopStore()
+    service = ProvisioningService(db_stores=SimpleNamespace(workshops=store))
+    workshop = Workshop(
+        tenant_id="stale-worker-tenant",
+        catalog_item_id="inference-overdrive-quickstart",
+        num_users=1,
+    )
+    seat_started = threading.Event()
+    allow_seat_to_finish = threading.Event()
+    late_session = LabSession(
+        request_id="late-request",
+        tenant_id=workshop.tenant_id,
+        catalog_item_id=workshop.catalog_item_id,
+        namespace="launchpad-late-seat",
+        status=SessionStatus.READY,
+    )
+
+    def late_seat(target_workshop, index):
+        seat_started.set()
+        assert allow_seat_to_finish.wait(timeout=2)
+        service._save_session(late_session)
+        return target_workshop.seats[index].model_copy(
+            update={
+                "status": WorkshopSeatStatus.READY,
+                "session_id": late_session.session_id,
+                "request_id": late_session.request_id,
+            }
+        ), late_session.session_id
+
+    result = {}
+
+    def provision():
+        result["workshop"] = service.provision_workshop(workshop)
+
+    with (
+        patch.object(service, "_provision_workshop_seat", side_effect=late_seat),
+        patch.object(
+            service, "_reclaim_workshop_session", return_value=None
+        ) as reclaim,
+    ):
+        thread = threading.Thread(target=provision)
+        thread.start()
+        assert seat_started.wait(timeout=2)
+
+        persisted = store.get(workshop.workshop_id)
+        store.save(
+            persisted.model_copy(
+                update={
+                    "status": WorkshopStatus.COMPLETED,
+                    "completed_at": persisted.started_at,
+                    "seats": [
+                        persisted.seats[0].model_copy(
+                            update={"status": WorkshopSeatStatus.RECLAIMED}
+                        )
+                    ],
+                }
+            )
+        )
+        allow_seat_to_finish.set()
+        thread.join(timeout=5)
+
+    assert not thread.is_alive()
+    reclaim.assert_called_once_with(late_session.session_id)
+    assert result["workshop"].status == WorkshopStatus.COMPLETED
+    assert store.get(workshop.workshop_id).status == WorkshopStatus.COMPLETED
+
+
 def test_reclaim_cancels_workshop_seats_that_have_not_started():
     service = ProvisioningService()
     item = service.catalog.get_item("inference-overdrive-quickstart")
@@ -1129,7 +1206,13 @@ def test_reclaim_cancels_workshop_seats_that_have_not_started():
     assert not thread.is_alive()
     assert started_indexes == [0]
     assert result["workshop"].status == WorkshopStatus.RECLAIMING
-    assert len(result["workshop"].session_ids) == 1
+    # The in-flight seat is reclaimed immediately once its result observes
+    # the group stop state; the final reclaim relinks the persisted record so
+    # its seat-level audit trail is still complete.
+    assert result["workshop"].session_ids == []
+    assert {
+        session.status for session in service._sessions.values()
+    } == {SessionStatus.RECLAIMED}
 
     reclaimed = service.reclaim_workshop(workshop.workshop_id)
     assert reclaimed.status == WorkshopStatus.COMPLETED

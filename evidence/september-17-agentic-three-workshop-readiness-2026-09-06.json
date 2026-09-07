@@ -1,8 +1,8 @@
 {
   "schema": "launchpad.redhat.com/event-readiness/v2",
   "evidence_id": "READINESS-SEPTEMBER-17-AGENTIC-THREE-WORKSHOPS-20260906",
-  "generated_at": "2026-09-07T01:45:54Z",
-  "source_revision": "80c2747527b8bfb4fa92097b6e97560f3ccd58c8",
+  "generated_at": "2026-09-07T04:03:37Z",
+  "source_revision": "227af6250c4361cf21d3462eb6709a410710f05e",
   "event_date": "2026-09-17",
   "deployment_scope": "fleet",
   "supersedes": "evidence/september-17-three-workshop-readiness-2026-09-05.json",
@@ -21,7 +21,7 @@
   "concurrent_participant_seats": 75,
   "public_access_certified": false,
   "overall_status": "RED",
-  "certification_boundary": "The individual workshop evidence and current Arena capacity make the revised trio eligible for a live rehearsal. This artifact does not claim that the exact three current catalog releases have yet run together.",
+  "certification_boundary": "Exact-trio runs 01 and 02 are RED. Run 01 reached 75 Ready seats but failed participant probes during a worker outage. Run 02 proved balanced placement and one 25-seat workshop, then stopped during the second order after a backend OOM and worker startup stall. The event candidate is not certified.",
   "workshops": [
     {
       "provision_order": 1,
@@ -85,7 +85,7 @@
   },
   "previous_pattern_evidence": "evidence/arena-staggered-three-workshops-2026-09-04.json",
   "latest_multi_agent_promotion_evidence": "evidence/multi-agent-quickstart-25-seat-promotion-2026-09-06.json",
-  "latest_exact_trio_evidence": "evidence/september-17-agentic-trio-run01-red-2026-09-06.json",
+  "latest_exact_trio_evidence": "evidence/september-17-agentic-trio-run02-red-2026-09-06.json",
   "capacity_status": {
     "observed_at": "2026-09-07T01:45:54Z",
     "cluster_id": "arena",
@@ -111,10 +111,10 @@
     "sequential bulk reclaim with zero run-specific residue"
   ],
   "remaining_release_gates": [
-    "confirm-arena-workers-connectivity-stable-for-fifteen-minutes",
-    "verify-gitops-control-plane-placement-guardrails",
+    "deploy-and-verify-run02-control-plane-and-reconciler-fixes",
+    "qualify-rhgnr1-with-a-workload-start-canary-or-exclude-it",
     "preflight-current-arena-capacity-and-node-stability",
-    "exact-agentic-trio-run02",
+    "exact-agentic-trio-run03",
     "sixty-minute-concurrent-participant-soak",
     "manual-browser-showroom-terminal-and-workspace-journey",
     "shared-model-contention-and-error-rate-check",
@@ -122,7 +122,7 @@
     "zero-residue-bulk-reclaim",
     "event-day-capacity-preflight"
   ],
-  "next_gate": "arena-stability-validation-then-exact-agentic-trio-run02",
+  "next_gate": "deploy-run02-remediation-then-exact-agentic-trio-run03",
   "release_policy": {
     "rubric_score_required": 100,
     "critical_cells_must_be_green_live": true,

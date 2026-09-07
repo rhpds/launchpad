@@ -125,8 +125,12 @@ staggered while all 75 environments remain available concurrently. The exact
 combined rehearsal and capacity gate are tracked in
 [docs/september-17-agentic-three-workshop-readiness.md](docs/september-17-agentic-three-workshop-readiness.md).
 Run 01 provisioned all 75 environments and reclaimed them without residue, but
-is RED because Arena worker connectivity failed during participant probes; the
-next gate is worker stability validation followed by run 02.
+is RED because Arena worker connectivity failed during participant probes.
+Run 02 proved balanced placement and a healthy first 25-seat workshop, then
+stopped on a backend OOM, a misleadingly Ready `rhgnr1`, and a late-seat
+cancellation race. It also reached zero residue after targeted reconciliation.
+The next gate is deployment verification of the recorded fixes followed by
+run 03; the event candidate is not yet certified.
 
 ## Repository layout
 

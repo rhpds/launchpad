@@ -1,6 +1,8 @@
+from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
-from app.domain.enums import SessionStatus
+from app.domain.enums import CatalogCategory, SessionStatus, WorkshopStatus
+from app.domain.models import LabRequest, Workshop
 from app.services.provisioning import ProvisioningService
 
 
@@ -64,3 +66,58 @@ def test_reconcile_fails_closed_when_database_is_unavailable(lab_session):
     namespaces.assert_not_called()
     service.cleanup.cleanup.assert_not_called()
     assert report["errors"] == ["database unavailable — orphan deletion skipped"]
+
+
+def test_reconcile_reclaims_active_session_owned_by_completed_workshop(lab_session):
+    workshop = Workshop(
+        workshop_id="completed-workshop",
+        tenant_id=lab_session.tenant_id,
+        catalog_item_id=lab_session.catalog_item_id,
+        num_users=1,
+        status=WorkshopStatus.COMPLETED,
+    )
+    request = LabRequest(
+        request_id=lab_session.request_id,
+        tenant_id=lab_session.tenant_id,
+        requester_id="seat-1",
+        catalog_item_id=lab_session.catalog_item_id,
+        requested_mode=CatalogCategory.QUICK_START,
+        metadata={"workshop_id": workshop.workshop_id, "seat_id": "seat-1"},
+    )
+    late = lab_session.model_copy(
+        update={"status": SessionStatus.PROVISIONING, "cluster_ref": "arena"}
+    )
+    service = SimpleNamespace(
+        _sessions={late.session_id: late},
+        _requests={request.request_id: request},
+        _workshops={workshop.workshop_id: workshop},
+        cleanup=MagicMock(),
+        _scrub_credentials=lambda session: session,
+        _save_session=MagicMock(),
+        _reclaim_workshop_session=MagicMock(return_value=None),
+    )
+
+    from app.services.resource_reconciliation import reconcile_resources
+
+    with (
+        patch(
+            "app.services.resource_reconciliation._database_available",
+            return_value=True,
+        ),
+        patch(
+            "app.services.resource_reconciliation._managed_namespaces",
+            return_value=[],
+        ),
+    ):
+        report = reconcile_resources(service, delete_orphans=True)
+
+    service._reclaim_workshop_session.assert_called_once_with(late.session_id)
+    assert report["late_workshop_sessions_reclaimed"] == [
+        {
+            "workshop_id": workshop.workshop_id,
+            "session_id": late.session_id,
+            "cluster_id": "arena",
+            "namespace": late.namespace,
+        }
+    ]
+    assert report["errors"] == []

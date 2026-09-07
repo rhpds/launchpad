@@ -28,6 +28,10 @@ from app.storage.database import get_database_url
 logger = logging.getLogger("launchpad.stores")
 
 
+class PersistenceUnavailableError(RuntimeError):
+    """Raised when configured durable storage cannot be reached."""
+
+
 class PostgresAccessStore:
     _models = {
         "access_policies": ("order_id", AccessPolicy),
@@ -154,7 +158,9 @@ def _get_sync_conn():
         return psycopg2.connect(url, connect_timeout=5)
     except Exception as e:
         logger.warning("psycopg2 connect failed: %s", e)
-        return None
+        raise PersistenceUnavailableError(
+            "configured PostgreSQL persistence is unavailable"
+        ) from e
 
 
 def _decode_json(value: Any) -> Any:
@@ -248,6 +254,9 @@ class PostgresSessionStore:
         except Exception as e:
             logger.warning("DB save session error: %s", e)
             conn.rollback()
+            raise PersistenceUnavailableError(
+                "failed to persist lab session"
+            ) from e
         finally:
             conn.close()
 
@@ -333,6 +342,9 @@ class PostgresWorkshopStore:
         except Exception as e:
             logger.warning("DB save workshop error: %s", e)
             conn.rollback()
+            raise PersistenceUnavailableError(
+                "failed to persist workshop"
+            ) from e
         finally:
             conn.close()
 
@@ -404,6 +416,9 @@ class PostgresRequestStore:
         except Exception as e:
             logger.warning("DB save request error: %s", e)
             conn.rollback()
+            raise PersistenceUnavailableError(
+                "failed to persist lab request"
+            ) from e
         finally:
             conn.close()
 

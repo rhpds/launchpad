@@ -5,6 +5,10 @@ metadata:
   annotations:
     launchpad.redhat.com/ha-blocker: in-memory-session-cache-must-be-externalized-before-replicas-exceed-one
 spec:
+  # A rolling replacement can overlap two process-local workshop workers.
+  # Use Recreate until workshop execution has a distributed database lease.
+  strategy:
+    type: Recreate
   template:
     spec:
       # The backend is intentionally single-replica until its in-memory session

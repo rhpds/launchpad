@@ -110,6 +110,35 @@ isolation, real LLM traffic, and the full 60-minute concurrent soak. The
 control-plane pin and seat spreading are recovery guardrails, not evidence that
 the two-worker Arena execution capacity is itself stable.
 
+## Exact-trio run 02 — RED
+
+Run 02 proved that node spreading works: Multi-Agent reached 25/25 Ready in
+about 543 seconds and distributed its seat namespaces 13 on `gnr2` and 12 on
+`rhgnr1` (26 and 24 active seat pods respectively). The first workshop was
+retained while the Serve LLMs capacity preview passed.
+
+The run stopped during the second order. The backend exceeded its original
+512Mi limit and was OOMKilled. After the live memory increase, two new Showroom
+pods assigned to `rhgnr1` did not make deterministic startup progress even
+though the node still reported Ready. Building an AI Agent was therefore never
+ordered, and no participant, isolation, real-LLM, or soak gate was attempted.
+
+Cancellation exposed a second control-plane race: the backend replacement
+overlapped workshop recovery, and two Serve LLMs sessions arrived after the
+workshop had already completed reclaim. The scheduled reconciler also could
+not reach PostgreSQL because its standalone pod did not match the rendered
+database ingress policy. Targeted normal session reclaim removed both late
+sessions. Final verification found zero run namespaces and zero Argo CD
+Applications, but automatic cleanup remains RED because manual reconciliation
+was required. The immutable record is
+`evidence/september-17-agentic-trio-run02-red-2026-09-06.json`.
+
+Before run 03, deploy the 1Gi/2Gi backend envelope, Recreate rollout strategy,
+persisted stop-state check, late-session reconciler, fail-closed persistence,
+and reconciler NetworkPolicy label. Then prove the scheduled reconciler can
+reach PostgreSQL and repair or exclude `rhgnr1` using a workload-start canary;
+the Kubernetes Ready condition alone did not predict usable seat startup.
+
 ## Exact-trio GREEN-live procedure
 
 1. Record commit SHA, catalog versions, image digests, model routes, Arena node

@@ -18,8 +18,14 @@ guided labs at 25 seats. Multi-Agent v0.2.5 independently passed three
 consecutive 25-seat Arena certifications. Exact-trio run 01 provisioned and
 retained 75/75 environments, but `rhgnr1` connectivity failed during the first
 participant probes, so the run is RED despite successful zero-residue cleanup.
-The next gate is Arena stability validation and exact-trio run 02 after the
-singleton control-plane placement guardrails are deployed. Public access
+Exact-trio run 02 proved balanced placement and one healthy 25-seat workshop,
+then stopped when the backend was OOMKilled and `rhgnr1` stalled new Showroom
+pods while still reporting Ready. Cancellation also exposed late unlinked
+sessions during backend replacement, and the scheduled reconciler could not
+reach PostgreSQL through its NetworkPolicy. Run 02 was safely reclaimed to
+zero residue after targeted reconciliation but remains RED. The next gate is
+deployment and live verification of those fixes, a workload-start health gate
+for `rhgnr1`, and exact-trio run 03. Public access
 remains a separate certification gate;
 internal Arena access is the September release baseline unless the public
 matrix is independently GREEN-live by Sep 15.

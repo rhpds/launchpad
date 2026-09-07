@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, timezone
 import os
 from typing import Any
 
-from app.domain.enums import SessionStatus
+from app.domain.enums import SessionStatus, WorkshopStatus
 from app.domain.models import LifecycleEvent
 
 
@@ -81,12 +81,54 @@ def reconcile_resources(service: Any, *, delete_orphans: bool = True) -> dict[st
     """Reconcile persisted lifecycle state with launchpad-managed namespaces."""
     report: dict[str, Any] = {
         "sessions_reconciled": 0,
+        "late_workshop_sessions_reclaimed": [],
         "orphan_namespaces_deleted": [],
         "errors": [],
     }
     if delete_orphans and not _database_available():
         report["errors"].append("database unavailable — orphan deletion skipped")
         return report
+
+    # A process that was replaced while provisioning can finish a seat after
+    # another process has already completed the parent workshop reclaim. Such
+    # a session is persisted and therefore is not a namespace orphan, but it
+    # is invalid lifecycle state and must be reclaimed before orphan scanning.
+    requests = getattr(service, "_requests", {})
+    workshops = getattr(service, "_workshops", {})
+    if (
+        delete_orphans
+        and isinstance(requests, dict)
+        and isinstance(workshops, dict)
+    ):
+        terminal_workshop_states = {
+            WorkshopStatus.COMPLETED,
+            WorkshopStatus.COMPLETED_WITH_ERRORS,
+        }
+        for session in list(service._sessions.values()):
+            if session.status not in ACTIVE_STATES:
+                continue
+            request = requests.get(session.request_id)
+            workshop_id = (
+                request.metadata.get("workshop_id") if request else None
+            )
+            workshop = workshops.get(workshop_id) if workshop_id else None
+            if not workshop or workshop.status not in terminal_workshop_states:
+                continue
+            error = service._reclaim_workshop_session(session.session_id)
+            if error:
+                report["errors"].append(
+                    f"completed workshop {workshop_id} session "
+                    f"{session.session_id}: {error}"
+                )
+                continue
+            report["late_workshop_sessions_reclaimed"].append(
+                {
+                    "workshop_id": workshop_id,
+                    "session_id": session.session_id,
+                    "cluster_id": session.cluster_ref,
+                    "namespace": session.namespace,
+                }
+            )
     for session in list(service._sessions.values()):
         if session.status != SessionStatus.CLEANUP_FAILED or not session.namespace:
             continue
