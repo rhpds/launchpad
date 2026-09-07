@@ -103,10 +103,12 @@ Applications. The immutable record is
 Before run 02, GitOps pins the singleton backend, Postgres, and resource
 reconciler to stable `gnr2`; the reliability alert includes Postgres; and every
 event catalog excludes a worker that has been Ready for less than 15 minutes.
-Run 02 must still prove all 75 participant journeys, namespace isolation, real
-LLM traffic, and the full 60-minute concurrent soak. The control-plane pin is a
-recovery guardrail, not evidence that the two-worker Arena execution capacity
-is itself stable.
+Each seat namespace is also assigned round-robin to an eligible stable worker,
+so its Showroom and workload pods cannot all fall onto the scheduler's current
+favorite node. Run 02 must still prove all 75 participant journeys, namespace
+isolation, real LLM traffic, and the full 60-minute concurrent soak. The
+control-plane pin and seat spreading are recovery guardrails, not evidence that
+the two-worker Arena execution capacity is itself stable.
 
 ## Exact-trio GREEN-live procedure
 

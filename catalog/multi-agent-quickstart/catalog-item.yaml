@@ -95,7 +95,7 @@ metadata:
     delivery_mode: architecture-and-manifest-exploration
     certification_status: content-present
   workshop_provision_concurrency: 2
-  workshop_node_spread: false
+  workshop_node_spread: true
   workshop_node_min_ready_seconds: 900
   workshop_node_headroom_pods: 0
   workshop_node_required_labels: {}

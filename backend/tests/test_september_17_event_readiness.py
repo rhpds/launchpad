@@ -124,4 +124,5 @@ def test_every_event_catalog_blocks_recently_recovered_workers():
         catalog = yaml.safe_load(
             (ROOT / "catalog" / catalog_item_id / "catalog-item.yaml").read_text()
         )
+        assert catalog["metadata"]["workshop_node_spread"] is True
         assert catalog["metadata"]["workshop_node_min_ready_seconds"] == 900

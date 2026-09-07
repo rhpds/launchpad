@@ -84,6 +84,7 @@ runtime:
     pods: 2
     storage_gib: 0
   workshop_provision_concurrency: 2
+  workshop_node_spread: true
   tabs:
     - id: terminal
       title: Terminal

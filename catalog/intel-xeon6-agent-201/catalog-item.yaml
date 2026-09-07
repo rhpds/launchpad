@@ -41,6 +41,7 @@ metadata:
   seat_cpu_millicores: 415
   seat_memory_mib: 912
   seat_pods: 3
+  workshop_node_spread: true
   workshop_node_min_ready_seconds: 900
   source_content_repo: "https://github.com/jkershawrh/intel-xeon6-ai-agent-201.git"
   source_content_revision: "d5cd98c1bc9eddf3327f136cb7114eef551bf9a6"

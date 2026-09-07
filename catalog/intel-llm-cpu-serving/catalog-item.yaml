@@ -41,6 +41,7 @@ metadata:
   seat_cpu_millicores: 665
   seat_memory_mib: 1488
   seat_pods: 2
+  workshop_node_spread: true
   workshop_node_min_ready_seconds: 900
   source_content_repo: "https://github.com/rhpds/showroom-intel-llm-cpu-serving.git"
   source_content_revision: "ca1b9af736d1b5dfa80e76c0a1bd6c4638d3eaef"
