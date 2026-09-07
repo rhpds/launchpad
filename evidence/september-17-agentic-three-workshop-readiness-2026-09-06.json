@@ -27,6 +27,10 @@
       "provision_order": 1,
       "catalog_item_id": "multi-agent-quickstart",
       "catalog_version": "0.2.5",
+      "catalog_status": "active",
+      "allowed_exposure_policies": [
+        "internal"
+      ],
       "seat_count": 25,
       "release_status": "GREEN-live-25-x3-internal",
       "current_certification_stage": "twenty-five-seat-certified",

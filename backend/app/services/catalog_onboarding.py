@@ -40,10 +40,19 @@ def build_catalog_item(intake: dict[str, Any]) -> dict[str, Any]:
     capacity_metadata = {}
     track_metadata = {}
     certification_metadata = {}
+    access_metadata = {}
     if certification.get("proof_contract"):
         certification_metadata["certification_proof_contract"] = certification[
             "proof_contract"
         ]
+    if "production_blockers" in certification:
+        certification_metadata["production_blockers"] = copy.deepcopy(
+            certification["production_blockers"]
+        )
+    if "allowed_exposure_policies" in runtime:
+        access_metadata["allowed_exposure_policies"] = copy.deepcopy(
+            runtime["allowed_exposure_policies"]
+        )
     if "learning_tracks" in runtime:
         tracks = copy.deepcopy(runtime.get("learning_tracks", []))
         track_metadata = {
@@ -70,9 +79,10 @@ def build_catalog_item(intake: dict[str, Any]) -> dict[str, Any]:
         "description": catalog["description"],
         "category": catalog["category"],
         "version": catalog["version"],
-        # Intake-generated catalog entries stay non-orderable until the
-        # certification contract has no blockers and is explicitly promoted.
-        "status": "draft",
+        # Intake-generated entries default to non-orderable. A reviewed
+        # promotion may persist an explicit active status only after its
+        # activation blockers are empty.
+        "status": catalog.get("status", "draft"),
         "required_capabilities": runtime["required_capabilities"],
         "default_hardware_profile": runtime.get("default_hardware_profile", "xeon-basic"),
         "default_quota_profile": runtime.get("default_quota_profile", "large"),
@@ -105,6 +115,7 @@ def build_catalog_item(intake: dict[str, Any]) -> dict[str, Any]:
             "promotion_sequence": certification["promotion_sequence"],
             "activation_blockers": certification["activation_blockers"],
             **certification_metadata,
+            **access_metadata,
             "showroom_journey": catalog["catalog_item_id"],
             "showroom_title": catalog["display_name"],
             "namespace_slug": runtime.get("namespace_slug", catalog["catalog_item_id"]),
@@ -195,6 +206,9 @@ def _validate_contract(intake: dict[str, Any], errors: list[str]) -> None:
     for key in ("display_name", "description", "category", "version"):
         if not str(catalog.get(key, "")).strip():
             errors.append(f"catalog.{key} is required")
+    catalog_status = catalog.get("status", "draft")
+    if catalog_status not in {"draft", "active"}:
+        errors.append("catalog.status must be draft or active")
 
     for source_name, source in (("showroom", showroom), ("workload", workload)):
         if not str(source.get("repo_url", "")).startswith("https://github.com/"):
@@ -418,6 +432,23 @@ def _validate_contract(intake: dict[str, Any], errors: list[str]) -> None:
     blockers = certification.get("activation_blockers")
     if not isinstance(blockers, list):
         errors.append("certification.activation_blockers must be a list")
+    elif catalog_status == "active" and blockers:
+        errors.append("catalog.status active requires zero activation blockers")
+    production_blockers = certification.get("production_blockers")
+    if production_blockers is not None and not isinstance(production_blockers, list):
+        errors.append("certification.production_blockers must be a list")
+    allowed_exposure_policies = runtime.get("allowed_exposure_policies")
+    if allowed_exposure_policies is not None and (
+        not isinstance(allowed_exposure_policies, list)
+        or not allowed_exposure_policies
+        or any(
+            value not in {"internal", "public_code"}
+            for value in allowed_exposure_policies
+        )
+    ):
+        errors.append(
+            "runtime.allowed_exposure_policies must contain internal or public_code"
+        )
     proof_contract = certification.get("proof_contract")
     if proof_contract is not None and (
         not isinstance(proof_contract, str)

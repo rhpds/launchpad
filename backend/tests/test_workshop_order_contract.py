@@ -9,6 +9,7 @@ import pytest
 from app.domain.clusters import ClusterTarget
 from app.domain.enums import (
     CatalogCategory,
+    LabRequestStatus,
     SessionStatus,
     ValidationResultStatus,
     WorkshopSeatStatus,
@@ -25,12 +26,19 @@ from fastapi.testclient import TestClient
 from pydantic import ValidationError
 
 
-def _catalog_with_workshop_limit(limit: int):
+def _catalog_with_workshop_limit(
+    limit: int, *, allowed_exposure_policies: list[str] | None = None
+):
     catalog = SimpleNamespace()
     catalog.get_item = lambda _item_id: SimpleNamespace(
         metadata={
             "max_workshop_seats": limit,
             "promotion_sequence": [1, 5, 25],
+            **(
+                {"allowed_exposure_policies": allowed_exposure_policies}
+                if allowed_exposure_policies is not None
+                else {}
+            ),
         },
         required_capabilities=[],
     )
@@ -708,6 +716,44 @@ def test_certification_override_is_internal_only():
                 exposure_policy="public_code",
             )
         )
+
+
+def test_catalog_can_limit_promoted_workshop_to_internal_exposure():
+    service = ProvisioningService(
+        catalog=_catalog_with_workshop_limit(
+            25, allowed_exposure_policies=["internal"]
+        )
+    )
+
+    with pytest.raises(ValueError, match="does not allow public_code exposure"):
+        service.create_workshop_order(
+            Workshop(
+                tenant_id="event-tenant",
+                catalog_item_id="multi-agent-quickstart",
+                num_users=25,
+                exposure_policy="public_code",
+            )
+        )
+
+
+def test_catalog_can_limit_promoted_individual_lab_to_internal_exposure():
+    service = ProvisioningService(
+        catalog=_catalog_with_workshop_limit(
+            25, allowed_exposure_policies=["internal"]
+        )
+    )
+
+    result = service.submit_request(
+        LabRequest(
+            tenant_id="event-tenant",
+            requester_id="participant-1",
+            catalog_item_id="multi-agent-quickstart",
+            requested_mode=CatalogCategory.GUIDED_BUILD,
+            exposure_policy="public_code",
+        )
+    )
+
+    assert result.status == LabRequestStatus.REJECTED
 
 
 def test_non_admin_cannot_request_workshop_certification_override():

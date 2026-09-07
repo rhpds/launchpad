@@ -1,6 +1,5 @@
 from pathlib import Path
 
-import pytest
 import yaml
 from app.adapters.file.catalog import FileCatalogAdapter
 from app.domain.enums import CatalogStatus
@@ -17,7 +16,7 @@ TRACKS = {
 }
 
 
-def test_multi_agent_quickstart_is_imported_as_a_distinct_fail_closed_item():
+def test_multi_agent_quickstart_is_active_for_internal_event_orders():
     intake = load_intake(INTAKE_PATH)
     catalog = yaml.safe_load(CATALOG_PATH.read_text())
 
@@ -25,9 +24,11 @@ def test_multi_agent_quickstart_is_imported_as_a_distinct_fail_closed_item():
     assert catalog["catalog_item_id"] == "multi-agent-quickstart"
     assert catalog["display_name"] == "Build Multi-Agent AI Systems with Open Protocols"
     assert catalog["version"] == "0.2.5"
-    assert catalog["status"] == "draft"
+    assert catalog["status"] == "active"
     assert catalog["metadata"]["onboarding_managed"] is True
-    assert catalog["metadata"]["activation_blockers"]
+    assert catalog["metadata"]["activation_blockers"] == []
+    assert catalog["metadata"]["allowed_exposure_policies"] == ["internal"]
+    assert catalog["metadata"]["production_blockers"]
     assert catalog["metadata"]["certification_stage"] == (
         "twenty-five-seat-certified"
     )
@@ -147,11 +148,13 @@ def test_multi_agent_track_scope_is_explicit_and_does_not_overclaim_track_three(
     assert "not an end-to-end validated deployment" in track_3
 
 
-def test_multi_agent_quickstart_cannot_activate_with_import_blockers():
+def test_multi_agent_quickstart_is_orderable_after_internal_promotion():
     adapter = FileCatalogAdapter(str(ROOT / "catalog"))
 
-    with pytest.raises(ValueError, match="activation blocker"):
-        adapter.set_status("multi-agent-quickstart", CatalogStatus.ACTIVE)
+    assert adapter.validate_item("multi-agent-quickstart") is True
+    assert adapter.set_status(
+        "multi-agent-quickstart", CatalogStatus.ACTIVE
+    ).status == CatalogStatus.ACTIVE
 
 
 def test_track_two_certification_executes_and_cleans_the_learner_change():

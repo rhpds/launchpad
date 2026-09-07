@@ -11,6 +11,7 @@ catalog:
     guardrails, and service authentication on Intel infrastructure.
   category: guided_build
   version: "0.2.5"
+  status: active
   supported_branding:
     - redhat-intel-default
     - intel-internal
@@ -56,6 +57,8 @@ runtime:
     - model_endpoint
   required_models:
     - granite-3.2-8b-tools
+  allowed_exposure_policies:
+    - internal
   single_environment: true
   learning_tracks:
     - id: track-1-local
@@ -120,7 +123,8 @@ certification:
     - 1
     - 5
     - 25
-  activation_blockers:
+  activation_blockers: []
+  production_blockers:
     - >-
       Mirror the Arena-built, digest-pinned candidate image to a durable
       external registry or durable control-plane mirror before production;

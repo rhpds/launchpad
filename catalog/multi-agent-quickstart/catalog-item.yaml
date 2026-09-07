@@ -6,7 +6,7 @@ description: 'Follow three learning tracks in one environment: study the local m
   authentication on Intel infrastructure.'
 category: guided_build
 version: 0.2.5
-status: draft
+status: active
 required_capabilities:
 - openshift
 - showroom
@@ -38,7 +38,9 @@ metadata:
   - 1
   - 5
   - 25
-  activation_blockers:
+  activation_blockers: []
+  certification_proof_contract: certification/catalog/multi-agent-quickstart.yaml
+  production_blockers:
   - Mirror the Arena-built, digest-pinned candidate image to a durable external registry
     or durable control-plane mirror before production; Arena's internal registry is
     sufficient only for certification.
@@ -47,7 +49,8 @@ metadata:
   - Track 3 is currently an architecture and manifest exploration path; certify Kagenti
     and OpenTelemetry runtime integrations before presenting those optional blueprint
     components as deployed services.
-  certification_proof_contract: certification/catalog/multi-agent-quickstart.yaml
+  allowed_exposure_policies:
+  - internal
   showroom_journey: multi-agent-quickstart
   showroom_title: Build Multi-Agent AI Systems with Open Protocols
   namespace_slug: multi-agent

@@ -378,6 +378,17 @@ class ProvisioningService:
             self._save_request(request)
             return request
 
+        allowed_exposure_policies = (catalog_item.metadata or {}).get(
+            "allowed_exposure_policies"
+        )
+        if (
+            allowed_exposure_policies
+            and request.exposure_policy.value not in allowed_exposure_policies
+        ):
+            request = request.model_copy(update={"status": LabRequestStatus.REJECTED})
+            self._save_request(request)
+            return request
+
         constraint_result: ConstraintResult = self.constraints.evaluate(request)
         if not constraint_result.allowed:
             request = request.model_copy(update={"status": LabRequestStatus.REJECTED})
@@ -1044,6 +1055,19 @@ class ProvisioningService:
             )
 
         catalog_item = self.catalog.get_item(workshop.catalog_item_id)
+        allowed_exposure_policies = (
+            (catalog_item.metadata or {}).get("allowed_exposure_policies")
+            if catalog_item
+            else None
+        )
+        if (
+            allowed_exposure_policies
+            and workshop.exposure_policy.value not in allowed_exposure_policies
+        ):
+            raise ValueError(
+                f"{workshop.catalog_item_id} does not allow "
+                f"{workshop.exposure_policy.value} exposure"
+            )
         raw_catalog_limit = (
             (catalog_item.metadata or {}).get("max_workshop_seats")
             if catalog_item

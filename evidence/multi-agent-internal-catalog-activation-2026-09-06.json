@@ -1,0 +1,25 @@
+{
+  "schema": "launchpad.redhat.com/catalog-activation-evidence/v1",
+  "evidence_id": "MULTI-AGENT-INTERNAL-CATALOG-ACTIVATION-20260906",
+  "generated_at": "2026-09-07T01:45:54Z",
+  "catalog_item_id": "multi-agent-quickstart",
+  "catalog_version": "0.2.5",
+  "decision": "active-internal-only",
+  "basis": "Three consecutive 25-seat GREEN-live Arena runs and approved substitution into the September 17 internal event candidate.",
+  "tdd": {
+    "red": "3 failed: the item remained draft, was not orderable, and public exposure was not catalog-restricted.",
+    "green": "The generated catalog is active, FileCatalogAdapter reports it available, and service-level individual/workshop exposure checks reject public_code.",
+    "focused_tests": "92 passed",
+    "full_non_local_regression": "1123 passed, 13 deselected"
+  },
+  "contracts": {
+    "catalog_status": "active",
+    "allowed_exposure_policies": [
+      "internal"
+    ],
+    "activation_blockers": [],
+    "production_blockers_retained": true,
+    "max_workshop_seats": 25
+  },
+  "production_boundary": "Internal activation does not certify public access, a durable external image registry, or optional Track 3 runtime integrations."
+}
