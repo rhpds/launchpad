@@ -34,6 +34,13 @@ def test_arena_overlay_installs_reliability_resources():
         "LaunchpadControlPlaneUnavailable",
         "LaunchpadReconcilerFailed",
     } <= alert_names
+    control_plane_alert = next(
+        rule
+        for group in rules["spec"]["groups"]
+        for rule in group["rules"]
+        if rule["alert"] == "LaunchpadControlPlaneUnavailable"
+    )
+    assert "postgres" in control_plane_alert["expr"]
 
     pdbs = [item for item in documents if item["kind"] == "PodDisruptionBudget"]
     assert {item["metadata"]["name"] for item in pdbs} == {
@@ -85,6 +92,45 @@ def test_backend_single_replica_limit_is_explicit():
     assert annotations["launchpad.redhat.com/ha-blocker"] == (
         "in-memory-session-cache-must-be-externalized-before-replicas-exceed-one"
     )
+
+
+def test_arena_backend_runs_on_the_stable_execution_worker():
+    documents = _documents("patch-runtime.yaml")
+    backend = next(
+        item
+        for item in documents
+        if item["kind"] == "Deployment" and item["metadata"]["name"] == "backend"
+    )
+
+    assert backend["spec"]["template"]["spec"]["nodeSelector"] == {
+        "kubernetes.io/hostname": "gnr2.fm2aihpcsed.com"
+    }
+
+
+def test_arena_postgres_runs_on_the_stable_execution_worker():
+    documents = _documents("patch-runtime.yaml")
+    postgres = next(
+        item
+        for item in documents
+        if item["kind"] == "Deployment" and item["metadata"]["name"] == "postgres"
+    )
+
+    assert postgres["spec"]["template"]["spec"]["nodeSelector"] == {
+        "kubernetes.io/hostname": "gnr2.fm2aihpcsed.com"
+    }
+
+
+def test_arena_reconciler_runs_on_the_stable_execution_worker():
+    reconciler = next(
+        item
+        for item in _documents("operations-automation.yaml")
+        if item["kind"] == "CronJob"
+        and item["metadata"]["name"] == "launchpad-resource-reconciler"
+    )
+
+    assert reconciler["spec"]["jobTemplate"]["spec"]["template"]["spec"][
+        "nodeSelector"
+    ] == {"kubernetes.io/hostname": "gnr2.fm2aihpcsed.com"}
 
 
 def test_cpu_model_readiness_does_not_flap_during_a_participant_burst():

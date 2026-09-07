@@ -85,6 +85,7 @@
   },
   "previous_pattern_evidence": "evidence/arena-staggered-three-workshops-2026-09-04.json",
   "latest_multi_agent_promotion_evidence": "evidence/multi-agent-quickstart-25-seat-promotion-2026-09-06.json",
+  "latest_exact_trio_evidence": "evidence/september-17-agentic-trio-run01-red-2026-09-06.json",
   "capacity_status": {
     "observed_at": "2026-09-07T01:45:54Z",
     "cluster_id": "arena",
@@ -110,9 +111,10 @@
     "sequential bulk reclaim with zero run-specific residue"
   ],
   "remaining_release_gates": [
+    "confirm-arena-workers-connectivity-stable-for-fifteen-minutes",
+    "verify-gitops-control-plane-placement-guardrails",
     "preflight-current-arena-capacity-and-node-stability",
-    "current-agent-201-release-on-arena",
-    "exact-agentic-trio-first-run",
+    "exact-agentic-trio-run02",
     "sixty-minute-concurrent-participant-soak",
     "manual-browser-showroom-terminal-and-workspace-journey",
     "shared-model-contention-and-error-rate-check",
@@ -120,7 +122,7 @@
     "zero-residue-bulk-reclaim",
     "event-day-capacity-preflight"
   ],
-  "next_gate": "exact-agentic-trio-live-rehearsal",
+  "next_gate": "arena-stability-validation-then-exact-agentic-trio-run02",
   "release_policy": {
     "rubric_score_required": 100,
     "critical_cells_must_be_green_live": true,

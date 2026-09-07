@@ -28,7 +28,7 @@ spec:
     - name: launchpad.arena.control-plane
       rules:
         - alert: LaunchpadControlPlaneUnavailable
-          expr: kube_deployment_status_replicas_available{namespace="partner-ai-launchpad",deployment=~"backend|partner-portal|admin|public-access-gateway"} < 1
+          expr: kube_deployment_status_replicas_available{namespace="partner-ai-launchpad",deployment=~"backend|postgres|partner-portal|admin|public-access-gateway"} < 1
           for: 2m
           labels:
             severity: critical

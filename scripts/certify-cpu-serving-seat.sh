@@ -4,13 +4,14 @@ set -euo pipefail
 namespace="${1:?usage: certify-cpu-serving-seat.sh <namespace>}"
 : "${KUBECONFIG:?KUBECONFIG must point to the Arena credential}"
 
-case "$KUBECONFIG" in
-  *config-arena*) ;;
-  *)
-    echo "refusing to mutate a non-Arena cluster" >&2
-    exit 2
-    ;;
-esac
+actual_cluster="$(
+  oc get namespace "$namespace" \
+    -o jsonpath='{.metadata.labels.launchpad\.redhat\.com/cluster-id}'
+)"
+if [[ "$actual_cluster" != "arena" ]]; then
+  echo "refusing to mutate cluster '${actual_cluster}'; expected 'arena'" >&2
+  exit 2
+fi
 
 host="$(oc get route showroom -n "$namespace" -o jsonpath='{.spec.host}')"
 curl_options=(-fsSk)

@@ -1,0 +1,164 @@
+{
+  "schema": "launchpad.redhat.com/event-certification/v1",
+  "evidence_id": "CERT-SEPTEMBER-17-AGENTIC-TRIO-RUN01-RED-20260906",
+  "generated_at": "2026-09-07T03:10:26Z",
+  "event_date": "2026-09-17",
+  "cluster_id": "arena",
+  "access_scope": "internal-vpn",
+  "source_revision": "1044647246dd5ce0b3abe1d5f6731ee0212c15f0",
+  "backend_image": {
+    "build": "launchpad-backend-106",
+    "digest": "sha256:1b16195f7573f22e71bfdc2e95f7bfd24b213303c4940d0ce49255f35849a1ce"
+  },
+  "overall_status": "RED",
+  "workshops": [
+    {
+      "provision_order": 1,
+      "workshop_id": "3a88271e-f2bc-4a2f-9e68-213dbbf41c0a",
+      "catalog_item_id": "multi-agent-quickstart",
+      "catalog_version": "0.2.5",
+      "seats_requested": 25,
+      "seats_ready": 25,
+      "provisioning_seconds": 768,
+      "cleanup_status": "completed",
+      "reclaimed_seats": 25,
+      "cleanup_completed_at": "2026-09-07T03:04:53.055175Z"
+    },
+    {
+      "provision_order": 2,
+      "workshop_id": "d54f8c1a-2c42-40ed-aee3-0d6074d4595c",
+      "catalog_item_id": "intel-llm-cpu-serving",
+      "catalog_version": "1.0.0",
+      "seats_requested": 25,
+      "seats_ready": 25,
+      "provisioning_seconds": 679,
+      "cleanup_status": "completed",
+      "reclaimed_seats": 25,
+      "cleanup_completed_at": "2026-09-07T02:55:26.890444Z"
+    },
+    {
+      "provision_order": 3,
+      "workshop_id": "f16a0ea5-c10e-4373-bd6d-817e2efef461",
+      "catalog_item_id": "intel-xeon6-agent-201",
+      "catalog_version": "1.0.2",
+      "seats_requested": 25,
+      "seats_ready": 25,
+      "provisioning_seconds": 375,
+      "cleanup_status": "completed",
+      "reclaimed_seats": 25,
+      "cleanup_completed_at": "2026-09-07T02:53:20.234787Z"
+    }
+  ],
+  "provisioning": {
+    "mode": "staggered-common-readiness-barrier",
+    "requested_seats": 75,
+    "ready_seats": 75,
+    "failed_seats": 0,
+    "all_three_workshops_retained_concurrently": true,
+    "result": "GREEN-live"
+  },
+  "participant_functional_probes": {
+    "planned_seats": 75,
+    "started_catalog_item_id": "multi-agent-quickstart",
+    "completed": false,
+    "route_failures": 2,
+    "failed_namespaces": [
+      "launchpad-smoke-test-tenant-multi-agent-214935",
+      "launchpad-smoke-test-tenant-multi-agent-530af2"
+    ],
+    "failed_stage": "participant-routes",
+    "remaining_probes_aborted_after_critical_failure": true,
+    "sixty_minute_soak_completed": false,
+    "result": "RED"
+  },
+  "infrastructure_failure": {
+    "node": "rhgnr1",
+    "node_not_ready_observed": true,
+    "node_not_ready_events": [
+      "2026-09-07T02:57:38Z",
+      "2026-09-07T03:02:01Z"
+    ],
+    "node_ready_recovery_observed_at": "2026-09-07T03:02:38Z",
+    "connectivity_outage_events_observed": true,
+    "control_plane_interrupted": true,
+    "backend_unavailable": true,
+    "postgres_service_temporarily_unreachable": true,
+    "cleanup_interrupted": true,
+    "observed_worker_pod_distribution": {
+      "rhgnr1": 240,
+      "gnr2.fm2aihpcsed.com": 66
+    },
+    "finding": "The exact trio fit aggregate capacity but the workload and singleton Launchpad control-plane dependencies were concentrated on rhgnr1. Its connectivity and readiness loss invalidated participant and soak certification and temporarily stalled reclaim."
+  },
+  "cleanup": {
+    "controller_recovery_exercised": true,
+    "workshops_completed": 3,
+    "reclaimed_seats": 75,
+    "failed_reclaims": 0,
+    "remaining_namespaces": 0,
+    "remaining_argocd_applications": 0,
+    "zero_residue_observed_at": "2026-09-07T03:07:16Z",
+    "result": "GREEN-live-after-control-plane-recovery"
+  },
+  "red_green_matrix": [
+    {
+      "gate": "exact-catalog-revisions",
+      "status": "GREEN-live"
+    },
+    {
+      "gate": "capacity-preview-and-revalidation",
+      "status": "GREEN-live"
+    },
+    {
+      "gate": "staggered-25-plus-25-plus-25-provisioning",
+      "status": "GREEN-live"
+    },
+    {
+      "gate": "75-concurrent-ready-environments",
+      "status": "GREEN-live"
+    },
+    {
+      "gate": "75-participant-functional-journeys",
+      "status": "RED"
+    },
+    {
+      "gate": "cross-seat-and-node-authorization",
+      "status": "NOT-RUN-AFTER-RED"
+    },
+    {
+      "gate": "sixty-minute-soak",
+      "status": "NOT-RUN-AFTER-RED"
+    },
+    {
+      "gate": "sequential-reclaim-and-zero-residue",
+      "status": "GREEN-live-after-recovery"
+    }
+  ],
+  "rubric": {
+    "score": 55,
+    "required": 100,
+    "categories": {
+      "immutable_contracts_and_artifacts": "15/15",
+      "placement_and_capacity": "10/15",
+      "provisioning_and_readiness": "20/20",
+      "participant_functionality": "0/25",
+      "authorization_and_isolation": "0/15",
+      "cleanup_and_repeatability": "10/10"
+    },
+    "critical_failure_overrides_score": true
+  },
+  "remediation_applied_live": [
+    "Moved the single Launchpad backend replica to gnr2.fm2aihpcsed.com",
+    "Moved the single Postgres replica and its RWO NFS claim to gnr2.fm2aihpcsed.com",
+    "Restarted the backend after Postgres recovery so persisted workshop state reloaded",
+    "Allowed automatic interrupted-workshop recovery to complete reclaim"
+  ],
+  "required_before_run02": [
+    "Persist backend, Postgres, and resource-reconciler placement on the stable Arena worker through GitOps",
+    "Alert on Postgres as a Launchpad control-plane dependency",
+    "Require every September event catalog item to exclude workers Ready for less than 900 seconds",
+    "Confirm both Arena workers remain Ready and connectivity-stable for at least 15 minutes",
+    "Re-run all 75 participant journeys, namespace isolation checks, and the 60-minute soak"
+  ],
+  "release_decision": "not-certified"
+}

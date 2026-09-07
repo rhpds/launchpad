@@ -15,8 +15,12 @@ and access boundary are defined in
 
 The earlier three-workshop pilot proved the orchestration shape and both Intel
 guided labs at 25 seats. Multi-Agent v0.2.5 independently passed three
-consecutive 25-seat Arena certifications, making the revised exact-trio
-rehearsal the next gate. Public access remains a separate certification gate;
+consecutive 25-seat Arena certifications. Exact-trio run 01 provisioned and
+retained 75/75 environments, but `rhgnr1` connectivity failed during the first
+participant probes, so the run is RED despite successful zero-residue cleanup.
+The next gate is Arena stability validation and exact-trio run 02 after the
+singleton control-plane placement guardrails are deployed. Public access
+remains a separate certification gate;
 internal Arena access is the September release baseline unless the public
 matrix is independently GREEN-live by Sep 15.
 

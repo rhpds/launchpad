@@ -18,6 +18,8 @@ spec:
         spec:
           serviceAccountName: launchpad-backend
           restartPolicy: Never
+          nodeSelector:
+            kubernetes.io/hostname: gnr2.fm2aihpcsed.com
           containers:
             - name: reconcile
               image: backend:latest
@@ -42,4 +44,3 @@ spec:
           volumes:
             - name: cluster-targets
               configMap: {name: launchpad-cluster-targets}
-

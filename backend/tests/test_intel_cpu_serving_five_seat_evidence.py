@@ -66,8 +66,9 @@ def test_cpu_serving_certification_driver_uses_the_participant_boundary():
     script = (ROOT / "scripts/certify-cpu-serving-seat.sh").read_text()
     rag_script = (ROOT / "scripts/certify-cpu-serving-rag.sh").read_text()
 
-    assert "*config-arena*" in script
-    assert "refusing to mutate a non-Arena cluster" in script
+    assert 'actual_cluster="$(' in script
+    assert 'actual_cluster" != "arena' in script
+    assert "refusing to mutate cluster" in script
     assert "deploy/showroom -c terminal" in script
     assert "anythingllm-openshift@sha256:" in script
     assert 'name: "rag"' in script
@@ -75,7 +76,9 @@ def test_cpu_serving_certification_driver_uses_the_participant_boundary():
     assert "GENERIC_OPEN_AI_BASE_PATH" in script
     assert "ARENA_CURL_INTERFACE" in script
     assert "ARENA_INGRESS_IP" in script
-    assert "*config-arena*" in rag_script
+    assert 'actual_cluster="$(' in rag_script
+    assert 'actual_cluster" != "arena' in rag_script
+    assert "refusing to validate cluster" in rag_script
     assert "ARENA_CURL_INTERFACE" in rag_script
     assert "ARENA_INGRESS_IP" in rag_script
     assert "CERTIFICATION_RUN_ID" in rag_script

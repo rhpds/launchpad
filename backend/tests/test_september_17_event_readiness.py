@@ -4,6 +4,8 @@ import hashlib
 import json
 from pathlib import Path
 
+import yaml
+
 ROOT = Path(__file__).resolve().parents[2]
 READINESS = (
     ROOT / "evidence/september-17-agentic-three-workshop-readiness-2026-09-06.json"
@@ -57,7 +59,9 @@ def test_event_readiness_manifest_keeps_the_exact_workshop_target_and_budget():
     )
     assert readiness["public_access_certified"] is False
     assert readiness["overall_status"] == "RED"
-    assert readiness["next_gate"] == "exact-agentic-trio-live-rehearsal"
+    assert readiness["next_gate"] == (
+        "arena-stability-validation-then-exact-agentic-trio-run02"
+    )
     assert readiness["supersedes"] == (
         "evidence/september-17-three-workshop-readiness-2026-09-05.json"
     )
@@ -69,6 +73,9 @@ def test_event_readiness_manifest_keeps_the_exact_workshop_target_and_budget():
     )
     assert readiness["latest_multi_agent_promotion_evidence"] == (
         "evidence/multi-agent-quickstart-25-seat-promotion-2026-09-06.json"
+    )
+    assert readiness["latest_exact_trio_evidence"] == (
+        "evidence/september-17-agentic-trio-run01-red-2026-09-06.json"
     )
     assert readiness["capacity_status"]["active_worker_pods"] == 216
     assert readiness["capacity_status"]["available_slots_after_reserve"] == 184
@@ -96,6 +103,7 @@ def test_event_runbook_names_every_gate_and_does_not_overclaim_capacity():
         "175",
         "184",
         "evidence/arena-staggered-three-workshops-2026-09-04.json",
+        "Exact-trio run 01 — RED",
     ):
         assert value in runbook
 
@@ -105,3 +113,15 @@ def test_event_runbook_names_every_gate_and_does_not_overclaim_capacity():
     assert "Multi-Agent first" in runbook
     assert "AgentOps remains available as a five-seat pilot" in runbook
     assert "zero residue" in runbook
+
+
+def test_every_event_catalog_blocks_recently_recovered_workers():
+    for catalog_item_id in (
+        "multi-agent-quickstart",
+        "intel-llm-cpu-serving",
+        "intel-xeon6-agent-201",
+    ):
+        catalog = yaml.safe_load(
+            (ROOT / "catalog" / catalog_item_id / "catalog-item.yaml").read_text()
+        )
+        assert catalog["metadata"]["workshop_node_min_ready_seconds"] == 900

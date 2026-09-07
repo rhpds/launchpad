@@ -78,6 +78,36 @@ Public access is not certified for this event candidate. The first rehearsal
 uses internal/VPN access so public DNS, Cloudflare quick-tunnel lifetime,
 Keycloak, and Console OIDC cannot be confused with workload-scale results.
 
+## Exact-trio run 01 — RED
+
+Run 01 proved that the three exact orders can be provisioned in sequence and
+retained together: Multi-Agent reached 25/25 Ready in 768 seconds, Serve LLMs
+reached 25/25 in 679 seconds, and Building an AI Agent reached 25/25 in 375
+seconds. There were no provisioning failures.
+
+The run is nevertheless **RED and not certified**. During the first concurrent
+participant probes, two Multi-Agent routes failed and `rhgnr1` became NotReady
+amid cluster connectivity outages. Workload placement was highly concentrated
+on that worker (240 active pods versus 66 on `gnr2`), and the single backend
+and Postgres replicas were also on `rhgnr1`. Participant testing and the
+60-minute soak were stopped after the critical failure.
+
+Cleanup provided useful recovery evidence. Building an AI Agent and Serve LLMs
+reclaimed normally. Multi-Agent reclaim paused when the backend and Postgres
+became unavailable, then resumed automatically from persisted state after the
+services recovered. All three workshops finished with 75/75 seats reclaimed,
+zero failed reclaims, zero remaining run namespaces, and zero remaining Argo CD
+Applications. The immutable record is
+`evidence/september-17-agentic-trio-run01-red-2026-09-06.json`.
+
+Before run 02, GitOps pins the singleton backend, Postgres, and resource
+reconciler to stable `gnr2`; the reliability alert includes Postgres; and every
+event catalog excludes a worker that has been Ready for less than 15 minutes.
+Run 02 must still prove all 75 participant journeys, namespace isolation, real
+LLM traffic, and the full 60-minute concurrent soak. The control-plane pin is a
+recovery guardrail, not evidence that the two-worker Arena execution capacity
+is itself stable.
+
 ## Exact-trio GREEN-live procedure
 
 1. Record commit SHA, catalog versions, image digests, model routes, Arena node
@@ -120,6 +150,6 @@ for participant functionality, 15 for authorization/isolation, and 10 for
 cleanup and repeatability. Any failed critical cell keeps the event candidate
 RED regardless of the numerical score.
 
-The next gate is the **exact agentic trio live rehearsal on Arena**. AgentOps
-continues separately at a maximum of five internal seats until its own 25-seat
-capacity and architecture gates are satisfied.
+The next gate is **Arena stability validation followed by exact-trio run 02**.
+AgentOps continues separately at a maximum of five internal seats until its
+own 25-seat capacity and architecture gates are satisfied.

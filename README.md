@@ -124,6 +124,9 @@ The approved September 17 internal event candidate is 25 Multi-Agent seats,
 staggered while all 75 environments remain available concurrently. The exact
 combined rehearsal and capacity gate are tracked in
 [docs/september-17-agentic-three-workshop-readiness.md](docs/september-17-agentic-three-workshop-readiness.md).
+Run 01 provisioned all 75 environments and reclaimed them without residue, but
+is RED because Arena worker connectivity failed during participant probes; the
+next gate is worker stability validation followed by run 02.
 
 ## Repository layout
 
