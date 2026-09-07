@@ -1,0 +1,46 @@
+{
+  "schema": "launchpad.redhat.com/event-contract-test-evidence/v1",
+  "evidence_id": "SEPTEMBER-17-AGENTIC-EVENT-CONTRACT-TEST-20260906",
+  "timestamp": "2026-09-07T01:45:54Z",
+  "environment": "local-contract-and-live-arena-read-only-preflight",
+  "launchpad_commit": "80c2747527b8bfb4fa92097b6e97560f3ccd58c8",
+  "methodology": {
+    "TDD": "The readiness contract was changed before the v2 manifest and runbook existed.",
+    "EDD": "The prior event receipt, current catalog contracts, Multi-Agent promotion evidence, and a read-only Arena snapshot support each claim.",
+    "CDD": "backend/tests/test_september_17_event_readiness.py fixes the exact trio, targets, resource budget, evidence boundary, and next gate.",
+    "BDD": "Given the approved AgentOps substitution, the release contract names three 25-seat workshops, staggered provisioning, 75 concurrent seats, and exact-trio rehearsal before promotion.",
+    "CBT": "Event contract, prior staggered-workshop evidence, and Multi-Agent v0.2.5 evidence were tested together without mutating live resources."
+  },
+  "red": {
+    "command": ".venv/bin/pytest -q backend/tests/test_september_17_event_readiness.py",
+    "result": "2 failed",
+    "reason": "The required v2 evidence manifest and revised runbook did not exist."
+  },
+  "green": {
+    "command": ".venv/bin/pytest -q backend/tests/test_september_17_event_readiness.py backend/tests/test_arena_staggered_three_workshop_evidence.py backend/tests/test_multi_agent_v025_twenty_five_seat_evidence.py backend/tests/test_multi_agent_twenty_five_seat_promotion_evidence.py",
+    "result": "7 passed"
+  },
+  "regression": {
+    "command": ".venv/bin/pytest -q backend/tests -m 'not local'",
+    "result": "1121 passed, 13 deselected",
+    "failed": 0
+  },
+  "live_arena_snapshot": {
+    "mutation": false,
+    "kubeconfig": ".arena-kubeconfig",
+    "ready_schedulable_workers": 2,
+    "worker_pod_capacity": 500,
+    "active_worker_pods": 216,
+    "available_slots_after_twenty_percent_reserve": 184,
+    "revised_event_pod_reservation": 175,
+    "remaining_slots_after_event": 9,
+    "decision": "eligible-for-rehearsal-preflight-with-narrow-pod-margin"
+  },
+  "summary": {
+    "focused_total": 7,
+    "focused_passed": 7,
+    "regression_passed": 1121,
+    "failed": 0
+  },
+  "release_boundary": "GREEN applies to the revised contract and rehearsal eligibility only. The exact combined 75-seat run remains RED until live execution, a 60-minute hold, functional probes, and zero-residue cleanup pass."
+}

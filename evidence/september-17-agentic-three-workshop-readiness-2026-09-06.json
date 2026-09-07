@@ -1,0 +1,129 @@
+{
+  "schema": "launchpad.redhat.com/event-readiness/v2",
+  "evidence_id": "READINESS-SEPTEMBER-17-AGENTIC-THREE-WORKSHOPS-20260906",
+  "generated_at": "2026-09-07T01:45:54Z",
+  "source_revision": "80c2747527b8bfb4fa92097b6e97560f3ccd58c8",
+  "event_date": "2026-09-17",
+  "deployment_scope": "fleet",
+  "supersedes": "evidence/september-17-three-workshop-readiness-2026-09-05.json",
+  "substitution": {
+    "decision": "approved",
+    "removed_catalog_item_id": "agentops-observability",
+    "replacement_catalog_item_id": "multi-agent-quickstart",
+    "reason": "Replace the AgentOps 25-seat capacity blocker with the internally certified agentic workshop while retaining AgentOps as a five-seat pilot."
+  },
+  "candidate_cluster_targets": {
+    "multi-agent-quickstart": "arena",
+    "intel-llm-cpu-serving": "arena",
+    "intel-xeon6-agent-201": "arena"
+  },
+  "provisioning_mode": "staggered",
+  "concurrent_participant_seats": 75,
+  "public_access_certified": false,
+  "overall_status": "RED",
+  "certification_boundary": "The individual workshop evidence and current Arena capacity make the revised trio eligible for a live rehearsal. This artifact does not claim that the exact three current catalog releases have yet run together.",
+  "workshops": [
+    {
+      "provision_order": 1,
+      "catalog_item_id": "multi-agent-quickstart",
+      "catalog_version": "0.2.5",
+      "seat_count": 25,
+      "release_status": "GREEN-live-25-x3-internal",
+      "current_certification_stage": "twenty-five-seat-certified",
+      "current_catalog_limit": 25,
+      "candidate_cluster_id": "arena",
+      "cpu_millicores": 30000,
+      "memory_mib": 51200,
+      "pod_slots": 50,
+      "storage_gib_minimum": 0
+    },
+    {
+      "provision_order": 2,
+      "catalog_item_id": "intel-llm-cpu-serving",
+      "catalog_version": "1.0.0",
+      "seat_count": 25,
+      "release_status": "GREEN-live-25",
+      "current_certification_stage": "twenty-five-seat",
+      "current_catalog_limit": 25,
+      "candidate_cluster_id": "arena",
+      "cpu_millicores": 16625,
+      "memory_mib": 37200,
+      "pod_slots": 50,
+      "storage_gib_minimum": 0
+    },
+    {
+      "provision_order": 3,
+      "catalog_item_id": "intel-xeon6-agent-201",
+      "catalog_version": "1.0.2",
+      "seat_count": 25,
+      "release_status": "GREEN-live-25-prior-arena-release",
+      "current_certification_stage": "twenty-five-seat",
+      "current_catalog_limit": 25,
+      "candidate_cluster_id": "arena",
+      "cpu_millicores": 10375,
+      "memory_mib": 22800,
+      "pod_slots": 75,
+      "storage_gib_minimum": 0,
+      "target_specific_gate": "Re-run the current compact 1.0.2 catalog release on Arena; the current release's 25-seat proof was recorded on Brutus and the earlier Arena proof used an older release."
+    }
+  ],
+  "declared_event_reservation": {
+    "cpu_millicores": 57000,
+    "memory_mib": 111200,
+    "pod_slots": 175,
+    "storage_gib_minimum": 0
+  },
+  "admission_target_with_twenty_percent_headroom": {
+    "cpu_millicores": 68400,
+    "memory_mib": 133440,
+    "pod_slots": 210,
+    "storage_gib_minimum": 0
+  },
+  "previous_pattern_evidence": "evidence/arena-staggered-three-workshops-2026-09-04.json",
+  "latest_multi_agent_promotion_evidence": "evidence/multi-agent-quickstart-25-seat-promotion-2026-09-06.json",
+  "capacity_status": {
+    "observed_at": "2026-09-07T01:45:54Z",
+    "cluster_id": "arena",
+    "schedulable_workers": 2,
+    "schedulable_pod_slots": 500,
+    "active_worker_pods": 216,
+    "protected_worker_pod_ceiling": 400,
+    "available_slots_after_reserve": 184,
+    "event_pod_reservation": 175,
+    "remaining_slots_after_event": 9,
+    "worker_cpu_allocatable_millicores": 568000,
+    "worker_cpu_requested_millicores": 232741,
+    "event_cpu_reservation_millicores": 57000,
+    "fit_decision": "fits-current-snapshot-with-narrow-pod-margin",
+    "warning": "The nine-slot margin is a point-in-time admission result, not durable capacity. Re-measure active pods, requested resources, node health, model health, and temporary rollout demand immediately before creating each workshop."
+  },
+  "already_proven": [
+    "Multi-Agent 0.2.5 completed three consecutive 25-seat Arena runs with all hands-on journeys and zero residue",
+    "Serve LLMs completed a 25-seat Arena workshop",
+    "Building an AI Agent completed an earlier 25-seat Arena workshop and the current compact release completed a 25-seat Brutus workshop",
+    "Arena retained three staggered 25-seat workshops for 75 concurrent internal participant journeys",
+    "namespace-scoped terminal identity and cross-seat denial",
+    "sequential bulk reclaim with zero run-specific residue"
+  ],
+  "remaining_release_gates": [
+    "preflight-current-arena-capacity-and-node-stability",
+    "current-agent-201-release-on-arena",
+    "exact-agentic-trio-first-run",
+    "sixty-minute-concurrent-participant-soak",
+    "manual-browser-showroom-terminal-and-workspace-journey",
+    "shared-model-contention-and-error-rate-check",
+    "exact-agentic-trio-repeat-run",
+    "zero-residue-bulk-reclaim",
+    "event-day-capacity-preflight"
+  ],
+  "next_gate": "exact-agentic-trio-live-rehearsal",
+  "release_policy": {
+    "rubric_score_required": 100,
+    "critical_cells_must_be_green_live": true,
+    "pod_readiness_alone_is_sufficient": false,
+    "silent_workshop_substitution_allowed": false,
+    "uncertified_public_access_allowed": false,
+    "exact_catalog_versions_must_match": true,
+    "zero_residue_cleanup_required": true
+  }
+}

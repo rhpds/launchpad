@@ -1,5 +1,11 @@
 # September 17 three-workshop readiness gate
 
+> **Superseded September 6, 2026.** The approved event candidate replaces the
+> 25-seat AgentOps workshop with `multi-agent-quickstart`. This document and its
+> RED capacity evidence are retained as immutable history. Use
+> [`september-17-agentic-three-workshop-readiness.md`](september-17-agentic-three-workshop-readiness.md)
+> for the current release gate.
+
 ## Event outcome
 
 On **September 17, 2026**, the Launchpad execution fleet must support these

@@ -119,6 +119,12 @@ AgentOps import analysis is in
 The native Multi-Agent Quickstart intake and promotion gates are in
 [docs/multi-agent-quickstart-import.md](docs/multi-agent-quickstart-import.md).
 
+The approved September 17 internal event candidate is 25 Multi-Agent seats,
+25 Serve LLMs seats, and 25 Building an AI Agent seats. Provisioning is
+staggered while all 75 environments remain available concurrently. The exact
+combined rehearsal and capacity gate are tracked in
+[docs/september-17-agentic-three-workshop-readiness.md](docs/september-17-agentic-three-workshop-readiness.md).
+
 ## Repository layout
 
 ```text

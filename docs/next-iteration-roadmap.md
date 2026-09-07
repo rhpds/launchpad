@@ -6,18 +6,24 @@ Showroom-scale release gate. They are not blockers for completing the present
 
 ## Immediate release gate
 
-The dated release gate is now the September 17 fleet event candidate: 25
-AgentOps seats, 25 Serve LLMs seats, and 25 Building an AI Agent seats. Orders
-are staggered but all 75 participant environments remain active concurrently.
-The capacity contract, AgentOps 1 -> 5 -> 25 promotion path, exact-trio proof
-matrix, stop/go dates, and access boundary are defined in
-`docs/september-17-three-workshop-readiness.md`.
+The dated release gate is now the approved September 17 agentic event
+candidate: 25 Multi-Agent seats, 25 Serve LLMs seats, and 25 Building an AI
+Agent seats. Orders are staggered but all 75 participant environments remain
+active concurrently. The revised capacity contract, exact-trio proof matrix,
+and access boundary are defined in
+`docs/september-17-agentic-three-workshop-readiness.md`.
 
 The earlier three-workshop pilot proved the orchestration shape and both Intel
-guided labs at 25 seats. AgentOps is the critical path and must not be promoted
-past its measured live evidence. Public access remains a separate certification
-gate; internal Arena access is the September release baseline unless the public
+guided labs at 25 seats. Multi-Agent v0.2.5 independently passed three
+consecutive 25-seat Arena certifications, making the revised exact-trio
+rehearsal the next gate. Public access remains a separate certification gate;
+internal Arena access is the September release baseline unless the public
 matrix is independently GREEN-live by Sep 15.
+
+AgentOps remains in the catalog as a five-seat internal pilot. Its one- and
+five-seat evidence, 25-seat RED capacity finding, and production-hardening
+path remain valid, but AgentOps is no longer on the September event critical
+path.
 
 As of September 5, AgentOps passed its internal Launchpad-created one- and
 five-seat gates, including Showroom, runtime credentials, concurrent
