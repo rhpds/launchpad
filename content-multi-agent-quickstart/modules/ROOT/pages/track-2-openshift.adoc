@@ -156,16 +156,6 @@ independence are more important than workshop pod efficiency.
 Your values are the evidence that you changed an agent's operating policy
 without changing its protocol contract or escaping your namespace.
 
-== Continue the OpenShift Path
-
-Use these shared exercises to inspect every boundary in more depth:
-
-* xref:01-architecture.adoc[Architecture and Open Protocols]
-* xref:02-explore.adoc[Explore the Running System]
-* xref:03-run-workflows.adoc[Run Multi-Agent Workflows]
-* xref:04-tools-and-guardrails.adoc[MCP Tools and Guardrails]
-* xref:05-customize.adoc[Design an Additional Agent Role]
-
 == Track 2 Checkpoint
 
 Track 2 is complete when you have captured the baseline, applied the executor
@@ -173,4 +163,4 @@ policy, repeated the three-agent workflow successfully, restored the original
 deployment, and proved the temporary ConfigMap is gone.
 
 [.next-nav]
-xref:track-3-blueprint.adoc[Continue to Track 3: Blueprint Alignment ->]
+xref:05-customize.adoc[Next: Design an Additional Agent Role ->]

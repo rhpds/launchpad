@@ -51,5 +51,12 @@ pytest -q tests/unit tests/contracts
 
 Start with a failing test that describes the new behavior, implement the smallest change that makes it green, and retain the test as regression evidence.
 
+== Customization Checkpoint
+
+You are ready to continue when your proposed agent has a narrow purpose,
+published skills, an A2A-compatible input and output contract, only the MCP
+tools it needs, and explicit input and output policy. You do not need to deploy
+the proposed role during this workshop.
+
 [.next-nav]
-xref:99-conclusion.adoc[Next: Review and Next Steps ->]
+xref:track-3-blueprint.adoc[Next: Map the Production Blueprint ->]

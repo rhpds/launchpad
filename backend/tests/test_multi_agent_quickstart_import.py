@@ -23,7 +23,7 @@ def test_multi_agent_quickstart_is_active_for_public_event_orders():
     assert catalog == build_catalog_item(intake)
     assert catalog["catalog_item_id"] == "multi-agent-quickstart"
     assert catalog["display_name"] == "Build Multi-Agent AI Systems with Open Protocols"
-    assert catalog["version"] == "0.2.10"
+    assert catalog["version"] == "0.2.11"
     assert catalog["status"] == "active"
     assert catalog["metadata"]["onboarding_managed"] is True
     assert catalog["metadata"]["activation_blockers"] == []
@@ -93,7 +93,7 @@ def test_multi_agent_showroom_is_native_launchpad_content():
     assert "releases/download/patternfly-6/" in playbook["ui"]["bundle"]["url"]
     catalog = yaml.safe_load(CATALOG_PATH.read_text())
     assert catalog["metadata"]["showroom_content_ref"] == (
-        "pilot-2026-09-17-showroom-multi-agent-v1.0.1"
+        "pilot-2026-09-17-showroom-multi-agent-v1.0.2"
     )
     assert component["asciidoc"]["attributes"]["project_name"] == "%namespace%"
     assert component["asciidoc"]["attributes"]["maas_model"] == "%maas_model%"
@@ -120,7 +120,7 @@ def test_multi_agent_is_one_lab_with_all_three_upstream_tracks():
     assert metadata["track_count"] == 3
     assert [track["id"] for track in metadata["learning_tracks"]] == list(TRACKS)
     assert [track["title"] for track in metadata["learning_tracks"]] == [
-        "Run locally",
+        "Understand the application pattern",
         "Build and operate on OpenShift",
         "Advanced blueprint alignment",
     ]
@@ -154,6 +154,56 @@ def test_multi_agent_track_scope_is_explicit_and_does_not_overclaim_track_three(
     assert "Kagenti" in track_3
     assert "OpenTelemetry" in track_3
     assert "not an end-to-end validated deployment" in track_3
+
+
+def test_multi_agent_showroom_has_one_linear_pilot_journey():
+    pages = CONTENT_ROOT / "modules/ROOT/pages"
+    nav = (CONTENT_ROOT / "modules/ROOT/nav.adoc").read_text()
+    index = (pages / "index.adoc").read_text()
+    track_1 = (pages / TRACKS["track-1-local"]).read_text()
+
+    expected_order = [
+        "index.adoc",
+        "track-1-local.adoc",
+        "01-architecture.adoc",
+        "02-explore.adoc",
+        "03-run-workflows.adoc",
+        "04-tools-and-guardrails.adoc",
+        "track-2-openshift.adoc",
+        "05-customize.adoc",
+        "track-3-blueprint.adoc",
+        "99-conclusion.adoc",
+    ]
+    assert [
+        line.split("xref:", 1)[1].split("[", 1)[0]
+        for line in nav.splitlines()
+        if "xref:" in line
+    ] == expected_order
+    assert "Choose Your Track" not in nav
+    assert "Shared Hands-On Exercises" not in nav
+    assert "follow this sequence from top to bottom" in " ".join(index.split())
+    assert "any or all three" not in index
+    assert "Track 1: Understand the Application Pattern" in track_1
+    assert track_1.index("== Run Your First Workflow") < track_1.index(
+        "== Inspect the Application Topology"
+    )
+
+    next_page = {
+        "index.adoc": "track-1-local.adoc",
+        "track-1-local.adoc": "01-architecture.adoc",
+        "01-architecture.adoc": "02-explore.adoc",
+        "02-explore.adoc": "03-run-workflows.adoc",
+        "03-run-workflows.adoc": "04-tools-and-guardrails.adoc",
+        "04-tools-and-guardrails.adoc": "track-2-openshift.adoc",
+        "track-2-openshift.adoc": "05-customize.adoc",
+        "05-customize.adoc": "track-3-blueprint.adoc",
+        "track-3-blueprint.adoc": "99-conclusion.adoc",
+    }
+    for source, destination in next_page.items():
+        assert f"xref:{destination}[" in (pages / source).read_text()
+
+    for module in expected_order[1:-1]:
+        assert "Checkpoint" in (pages / module).read_text(), module
 
 
 def test_track_one_teaches_the_participant_ui_workflow_and_checkpoint_concepts():

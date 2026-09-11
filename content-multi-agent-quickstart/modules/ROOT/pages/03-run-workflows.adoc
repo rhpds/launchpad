@@ -64,5 +64,12 @@ The response must contain `steps`, `total_latency_ms`, `agents_involved`, and `a
 
 The orchestration layer owns workflow state. Agents receive bounded tasks through A2A and return structured artifacts. MCP enrichment is a separate tool boundary, and model calls go through the Launchpad-provided endpoint. This separation lets each contract be tested and secured independently.
 
+== Workflow Checkpoint
+
+You are ready to continue when you can point to the routing choice, ordered
+agent results, MCP data, and per-step latency for a completed request—and
+explain why the comprehensive workflow has more steps than the lightweight
+workflow.
+
 [.next-nav]
 xref:04-tools-and-guardrails.adoc[Next: MCP Tools and Guardrails ->]

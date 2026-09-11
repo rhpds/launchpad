@@ -76,9 +76,9 @@ failure of the Track 2 application.
 | Supported guardrail service with governed policies and audit evidence
 |===
 
-Use xref:05-customize.adoc[Customize the System] to design a new agent role
-while preserving these contracts. Installing cluster-scoped operators or CRDs
-is outside the participant role and outside this lab's current certification.
+The role you designed in the previous module preserves these contracts while
+extending the application. Installing cluster-scoped operators or CRDs is
+outside the participant role and outside this lab's current certification.
 
 == Track 3 Checkpoint
 
