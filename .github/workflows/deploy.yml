@@ -1,81 +1,68 @@
-name: Deploy to Cluster
+name: Launchpad Deployment Gate
 
 on:
   workflow_dispatch:
     inputs:
-      environment:
-        description: "Target environment"
+      overlay:
+        description: "Deployment source to validate (this workflow does not apply it)"
         required: true
         type: choice
         options:
-          - infra01
-      confirm:
-        description: "Type 'deploy' to confirm"
-        required: true
+          - arena
+          - arena-ha-pilot
+          - flightpath-dr
+
+permissions:
+  contents: read
 
 jobs:
-  gate-check:
-    name: Pre-deployment Gate
+  validate:
+    name: Validate ${{ inputs.overlay }} deployment source
     runs-on: ubuntu-latest
     steps:
-      - name: Confirm deployment
-        run: |
-          if [ "${{ inputs.confirm }}" != "deploy" ]; then
-            echo "Deployment not confirmed. Type 'deploy' to proceed."
-            exit 1
-          fi
-
       - uses: actions/checkout@v4
 
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Run full test suite
+      - name: Install test dependencies
         run: |
-          cd backend
-          pip install -e ".[dev]"
-          python -m pytest tests/ -q --ignore=tests/test_local_provisioning.py --ignore=tests/test_sandbox.py --tb=short
+          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install ".[dev]"
 
-      - name: Verify Helm chart
-        uses: azure/setup-helm@v4
-      - run: |
-          helm template gate-check tenant/bootstrap/ \
-            --set tenant.name=gate \
-            --set demo.namespace=gate-ns \
-            --set demo.gateway.litellmApiEndpoint=https://test.com \
-            --set demo.gateway.litellmVirtualKey=sk-test \
-            > /dev/null
-          echo "Helm chart valid"
-
-  deploy:
-    name: Deploy to ${{ inputs.environment }}
-    runs-on: ubuntu-latest
-    needs: gate-check
-    environment: ${{ inputs.environment }}
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Build and push images
+      - name: Run deployment and lifecycle contract tests
+        env:
+          PYTHONPATH: backend
         run: |
-          echo "Build + push would happen here"
-          echo "Target: ${{ inputs.environment }}"
-          echo "This step requires: oc login, registry push access"
-          echo "Skipping actual deploy — manual for now"
+          python -m pytest \
+            backend/tests/test_ha_dr_manifests.py \
+            backend/tests/test_lifecycle_worker_manifest.py \
+            backend/tests/test_arena_reliability_manifests.py \
+            backend/tests/test_lifecycle_job_queue.py \
+            -q --tb=short
 
-      - name: Generate deployment receipt
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Render selected Kustomize overlay
+        env:
+          OVERLAY: ${{ inputs.overlay }}
+          RENDER_DIR: ${{ runner.temp }}/launchpad-deployment-gate
         run: |
-          python3 -c "
-          import json, uuid, subprocess
-          from datetime import datetime
-          commit = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD'], text=True).strip()
-          receipt = {
-              'deployment_id': str(uuid.uuid4()),
-              'timestamp': datetime.utcnow().isoformat() + 'Z',
-              'environment': '${{ inputs.environment }}',
-              'commit': commit,
-              'triggered_by': '${{ github.actor }}',
-              'status': 'gate_passed',
-          }
-          print(json.dumps(receipt, indent=2))
-          "
+          mkdir -p "$RENDER_DIR"
+          kubectl kustomize "deploy/launchpad/overlays/$OVERLAY" \
+            > "$RENDER_DIR/$OVERLAY.yaml"
+          test -s "$RENDER_DIR/$OVERLAY.yaml"
+
+      - name: Upload rendered manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: launchpad-${{ inputs.overlay }}-manifest
+          path: ${{ runner.temp }}/launchpad-deployment-gate/${{ inputs.overlay }}.yaml
+
+      - name: Report deployment boundary
+        run: |
+          echo "Validation passed for deploy/launchpad/overlays/${{ inputs.overlay }}."
+          echo "This gate does not contact a cluster or perform a deployment."
+          echo "Live promotion remains an explicit Argo CD/operator action."

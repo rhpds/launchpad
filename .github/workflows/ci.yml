@@ -57,11 +57,14 @@ jobs:
 
       - name: Save test receipt
         if: always()
+        env:
+          RECEIPT_DIR: ${{ runner.temp }}/launchpad-receipts
         run: |
           cd backend
+          mkdir -p "$RECEIPT_DIR"
           TOTAL=$(python -m pytest tests/ -q --ignore=tests/test_local_provisioning.py --ignore=tests/test_sandbox.py --tb=no 2>&1 | tail -1 | grep -o "[0-9]* passed" | grep -o "[0-9]*" || echo "0")
           python3 -c "
-          import json, uuid, subprocess
+          import json, os, uuid, subprocess
           from datetime import datetime
           commit = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD'], text=True).strip()
           receipt = {
@@ -73,7 +76,7 @@ jobs:
               'trigger': '${{ github.event_name }}',
               'branch': '${{ github.ref_name }}',
           }
-          with open('../test-receipts/ci-latest.json', 'w') as f:
+          with open(os.path.join(os.environ['RECEIPT_DIR'], 'ci-latest.json'), 'w') as f:
               json.dump(receipt, f, indent=2)
           print(f'Receipt: {$TOTAL} tests, commit {commit}')
           "
@@ -83,7 +86,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-receipt
-          path: test-receipts/ci-latest.json
+          path: ${{ runner.temp }}/launchpad-receipts/ci-latest.json
 
   catalog-onboarding:
     name: Catalog Onboarding Contracts
@@ -105,8 +108,10 @@ jobs:
           npm ci
 
       - name: Validate pinned onboarding sources and generated catalog
+        env:
+          RECEIPT_DIR: ${{ runner.temp }}/launchpad-receipts
         run: |
-          mkdir -p test-receipts
+          mkdir -p "$RECEIPT_DIR"
           for intake in catalog-onboarding/*.yaml; do
             catalog_id="${intake##*/}"
             catalog_id="${catalog_id%.yaml}"
@@ -116,19 +121,21 @@ jobs:
               --fetch \
               --build-showroom \
               --antora-bin node_modules/.bin/antora \
-              --report "test-receipts/catalog-onboarding-$catalog_id.json"
+              --report "$RECEIPT_DIR/catalog-onboarding-$catalog_id.json"
           done
 
       - name: Validate reusable catalog certification contracts
+        env:
+          RECEIPT_DIR: ${{ runner.temp }}/launchpad-receipts
         run: |
-          mkdir -p test-receipts
+          mkdir -p "$RECEIPT_DIR"
           for contract in certification/catalog/*.yaml; do
             catalog_id="${contract##*/}"
             catalog_id="${catalog_id%.yaml}"
             python scripts/catalog_certification.py validate \
               "$contract" \
               --intake "catalog-onboarding/$catalog_id.yaml" \
-              > "test-receipts/catalog-certification-$catalog_id.json"
+              > "$RECEIPT_DIR/catalog-certification-$catalog_id.json"
           done
 
       - name: Upload onboarding evidence
@@ -137,8 +144,8 @@ jobs:
         with:
           name: catalog-onboarding-receipts
           path: |
-            test-receipts/catalog-onboarding-*.json
-            test-receipts/catalog-certification-*.json
+            ${{ runner.temp }}/launchpad-receipts/catalog-onboarding-*.json
+            ${{ runner.temp }}/launchpad-receipts/catalog-certification-*.json
 
   frontend-check:
     name: Frontend TypeScript
