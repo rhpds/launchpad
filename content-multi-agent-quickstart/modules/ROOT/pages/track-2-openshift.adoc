@@ -34,24 +34,38 @@ oc auth can-i get pods -n partner-ai-launchpad
 oc auth can-i get nodes
 ----
 
-The first two authorization checks must return `yes`. The final two checks must
-return `no` or `Forbidden`; they prove the seat is not a cluster-wide identity.
+The initial `test` command is silent when the project is correct. The next two
+authorization checks must return `yes`, and the
+`partner-ai-launchpad` check must return `no`. Because `Node` is a
+cluster-scoped resource, the last command normally prints
+`Warning: resource 'nodes' is not namespace scoped` and then `no`. That warning
+is informational; the final result must be `no`. A `Forbidden` response is
+also an expected denial if you attempt a direct read instead of asking
+`oc auth can-i`. These denials prove the seat is not a cluster-wide identity.
 
 == Inspect the Deployed Baseline
 
 [source,bash,role="execute"]
 ----
 oc get deployments,pods,services,routes
-oc get deployment multi-agent \
-  -o jsonpath='{range .spec.template.spec.containers[*]}{.name}{"\n"}{end}'
+WORKLOAD_POD="$(
+  oc get pod -l app.kubernetes.io/name=multi-agent-seat \
+    -o jsonpath='{.items[0].metadata.name}'
+)"
+echo "Workload pod: ${WORKLOAD_POD}"
+oc get pod "${WORKLOAD_POD}" \
+  -o jsonpath='{range .spec.containers[*]}{.name}{"\n"}{end}'
 oc rollout status deployment/multi-agent --timeout=5m
 oc rollout status deployment/showroom --timeout=5m
 ----
 
-The workload pod contains the orchestrator, research, analyst, executor, MCP,
-guardrails, and participant UI containers. A separate Showroom pod supplies
-this guide and terminal. The model remains a shared Launchpad MaaS service; it
-is not loaded once per participant namespace.
+The Deployment named `multi-agent` creates one seat-specific workload pod,
+whose generated name starts with `multi-agent-`. The label
+`app.kubernetes.io/name=multi-agent-seat` finds that pod without depending on
+its generated suffix. It contains the `orchestrator`, `research`, `analyst`,
+`executor`, `mcp-server`, `guardrails`, and `participant-ui` containers. A
+separate Showroom pod supplies this guide and terminal. The model remains a
+shared Launchpad MaaS service; it is not loaded once per participant namespace.
 
 Open the *Multi-Agent Workspace*, choose `comprehensive`, and run this
 sanitized baseline request:

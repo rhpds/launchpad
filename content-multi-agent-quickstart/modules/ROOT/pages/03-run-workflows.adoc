@@ -2,7 +2,10 @@
 
 == Open the Participant UI
 
-Select the *Multi-Agent Workspace* tab. Confirm the health panel reports three discovered agents before sending a request.
+Select the *Multi-Agent Workspace* tab. Open *System Status* and click
+*Refresh*. In the *System Health* box, confirm `Agents discovered: 3` and the
+agent names `research`, `analyst`, and `executor`. Then return to the
+*Workflow* tab before sending a request.
 
 Start with a simple fictional request:
 
