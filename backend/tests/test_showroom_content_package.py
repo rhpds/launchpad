@@ -32,7 +32,7 @@ INTEL_GUIDED_LABS = [
         "title": "Serve LLMs on Intel Xeon CPUs",
         "model": "granite-2b-cpu",
         "workspace_route": "rag",
-        "content_ref": "pilot-2026-09-17-showroom-brand-v1.0.0",
+        "content_ref": "pilot-2026-09-17-intel-llm-cpu-serving-v1.0.9",
         "max_workshop_seats": 25,
         "certification_stage": "twenty-five-seat",
     },
@@ -544,9 +544,9 @@ def test_cpu_serving_catalog_uses_current_immutable_showroom_revision():
         (ROOT / "catalog/intel-llm-cpu-serving/catalog-item.yaml").read_text()
     )
 
-    assert catalog["version"] == "1.0.8"
+    assert catalog["version"] == "1.0.9"
     assert catalog["metadata"]["showroom_content_ref"] == (
-        "pilot-2026-09-17-showroom-brand-v1.0.0"
+        "pilot-2026-09-17-intel-llm-cpu-serving-v1.0.9"
     )
 
 
