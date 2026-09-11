@@ -39,7 +39,9 @@ guardrails are called before and after model work.
 
 == Follow the Local Request Flow
 
-Open the *Multi-Agent Workspace* tab and run these two sanitized requests:
+Open the *Multi-Agent Workspace* tab and run the following two sanitized
+requests one after another by entering each request in the *Query* box on the
+*Workflow* tab and clicking *Run Workflow*:
 
 [source,text]
 ----
@@ -52,9 +54,54 @@ Research a fictional API latency increase, analyze likely causes, and create a r
 ----
 
 Use `auto` routing for both. The first request should choose a shorter path;
-the second should involve research, analyst, and executor roles. Then continue
-through xref:03-run-workflows.adoc[Run Multi-Agent Workflows] and
-xref:04-tools-and-guardrails.adoc[MCP Tools and Guardrails].
+the second should involve research, analyst, and executor roles.
+
+== Follow One Query Through the System
+
+When you click *Run Workflow*, the participant UI sends the query and selected
+workflow type to the orchestrator. With `auto` selected, the semantic router
+classifies the request as `SIMPLE`, `MEDIUM`, `COMPLEX`, or `REASONING`. That
+classification selects both the workflow depth and the model tier: a simple
+request can go straight to the executor, a medium request can use research and
+execution, and a complex or reasoning request can use research, analysis, and
+execution.
+
+The orchestrator discovers each service from its A2A agent card and sends each
+step as an A2A `tasks/send` request. Before an agent calls a tool or model,
+input guardrails screen the task. The agent may ask the separate MCP server for
+structured external data, then calls the selected model. Output guardrails
+screen the generated response before it returns to the orchestrator. The
+result of one step becomes context for the next step, and the UI separates the
+combined response into three boxes.
+
+=== Routing Decision
+
+This box explains _why_ the request took its path. For `auto` routing it shows
+the active classifier, chosen workflow, selected model tier, classification
+signal scores, agents involved, step count, and total latency. Compare the two
+requests: the signal and workflow should change as the requested work becomes
+more complex. If static routing is shown, the selected workflow was used
+directly instead of a semantic classification.
+
+=== Agent Results
+
+This box shows the ordered output from each participating agent. Each section
+names the agent and action and reports that step's latency. The research result
+becomes context for the analyst, and the accumulated context becomes input for
+the executor. These are AI-generated results, so the disclaimer is a reminder
+to verify recommendations rather than treat them as approved actions.
+
+=== MCP Tool Data
+
+This box shows structured results returned by tools such as `lookup_record`,
+`search_knowledge_base`, or `create_task`. MCP keeps deterministic data lookup
+and actions outside the language model so they can be schema-controlled,
+authorized, tested, and audited independently. This is external tool data, not
+hidden model reasoning. A request that does not match a tool's trigger can
+correctly show that no MCP tools were called.
+
+Then continue through xref:03-run-workflows.adoc[Run Multi-Agent Workflows]
+and xref:04-tools-and-guardrails.adoc[MCP Tools and Guardrails].
 
 == Optional Run Outside Launchpad
 
@@ -72,6 +119,21 @@ You have completed Track 1 when you can explain:
 * how semantic routing changes workflow depth;
 * why MCP tools are separate from the model; and
 * where input and output guardrails run.
+
+Use these observations to check your explanation:
+
+* Each agent is independently discoverable because it publishes its own A2A
+  agent card, service URL, and skills. The orchestrator learns that contract
+  without importing the agent's implementation.
+* Semantic routing changes workflow depth by mapping the query classification
+  to a one-, two-, or three-agent path and an appropriate model tier. Choosing
+  a workflow explicitly bypasses that automatic choice.
+* MCP tools are separate because the model produces language while tools
+  perform schema-defined data retrieval or actions that can be governed and
+  audited independently.
+* Input guardrails run before an agent calls MCP or the model. Output
+  guardrails run after generation and before the result returns to the
+  orchestrator.
 
 [.next-nav]
 xref:track-2-openshift.adoc[Continue to Track 2: Build and Operate on OpenShift ->]

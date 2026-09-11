@@ -59,23 +59,24 @@ def test_antora_playbook_builds_content_from_this_repository():
     assert "rhdp_showroom_theme" in playbook["ui"]["bundle"]["url"]
 
 
-def test_shared_showroom_ui_adds_execute_without_removing_copy():
+def test_shared_showroom_ui_uses_canonical_terminal_execute_controls():
     supplemental = ROOT / "content/supplemental-ui"
     head = (supplemental / "partials/head-meta.hbs").read_text()
     header = (supplemental / "partials/header-content.hbs").read_text()
-    script = (supplemental / "js/execute.js").read_text()
+    script = (supplemental / "js/vendor/clipboard.js").read_text()
     styles = (supplemental / "css/site-extra.css").read_text()
 
-    assert '{{uiRootPath}}/js/execute.js' in head
+    assert '{{uiRootPath}}/js/execute.js' not in head
+    assert not (supplemental / "js/execute.js").exists()
     assert '{{uiRootPath}}/css/site-extra.css' in head
-    assert "div.listingblock.execute" in script
-    assert "launchpad-execute-button" in script
-    assert "Execute" in script
-    assert "copy-button" not in script
-    assert "findTerminalIframe" in script
+    assert "pasteToTerminal" in script
+    assert ".tabcontent.active .main-content" in script
     assert "xterm-helper-textarea" in script
-    assert "Terminal unavailable" in script
-    assert ".launchpad-execute-button" in styles
+    assert "Run in terminal" in script
+    assert "writeToClipboard" in script
+    assert "copy-button" in script
+    assert "launchpad-execute-button" not in script
+    assert ".launchpad-execute-button" not in styles
     assert "intel-logo.svg" in header
     assert (supplemental / "img/intel-logo.svg").is_file()
     assert "logo-demo-platform.svg" in header

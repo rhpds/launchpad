@@ -23,7 +23,7 @@ def test_multi_agent_quickstart_is_active_for_public_event_orders():
     assert catalog == build_catalog_item(intake)
     assert catalog["catalog_item_id"] == "multi-agent-quickstart"
     assert catalog["display_name"] == "Build Multi-Agent AI Systems with Open Protocols"
-    assert catalog["version"] == "0.2.9"
+    assert catalog["version"] == "0.2.10"
     assert catalog["status"] == "active"
     assert catalog["metadata"]["onboarding_managed"] is True
     assert catalog["metadata"]["activation_blockers"] == []
@@ -93,7 +93,7 @@ def test_multi_agent_showroom_is_native_launchpad_content():
     assert "releases/download/patternfly-6/" in playbook["ui"]["bundle"]["url"]
     catalog = yaml.safe_load(CATALOG_PATH.read_text())
     assert catalog["metadata"]["showroom_content_ref"] == (
-        "pilot-2026-09-17-showroom-brand-v1.0.0"
+        "pilot-2026-09-17-showroom-multi-agent-v1.0.1"
     )
     assert component["asciidoc"]["attributes"]["project_name"] == "%namespace%"
     assert component["asciidoc"]["attributes"]["maas_model"] == "%maas_model%"
@@ -154,6 +154,57 @@ def test_multi_agent_track_scope_is_explicit_and_does_not_overclaim_track_three(
     assert "Kagenti" in track_3
     assert "OpenTelemetry" in track_3
     assert "not an end-to-end validated deployment" in track_3
+
+
+def test_track_one_teaches_the_participant_ui_workflow_and_checkpoint_concepts():
+    pages = CONTENT_ROOT / "modules/ROOT/pages"
+    track_1 = (pages / TRACKS["track-1-local"]).read_text()
+    workflows = (pages / "03-run-workflows.adoc").read_text()
+    track_1_text = " ".join(track_1.split())
+    workflows_text = " ".join(workflows.split())
+
+    assert "entering each request in the *Query* box on the *Workflow* tab" in track_1_text
+    assert "clicking *Run Workflow*" in track_1_text
+    for panel in ("Routing Decision", "Agent Results", "MCP Tool Data"):
+        assert f"=== {panel}" in track_1
+    for explanation in (
+        "SIMPLE`, `MEDIUM`, `COMPLEX`, or `REASONING",
+        "A2A agent card",
+        "not hidden model reasoning",
+        "Input guardrails run before",
+        "Output guardrails run after",
+    ):
+        assert explanation in track_1_text
+
+    assert "Open *System Status* and click *Refresh*" in workflows_text
+    assert "Agents discovered: 3" in workflows_text
+    assert "research`, `analyst`, and `executor" in workflows_text
+    assert "health panel" not in workflows_text
+
+
+def test_track_two_explains_expected_rbac_warning_and_workload_pod():
+    page = (
+        CONTENT_ROOT / "modules/ROOT/pages" / TRACKS["track-2-openshift"]
+    ).read_text()
+    page_text = " ".join(page.split())
+
+    assert "is silent when the project is correct" in page_text
+    assert "resource 'nodes' is not namespace scoped" in page_text
+    assert "informational" in page_text
+    assert "the final result must be `no`" in page_text
+    assert "A `Forbidden` response is also an expected denial" in page_text
+    assert "Deployment named `multi-agent` creates one seat-specific workload pod" in page_text
+    assert "app.kubernetes.io/name=multi-agent-seat" in page
+    for container in (
+        "orchestrator",
+        "research",
+        "analyst",
+        "executor",
+        "mcp-server",
+        "guardrails",
+        "participant-ui",
+    ):
+        assert f"`{container}`" in page
 
 
 def test_multi_agent_quickstart_is_orderable_after_internal_promotion():
