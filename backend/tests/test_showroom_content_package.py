@@ -547,6 +547,31 @@ def test_cpu_serving_guides_participants_to_a_rag_workspace_not_agent_admin():
     assert "Create Workspace" in page
 
 
+def test_cpu_serving_external_participants_use_the_entitlement_gateway():
+    page = (
+        ROOT / "content-intel-llm-cpu-serving/modules/ROOT/pages/04-wire-rag-frontend.adoc"
+    ).read_text()
+
+    assert "Open the *RAG Assistant* tab inside *Open Lab*" in page
+    assert "entitlement-aware participant gateway" in page
+    assert "Open that URL in your browser" not in page
+    assert "Do not open the raw OpenShift Route" in page
+
+
+def test_cpu_serving_uses_the_anythingllm_v116_link_upload_contract():
+    page = (
+        ROOT / "content-intel-llm-cpu-serving/modules/ROOT/pages/05-load-documents.adoc"
+    ).read_text()
+
+    assert page.count("/api/v1/document/upload-link") == 2
+    assert "/api/v1/document/create-link" not in page
+    assert page.count('["documents"][0]["location"]') == 2
+    assert 'export DOCUMENT_PATH=' in page
+    assert 'export ADDITIONAL_DOCUMENT_PATH=' in page
+    assert "custom-documents/url-www.dol.gov-agencies-whd-fmla.json" not in page
+    assert page.count("/update-embeddings") >= 2
+
+
 def test_cpu_serving_terminal_uses_namespace_service_for_anythingllm_api():
     pages = ROOT / "content-intel-llm-cpu-serving/modules/ROOT/pages"
     load_documents = (pages / "05-load-documents.adoc").read_text()
@@ -556,7 +581,7 @@ def test_cpu_serving_terminal_uses_namespace_service_for_anythingllm_api():
     assert 'export ANYTHINGLLM_API_URL="http://anythingllm:3001"' in load_documents
     assert 'curl -fsS "${ANYTHINGLLM_API_URL}/api/ping"' in load_documents
     assert "ANYTHINGLLM_URL\\}/api/v1" not in terminal_exercises
-    assert terminal_exercises.count("ANYTHINGLLM_API_URL\\}/api/v1") == 7
+    assert terminal_exercises.count("ANYTHINGLLM_API_URL\\}/api/v1") == 8
     assert "The browser Route is not used for terminal API calls" in load_documents
 
 
