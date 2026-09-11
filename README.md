@@ -108,6 +108,7 @@ receives scoped API access and does not load model weights into its pod.
 | `intel-llm-cpu-serving` | Intel AI Quickstart: Serve LLMs on Intel Xeon CPUs | Guided build |
 | `intel-llm-tool-calling` | Intel AI Quickstart: LLM Tool Calling on Intel | Guided build |
 | `intel-xeon6-agent-201` | Intel Xeon 6 201: Building an AI Agent | Guided build |
+| `multi-agent-quickstart` | Build Multi-Agent AI Systems with Open Protocols | Guided build |
 | `openshift-operators-workshop` | OpenShift AI Operator Workshop | Guided build |
 | `rag-on-xeon` | RAG on Intel Xeon | Quick start |
 | `smoke-test` | Smoke Test Demo | Quick start |
@@ -120,7 +121,11 @@ order flow until runtime and live certification gates pass:
 | ID | Name | Current gate |
 |---|---|---|
 | `agentops-observability` | AgentOps in Production: End-to-End Observability with Red Hat AI | Five internal seats are GREEN-live with isolated concurrent journeys and zero-residue normal/fault reclaim; 25-seat capacity, public access, and production Logging/TLS remain gated |
-| `multi-agent-quickstart` | Build Multi-Agent AI Systems with Open Protocols | Active for internal orders up to 25 seats. One lab contains local, hands-on OpenShift, and advanced blueprint tracks. Track 2 runs a real workflow and has the learner apply, verify, and roll back an agent policy. Catalog v0.2.5 completed three consecutive GREEN-live 25-seat Arena runs with every hands-on journey and zero-residue reclaim proven. Optional advanced integrations, durable image supply, and public access remain gated |
+
+`multi-agent-quickstart` is active for orders up to 25 seats. One lab contains
+local, hands-on OpenShift, and advanced blueprint tracks. Optional advanced
+integrations and durable image supply remain later hardening work; the current
+pilot boundary is maintained in the September readiness documents.
 
 ## Architecture
 
@@ -192,6 +197,12 @@ deploy/        Kustomize, build, and optional RHDP/AgnosticV assets
 docs/          Current runbooks plus historical design documents
 ```
 
+Generated CI receipts are uploaded as workflow artifacts and are not committed.
+Historical proof remains immutable until its hash and reference chain has been
+migrated deliberately. See the
+[repository hygiene policy](docs/repository-hygiene.md) before moving or
+deleting catalogs, evidence, demo assets, or historical documents.
+
 ## Development and verification
 
 ```bash
@@ -241,11 +252,11 @@ KUBECONFIG=/Users/jkershaw/.kube/config-arena oc ...
 
 - Existing Guided RAG sessions retain their original content; new orders use the OpenShift AI Operator Workshop.
 - Operator availability is cluster-wide and centrally managed; catalog items should detect and use installed capabilities rather than install an Operator per participant seat.
-- Some older files in `docs/` describe the original RHDP/infra01 target. Files explicitly labeled **historical** are design references, not the Oberon production contract.
+- Some older files in `docs/` describe the original RHDP/infra01 target. Files explicitly labeled **historical** are design references, not the current Intel deployment contract.
 - Repository-wide lint currently includes pre-existing React purity errors in `BrandingContext.tsx` and `Fleet.tsx`.
 
-For certified multi-seat behavior and the current visual release gate, see
-[docs/oberon-workshop-readiness.md](docs/oberon-workshop-readiness.md). Deferred
+For the current multi-seat event behavior and release gate, see
+[docs/september-17-agentic-three-workshop-readiness.md](docs/september-17-agentic-three-workshop-readiness.md). Deferred
 performance, ETA, automation, and scale pathways are tracked in
 [docs/next-iteration-roadmap.md](docs/next-iteration-roadmap.md). For adapter
 behavior, see [docs/adapters.md](docs/adapters.md). StarGate, DeepField, and
