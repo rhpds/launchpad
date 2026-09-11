@@ -311,6 +311,26 @@ def test_tool_proxy_rewrites_root_relative_html_assets_to_the_order_mount():
     assert b'href="/labs/serve-llms-ab12cd34/proxy/tool/workspace/manifest.json"' in rewritten
 
 
+def test_tool_proxy_adapts_solution_architect_inline_api_base_to_the_order_mount():
+    source = (
+        b"<script>const AGENT_URL = window.AGENT_URL || '';"
+        b"fetch(AGENT_URL + '/api/v1/advise')</script>"
+    )
+
+    rewritten = _rewrite_upstream_content(
+        source,
+        "text/html; charset=utf-8",
+        "https://app-seat.apps.arena.fm2aihpcsed.com",
+        "/labs/build-agent-ab12cd34/proxy/tool/workspace",
+    ).decode()
+
+    assert (
+        "const AGENT_URL = window.AGENT_URL || "
+        "'/labs/build-agent-ab12cd34/proxy/tool/workspace';"
+    ) in rewritten
+    assert "fetch(AGENT_URL + '/api/v1/advise')" in rewritten
+
+
 def test_tool_proxy_adapts_anythingllm_bundle_to_the_order_mount():
     source = (
         b'const O="modulepreload",P=function(e){return"/"+e};'

@@ -188,6 +188,16 @@ def _rewrite_upstream_content(
             source,
             flags=re.IGNORECASE,
         )
+        # The lightweight Solution Architect UI is served both at an internal
+        # Route root and beneath an order-scoped public gateway mount. Its
+        # empty default keeps direct access at `/`, but would make a public
+        # request escape to `/api/v1/advise` on the gateway and return 404.
+        # Adapt only this stable application signature; unrelated inline
+        # scripts remain untouched.
+        source = source.replace(
+            "const AGENT_URL = window.AGENT_URL || '';",
+            f"const AGENT_URL = window.AGENT_URL || '{public}';",
+        )
     elif media_type == "application/javascript":
         # AnythingLLM's published image is a Vite SPA compiled for `/` and it
         # does not expose a supported runtime base-path option. Detect its
