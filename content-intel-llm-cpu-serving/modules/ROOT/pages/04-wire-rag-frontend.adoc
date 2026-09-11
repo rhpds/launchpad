@@ -212,16 +212,26 @@ seat's exact Showroom origin; every other origin remains denied. Its first pull
 to a worker can take several minutes; subsequent seats on that worker use the
 cached image layers.
 
-== Verify the Connection
+== Open the RAG Assistant
 
-Get the AnythingLLM URL:
+Open the *RAG Assistant* tab inside *Open Lab*. External participants must use
+this same-origin path because the entitlement-aware participant gateway checks
+the seat assignment before proxying AnythingLLM.
+
+IMPORTANT: Do not open the raw OpenShift Route in an external browser. That
+cluster route is available only to internal/VPN users and is not the public lab
+entry point.
+
+For internal instructor troubleshooting, display the underlying Route with:
 
 [source,bash,role="execute",subs="attributes+"]
 ----
 echo "AnythingLLM URL: $\{ANYTHINGLLM_URL\}"
 ----
 
-Open that URL in your browser. Complete the initial setup wizard -- select the existing LLM configuration (it will auto-detect the settings from the Secret).
+In the *RAG Assistant* tab, complete the initial setup wizard and select the
+existing LLM configuration. AnythingLLM auto-detects the settings from the
+Secret.
 
 IMPORTANT: Create a workspace -- not an AnythingLLM agent. Do not use *Admin -> Agent Skills*
 for this exercise. Agent Skills, Agent Flows, and MCP

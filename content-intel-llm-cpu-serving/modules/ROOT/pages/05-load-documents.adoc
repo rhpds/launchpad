@@ -83,13 +83,23 @@ Load an HR compliance document from the web into the workspace:
 
 [source,bash,role="execute",subs="attributes+"]
 ----
-curl -fsS -X POST "$\{ANYTHINGLLM_API_URL\}/api/v1/document/create-link" \
+UPLOAD_RESPONSE="$(curl -fsS -X POST "$\{ANYTHINGLLM_API_URL\}/api/v1/document/upload-link" \
   -H "Authorization: Bearer $\{ANYTHINGLLM_API_KEY\}" \
   -H "Content-Type: application/json" \
-  -d '{"link": "https://www.dol.gov/agencies/whd/fmla"}' | python3 -m json.tool
+  -d '{"link": "https://www.dol.gov/agencies/whd/fmla"}')"
+
+printf '%s\n' "$\{UPLOAD_RESPONSE\}" | python3 -m json.tool
+export DOCUMENT_PATH="$(printf '%s' "$\{UPLOAD_RESPONSE\}" | \
+  python3 -c 'import json, sys; print(json.load(sys.stdin)["documents"][0]["location"])')"
+test -n "$\{DOCUMENT_PATH\}"
+echo "Document path: $\{DOCUMENT_PATH\}"
 ----
 
-This fetches the page, parses the HTML into text, chunks the text into passages, embeds each chunk, and stores the vectors in LanceDB.
+The `upload-link` response contains the generated path in
+`documents[0].location`. AnythingLLM includes a unique identifier in that path,
+so it must be captured from the response instead of guessed. This call fetches,
+parses, and chunks the page; the next call embeds those chunks into the
+workspace.
 
 == Embed the Document into the Workspace
 
@@ -97,10 +107,13 @@ After uploading, embed the document so it is searchable:
 
 [source,bash,role="execute",subs="attributes+"]
 ----
+EMBED_PAYLOAD="$(python3 -c \
+  'import json, os; print(json.dumps(dict(adds=[os.environ["DOCUMENT_PATH"]])))')"
+
 curl -fsS -X POST "$\{ANYTHINGLLM_API_URL\}/api/v1/workspace/hr-assistant/update-embeddings" \
   -H "Authorization: Bearer $\{ANYTHINGLLM_API_KEY\}" \
   -H "Content-Type: application/json" \
-  -d '{"adds": ["custom-documents/url-www.dol.gov-agencies-whd-fmla.json"]}' | python3 -m json.tool
+  -d "$\{EMBED_PAYLOAD\}" | python3 -m json.tool
 ----
 
 == Verify the Loaded Documents
@@ -123,10 +136,24 @@ Load more documents to build a richer knowledge base:
 
 [source,bash,role="execute",subs="attributes+"]
 ----
-curl -fsS -X POST "$\{ANYTHINGLLM_API_URL\}/api/v1/document/create-link" \
+ADDITIONAL_UPLOAD_RESPONSE="$(curl -fsS -X POST "$\{ANYTHINGLLM_API_URL\}/api/v1/document/upload-link" \
   -H "Authorization: Bearer $\{ANYTHINGLLM_API_KEY\}" \
   -H "Content-Type: application/json" \
-  -d '{"link": "https://www.dol.gov/agencies/whd/overtime"}' | python3 -m json.tool
+  -d '{"link": "https://www.dol.gov/agencies/whd/overtime"}')"
+
+printf '%s\n' "$\{ADDITIONAL_UPLOAD_RESPONSE\}" | python3 -m json.tool
+export ADDITIONAL_DOCUMENT_PATH="$(printf '%s' "$\{ADDITIONAL_UPLOAD_RESPONSE\}" | \
+  python3 -c 'import json, sys; print(json.load(sys.stdin)["documents"][0]["location"])')"
+test -n "$\{ADDITIONAL_DOCUMENT_PATH\}"
+echo "Additional document path: $\{ADDITIONAL_DOCUMENT_PATH\}"
+
+ADDITIONAL_EMBED_PAYLOAD="$(python3 -c \
+  'import json, os; print(json.dumps(dict(adds=[os.environ["ADDITIONAL_DOCUMENT_PATH"]])))')"
+
+curl -fsS -X POST "$\{ANYTHINGLLM_API_URL\}/api/v1/workspace/hr-assistant/update-embeddings" \
+  -H "Authorization: Bearer $\{ANYTHINGLLM_API_KEY\}" \
+  -H "Content-Type: application/json" \
+  -d "$\{ADDITIONAL_EMBED_PAYLOAD\}" | python3 -m json.tool
 ----
 
 == What Happened Under the Hood
@@ -146,7 +173,7 @@ The LLM inference (via MaaS) is not involved in this step. Embedding uses a sepa
 |===
 |Symptom |Resolution
 
-|`create-link` API returns 403
+|`upload-link` API returns 403
 |The API key is missing or incorrect. Regenerate it from the AnythingLLM settings page.
 
 |Document shows in workspace but with zero embeddings
