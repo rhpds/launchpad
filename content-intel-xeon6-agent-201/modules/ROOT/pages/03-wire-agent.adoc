@@ -39,7 +39,7 @@ The lab provisioner has already generated and assigned a short-lived, model-scop
 [source,bash,role="execute",subs=attributes+]
 ----
 oc get pod -l app=solution-agent
-export ADVISOR_URL="https://$(oc get route agent -o jsonpath='{.spec.host}')"
+export ADVISOR_API_URL="http://solution-agent:8082"
 ----
 
 Check the agent's environment:
@@ -84,8 +84,8 @@ Send a request via the terminal:
 
 [source,bash,role="execute"]
 ----
-ADVISOR_URL="https://$(oc get route agent -o jsonpath='{.spec.host}')"
-curl -fsS -X POST "${ADVISOR_URL}/api/v1/advise" \
+ADVISOR_API_URL="http://solution-agent:8082"
+curl -fsS -X POST "${ADVISOR_API_URL}/api/v1/advise" \
   -H "Content-Type: application/json" \
   -d '{
     "query": "A retail chain needs real-time inventory prediction across 500 stores. Each store has 2 edge servers running legacy Windows applications. They currently run VMware with Oracle DB. Budget is $2M for the infrastructure refresh. They need sub-second predictions at each store."

@@ -18,9 +18,9 @@ INTEL_GUIDED_LABS = [
         "title": "Intel Xeon 6 201 — Building an AI Agent",
         "model": "granite-3.2-8b-tools",
         "workspace_route": "app",
-        # v1.0.14 descends from the shared execute-control revision and also
-        # pins the rebuilt Agent 201 runtime image used by the live workshop.
-        "content_ref": "pilot-2026-09-17-showroom-brand-v1.0.0",
+        # The Agent 201 pilot fix release keeps terminal API calls inside the
+        # namespace and keeps the browser UI beneath the public order mount.
+        "content_ref": "pilot-2026-09-17-showroom-agent201-v1.0.1",
         "max_workshop_seats": 25,
         "certification_stage": "twenty-five-seat",
     },
@@ -344,6 +344,31 @@ def test_agent_201_runtime_bounds_cpu_generation_for_workshop_scale():
         "solution-agent-workshop@sha256:"
         "5fc8c0d69af7cd4b30023354152f6ac8b2470256afc46365590bbf9c1014aa91"
     ) in manifest
+
+
+def test_agent_201_terminal_calls_use_the_namespace_service_without_tls_bypass():
+    catalog = yaml.safe_load(
+        (ROOT / "catalog/intel-xeon6-agent-201/catalog-item.yaml").read_text()
+    )
+    pages = ROOT / "content-intel-xeon6-agent-201/modules/ROOT/pages"
+    exercises = "\n".join(
+        (pages / filename).read_text()
+        for filename in ("03-wire-agent.adoc", "04-test-and-tune.adoc")
+    )
+
+    assert catalog["version"] == "1.0.5"
+    assert catalog["metadata"]["showroom_content_ref"] == (
+        "pilot-2026-09-17-showroom-agent201-v1.0.1"
+    )
+    assert 'ADVISOR_API_URL="http://solution-agent:8082"' in exercises
+    assert exercises.count("${ADVISOR_API_URL}/api/v1/advise") == 5
+    assert "oc get route agent" not in exercises
+    assert "ADVISOR_URL" not in exercises
+    assert all(
+        "-k" not in line
+        for line in exercises.splitlines()
+        if line.strip().startswith("curl ")
+    )
 
 
 def test_agentops_showroom_is_native_launchpad_content():
