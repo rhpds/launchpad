@@ -1,19 +1,43 @@
 [[track-1-local]]
-= Track 1: Run Locally
+= Track 1: Understand the Application Pattern
 
 == Purpose
 
-Track 1 teaches the application pattern before adding platform concerns. The
-upstream quickstart runs the orchestrator, three A2A agents, the MCP server,
-guardrails, and participant UI with Docker Compose and an optional local model.
+The source project's first track teaches the application pattern before adding
+platform concerns. It can run the orchestrator, three A2A agents, the MCP
+server, guardrails, and participant UI with Docker Compose and an optional
+local model.
 
 In a Launchpad workshop you already have a *pre-provisioned OpenShift runtime*
 containing the same application services. You will inspect the local source
-contract and exercise the same request flow without starting a second copy of
-the stack inside your seat. This keeps one lab consistent for every
-participant while preserving the learning objectives of the local track.
+contract and exercise that request flow without starting a second copy of the
+stack inside your seat. This keeps one lab consistent for every participant
+while preserving the source track's learning objectives.
 
-== Inspect the Local Topology
+== Run Your First Workflow
+
+Open the *Multi-Agent Workspace* tab and run the following two sanitized
+requests one after another by entering each request in the *Query* box on the
+*Workflow* tab and clicking *Run Workflow*:
+
+[source,text]
+----
+Create a short task to verify a fictional service health endpoint.
+----
+
+[source,text]
+----
+Research a fictional API latency increase, analyze likely causes, and create a remediation task.
+----
+
+Use `auto` routing for both. The first request should choose a shorter path;
+the second should involve research, analyst, and executor roles. Do not worry
+about every field yet—the rest of this phase explains what you are seeing.
+
+*Expected result:* both requests complete without a workflow error, and the
+*Routing Decision*, *Agent Results*, and *MCP Tool Data* boxes update.
+
+== Inspect the Application Topology
 
 Clone the exact source revision used to construct this lab:
 
@@ -36,25 +60,6 @@ sed -n '1,160p' src/agent.py
 Notice that each agent has its own service boundary. The orchestrator discovers
 agents through A2A cards, MCP tools remain separate from inference, and
 guardrails are called before and after model work.
-
-== Follow the Local Request Flow
-
-Open the *Multi-Agent Workspace* tab and run the following two sanitized
-requests one after another by entering each request in the *Query* box on the
-*Workflow* tab and clicking *Run Workflow*:
-
-[source,text]
-----
-Create a short task to verify a fictional service health endpoint.
-----
-
-[source,text]
-----
-Research a fictional API latency increase, analyze likely causes, and create a remediation task.
-----
-
-Use `auto` routing for both. The first request should choose a shorter path;
-the second should involve research, analyst, and executor roles.
 
 == Follow One Query Through the System
 
@@ -100,9 +105,6 @@ authorized, tested, and audited independently. This is external tool data, not
 hidden model reasoning. A request that does not match a tool's trigger can
 correctly show that no MCP tools were called.
 
-Then continue through xref:03-run-workflows.adoc[Run Multi-Agent Workflows]
-and xref:04-tools-and-guardrails.adoc[MCP Tools and Guardrails].
-
 == Optional Run Outside Launchpad
 
 Docker Compose is the upstream local execution method. Run it on your own
@@ -136,4 +138,4 @@ Use these observations to check your explanation:
   orchestrator.
 
 [.next-nav]
-xref:track-2-openshift.adoc[Continue to Track 2: Build and Operate on OpenShift ->]
+xref:01-architecture.adoc[Next: Understand the Architecture ->]

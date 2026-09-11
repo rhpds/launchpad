@@ -69,5 +69,12 @@ This educational system demonstrates several controls:
 
 The regex guardrails in the source lab are demonstrations. They are not a replacement for a supported policy service such as TrustyAI Guardrails Orchestrator.
 
+== Architecture Checkpoint
+
+Before continuing, identify one boundary each for A2A delegation, MCP tools,
+model inference, guardrails, and participant authorization. You should be able
+to say which component owns each decision instead of treating the application
+as one opaque model call.
+
 [.next-nav]
 xref:02-explore.adoc[Next: Explore the Running System ->]

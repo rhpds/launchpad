@@ -65,5 +65,12 @@ The lab demonstrates defense in depth, but each layer has a different purpose:
 
 OpenTelemetry connects these boundaries with trace context so an operator can follow one request without exposing credentials or hidden prompts.
 
+== Tool and Guardrail Checkpoint
+
+You are ready to continue when the MCP server lists its schema-controlled
+tools, a permitted tool call returns structured data, and the synthetic prompt
+injection is denied. A successful denial is security evidence, not a failed
+exercise.
+
 [.next-nav]
-xref:05-customize.adoc[Next: Customize the System ->]
+xref:track-2-openshift.adoc[Next: Operate the Workload on OpenShift ->]

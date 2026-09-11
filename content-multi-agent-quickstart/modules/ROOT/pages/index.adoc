@@ -1,36 +1,34 @@
 = Build Multi-Agent AI Systems with Open Protocols
 :navtitle: Welcome
 
-== One Lab, Three Tracks
+== One Lab, One Guided Journey
 
 This is *one catalog item* and *one participant environment*. Your order gives
 you one namespace, one Showroom, one terminal, and one Multi-Agent Workspace.
-Inside that lab you can follow any or all three upstream learning tracks; you
-do not order three separate environments.
+The three source learning tracks remain present as three learning phases, but
+the Showroom presents one prescribed pilot path. For this pilot, follow this
+sequence from top to bottom using the button at the end of each page; you do
+not order three separate environments or choose a different starting point.
 
-[cols="1,2,3,2",options="header"]
+[cols="1,2,4",options="header"]
 |===
-| Track | Start | Focus | Launchpad delivery
+| Phase | Start | What you will do
 
 | 1
-| xref:track-1-local.adoc[Run locally]
-| Learn the application pattern, agent discovery, routing, MCP, and guardrails.
-| Source-guided exercises use the same pre-provisioned application so every participant starts consistently.
+| xref:track-1-local.adoc[Understand the application pattern]
+| Run a request immediately, then learn agent discovery, routing, MCP, and
+  guardrail boundaries using the pre-provisioned application.
 
 | 2
 | xref:track-2-openshift.adoc[Build and operate on OpenShift]
-| Run the agentic workflow, apply an executor policy, verify it, and roll it back.
-| Fully live in your assigned Arena namespace; this is the currently certified runtime path.
+| Inspect your namespace, apply an executor policy to the live workload,
+  verify the change, and roll it back safely.
 
 | 3
 | xref:track-3-blueprint.adoc[Advanced blueprint alignment]
-| Map the application to Kagenti, OpenTelemetry, service identity, and governance.
-| Architecture and manifest exploration; optional platform integrations are identified explicitly when they are not installed.
+| Map what you operated to Kagenti, OpenTelemetry, service identity,
+  governance, and the production architecture.
 |===
-
-If this is your first time with the project, follow Tracks 1, 2, and 3 in
-order. Experienced OpenShift users can begin with Track 2, while platform
-architects can begin with Track 3 and return to the shared exercises as needed.
 
 == What You Will Build
 
@@ -88,19 +86,20 @@ The final command must return `{project_name}`. Launchpad has already authentica
 | Lets you run workflows and inspect routing, agent results, tools, and health.
 |===
 
-== Shared Lab Flow
+== Your Guided Route
 
 This guided build takes about 60 minutes.
 
 [cols="1,3,1",options="header"]
 |===
-| Module | Activity | Time
-| 1 | Understand the A2A, MCP, routing, and inference architecture | 10 min
-| 2 | Inspect the OpenShift resources and agent discovery | 10 min
-| 3 | Run one-agent and three-agent workflows | 15 min
-| 4 | Exercise MCP tools and guardrails | 15 min
+| Step | Activity | Time
+| 1 | Run a working request and understand the application pattern | 10 min
+| 2 | Inspect A2A, MCP, routing, OpenShift resources, and agent discovery | 10 min
+| 3 | Compare one-agent and three-agent workflows | 10 min
+| 4 | Exercise MCP tools and guardrails | 10 min
 | 5 | Apply an agent policy, verify the workflow, and roll it back | 10 min
+| 6 | Design an extension and map the production blueprint | 10 min
 |===
 
 [.next-nav]
-xref:track-1-local.adoc[Start Track 1: Run Locally ->]
+xref:track-1-local.adoc[Start: Run Your First Workflow ->]

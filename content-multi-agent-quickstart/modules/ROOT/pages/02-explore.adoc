@@ -64,5 +64,11 @@ kill "$RESEARCH_PF_PID"
 
 Look for the agent name, supported skills, protocol version, and endpoint URL. This published contract is how compatible A2A clients discover the agent.
 
+== Exploration Checkpoint
+
+You are ready to continue when the orchestrator reports three discovered
+agents and the research agent card shows its name, skills, protocol version,
+and endpoint. These are runtime observations, not assumptions from a diagram.
+
 [.next-nav]
 xref:03-run-workflows.adoc[Next: Run Multi-Agent Workflows ->]

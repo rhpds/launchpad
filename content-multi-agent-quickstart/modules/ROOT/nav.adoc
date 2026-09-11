@@ -1,17 +1,19 @@
 .Build Multi-Agent AI Systems
 * xref:index.adoc[Welcome]
 
-.Choose Your Track
-* xref:track-1-local.adoc[Track 1: Run Locally]
-* xref:track-2-openshift.adoc[Track 2: Build and Operate on OpenShift]
-* xref:track-3-blueprint.adoc[Track 3: Blueprint Alignment]
-
-.Shared Hands-On Exercises
+.Part 1: Understand the Pattern
+* xref:track-1-local.adoc[1. Run Your First Workflow]
 * xref:01-architecture.adoc[Architecture and Open Protocols]
 * xref:02-explore.adoc[Explore the Running System]
 * xref:03-run-workflows.adoc[Run Multi-Agent Workflows]
 * xref:04-tools-and-guardrails.adoc[MCP Tools and Guardrails]
+
+.Part 2: Operate and Extend
+* xref:track-2-openshift.adoc[2. Build and Operate on OpenShift]
 * xref:05-customize.adoc[Customize the System]
+
+.Part 3: Plan the Production Path
+* xref:track-3-blueprint.adoc[3. Blueprint Alignment]
 
 .Wrap Up
 * xref:99-conclusion.adoc[Review and Next Steps]

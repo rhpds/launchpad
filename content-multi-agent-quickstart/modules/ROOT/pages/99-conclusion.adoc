@@ -2,7 +2,7 @@
 
 == What You Proved
 
-Across one participant environment, the three tracks let you:
+Across one participant environment, the three learning phases let you:
 
 * use Track 1 to understand the local application topology and request flow;
 * use Track 2 to apply, verify, and roll back an agent policy in a namespace-scoped OpenShift environment; and
