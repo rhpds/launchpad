@@ -245,25 +245,16 @@
         <p class="lead">The event owner supplies the participant URL and instructor code immediately before the session. Keep the code out of Git, slides, recordings, and tickets.</p>
         <div class="grid">
           <article class="card"><p class="card-label">Event catalog</p><h3>Three guided labs</h3><p>Intel AI Quickstart: Serve LLMs on Intel Xeon CPUs; Intel Xeon 6 201: Building an AI Agent; and Build Multi-Agent AI Systems with Open Protocols.</p></article>
-          <article class="card"><p class="card-label">Workshop shape</p><h3>Three orders x 25 seats</h3><p>Orders are staggered; all 75 participant environments operate concurrently.</p></article>
+          <article class="card"><p class="card-label">Workshop shape</p><h3>Three orders x 30 seats</h3><p>Orders are staggered; all 90 participant environments operate concurrently.</p></article>
           <article class="card"><p class="card-label">Execution</p><h3>Arena + Brutus</h3><p>Each whole workshop is persisted to one eligible cluster before resources are created.</p></article>
           <article class="card"><p class="card-label">Escalation</p><h3>Launchpad operator</h3><p>Capture order, session, cluster, namespace, time, and error—never credentials.</p></article>
         </div>
-        <div class="callout amber"><div><h3>Pilot boundary</h3><p>Temporary Quick Tunnels and public OpenShift Console SSO are not production-ready. Complete trainer proof may use the internal Showroom paths while public ingress and trusted certificates remain separate gates.</p></div></div>
+        <div class="callout amber"><div><h3>Pilot boundary</h3><p>Participant access uses the permanent <strong>labs.smg-helix.ai</strong> named tunnel. Public OpenShift Console SSO, full HA/DR, and automated remediation are not production-ready gates for this pilot.</p></div></div>
       </section>
 
       <section id="live-example">
         <p class="eyebrow">Temporary trainer handoff</p>
-        <div class="live-lab" id="live-lab-card" hidden>
-          <h2>Live external lab example</h2>
-          <p>This link demonstrates the participant email-and-code flow for <strong>Intel AI Quickstart: Serve LLMs on Intel Xeon CPUs</strong>. It is temporary and must be replaced for the event.</p>
-          <div class="live-meta">
-            <div class="live-field"><span>Quick Tunnel</span><code id="live-tunnel"></code></div>
-            <div class="live-field"><span>Instructor code</span><code id="live-code"></code></div>
-          </div>
-          <p><a class="button" id="live-url" href="#" target="_blank" rel="noopener noreferrer">Open external lab</a></p>
-          <p class="print-note">Scheduled expiry: <span id="live-expiry"></span>. If the link stops resolving earlier, the temporary tunnel process must be restarted and a new hostname distributed.</p>
-        </div>
+        <div id="live-labs" class="grid"></div>
         <div class="callout amber" id="live-lab-missing"><div><h3>No live example configured</h3><p>Ask the event owner for the current participant URL and instructor code.</p></div></div>
       </section>
 
@@ -469,7 +460,7 @@ test "$(oc exec deployment/multi-agent -c executor -- \
           <li>Show cluster health and provisioning analytics in Operations.</li>
           <li>Explain group-scoped, idempotent reclaim and zero-residue verification.</li>
         </ol>
-        <div class="callout blue"><div><h3>Scale statement</h3><p>“We staggered three 25-seat orders, then ran all 75 participant environments concurrently across Arena and Brutus.” Do not claim simultaneous provisioning of all 75 or arbitrary catalog portability.</p></div></div>
+        <div class="callout blue"><div><h3>Scale statement</h3><p>“We staggered three 30-seat orders, then ran all 90 participant environments concurrently across Arena and Brutus.” Do not claim simultaneous provisioning of all 90 or arbitrary catalog portability.</p></div></div>
       </section>
 
       <section id="troubleshoot">
@@ -522,17 +513,37 @@ test "$(oc exec deployment/multi-agent -c executor -- \
   <script src="train-the-trainer-live.js"></script>
   <script>
     (() => {
-      const lab = window.launchpadLiveLab;
-      if (!lab) return;
-      const card = document.getElementById("live-lab-card");
+      const labs = window.launchpadLiveLabs || (window.launchpadLiveLab ? [window.launchpadLiveLab] : []);
+      if (!labs.length) return;
+      const container = document.getElementById("live-labs");
       const missing = document.getElementById("live-lab-missing");
-      const link = document.getElementById("live-url");
-      link.href = lab.url;
-      link.textContent = lab.label || "Open external lab";
-      document.getElementById("live-tunnel").textContent = lab.tunnel;
-      document.getElementById("live-code").textContent = lab.code;
-      document.getElementById("live-expiry").textContent = lab.expires;
-      card.hidden = false;
+      labs.forEach((lab, index) => {
+        const card = document.createElement("article");
+        card.className = "live-lab";
+        const title = document.createElement("h3");
+        title.textContent = `${index + 1}. ${lab.name}`;
+        const meta = document.createElement("div");
+        meta.className = "live-meta";
+        const codeField = document.createElement("div");
+        codeField.className = "live-field";
+        const codeLabel = document.createElement("span");
+        codeLabel.textContent = "Instructor code";
+        const code = document.createElement("code");
+        code.textContent = lab.code;
+        codeField.append(codeLabel, code);
+        meta.append(codeField);
+        const link = document.createElement("a");
+        link.className = "button";
+        link.href = lab.url;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.textContent = "Open participant lab";
+        const expiry = document.createElement("p");
+        expiry.className = "print-note";
+        expiry.textContent = `30 seats · ${lab.cluster} · expires ${lab.expires}`;
+        card.append(title, meta, link, expiry);
+        container.append(card);
+      });
       missing.hidden = true;
     })();
   </script>
