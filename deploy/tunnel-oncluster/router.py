@@ -50,7 +50,14 @@ UPSTREAM_TIMEOUT = httpx.Timeout(
 )
 
 OPENSHIFT_CONSOLE_HOST = os.environ["OPENSHIFT_CONSOLE_HOST"]
+OPENSHIFT_CONSOLE_UPSTREAM_HOST = os.environ.get(
+    "OPENSHIFT_CONSOLE_UPSTREAM_HOST", OPENSHIFT_CONSOLE_HOST
+)
 OPENSHIFT_OAUTH_HOST = os.environ["OPENSHIFT_OAUTH_HOST"]
+OPENSHIFT_CONSOLE_CALLBACK_URL = os.environ.get(
+    "OPENSHIFT_CONSOLE_CALLBACK_URL",
+    f"https://{OPENSHIFT_CONSOLE_HOST}/auth/callback",
+)
 KEYCLOAK_PUBLIC_HOST = os.environ["KEYCLOAK_PUBLIC_HOST"]
 OPENSHIFT_INGRESS_DOMAIN = os.environ["OPENSHIFT_INGRESS_DOMAIN"]
 KEYCLOAK_INT_ORIGIN = os.environ.get(
@@ -127,6 +134,41 @@ def _rewrite_response_cookie(cookie: str, origin: str) -> str:
     return _fix_cookie_samesite(cookie)
 
 
+def _filter_request_cookies(origin: str, cookie_header: str) -> str:
+    """Forward only the same-origin cookies needed by each upstream."""
+    if origin == CONSOLE_ORIGIN:
+        blocked_prefixes = (
+            "_oauth2_proxy", "auth_session_id", "kc_restart",
+            "keycloak_identity", "keycloak_session",
+        )
+    elif origin == OAUTH_ORIGIN:
+        blocked_prefixes = (
+            "_oauth2_proxy", "auth_session_id", "kc_restart",
+            "keycloak_identity", "keycloak_session", "openshift-session-token",
+            "csrf-token", "login-state",
+        )
+    elif origin == KEYCLOAK_ORIGIN:
+        blocked_prefixes = (
+            "_oauth2_proxy", "openshift-session-token", "csrf-token",
+            "login-state", "ssn",
+        )
+    else:
+        blocked_prefixes = (
+            "auth_session_id", "kc_restart", "keycloak_identity",
+            "keycloak_session", "openshift-session-token", "csrf-token",
+            "login-state", "ssn",
+        )
+    kept = []
+    for part in cookie_header.split(";"):
+        item = part.strip()
+        if not item or "=" not in item:
+            continue
+        name = item.split("=", 1)[0].strip().casefold()
+        if not name.startswith(blocked_prefixes):
+            kept.append(item)
+    return "; ".join(kept)
+
+
 def _csrf_recovery_url(path: str, cookies: dict, state: str) -> str | None:
     """Restart an OAuth flow whose short-lived CSRF cookie was lost."""
     if path != "oauth2/callback" or cookies.get("_oauth2_proxy_csrf"):
@@ -195,6 +237,37 @@ def _rewrite_nested_redirect_uri(value: str, tunnel_host: str) -> str:
     return urlunsplit(
         (parsed.scheme, parsed.netloc, parsed.path, urlencode(updated), parsed.fragment)
     )
+
+
+def _rewrite_oauth_request_query(
+    origin: str,
+    query_items: list[tuple[str, str]],
+    tunnel_host: str,
+) -> list[tuple[str, str]]:
+    """Bind Console authorization to the operator-managed OAuth client.
+
+    The Console operator owns the ``console`` OAuthClient and continuously
+    restores its native callback URI.  Browsers use the public, same-origin
+    tunnel callback, so translate that value only while forwarding the
+    authorization request.  The public participant has already authenticated
+    through the Launchpad realm, so select that OpenShift identity provider
+    when the Console has not requested one explicitly.  Response ``Location``
+    headers are translated back to the public origin by ``_rewrite_url``.
+    """
+    if origin != OAUTH_ORIGIN:
+        return query_items
+    values = dict(query_items)
+    if values.get("client_id") != "console":
+        return query_items
+    public_callback = f"https://{tunnel_host}/auth/callback"
+    accepted_callback = OPENSHIFT_CONSOLE_CALLBACK_URL
+    rewritten = [
+        (key, accepted_callback if key == "redirect_uri" and value == public_callback else value)
+        for key, value in query_items
+    ]
+    if "idp" not in values:
+        rewritten.append(("idp", "launchpad-public"))
+    return rewritten
 
 
 def _canonical_public_path(path: str) -> str:
@@ -347,11 +420,23 @@ async def route(path: str, request: Request):
         for key, value in request.headers.items()
         if key.casefold() not in {"content-length", "accept-encoding", "connection"}
     }
+    if "cookie" in headers:
+        filtered_cookie = _filter_request_cookies(origin, headers["cookie"])
+        if filtered_cookie:
+            headers["cookie"] = filtered_cookie
+        else:
+            headers.pop("cookie")
 
     if is_tls and origin == CONSOLE_ORIGIN:
-        headers["host"] = OPENSHIFT_CONSOLE_HOST
+        headers["host"] = OPENSHIFT_CONSOLE_UPSTREAM_HOST
     elif is_tls and origin == OAUTH_ORIGIN:
         headers["host"] = OPENSHIFT_OAUTH_HOST
+
+    upstream_query = _rewrite_oauth_request_query(
+        origin,
+        list(request.query_params.multi_items()),
+        tunnel_host,
+    )
 
     async with httpx.AsyncClient(
         timeout=UPSTREAM_TIMEOUT, follow_redirects=False, verify=False
@@ -359,7 +444,7 @@ async def route(path: str, request: Request):
         upstream = await client.request(
             request.method,
             f"{origin}/{upstream_path}",
-            params=request.query_params,
+            params=upstream_query,
             headers=headers,
             content=await request.body(),
         )

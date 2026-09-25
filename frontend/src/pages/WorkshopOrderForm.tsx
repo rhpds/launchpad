@@ -18,9 +18,10 @@ export default function WorkshopOrderForm({ embedded = false }: { embedded?: boo
   });
 
   useEffect(() => {
-    Promise.all([api.listCatalog(), api.listTenants()]).then(([items, tenantItems]) => {
+    Promise.all([api.listCatalog(), api.listTenants(), api.getCurrentIdentity()]).then(([items, tenantItems, identity]) => {
       setCatalog(items.filter((item) => item.category !== 'open_sandbox' && item.status === 'active'));
       setTenants(tenantItems.filter((tenant) => tenant.status === 'active'));
+      setForm((current) => ({ ...current, owner_id: identity.username }));
     });
   }, []);
 
@@ -68,7 +69,7 @@ export default function WorkshopOrderForm({ embedded = false }: { embedded?: boo
     {error && <div className="mb-6 rounded border border-[#C9190B]/50 bg-[#C9190B]/15 px-4 py-3 text-sm text-red-200">{error}</div>}
 
     <div className="space-y-6">
-      <label className={label}>Instructor ID<input required className={field} value={form.owner_id} onChange={(e) => setForm({...form, owner_id:e.target.value})} placeholder="e.g., instructor-1" /></label>
+      <label className={label}>Signed-in owner<input required readOnly aria-readonly="true" className={`${field} cursor-not-allowed bg-[#292929] text-[#B8BBBE]`} value={form.owner_id} /><span className="mt-1 block text-xs font-normal text-[#6A6E73]">Workshop ownership is bound to the authenticated identity.</span></label>
       <label className={label}>Tenant<select required className={field} value={form.tenant_id} onChange={(e) => setForm({...form, tenant_id:e.target.value})}><option value="">Select a tenant...</option>{tenants.map((t)=><option key={t.tenant_id} value={t.tenant_id}>{t.display_name}</option>)}</select></label>
       <label className={label}>Lab<select className={field} value={form.catalog_item_id} onChange={(e) => { const catalog_item_id = e.target.value; const item = catalog.find((candidate) => candidate.catalog_item_id === catalog_item_id); const configured = Number(item?.metadata?.max_workshop_seats ?? MAX_WORKSHOP_SEATS); const maximum = Number.isInteger(configured) ? Math.min(MAX_WORKSHOP_SEATS, Math.max(1, configured)) : MAX_WORKSHOP_SEATS; setForm({...form, catalog_item_id, num_users: Math.min(form.num_users, maximum)}); setPreview(null); }}>{catalog.map((c)=><option key={c.catalog_item_id} value={c.catalog_item_id}>{c.display_name}</option>)}</select></label>
       <div className="grid gap-4 sm:grid-cols-2">

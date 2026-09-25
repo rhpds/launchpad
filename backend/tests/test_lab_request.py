@@ -5,6 +5,50 @@ from app.domain.enums import CatalogCategory, LabRequestStatus, Persistence
 from app.domain.models import LabRequest
 
 
+def test_verified_internal_request_uses_authenticated_openshift_identity():
+    from app.api.routers.lab_requests import _bind_authenticated_requester
+    from app.auth.oauth import User
+
+    request = LabRequest(
+        tenant_id="tenant-a",
+        requester_id="typed-but-untrusted",
+        catalog_item_id="guided-rag-on-xeon",
+        requested_mode="guided_build",
+    )
+
+    bound = _bind_authenticated_requester(
+        request,
+        User(
+            username="lp-stable-participant",
+            email="participant@example.com",
+            identity_verified=True,
+        ),
+    )
+
+    assert bound.requester_id == "lp-stable-participant"
+    assert bound.metadata["authenticated_requester"] == "lp-stable-participant"
+
+
+def test_api_key_request_preserves_legacy_requester_identity():
+    from app.api.routers.lab_requests import _bind_authenticated_requester
+    from app.auth.oauth import User
+
+    request = LabRequest(
+        tenant_id="tenant-a",
+        requester_id="automation-service",
+        catalog_item_id="guided-rag-on-xeon",
+        requested_mode="guided_build",
+    )
+
+    bound = _bind_authenticated_requester(
+        request,
+        User(username="api-user", identity_verified=False),
+    )
+
+    assert bound.requester_id == "automation-service"
+    assert "authenticated_requester" not in bound.metadata
+
+
 def test_lab_request_accepts_ephemeral(ephemeral_lab_request):
     assert ephemeral_lab_request.persistence == Persistence.EPHEMERAL
     assert ephemeral_lab_request.status == LabRequestStatus.SUBMITTED

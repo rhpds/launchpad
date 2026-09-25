@@ -41,8 +41,13 @@ export default function LabRequestForm({ embedded = false }: { embedded?: boolea
   });
 
   useEffect(() => {
-    Promise.all([api.listCatalog(), api.listTenants(), api.listBrandingProfiles()]).then(
-      ([cats, tens, brands]) => {
+    Promise.all([
+      api.listCatalog(),
+      api.listTenants(),
+      api.listBrandingProfiles(),
+      api.getCurrentIdentity(),
+    ]).then(
+      ([cats, tens, brands, identity]) => {
         const orderableCatalog = participantCatalog(cats);
         setCatalogs(orderableCatalog);
         setTenants(tens);
@@ -53,9 +58,12 @@ export default function LabRequestForm({ embedded = false }: { embedded?: boolea
           const selected = orderableCatalog.find(
             (c) => c.catalog_item_id === current.catalog_item_id,
           );
-          if (!selected || current.hardware_profile) return current;
+          if (!selected || current.hardware_profile) {
+            return { ...current, requester_id: identity.username };
+          }
           return {
             ...current,
+            requester_id: identity.username,
             hardware_profile: selected.default_hardware_profile || '',
             ttl: selected.default_ttl || '4h',
             quota_profile: selected.default_quota_profile || 'standard',
@@ -185,15 +193,16 @@ export default function LabRequestForm({ embedded = false }: { embedded?: boolea
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-[#3C3F42] mb-1">Requester ID</label>
+          <label className="block text-sm font-medium text-[#3C3F42] mb-1">Signed-in identity</label>
           <input
             type="text"
             value={form.requester_id}
-            onChange={(e) => setForm({ ...form, requester_id: e.target.value })}
-            placeholder="e.g., demo-engineer-1"
-            className="w-full border border-[#D2D2D2] rounded-md px-3 py-2 text-sm"
+            readOnly
+            aria-readonly="true"
+            className="w-full cursor-not-allowed border border-[#D2D2D2] rounded-md bg-[#F0F0F0] px-3 py-2 text-sm text-[#4F5255]"
             required
           />
+          <p className="mt-1 text-xs text-[#6A6E73]">Namespace access is granted to this authenticated identity.</p>
         </div>
 
         <div className="grid grid-cols-2 gap-4">

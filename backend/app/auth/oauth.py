@@ -22,6 +22,7 @@ class User(BaseModel):
     groups: list[str] = []
     tenant_ids: list[str] = []
     is_admin: bool = False
+    identity_verified: bool = False
 
 
 AUTH_ENABLED = os.environ.get("AUTH_ENABLED", "true").lower() != "false"
@@ -81,7 +82,14 @@ def get_current_user(request: Request) -> User:
     tenant_ids = set(_tenant_user_map().get(username, []))
     tenant_ids.update(group.removeprefix("launchpad-tenant:") for group in groups if group.startswith("launchpad-tenant:"))
 
-    return User(username=username, email=email, groups=groups, tenant_ids=sorted(tenant_ids), is_admin=is_admin)
+    return User(
+        username=username,
+        email=email,
+        groups=groups,
+        tenant_ids=sorted(tenant_ids),
+        is_admin=is_admin,
+        identity_verified=True,
+    )
 
 
 def require_admin(user: User = Depends(get_current_user)) -> User:

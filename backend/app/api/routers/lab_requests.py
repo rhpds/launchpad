@@ -24,11 +24,32 @@ def _lifecycle_ha_enabled() -> bool:
     return os.environ.get("LIFECYCLE_HA_ENABLED", "false").lower() == "true"
 
 
+def _bind_authenticated_requester(request: LabRequest, user: User) -> LabRequest:
+    """Make a trusted browser identity authoritative for namespace access.
+
+    API-key and local-development callers retain the supplied requester ID for
+    compatibility. OAuth-proxy users cannot impersonate another requester by
+    changing the request payload.
+    """
+    if not user.identity_verified:
+        return request
+    return request.model_copy(
+        update={
+            "requester_id": user.username,
+            "metadata": {
+                **request.metadata,
+                "authenticated_requester": user.username,
+            },
+        }
+    )
+
+
 @router.post("", response_model=LabRequestCreateResponse, status_code=201)
 def create_lab_request(request: LabRequest, user: User = Depends(get_current_user)):
     require_tenant_access(user, request.tenant_id)
     if request.metadata.get("target_cluster") and not user.is_admin:
         raise HTTPException(403, "Only administrators can override environment placement")
+    request = _bind_authenticated_requester(request, user)
     created = provisioning_service.submit_request(request)
     result = created.model_dump(mode="json")
     if request.exposure_policy == ExposurePolicy.PUBLIC_CODE:

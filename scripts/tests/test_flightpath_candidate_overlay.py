@@ -60,7 +60,10 @@ def test_candidate_is_isolated_and_fail_closed() -> None:
     assert config["DEMO_GATEWAY_IMAGE"].startswith(
         "quay.io/redhat-gpte/intel-inference-gateway@sha256:"
     )
-    assert config["PUBLIC_ACCESS_ENABLED"] == "false"
+    assert config["PUBLIC_ACCESS_ENABLED"] == "true"
+    assert config["PUBLIC_LABS_SHARED_ORIGIN"] == "https://labs.smg-helix.ai"
+    assert config["PUBLIC_LABS_SHARED_PATH_MODE"] == "true"
+    assert config["PUBLIC_ACCESS_PILOT_CLUSTER"] == "flightpath"
     assert config["ORPHAN_CLEANUP_ENABLED"] == "false"
     assert config["SMART_PLACEMENT_ENABLED"] == "false"
     assert config["SERIALIZE_WORKSHOP_PROVISIONING"] == "true"
@@ -83,7 +86,9 @@ def test_candidate_is_isolated_and_fail_closed() -> None:
     assert [target["cluster_id"] for target in targets] == ["flightpath"]
     assert targets[0]["local"] is True
     assert targets[0]["enabled"] is True
-    assert targets[0]["public_access_enabled"] is False
+    assert targets[0]["public_access_enabled"] is True
+    assert targets[0]["public_console_url"] == "https://labs.smg-helix.ai"
+    assert targets[0]["public_oauth_url"] == "https://labs.smg-helix.ai/oauth"
     assert "credential_secret" not in targets[0]
     assert targets[0]["image_references"] == {
         "showroom_git_cloner": (
@@ -127,7 +132,7 @@ def test_candidate_is_isolated_and_fail_closed() -> None:
         "launchpad-candidate-maas": 1,
         "partner-portal": 1,
         "postgres": 1,
-        "public-access-gateway": 0,
+        "public-access-gateway": 2,
     }
     assert _one(documents, "CronJob", "lifecycle-scheduler")["spec"]["suspend"] is False
 
@@ -380,6 +385,38 @@ def test_candidate_isolates_hybrid_fraud_on_flightpath() -> None:
             "subPath": "catalog-item.yaml",
             "readOnly": True,
         } in container["volumeMounts"]
+
+
+def test_candidate_pins_network_operations_participant_experience() -> None:
+    documents = _render()
+    catalog = yaml.safe_load(
+        _one(documents, "ConfigMap", "flightpath-candidate-network-operations-catalog")[
+            "data"
+        ]["catalog-item.yaml"]
+    )
+    metadata = catalog["metadata"]
+
+    assert catalog["catalog_item_id"] == "network-operations-agent"
+    assert catalog["version"] == "0.2.0-flightpath.10"
+    assert metadata["workshop_cluster_ref"] == "flightpath"
+    assert metadata["showroom_content_ref"] == (
+        "287bffcca9c90336ed199ab2156d4471377b2c3e"
+    )
+    assert metadata["workload_revision"] == (
+        "287bffcca9c90336ed199ab2156d4471377b2c3e"
+    )
+    assert metadata["workspace_route_name"] == "netops"
+    assert metadata["workload_routes"] == {"ui": "netops"}
+    assert metadata["workload_helm_values"]["route"] == {
+        "enabled": True,
+        "name": "netops",
+    }
+    assert metadata["workload_helm_values"]["lab"]["enabled"] is True
+    assert metadata["showroom_tabs"][-1] == {
+        "id": "openshift-console",
+        "title": "OpenShift Console",
+        "source": "cluster.console_url",
+    }
 
 
 def test_candidate_maas_enforces_virtual_keys_without_publishing_secrets() -> None:

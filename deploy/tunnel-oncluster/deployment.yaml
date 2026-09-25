@@ -64,7 +64,11 @@ spec:
           # retain the pinned digest in the node cache across tunnel rollouts.
           imagePullPolicy: IfNotPresent
           command: [uvicorn]
-          args: [router:app, --host, 0.0.0.0, --port, "8080", --app-dir, /opt/tunnel]
+          # The shared public origin carries the participant, Keycloak, and
+          # OpenShift Console sessions.  WebSocket upgrades therefore need
+          # more headroom than the HTTP parser default after a participant has
+          # exercised the full lab journey.
+          args: [router:app, --host, 0.0.0.0, --port, "8080", --app-dir, /opt/tunnel, --h11-max-incomplete-event-size, "262144"]
           env:
             - name: ACCESS_BROKER_KEY
               valueFrom:

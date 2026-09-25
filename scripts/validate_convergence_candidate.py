@@ -23,8 +23,25 @@ def _require(condition: bool, message: str) -> None:
         raise ValueError(message)
 
 
-def _catalog_identity(path: Path) -> dict[str, str]:
-    source = yaml.safe_load(path.read_text(encoding="utf-8"))
+def _revision_blob(root: Path, revision: str, path: str) -> bytes:
+    """Read candidate source from its immutable Git revision.
+
+    A historical candidate must remain verifiable after the working tree moves
+    on to a newer catalog.  Comparing it with today's overlay turns ordinary
+    forward development into apparent evidence drift.
+    """
+    result = subprocess.run(
+        ["git", "show", f"{revision}:{path}"],
+        cwd=root,
+        capture_output=True,
+        check=False,
+    )
+    _require(result.returncode == 0, f"candidate source is missing at revision: {path}")
+    return result.stdout
+
+
+def _catalog_identity(content: bytes) -> dict[str, str]:
+    source = yaml.safe_load(content.decode("utf-8"))
     metadata = source["catalog"]
     content = source["sources"]
     return {
@@ -35,12 +52,12 @@ def _catalog_identity(path: Path) -> dict[str, str]:
     }
 
 
-def _effective_catalog_identity(path: Path) -> dict[str, str]:
-    source = yaml.safe_load(path.read_text(encoding="utf-8"))
+def _effective_catalog_identity(path: str, content: bytes) -> dict[str, str]:
+    source = yaml.safe_load(content.decode("utf-8"))
     return {
         "version": str(source["version"]),
-        "manifest_path": str(path.relative_to(ROOT)),
-        "manifest_sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+        "manifest_path": path,
+        "manifest_sha256": hashlib.sha256(content).hexdigest(),
     }
 
 
@@ -70,17 +87,17 @@ def validate(candidate: dict[str, Any], *, root: Path = ROOT) -> dict[str, Any]:
     }
     _require(set(declared) == required, "candidate must bind exactly the three pilot catalogs")
     for catalog_id in sorted(required):
-        actual = _catalog_identity(root / "catalog-onboarding" / f"{catalog_id}.yaml")
+        catalog_path = f"catalog-onboarding/{catalog_id}.yaml"
+        actual = _catalog_identity(_revision_blob(root, revision, catalog_path))
         item = declared[catalog_id]
         source_identity = {key: item.get(key) for key in actual}
         _require(source_identity == actual, f"catalog identity drift: {catalog_id}")
         effective = item.get("effective_release") or {}
-        effective_path = root / effective.get("manifest_path", "missing")
-        _require(
-            effective_path.is_file(),
-            f"effective catalog manifest is missing: {catalog_id}",
+        effective_path = effective.get("manifest_path", "missing")
+        actual_effective = _effective_catalog_identity(
+            effective_path,
+            _revision_blob(root, revision, effective_path),
         )
-        actual_effective = _effective_catalog_identity(effective_path)
         _require(
             effective == actual_effective,
             f"effective catalog identity drift: {catalog_id}",

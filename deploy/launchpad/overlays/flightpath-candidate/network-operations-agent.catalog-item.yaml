@@ -2,7 +2,7 @@ catalog_item_id: network-operations-agent
 display_name: 'Intel AI 301: Build an Evidence-Backed Network Operations Agent'
 description: Investigate a simulated telecom network alarm with an evidence-backed agent, internal MCP diagnostics, and shared CPU model inference.
 category: guided_build
-version: 0.2.0-flightpath.5
+version: 0.2.0-flightpath.10
 status: active
 required_capabilities: [openshift, showroom, model_endpoint]
 default_hardware_profile: xeon-basic
@@ -23,12 +23,16 @@ metadata:
   max_workshop_seats: 25
   promotion_sequence: [1, 5, 25]
   activation_blockers: []
-  allowed_exposure_policies: [internal]
+  # Public access is enabled first as a one-seat Flightpath certification gate.
+  # Multi-seat public promotion remains separately evidence-gated.
+  allowed_exposure_policies: [internal, public_code]
+  public_access_certification_stage: one-seat-candidate
+  public_max_workshop_seats: 1
   showroom_journey: network-operations-agent
   showroom_title: Evidence-Backed Network Operations Agent
   namespace_slug: network-ops
   showroom_content_repo_url: https://github.com/jkershawrh/network-operations-agent.git
-  showroom_content_ref: d4f88b25fc4c8a92f9e2137822bc90f9fad81c65
+  showroom_content_ref: 287bffcca9c90336ed199ab2156d4471377b2c3e
   showroom_content_playbook: site-lab.yml
   showroom_content_start_path: showroom-lab
   showroom_terminal_storage: true
@@ -38,6 +42,10 @@ metadata:
       source: workload.route.ui
       path: /story/
       same_origin_path: /story/
+      # Authorize the whole declared application origin through the participant
+      # gateway while opening this tab at /story/. The Story can then call the
+      # same workload's /ready and /api endpoints without escaping the order.
+      public_proxy_root: true
     - id: terminal
       title: Terminal
       source: showroom.terminal
@@ -52,9 +60,6 @@ metadata:
     - id: openshift-console
       title: OpenShift Console
       source: cluster.console_url
-      # OpenShift Console currently returns X-Frame-Options: DENY. Keep the
-      # operator experience usable until console embedding is certified.
-      external: true
   workspace_route_name: netops
   workspace_title: Network Operations Workspace
   required_models: [granite-3.2-8b-tools]
@@ -67,7 +72,7 @@ metadata:
   workshop_node_spread: false
   workshop_node_min_ready_seconds: 0
   workload_repo: https://github.com/jkershawrh/network-operations-agent.git
-  workload_revision: d4f88b25fc4c8a92f9e2137822bc90f9fad81c65
+  workload_revision: 287bffcca9c90336ed199ab2156d4471377b2c3e
   workload_deploy_type: helm
   workload_deployment_scope: seat
   workload_deploy_path: chart
@@ -77,10 +82,12 @@ metadata:
   workload_helm_values:
     image:
       repository: ghcr.io/jkershawrh/network-operations-agent
-      digest: sha256:ab35bf05c947639228511be2ea16ed71c910c8e5cb9d20d5ad753aaf62baee97
+      digest: sha256:74afaf7d26791327fe4d1d7e5f302c7532b644f8d902daf1e914f9c2c4e5faf1
     route:
       enabled: true
       name: netops
+    lab:
+      enabled: true
   workload_runtime_secret_name: network-operations-model-runtime
   workload_runtime_secret_sources:
     endpoint:

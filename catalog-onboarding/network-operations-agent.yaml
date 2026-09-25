@@ -18,12 +18,12 @@ learning:
 sources:
   showroom:
     repo_url: https://github.com/jkershawrh/network-operations-agent.git
-    revision: b672eaf74467ef2e853befe3bdb3b34a3264a24c
+    revision: 287bffcca9c90336ed199ab2156d4471377b2c3e
     playbook: site-lab.yml
     start_path: showroom-lab
   workload:
     repo_url: https://github.com/jkershawrh/network-operations-agent.git
-    revision: b672eaf74467ef2e853befe3bdb3b34a3264a24c
+    revision: 287bffcca9c90336ed199ab2156d4471377b2c3e
     deploy_path: chart
 runtime:
   deployment_type: helm
@@ -31,10 +31,12 @@ runtime:
     helm_values:
       image:
         repository: ghcr.io/jkershawrh/network-operations-agent
-        digest: sha256:b240a34670db3009ec827ebe35dcb62bc5ae3ddd423b975fee08b17e114a040d
+        digest: sha256:74afaf7d26791327fe4d1d7e5f302c7532b644f8d902daf1e914f9c2c4e5faf1
       route:
         enabled: true
         name: netops
+      lab:
+        enabled: true
     runtime_secret_name: network-operations-model-runtime
     runtime_secret_value_path: model.existingSecret
     runtime_secret_sources:
@@ -71,6 +73,7 @@ runtime:
     source: cluster.console_url
   allowed_exposure_policies:
   - internal
+  - public_code
 certification:
   stage: twenty-five-seat-certified
   max_workshop_seats: 25
@@ -79,8 +82,8 @@ certification:
   - 5
   - 25
   activation_blockers:
-  - Certify public access separately before adding `public_code` to the allowed
-    exposure policies.
+  - Complete the one-seat Flightpath public browser journey before promoting
+    public workshops beyond one participant.
   - Certify concurrent workshops and production SLOs before treating this
     single-workshop result as production capacity.
   - Review every unparsed manifest; templating or invalid YAML prevents complete static

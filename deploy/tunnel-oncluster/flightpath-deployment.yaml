@@ -56,16 +56,23 @@ spec:
           image: ghcr.io/rhpds/launchpad-backend@sha256:c12c36c485b310dd55f7dd0e16cf333ada0e3b393269649d62fe351eccc7b14c
           imagePullPolicy: IfNotPresent
           command: [uvicorn]
-          args: [router:app, --host, 0.0.0.0, --port, "8080", --app-dir, /opt/tunnel]
+          # The shared public origin carries the participant, Keycloak, and
+          # OpenShift Console sessions.  WebSocket upgrades therefore need
+          # more headroom than the HTTP parser default after a participant has
+          # exercised the full lab journey.
+          args: [router:app, --host, 0.0.0.0, --port, "8080", --app-dir, /opt/tunnel, --h11-max-incomplete-event-size, "262144"]
           env:
             - name: ACCESS_BROKER_KEY
               valueFrom:
                 secretKeyRef: {name: launchpad-public-access, key: ACCESS_BROKER_KEY}
             - {name: BACKEND_URL, value: http://backend.launchpad-flightpath-candidate.svc:8000/api/v1}
             - {name: GATEWAY_ORIGIN, value: http://public-access-gateway.launchpad-flightpath-candidate.svc:8443}
+            - {name: CONSOLE_ORIGIN, value: https://router-internal-default.openshift-ingress.svc:443}
             - {name: KEYCLOAK_ORIGIN, value: http://keycloak.launchpad-stage.svc:8080}
             - {name: KEYCLOAK_INT_ORIGIN, value: http://keycloak.launchpad-stage.svc:8080}
             - {name: OPENSHIFT_CONSOLE_HOST, value: console-openshift-console.apps.flightpath.fm2aihpcsed.com}
+            - {name: OPENSHIFT_CONSOLE_UPSTREAM_HOST, value: labs.smg-helix.ai}
+            - {name: OPENSHIFT_CONSOLE_CALLBACK_URL, value: https://labs.smg-helix.ai/auth/callback}
             - {name: OPENSHIFT_OAUTH_HOST, value: oauth-openshift.apps.flightpath.fm2aihpcsed.com}
             - {name: KEYCLOAK_PUBLIC_HOST, value: labs.smg-helix.ai}
             - {name: OPENSHIFT_INGRESS_DOMAIN, value: apps.flightpath.fm2aihpcsed.com}

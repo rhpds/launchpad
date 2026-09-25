@@ -33,6 +33,11 @@ rules:
   - apiGroups: [route.openshift.io]
     resources: [routes]
     verbs: [get, list, create, update, patch, delete, watch]
+  # Public Showroom tool tabs share one generated hostname across path Routes.
+  # OpenShift admission checks this virtual subresource separately from routes.
+  - apiGroups: ["", route.openshift.io]
+    resources: [routes/custom-host]
+    verbs: [create, update]
   - apiGroups: [rbac.authorization.k8s.io]
     resources: [rolebindings]
     verbs: [get, list, create, update, patch, delete]

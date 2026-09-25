@@ -196,6 +196,74 @@ tabs:
     }
 
 
+def test_public_showroom_config_scopes_declared_same_origin_tools_to_the_selected_order():
+    source = """type: showroom
+tabs:
+  - name: Story
+    path: /story/
+    port: 443
+  - name: Network Operations Workspace
+    path: /workspace
+    port: 443
+"""
+
+    config = __import__("yaml").safe_load(
+        _rewrite_showroom_config(
+            source,
+            {
+                "story": "https://netops-seat.apps.flightpath.example/story/",
+                "workspace": "https://netops-seat.apps.flightpath.example/workspace",
+            },
+            proxy_prefix="/labs/network-operations-agent-order-123",
+        )
+    )
+
+    assert config["tabs"] == [
+        {
+            "name": "Story",
+            "url": "/labs/network-operations-agent-order-123/proxy/tool/story/",
+        },
+        {
+            "name": "Network Operations Workspace",
+            "url": "/labs/network-operations-agent-order-123/proxy/tool/workspace/",
+        },
+    ]
+
+
+def test_public_showroom_preserves_initial_path_for_origin_scoped_tool():
+    source = """type: showroom
+tabs:
+  - name: Story
+    path: /story/
+    port: 443
+  - name: Network Operations Workspace
+    path: /workspace
+    port: 443
+"""
+
+    config = __import__("yaml").safe_load(
+        _rewrite_showroom_config(
+            source,
+            {
+                "story": "https://netops-seat.apps.flightpath.example",
+                "workspace": "https://netops-seat.apps.flightpath.example",
+            },
+            proxy_prefix="/labs/network-operations-agent-order-123",
+        )
+    )
+
+    assert config["tabs"] == [
+        {
+            "name": "Story",
+            "url": "/labs/network-operations-agent-order-123/proxy/tool/story/story/",
+        },
+        {
+            "name": "Network Operations Workspace",
+            "url": "/labs/network-operations-agent-order-123/proxy/tool/workspace/",
+        },
+    ]
+
+
 def test_public_showroom_drops_unentitled_cluster_private_tabs():
     source = """type: showroom
 tabs:
@@ -241,11 +309,11 @@ tabs:
         _rewrite_showroom_config(
             source,
             {},
-            public_console_url="https://console.labs.example.test/k8s/ns/seat-a/core~v1~Pod",
+            public_console_url="https://labs.example.test/k8s/ns/seat-a/core~v1~Pod",
         )
     )
 
-    assert config["tabs"][0]["url"] == "/proxy/console/"
+    assert config["tabs"][0]["url"] == "/k8s/ns/seat-a/core~v1~Pod"
 
 
 def test_tool_proxy_url_cannot_escape_its_authorized_origin():
@@ -261,6 +329,18 @@ def test_tool_proxy_url_cannot_escape_its_authorized_origin():
             pass
         else:
             raise AssertionError(f"unsafe tool path was accepted: {path}")
+
+
+def test_tool_proxy_does_not_duplicate_an_entitled_base_path():
+    base = "https://netops-seat.apps.flightpath.example/story"
+
+    assert _tool_upstream_url(base, "", "") == base + "/"
+    assert _tool_upstream_url(base, "assets/index.js", "") == (
+        "https://netops-seat.apps.flightpath.example/story/assets/index.js"
+    )
+    assert _tool_upstream_url(base, "story/favicon.svg", "") == (
+        "https://netops-seat.apps.flightpath.example/story/favicon.svg"
+    )
 
 
 def test_tool_proxy_read_timeout_covers_the_multi_agent_ui_workflow_budget():

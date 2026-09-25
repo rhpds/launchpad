@@ -9,6 +9,7 @@ from fastapi.responses import JSONResponse
 
 from app.api.routers import (
     admin,
+    auth_identity,
     branding,
     callbacks,
     catalog,
@@ -197,6 +198,7 @@ app.add_middleware(
 API_PREFIX = "/api/v1"
 
 app.include_router(tenants.router, prefix=API_PREFIX)
+app.include_router(auth_identity.router, prefix=API_PREFIX)
 app.include_router(catalog.router, prefix=API_PREFIX)
 app.include_router(models.router, prefix=API_PREFIX)
 app.include_router(lab_requests.router, prefix=API_PREFIX)

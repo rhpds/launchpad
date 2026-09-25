@@ -92,13 +92,16 @@ class WorkshopOrderResponse(WorkshopResponse):
     )
 
 
-def _to_workshop(body: WorkshopCreate) -> Workshop:
+def _to_workshop(body: WorkshopCreate, user: User | None = None) -> Workshop:
+    owner_id = body.owner_id
+    if user and user.identity_verified:
+        owner_id = user.username
     return Workshop(
         tenant_id=body.tenant_id,
         catalog_item_id=body.catalog_item_id,
         num_users=body.num_users,
         name=body.name,
-        owner_id=body.owner_id,
+        owner_id=owner_id,
         ttl=body.ttl,
         ocp_version=body.ocp_version,
         purpose=body.purpose,
@@ -147,7 +150,7 @@ def create_workshop(
 ):
     require_tenant_access(user, body.tenant_id)
     _authorize_overrides(body, user)
-    workshop = _to_workshop(body)
+    workshop = _to_workshop(body, user)
     try:
         if _lifecycle_ha_enabled():
             order = provisioning_service.create_workshop_order(
@@ -178,7 +181,7 @@ def list_workshops(user: User = Depends(get_current_user)):
 def preview_workshop_capacity(body: WorkshopCreate, user: User = Depends(get_current_user)):
     require_tenant_access(user, body.tenant_id)
     _authorize_overrides(body, user)
-    return provisioning_service.preview_workshop_capacity(_to_workshop(body))
+    return provisioning_service.preview_workshop_capacity(_to_workshop(body, user))
 
 
 @router.post("/orders", response_model=WorkshopOrderResponse, status_code=201)
@@ -191,7 +194,7 @@ def create_workshop_order(
     _authorize_overrides(body, user)
     try:
         workshop = provisioning_service.create_workshop_order(
-            _to_workshop(body), idempotency_key=idempotency_key
+            _to_workshop(body, user), idempotency_key=idempotency_key
         )
         result = workshop.model_dump(mode="json")
         if body.exposure_policy == ExposurePolicy.PUBLIC_CODE:

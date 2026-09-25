@@ -108,7 +108,11 @@ def _tool_upstream_url(base: str, path: str, query: str) -> str:
     origin = urlsplit(base)
     if origin.scheme != "https" or not origin.netloc or origin.username:
         raise ValueError("Tool upstream must be an HTTPS origin")
-    url = urljoin(base.rstrip("/") + "/", path)
+    base_path = origin.path.strip("/")
+    if base_path and (decoded == base_path or decoded.startswith(base_path + "/")):
+        url = urljoin(f"{origin.scheme}://{origin.netloc}/", decoded)
+    else:
+        url = urljoin(base.rstrip("/") + "/", path)
     target = urlsplit(url)
     if (target.scheme, target.netloc) != (origin.scheme, origin.netloc):
         raise ValueError("Tool proxy path escaped its authorized origin")
@@ -302,15 +306,29 @@ def _rewrite_showroom_config(
     )
     rewritten_tabs = []
     for tab in config["tabs"]:
-        if (
-            proxy_prefix
-            and isinstance(tab, dict)
-            and isinstance(tab.get("path"), str)
-            and tab["path"].startswith("/terminal")
-        ):
-            tab["path"] = f"{proxy_prefix}/showroom{tab['path']}"
-            rewritten_tabs.append(tab)
-            continue
+        if proxy_prefix and isinstance(tab, dict) and isinstance(tab.get("path"), str):
+            tab_path = tab["path"]
+            if tab_path.startswith("/terminal"):
+                tab["path"] = f"{proxy_prefix}/showroom{tab_path}"
+                rewritten_tabs.append(tab)
+                continue
+            tool_id = tab_path.strip("/").split("/", 1)[0]
+            if tool_id in tool_urls:
+                # Most path tabs authorize a base that already includes the
+                # path (for example `/story`). Origin-scoped tools also need
+                # sibling `/api` and `/ready` endpoints, so retain their
+                # initial Showroom path when the authorized base is `/`.
+                tool_base_path = urlsplit(tool_urls[tool_id]).path.strip("/")
+                suffix = (
+                    tab_path.strip("/") + ("/" if tab_path.endswith("/") else "")
+                    if not tool_base_path and tab_path.endswith("/")
+                    else tab_path.strip("/").removeprefix(tool_id).lstrip("/")
+                )
+                tab.pop("path", None)
+                tab.pop("port", None)
+                tab["url"] = f"{proxy_prefix}/proxy/tool/{tool_id}/{suffix}"
+                rewritten_tabs.append(tab)
+                continue
         if not isinstance(tab, dict) or not isinstance(tab.get("url"), str):
             rewritten_tabs.append(tab)
             continue
@@ -318,7 +336,12 @@ def _rewrite_showroom_config(
         tab_host = urlsplit(tab_url).hostname or ""
         if tab_host.startswith("console-openshift-console."):
             if public_console_url:
-                tab["url"] = f"{proxy_prefix}/proxy/console/"
+                parsed_console = urlsplit(public_console_url)
+                if parsed_console.scheme != "https" or not parsed_console.netloc:
+                    raise ValueError("Public Console URL must be HTTPS")
+                tab["url"] = parsed_console.path or "/"
+                if parsed_console.query:
+                    tab["url"] += f"?{parsed_console.query}"
                 rewritten_tabs.append(tab)
             continue
         entitled = False

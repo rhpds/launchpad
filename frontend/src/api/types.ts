@@ -9,6 +9,13 @@ export interface Tenant {
   cost_center?: string;
 }
 
+export interface AuthenticatedIdentity {
+  username: string;
+  email?: string;
+  is_admin: boolean;
+  identity_verified: boolean;
+}
+
 export interface CatalogItem {
   catalog_item_id: string;
   display_name: string;

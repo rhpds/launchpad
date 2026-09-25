@@ -603,6 +603,78 @@ def test_console_callback_is_public_but_idp_callback_binding_stays_native():
     ]
 
 
+def test_console_oauth_request_uses_operator_managed_native_callback():
+    router = _router_module()
+    tunnel_host = "labs.example.test"
+
+    rewritten = router._rewrite_oauth_request_query(
+        router.OAUTH_ORIGIN,
+        [
+            ("client_id", "console"),
+            ("redirect_uri", f"https://{tunnel_host}/auth/callback"),
+            ("response_type", "code"),
+        ],
+        tunnel_host,
+    )
+
+    rewritten_values = dict(rewritten)
+    assert rewritten_values["redirect_uri"] == (
+        "https://console-openshift-console.apps.arena.fm2aihpcsed.com/auth/callback"
+    )
+    assert rewritten_values["idp"] == "launchpad-public"
+    assert router._rewrite_oauth_request_query(
+        router.OAUTH_ORIGIN,
+        [("client_id", "other"), ("redirect_uri", "https://example.test/callback")],
+        tunnel_host,
+    ) == [("client_id", "other"), ("redirect_uri", "https://example.test/callback")]
+
+
+def test_console_oauth_request_accepts_a_custom_operator_callback(monkeypatch):
+    router = _router_module()
+    tunnel_host = "labs.example.test"
+    monkeypatch.setattr(
+        router,
+        "OPENSHIFT_CONSOLE_CALLBACK_URL",
+        f"https://{tunnel_host}/auth/callback",
+    )
+
+    rewritten = router._rewrite_oauth_request_query(
+        router.OAUTH_ORIGIN,
+        [("client_id", "console"), ("redirect_uri", f"https://{tunnel_host}/auth/callback")],
+        tunnel_host,
+    )
+
+    assert dict(rewritten)["redirect_uri"] == f"https://{tunnel_host}/auth/callback"
+
+
+def test_same_origin_router_forwards_only_cookies_needed_by_each_service():
+    router = _router_module()
+    cookies = (
+        "_oauth2_proxy=gateway; _oauth2_proxy_csrf=csrf; "
+        "KEYCLOAK_SESSION=keycloak; AUTH_SESSION_ID=auth; ssn=oauth; "
+        "openshift-session-token=console; csrf-token=console-csrf; "
+        "login-state=console-state"
+    )
+
+    console = router._filter_request_cookies(router.CONSOLE_ORIGIN, cookies)
+    assert "openshift-session-token=console" in console
+    assert "csrf-token=console-csrf" in console
+    assert "ssn=oauth" in console
+    assert "_oauth2_proxy=" not in console
+    assert "KEYCLOAK_SESSION=" not in console
+
+    keycloak = router._filter_request_cookies(router.KEYCLOAK_ORIGIN, cookies)
+    assert "KEYCLOAK_SESSION=keycloak" in keycloak
+    assert "AUTH_SESSION_ID=auth" in keycloak
+    assert "openshift-session-token=" not in keycloak
+    assert "_oauth2_proxy=" not in keycloak
+
+    gateway = router._filter_request_cookies(router.GATEWAY_ORIGIN, cookies)
+    assert "_oauth2_proxy=gateway" in gateway
+    assert "KEYCLOAK_SESSION=" not in gateway
+    assert "openshift-session-token=" not in gateway
+
+
 def test_console_router_keeps_http_only_and_scopes_proxy_cookie_paths():
     router = _router_module()
 

@@ -7,6 +7,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 from app.api.deps import provisioning_service as api_provisioning_service
+from app.api.routers.workshops import WorkshopCreate, _to_workshop
 from app.auth.oauth import User, get_current_user
 from app.domain.clusters import ClusterTarget
 from app.domain.enums import (
@@ -29,17 +30,55 @@ from fastapi.testclient import TestClient
 from pydantic import ValidationError
 
 
+def test_verified_browser_identity_owns_internal_workshop():
+    body = WorkshopCreate(
+        tenant_id="tenant-a",
+        catalog_item_id="pilot-lab",
+        num_users=1,
+        owner_id="typed-but-untrusted",
+    )
+
+    workshop = _to_workshop(
+        body,
+        User(username="lp-instructor", identity_verified=True),
+    )
+
+    assert workshop.owner_id == "lp-instructor"
+
+
+def test_api_key_workshop_keeps_supplied_owner_for_compatibility():
+    body = WorkshopCreate(
+        tenant_id="tenant-a",
+        catalog_item_id="pilot-lab",
+        num_users=1,
+        owner_id="automation-owner",
+    )
+
+    workshop = _to_workshop(
+        body,
+        User(username="api-user", identity_verified=False),
+    )
+
+    assert workshop.owner_id == "automation-owner"
+
+
 def _catalog_with_workshop_limit(
     limit: int,
     *,
     allowed_exposure_policies: list[str] | None = None,
     workshop_cluster_ref: str | None = None,
+    public_limit: int | None = None,
 ):
     catalog = SimpleNamespace()
     catalog.get_item = lambda _item_id: SimpleNamespace(
         metadata={
             "max_workshop_seats": limit,
             "promotion_sequence": [1, 5, 25],
+            **(
+                {"public_max_workshop_seats": public_limit}
+                if public_limit is not None
+                else {}
+            ),
             **(
                 {"allowed_exposure_policies": allowed_exposure_policies}
                 if allowed_exposure_policies is not None
@@ -1165,6 +1204,31 @@ def test_workshop_order_rejects_catalog_certification_seat_limit():
                 num_users=2,
             )
         )
+
+
+def test_public_workshop_uses_separate_public_certification_limit():
+    service = ProvisioningService(
+        catalog=_catalog_with_workshop_limit(
+            25,
+            allowed_exposure_policies=["internal", "public_code"],
+            public_limit=1,
+        )
+    )
+
+    preview = service.preview_workshop_capacity(
+        Workshop(
+            tenant_id="pilot-tenant",
+            catalog_item_id="pilot-lab",
+            num_users=2,
+            exposure_policy="public_code",
+        )
+    )
+
+    assert preview["can_provision"] is False
+    assert preview["catalog_seat_limit"] == 1
+    assert preview["reason"] == (
+        "pilot-lab is certified for a maximum of 1 workshop seat(s)"
+    )
 
 
 def test_direct_workshop_provision_rejects_catalog_certification_seat_limit():

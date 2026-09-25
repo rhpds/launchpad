@@ -1,5 +1,10 @@
 # Public passwordless lab access
 
+Internal requester and OpenShift Console identity convergence is defined in
+[`flightpath-unified-identity-contract.md`](flightpath-unified-identity-contract.md).
+Public claims and internal ordering use the same stable username and
+namespace-RBAC boundary even though their login ceremonies differ.
+
 Public access is opt-in and release-gated. Existing orders remain internal
 when `exposure_policy` is absent. A public order uses one URL and one instructor
 code; the code is the sole secret and participant email is only an unverified

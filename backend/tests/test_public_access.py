@@ -70,6 +70,36 @@ def test_public_gateway_receives_only_catalog_declared_tool_urls():
     }
 
 
+def test_public_gateway_preserves_real_paths_but_not_rewritten_showroom_mounts():
+    session = SimpleNamespace(
+        resources={"routes": {"netops": "https://netops-seat.apps.flightpath.example"}}
+    )
+    catalog_item = SimpleNamespace(
+        metadata={
+            "showroom_tabs": [
+                {
+                    "id": "story",
+                    "source": "workload.route.ui",
+                    "same_origin_path": "/story/",
+                    "public_proxy_root": True,
+                },
+                {
+                    "id": "workspace",
+                    "source": "workload.route.ui",
+                    "same_origin_path": "/workspace",
+                    "rewrite_target": "/",
+                },
+            ],
+            "workload_routes": {"ui": "netops"},
+        }
+    )
+
+    assert _participant_tool_urls(session, catalog_item, None) == {
+        "story": "https://netops-seat.apps.flightpath.example",
+        "workspace": "https://netops-seat.apps.flightpath.example",
+    }
+
+
 def test_public_gateway_includes_legacy_catalog_workspace_route():
     session = SimpleNamespace(
         resources={

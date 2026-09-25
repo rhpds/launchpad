@@ -1,5 +1,6 @@
 import type {
   BrandingProfile,
+  AuthenticatedIdentity,
   AvailableModelsResponse,
   AdminObservability,
   CatalogItem,
@@ -62,6 +63,9 @@ async function provisionLabToReady(requestId: string): Promise<LabSession> {
 }
 
 export const api = {
+  // Authentication
+  getCurrentIdentity: () => request<AuthenticatedIdentity>('/auth/me'),
+
   // Tenants
   createTenant: (data: Partial<Tenant>) =>
     request<Tenant>('/tenants', { method: 'POST', body: JSON.stringify(data) }),

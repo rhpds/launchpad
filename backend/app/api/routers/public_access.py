@@ -78,6 +78,18 @@ def _participant_tool_urls(lab_session, catalog_item, cluster) -> dict[str, str]
             route_id = source.removeprefix("workload.route.")
             route_name = str(route_names.get(route_id, ""))
             url = str(route_urls.get(route_name, ""))
+            same_origin_path = str(tab.get("same_origin_path", "")).strip()
+            rewrite_target = str(tab.get("rewrite_target", "")).strip()
+            public_proxy_root = bool(tab.get("public_proxy_root", False))
+            if same_origin_path and not rewrite_target and not public_proxy_root:
+                if (
+                    not same_origin_path.startswith("/")
+                    or ".." in same_origin_path.split("/")
+                    or "?" in same_origin_path
+                    or "#" in same_origin_path
+                ):
+                    continue
+                url = f"{url.rstrip('/')}/{same_origin_path.lstrip('/')}"
         elif source.startswith("cluster.") and source.endswith("_url"):
             service = source.removeprefix("cluster.").removesuffix("_url")
             url = str(service_urls.get(service, ""))

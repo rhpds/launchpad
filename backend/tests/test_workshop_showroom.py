@@ -268,6 +268,12 @@ class TestCapacityGuard:
             },
         }
 
+    def test_memory_quantity_accepts_kubernetes_decimal_and_binary_units(self):
+        assert ProvisioningService._memory_mib("500M") == 476
+        assert ProvisioningService._memory_mib("1G") == 953
+        assert ProvisioningService._memory_mib("512Mi") == 512
+        assert ProvisioningService._memory_mib("2Gi") == 2048
+
     def test_capacity_solves_fixed_plus_per_seat_instead_of_dividing_all_headroom(self):
         item = _make_catalog_item()
         item.metadata = {

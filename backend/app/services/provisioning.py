@@ -1715,11 +1715,12 @@ class ProvisioningService:
                 f"{workshop.catalog_item_id} does not allow "
                 f"{workshop.exposure_policy.value} exposure"
             )
-        raw_catalog_limit = (
-            (catalog_item.metadata or {}).get("max_workshop_seats")
-            if catalog_item
-            else None
-        )
+        metadata = catalog_item.metadata or {} if catalog_item else {}
+        raw_catalog_limit = metadata.get("max_workshop_seats")
+        if workshop.exposure_policy == ExposurePolicy.PUBLIC_CODE:
+            raw_catalog_limit = metadata.get(
+                "public_max_workshop_seats", raw_catalog_limit
+            )
         if raw_catalog_limit is None:
             return None
         catalog_limit = int(raw_catalog_limit)
@@ -1793,13 +1794,23 @@ class ProvisioningService:
             catalog_limit = self._validate_workshop_seat_limit(workshop)
         except ValueError as exc:
             metadata = catalog_item.metadata if catalog_item else {}
+            catalog_limit_key = (
+                "public_max_workshop_seats"
+                if workshop.exposure_policy == ExposurePolicy.PUBLIC_CODE
+                else "max_workshop_seats"
+            )
             return {
                 "can_provision": False,
                 "reason": str(exc),
                 "selected_cluster": workshop.cluster_ref or workshop.target_cluster,
                 "placement_reason": "catalog certification limit",
                 "catalog_seat_limit": int(
-                    metadata.get("max_workshop_seats", self.MAX_ACTIVE_PER_WORKSHOP)
+                    metadata.get(
+                        catalog_limit_key,
+                        metadata.get(
+                            "max_workshop_seats", self.MAX_ACTIVE_PER_WORKSHOP
+                        ),
+                    )
                 ),
                 "seats_requested": workshop.num_users,
                 "estimated_resources": {
@@ -3186,7 +3197,20 @@ class ProvisioningService:
     @staticmethod
     def _memory_mib(value) -> int:
         value = str(value or "0")
-        units = {"Ki": 1 / 1024, "Mi": 1, "Gi": 1024, "Ti": 1024 * 1024}
+        # Kubernetes quantities permit both binary-SI (Mi/Gi) and decimal-SI
+        # (M/G) suffixes.  Some platform workloads use values such as `500M`;
+        # treating that as a raw integer makes the entire cluster capacity
+        # inspection fail closed even though the request is valid.
+        units = {
+            "Ki": 1 / 1024,
+            "Mi": 1,
+            "Gi": 1024,
+            "Ti": 1024 * 1024,
+            "K": 1000 / (1024 * 1024),
+            "M": 1_000_000 / (1024 * 1024),
+            "G": 1_000_000_000 / (1024 * 1024),
+            "T": 1_000_000_000_000 / (1024 * 1024),
+        }
         for suffix, multiplier in units.items():
             if value.endswith(suffix):
                 return int(float(value[:-len(suffix)]) * multiplier)

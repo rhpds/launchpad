@@ -13,11 +13,18 @@ vi.mock('../api/client', () => ({
     previewWorkshop: vi.fn(),
     createWorkshopOrder: vi.fn(),
     confirmWorkshop: vi.fn(),
+    getCurrentIdentity: vi.fn(),
   },
 }));
 
 describe('requester workshop order journey', () => {
   beforeEach(() => {
+    vi.mocked(api.getCurrentIdentity).mockResolvedValue({
+      username: 'lp-instructor-1',
+      email: 'instructor@example.com',
+      is_admin: false,
+      identity_verified: true,
+    });
     vi.mocked(api.listCatalog).mockResolvedValue([
       {
         catalog_item_id: 'multi-agent-quickstart',
@@ -74,9 +81,8 @@ describe('requester workshop order journey', () => {
 
     await screen.findByRole('option', { name: 'Build Multi-Agent AI Systems' });
     expect(screen.queryByLabelText('Workshop name')).not.toBeInTheDocument();
-    fireEvent.change(screen.getByLabelText('Instructor ID'), {
-      target: { value: 'instructor-1' },
-    });
+    expect(screen.getByLabelText(/^Signed-in owner/)).toHaveValue('lp-instructor-1');
+    expect(screen.getByLabelText(/^Signed-in owner/)).toHaveAttribute('readonly');
     fireEvent.change(screen.getByLabelText('Tenant'), {
       target: { value: 'smoke-test-tenant' },
     });
