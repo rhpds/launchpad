@@ -72,7 +72,7 @@ evidence:
 blockers_to_green_canary:
   - deploy-and-verify-the-exact-pinned-platform-and-images
   - complete-one-seat-order-claim-learn-execute-resume-and-reclaim-for-all-six-catalogs
-  - prove-public-identity-expiry-and-zero-residue-for-each-canary
+  - prove-public-identity-expiry-and-zero-residue-for-each-public-enabled-catalog
 blockers_to_green_staging:
   - production-shaped-5-and-25-or-30-seat-profiles
   - load-spike-stress-endurance-and-soak

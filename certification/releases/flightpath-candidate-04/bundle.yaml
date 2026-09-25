@@ -28,6 +28,19 @@ rollback:
 render:
   command: oc kustomize
   kustomize_version: v5.7.1
+canary:
+  runbook_path: docs/flightpath-candidate-04-canary-runbook.md
+  catalog_ids:
+    - agent-reliability
+    - hybrid-fraud-detection
+    - intel-llm-cpu-serving
+    - intel-xeon6-agent-201
+    - multi-agent-quickstart
+    - network-operations-agent
+  internal_seats_per_catalog: 1
+  public_catalog_ids:
+    - network-operations-agent
+  max_concurrent_canaries: 1
 gates:
   approval_required: true
   dry_run_required: true

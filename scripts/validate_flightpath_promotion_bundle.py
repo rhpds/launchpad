@@ -18,6 +18,14 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 SHA = re.compile(r"^[0-9a-f]{40}$")
 DIGEST_IMAGE = re.compile(r"^[^\s]+@sha256:[0-9a-f]{64}$")
+FLIGHTPATH_CANDIDATE_CATALOGS = [
+    "agent-reliability",
+    "hybrid-fraud-detection",
+    "intel-llm-cpu-serving",
+    "intel-xeon6-agent-201",
+    "multi-agent-quickstart",
+    "network-operations-agent",
+]
 
 
 def _require(condition: bool, message: str) -> None:
@@ -127,6 +135,27 @@ def validate(bundle: dict[str, Any], *, root: Path = ROOT) -> dict[str, Any]:
         gates.get("public_tls_gate") == expected_tls_gate,
         f"public TLS gate must be {expected_tls_gate}",
     )
+    if schema_version.endswith("/v2"):
+        canary = bundle.get("canary") or {}
+        runbook_path = Path(canary.get("runbook_path", ""))
+        _require(not runbook_path.is_absolute(), "canary runbook path must be relative")
+        _require((root / runbook_path).is_file(), "canary runbook does not exist")
+        _require(
+            canary.get("catalog_ids") == FLIGHTPATH_CANDIDATE_CATALOGS,
+            "canary catalog scope drift",
+        )
+        _require(
+            canary.get("internal_seats_per_catalog") == 1,
+            "each internal canary must use exactly one seat",
+        )
+        _require(
+            canary.get("public_catalog_ids") == ["network-operations-agent"],
+            "public canary scope exceeds the enabled catalog",
+        )
+        _require(
+            canary.get("max_concurrent_canaries") == 1,
+            "canaries must run sequentially",
+        )
     return {"valid": True, "bundle_id": bundle["bundle_id"], "identities": identities}
 
 

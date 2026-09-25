@@ -42,6 +42,8 @@ def test_public_canary_bundle_binds_all_signed_platform_images() -> None:
     assert result["valid"] is True
     assert result["bundle_id"] == "flightpath-candidate-04"
     assert bundle["target"]["public_max_seats"] == 1
+    assert len(bundle["canary"]["catalog_ids"]) == 6
+    assert bundle["canary"]["public_catalog_ids"] == ["network-operations-agent"]
 
 
 def test_public_canary_bundle_fails_closed_on_scope_or_image_drift() -> None:
@@ -54,6 +56,16 @@ def test_public_canary_bundle_fails_closed_on_scope_or_image_drift() -> None:
     bundle = copy.deepcopy(_bundle_04())
     bundle["promotion"]["requester_image"] = bundle["promotion"]["admin_image"]
     with pytest.raises(ValueError, match="requester_image does not match"):
+        module.validate(bundle, root=ROOT)
+
+    bundle = copy.deepcopy(_bundle_04())
+    bundle["canary"]["public_catalog_ids"].append("agent-reliability")
+    with pytest.raises(ValueError, match="public canary scope"):
+        module.validate(bundle, root=ROOT)
+
+    bundle = copy.deepcopy(_bundle_04())
+    bundle["canary"]["max_concurrent_canaries"] = 2
+    with pytest.raises(ValueError, match="sequentially"):
         module.validate(bundle, root=ROOT)
 
 
