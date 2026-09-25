@@ -15,11 +15,12 @@ on:
 
 permissions:
   contents: read
+  packages: write
   id-token: write
   attestations: write
 
 env:
-  IMAGE_REPOSITORY: quay.io/rh-ee-jkershaw/launchpad-backend
+  IMAGE_REPOSITORY: ghcr.io/${{ github.repository_owner }}/launchpad-backend
 
 jobs:
   release:
@@ -102,13 +103,13 @@ jobs:
             vulnerability-report-fixable.json
             sbom.spdx.json
 
-      - name: Log in to Quay
+      - name: Log in to GHCR
         if: ${{ inputs.publish }}
         uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9
         with:
-          registry: quay.io
-          username: ${{ secrets.LAUNCHPAD_QUAY_USERNAME }}
-          password: ${{ secrets.LAUNCHPAD_QUAY_TOKEN }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish immutable candidate and record digest
         if: ${{ inputs.publish }}

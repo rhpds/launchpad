@@ -43,7 +43,7 @@ def test_backend_release_scans_generates_sbom_signs_and_attests() -> None:
     assert "subject-digest: ${{ steps.publish.outputs.digest }}" in text
 
 
-def test_backend_release_uses_pinned_actions_and_external_secrets() -> None:
+def test_backend_release_uses_pinned_actions_and_repository_scoped_ghcr_identity() -> None:
     text, workflow = _workflow()
 
     action_lines = [line.strip() for line in text.splitlines() if "uses:" in line]
@@ -52,10 +52,16 @@ def test_backend_release_uses_pinned_actions_and_external_secrets() -> None:
     login = next(
         step
         for step in workflow["jobs"]["release"]["steps"]
-        if step.get("name") == "Log in to Quay"
+        if step.get("name") == "Log in to GHCR"
     )
-    assert login["with"]["username"] == "${{ secrets.LAUNCHPAD_QUAY_USERNAME }}"
+    assert workflow["permissions"]["packages"] == "write"
+    assert workflow["env"]["IMAGE_REPOSITORY"] == (
+        "ghcr.io/${{ github.repository_owner }}/launchpad-backend"
+    )
+    assert login["with"]["registry"] == "ghcr.io"
+    assert login["with"]["username"] == "${{ github.actor }}"
     credential_fields = set(login["with"]) - {"registry", "username"}
     assert len(credential_fields) == 1
     credential_value = login["with"][credential_fields.pop()]
-    assert credential_value == "${{ secrets.LAUNCHPAD_QUAY_TOKEN }}"
+    assert credential_value == "${{ secrets.GITHUB_TOKEN }}"
+    assert "LAUNCHPAD_QUAY" not in text
