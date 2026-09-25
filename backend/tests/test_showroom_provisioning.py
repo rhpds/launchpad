@@ -195,7 +195,11 @@ def test_helm_workload_plan_carries_only_declarative_non_secret_contract():
 def test_resolves_declared_showroom_tabs_from_cluster_and_workload_contract():
     tabs = OpenShiftProvisioningAdapter._resolve_showroom_tabs(
         [
-            {"title": "OpenShift", "source": "cluster.console_url"},
+            {
+                "title": "OpenShift",
+                "source": "cluster.console_url",
+                "external": True,
+            },
             {"title": "Terminal", "source": "showroom.terminal"},
             {"title": "App", "source": "workload.route.ui"},
             {"title": "Story", "source": "workload.route.ui", "path": "/story/"},
@@ -210,7 +214,9 @@ def test_resolves_declared_showroom_tabs_from_cluster_and_workload_contract():
 
     assert [tab.name for tab in tabs] == ["OpenShift", "Terminal", "App", "Story", "Grafana"]
     assert tabs[0].url.endswith("/k8s/ns/launchpad-seat-1/core~v1~Pod")
+    assert tabs[0].external is True
     assert tabs[1].path == "/terminal"
+    assert tabs[1].external is False
     assert tabs[2].url == ("https://mortgage-ai-ui-route-launchpad-seat-1.apps.arena.example.com")
     assert tabs[3].url == (
         "https://mortgage-ai-ui-route-launchpad-seat-1.apps.arena.example.com/story/"

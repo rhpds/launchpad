@@ -293,7 +293,11 @@ def test_declared_tool_tabs_replace_the_legacy_three_tab_layout_in_order():
             content_ref="b" * 40,
             apps_domain="apps.arena.example.com",
             tool_tabs=(
-                ShowroomToolTab(name="OpenShift Console", url="https://console.example.com"),
+                ShowroomToolTab(
+                    name="OpenShift Console",
+                    url="https://console.example.com",
+                    external=True,
+                ),
                 ShowroomToolTab(name="Terminal", path="/terminal", port=443),
                 ShowroomToolTab(name="Mortgage AI App", url="https://mortgage.example.com"),
                 ShowroomToolTab(name="Grafana", url="https://grafana.example.com"),
@@ -304,7 +308,11 @@ def test_declared_tool_tabs_replace_the_legacy_three_tab_layout_in_order():
     values = yaml.safe_load(app["spec"]["source"]["helm"]["values"])
     ui = yaml.safe_load(values["content"]["uiConfig"])
     assert ui["tabs"] == [
-        {"name": "OpenShift Console", "url": "https://console.example.com"},
+        {
+            "name": "OpenShift Console",
+            "url": "https://console.example.com",
+            "external": True,
+        },
         {"name": "Terminal", "path": "/terminal", "port": 443},
         {"name": "Mortgage AI App", "url": "https://mortgage.example.com"},
         {"name": "Grafana", "url": "https://grafana.example.com"},

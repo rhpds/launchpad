@@ -44,6 +44,7 @@ class ShowroomToolTab:
     url: str = ""
     path: str = ""
     port: int | None = None
+    external: bool = False
 
     def __post_init__(self) -> None:
         if not self.name.strip():
@@ -61,6 +62,8 @@ class ShowroomToolTab:
             config["path"] = self.path
             if self.port is not None:
                 config["port"] = self.port
+        if self.external:
+            config["external"] = True
         return config
 
 

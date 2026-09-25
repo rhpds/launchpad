@@ -37,15 +37,22 @@ metadata:
       title: Story
       source: workload.route.ui
       path: /story/
+      # Flightpath's wildcard certificate is not trusted yet. Opening the
+      # cross-host tool explicitly avoids a silently blocked iframe.
+      external: true
     - id: terminal
       title: Terminal
       source: showroom.terminal
     - id: workspace
       title: Network Operations Workspace
       source: workload.route.ui
+      external: true
     - id: openshift-console
       title: OpenShift Console
       source: cluster.console_url
+      # OpenShift Console currently returns X-Frame-Options: DENY. Keep the
+      # operator experience usable until console embedding is certified.
+      external: true
   workspace_route_name: netops
   workspace_title: Network Operations Workspace
   required_models: [granite-3.2-8b-tools]

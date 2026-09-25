@@ -713,21 +713,36 @@ http {{
         for spec in tab_specs:
             title = str(spec.get("title") or spec.get("name") or "").strip()
             source = str(spec.get("source", "")).strip()
+            external = bool(spec.get("external", False))
             if source == "showroom.terminal":
-                resolved.append(ShowroomToolTab(name=title, path="/terminal", port=443))
+                resolved.append(
+                    ShowroomToolTab(
+                        name=title,
+                        path="/terminal",
+                        port=443,
+                        external=external,
+                    )
+                )
                 continue
             if source == "cluster.console_url" and console_url:
                 resolved.append(
                     ShowroomToolTab(
                         name=title,
                         url=(f"{console_url.rstrip('/')}/k8s/ns/{namespace}/core~v1~Pod"),
+                        external=external,
                     )
                 )
                 continue
             if source.startswith("cluster.") and source.endswith("_url"):
                 service = source.removeprefix("cluster.").removesuffix("_url")
                 if cluster_service_urls.get(service):
-                    resolved.append(ShowroomToolTab(name=title, url=cluster_service_urls[service]))
+                    resolved.append(
+                        ShowroomToolTab(
+                            name=title,
+                            url=cluster_service_urls[service],
+                            external=external,
+                        )
+                    )
                     continue
             if source.startswith("workload.route."):
                 route_id = source.removeprefix("workload.route.")
@@ -752,11 +767,14 @@ http {{
                             url=OpenShiftProvisioningAdapter._workspace_url(
                                 route_url, route_path
                             ),
+                            external=external,
                         )
                     )
                     continue
             if source.startswith("https://"):
-                resolved.append(ShowroomToolTab(name=title, url=source))
+                resolved.append(
+                    ShowroomToolTab(name=title, url=source, external=external)
+                )
                 continue
             raise ValueError(f"Cannot resolve Showroom tab '{title}' from source '{source}'")
         return tuple(resolved)
