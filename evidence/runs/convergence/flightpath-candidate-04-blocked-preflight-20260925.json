@@ -1,0 +1,28 @@
+{
+  "schema_version": "launchpad.redhat.com/convergence-preflight-evidence/v1",
+  "candidate_id": "launchpad-staging-20260925-04",
+  "collected_at": "2026-09-25T20:27:00Z",
+  "stage": "green-integration",
+  "result": "blocked",
+  "target": {
+    "cluster_id": "flightpath",
+    "api_server": "https://api.flightpath.fm2aihpcsed.com:6443",
+    "namespace": "launchpad-flightpath-candidate"
+  },
+  "payload": {
+    "rendered_sha256": "ea287ce14b7bcdd28e055c85bb5bf291316ad2f82667e899f34409dbaea4af0b",
+    "server_validated_dry_run": "passed",
+    "validated_resource_count": 47,
+    "apply_mode": "client-side ownership with server dry-run"
+  },
+  "blocking_gates": {
+    "active_workshops": 1,
+    "active_sessions": 2,
+    "candidate_routes_reachable": false,
+    "route_observation": "The admin hostname resolved to 192.168.1.245 while the active Flightpath ingress and the requester, API, Console, and OAuth hostnames resolved to 192.168.1.246. The admin Service and pod were healthy in-cluster."
+  },
+  "field_ownership_observation": "An exploratory server-side-apply dry-run reported conflicts with the existing client-side apply manager. No force-conflicts operation was run. The server-validated client-side dry-run passed.",
+  "mutation_performed": false,
+  "promotion_authorized": false,
+  "next_gate": "Wait for deliberate reclaim or expiry with zero active records, correct the admin DNS record, verify the encrypted database backup, then repeat preflight."
+}

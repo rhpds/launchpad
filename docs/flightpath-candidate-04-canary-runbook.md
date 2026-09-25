@@ -78,7 +78,17 @@ rollback from the current working tree.
 5. Produce and verify an encrypted candidate database backup using the
    procedure in `docs/flightpath-candidate-03-staging-runbook.md` with a new
    Candidate 04 filename and an externally supplied age recipient.
-6. Run server-side dry-run against the already rendered promotion payload.
+6. Run server-validated dry-run against the already rendered promotion payload:
+
+   ```sh
+   KUBECONFIG=/explicit/flightpath.kubeconfig \
+     oc apply --dry-run=server \
+     -f /secure/release/flightpath-candidate-04.yaml -o name
+   ```
+
+   Do not add `--server-side` or `--force-conflicts`. The existing candidate is
+   owned by the client-side apply manager. Changing field ownership is a
+   separate migration requiring its own diff, approval, and rollback proof.
 7. Save and review the diff. Stop on unexpected namespace, image, Route, RBAC,
    storage, database, or Secret-reference changes.
 
