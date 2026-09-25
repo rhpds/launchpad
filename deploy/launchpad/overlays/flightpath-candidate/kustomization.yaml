@@ -37,13 +37,13 @@ generatorOptions:
 images:
   - name: backend
     newName: ghcr.io/rhpds/launchpad-backend
-    digest: sha256:076705d8af554d28cbd6a20d2381a124d5ff0c703c6a696a424cfe6163d6bbbf
+    digest: sha256:c5d74d8ce213ea6334227fd5d010f58168011283ee246de9f458f2165e51beef
   - name: partner-portal
-    newName: quay.io/rh-ee-jkershaw/launchpad-portal
-    digest: sha256:8f8a8bbd410d0ed5bb49a693b93e03d49c46f7001c10a47c7f2ab19b5814d583
+    newName: ghcr.io/rhpds/launchpad-portal
+    digest: sha256:f6778b456d7e737fd5483f3338205c15b5003faa475fafb1ecdb712c6928c9d1
   - name: admin
-    newName: quay.io/rh-ee-jkershaw/launchpad-admin
-    digest: sha256:e6eeedd4d614644598e88a8d6478f019acf8b0148422f2b7607c745aa1946c71
+    newName: ghcr.io/rhpds/launchpad-admin
+    digest: sha256:9808230f3ad7686a1f3413004ef24f0d3eabf33a71243252b6368dcc643c44ce
   - name: postgres
     newName: docker.io/library/postgres
     digest: sha256:075f7ba66bc9b3ce7d6b8b635208ff61cd7cf1a67d71ec530eec5d7ae0cbe571
