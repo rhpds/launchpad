@@ -16,6 +16,16 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 SHA = re.compile(r"^[0-9a-f]{40}$")
 STAGES = ["green-local", "green-integration", "green-canary", "green-staging"]
+LEGACY_PILOT_CATALOGS = {
+    "intel-llm-cpu-serving",
+    "intel-xeon6-agent-201",
+    "multi-agent-quickstart",
+}
+FLIGHTPATH_CANDIDATE_CATALOGS = LEGACY_PILOT_CATALOGS | {
+    "agent-reliability",
+    "hybrid-fraud-detection",
+    "network-operations-agent",
+}
 
 
 def _require(condition: bool, message: str) -> None:
@@ -80,12 +90,16 @@ def validate(candidate: dict[str, Any], *, root: Path = ROOT) -> dict[str, Any]:
     _require(resolved.returncode == 0, "platform revision does not resolve locally")
 
     declared = {item["catalog_id"]: item for item in candidate.get("catalog_releases", [])}
+    catalog_scope = candidate.get("catalog_scope", "legacy-pilot-three")
     required = {
-        "intel-llm-cpu-serving",
-        "intel-xeon6-agent-201",
-        "multi-agent-quickstart",
-    }
-    _require(set(declared) == required, "candidate must bind exactly the three pilot catalogs")
+        "legacy-pilot-three": LEGACY_PILOT_CATALOGS,
+        "flightpath-candidate-all": FLIGHTPATH_CANDIDATE_CATALOGS,
+    }.get(catalog_scope)
+    _require(required is not None, "unsupported candidate catalog scope")
+    _require(
+        set(declared) == required,
+        f"candidate must bind exactly the catalogs in scope {catalog_scope}",
+    )
     for catalog_id in sorted(required):
         catalog_path = f"catalog-onboarding/{catalog_id}.yaml"
         actual = _catalog_identity(_revision_blob(root, revision, catalog_path))
