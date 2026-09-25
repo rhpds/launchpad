@@ -2,7 +2,7 @@ catalog_item_id: network-operations-agent
 display_name: 'Intel AI 301: Build an Evidence-Backed Network Operations Agent'
 description: Investigate a simulated telecom network alarm with an evidence-backed agent, internal MCP diagnostics, and shared CPU model inference.
 category: guided_build
-version: 0.2.0-flightpath.4
+version: 0.2.0-flightpath.5
 status: active
 required_capabilities: [openshift, showroom, model_endpoint]
 default_hardware_profile: xeon-basic
@@ -28,7 +28,7 @@ metadata:
   showroom_title: Evidence-Backed Network Operations Agent
   namespace_slug: network-ops
   showroom_content_repo_url: https://github.com/jkershawrh/network-operations-agent.git
-  showroom_content_ref: b672eaf74467ef2e853befe3bdb3b34a3264a24c
+  showroom_content_ref: d4f88b25fc4c8a92f9e2137822bc90f9fad81c65
   showroom_content_playbook: site-lab.yml
   showroom_content_start_path: showroom-lab
   showroom_terminal_storage: true
@@ -67,7 +67,7 @@ metadata:
   workshop_node_spread: false
   workshop_node_min_ready_seconds: 0
   workload_repo: https://github.com/jkershawrh/network-operations-agent.git
-  workload_revision: b672eaf74467ef2e853befe3bdb3b34a3264a24c
+  workload_revision: d4f88b25fc4c8a92f9e2137822bc90f9fad81c65
   workload_deploy_type: helm
   workload_deployment_scope: seat
   workload_deploy_path: chart
@@ -77,7 +77,7 @@ metadata:
   workload_helm_values:
     image:
       repository: ghcr.io/jkershawrh/network-operations-agent
-      digest: sha256:b240a34670db3009ec827ebe35dcb62bc5ae3ddd423b975fee08b17e114a040d
+      digest: sha256:ab35bf05c947639228511be2ea16ed71c910c8e5cb9d20d5ad753aaf62baee97
     route:
       enabled: true
       name: netops
