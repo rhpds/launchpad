@@ -20,7 +20,6 @@ from urllib.parse import parse_qsl, quote, urlencode, urlsplit, urlunsplit
 
 import httpx
 import websockets
-
 from fastapi import FastAPI, Request, Response, WebSocket, WebSocketDisconnect
 from fastapi.responses import RedirectResponse
 
@@ -54,7 +53,9 @@ OPENSHIFT_CONSOLE_HOST = os.environ["OPENSHIFT_CONSOLE_HOST"]
 OPENSHIFT_OAUTH_HOST = os.environ["OPENSHIFT_OAUTH_HOST"]
 KEYCLOAK_PUBLIC_HOST = os.environ["KEYCLOAK_PUBLIC_HOST"]
 OPENSHIFT_INGRESS_DOMAIN = os.environ["OPENSHIFT_INGRESS_DOMAIN"]
-KEYCLOAK_INT_ORIGIN = "http://keycloak-service.keycloak.svc:8080"
+KEYCLOAK_INT_ORIGIN = os.environ.get(
+    "KEYCLOAK_INT_ORIGIN", "http://keycloak-service.keycloak.svc:8080"
+)
 
 
 def _select_upstream(path: str) -> tuple:

@@ -1,0 +1,134 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: launchpad-public-tunnel
+  namespace: launchpad-flightpath-candidate
+  labels:
+    app.kubernetes.io/name: cloudflare-tunnel
+    app.kubernetes.io/part-of: partner-ai-launchpad
+automountServiceAccountToken: false
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudflare-tunnel
+  namespace: launchpad-flightpath-candidate
+  labels:
+    app.kubernetes.io/name: cloudflare-tunnel
+    app.kubernetes.io/part-of: partner-ai-launchpad
+    app.kubernetes.io/managed-by: kustomize
+    launchpad.redhat.com/environment: flightpath-candidate
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: {maxUnavailable: 1, maxSurge: 1}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: cloudflare-tunnel
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: cloudflare-tunnel
+        app.kubernetes.io/part-of: partner-ai-launchpad
+        app.kubernetes.io/managed-by: kustomize
+        launchpad.redhat.com/environment: flightpath-candidate
+    spec:
+      serviceAccountName: launchpad-public-tunnel
+      automountServiceAccountToken: false
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - topologyKey: kubernetes.io/hostname
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: cloudflare-tunnel
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile: {type: RuntimeDefault}
+      volumes:
+        - name: router-script
+          configMap: {name: tunnel-router}
+        - name: cloudflared-home
+          emptyDir: {}
+      containers:
+        - name: router
+          image: ghcr.io/rhpds/launchpad-backend@sha256:c12c36c485b310dd55f7dd0e16cf333ada0e3b393269649d62fe351eccc7b14c
+          imagePullPolicy: IfNotPresent
+          command: [uvicorn]
+          args: [router:app, --host, 0.0.0.0, --port, "8080", --app-dir, /opt/tunnel]
+          env:
+            - name: ACCESS_BROKER_KEY
+              valueFrom:
+                secretKeyRef: {name: launchpad-public-access, key: ACCESS_BROKER_KEY}
+            - {name: BACKEND_URL, value: http://backend.launchpad-flightpath-candidate.svc:8000/api/v1}
+            - {name: GATEWAY_ORIGIN, value: http://public-access-gateway.launchpad-flightpath-candidate.svc:8443}
+            - {name: KEYCLOAK_ORIGIN, value: http://keycloak.launchpad-stage.svc:8080}
+            - {name: KEYCLOAK_INT_ORIGIN, value: http://keycloak.launchpad-stage.svc:8080}
+            - {name: OPENSHIFT_CONSOLE_HOST, value: console-openshift-console.apps.flightpath.fm2aihpcsed.com}
+            - {name: OPENSHIFT_OAUTH_HOST, value: oauth-openshift.apps.flightpath.fm2aihpcsed.com}
+            - {name: KEYCLOAK_PUBLIC_HOST, value: labs.smg-helix.ai}
+            - {name: OPENSHIFT_INGRESS_DOMAIN, value: apps.flightpath.fm2aihpcsed.com}
+            - {name: TUNNEL_UPSTREAM_READ_TIMEOUT, value: "330"}
+          ports:
+            - {name: http, containerPort: 8080}
+          volumeMounts:
+            - name: router-script
+              mountPath: /opt/tunnel/router.py
+              subPath: router.py
+              readOnly: true
+          readinessProbe:
+            httpGet: {path: /health, port: http}
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: {path: /health, port: http}
+            periodSeconds: 30
+          resources:
+            requests: {cpu: 100m, memory: 128Mi}
+            limits: {cpu: "1", memory: 512Mi}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities: {drop: [ALL]}
+        - name: cloudflared
+          image: cloudflare/cloudflared@sha256:b7a6db450ae2e2f773d4fbe9ffb48e7b5fc451e17329daab1b4dda5a2487e2cc
+          imagePullPolicy: IfNotPresent
+          args: [tunnel, --no-autoupdate, --loglevel, info, --metrics, 0.0.0.0:2000, run]
+          env:
+            - name: TUNNEL_TOKEN
+              valueFrom:
+                secretKeyRef: {name: tunnel-token, key: token}
+            - {name: HOME, value: /tmp}
+          ports:
+            - {name: metrics, containerPort: 2000}
+          readinessProbe:
+            httpGet: {path: /ready, port: metrics}
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            httpGet: {path: /ready, port: metrics}
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            failureThreshold: 3
+          resources:
+            requests: {cpu: 50m, memory: 64Mi}
+            limits: {cpu: 500m, memory: 256Mi}
+          volumeMounts:
+            - {name: cloudflared-home, mountPath: /tmp}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities: {drop: [ALL]}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: cloudflare-tunnel
+  namespace: launchpad-flightpath-candidate
+  labels:
+    app.kubernetes.io/name: cloudflare-tunnel
+    app.kubernetes.io/part-of: partner-ai-launchpad
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: cloudflare-tunnel

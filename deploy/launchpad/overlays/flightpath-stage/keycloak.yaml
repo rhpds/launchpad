@@ -66,8 +66,11 @@ spec:
                 secretKeyRef: {name: launchpad-db-secret, key: POSTGRES_PASSWORD}
             - {name: KC_HTTP_ENABLED, value: "true"}
             - {name: KC_HEALTH_ENABLED, value: "true"}
-            - {name: KC_HOSTNAME, value: http://keycloak.launchpad-stage.svc:8080}
-            - {name: KC_HOSTNAME_STRICT, value: "false"}
+            # Browser-facing issuer is the permanent Cloudflare hostname;
+            # token/JWKS backchannel traffic remains on the cluster Service.
+            - {name: KC_HOSTNAME, value: https://labs.smg-helix.ai}
+            - {name: KC_HOSTNAME_STRICT, value: "true"}
+            - {name: KC_HOSTNAME_BACKCHANNEL_DYNAMIC, value: "true"}
             - {name: KC_PROXY_HEADERS, value: xforwarded}
             - {name: KC_CACHE, value: ispn}
             - name: KC_BOOTSTRAP_ADMIN_USERNAME
@@ -76,7 +79,7 @@ spec:
             - name: KC_BOOTSTRAP_ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef: {name: keycloak-stage-bootstrap, key: password}
-            - {name: LAUNCHPAD_ACCESS_VALIDATION_URL, value: http://backend:8000/api/v1/public-access/private/validate}
+            - {name: LAUNCHPAD_ACCESS_VALIDATION_URL, value: http://backend.launchpad-flightpath-candidate.svc:8000/api/v1/public-access/private/validate}
             - name: ACCESS_BROKER_KEY
               valueFrom:
                 secretKeyRef: {name: keycloak-stage-bootstrap, key: broker-key}

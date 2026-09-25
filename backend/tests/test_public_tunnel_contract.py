@@ -1,12 +1,11 @@
 import importlib.util
 import json
 import os
-from pathlib import Path
 import subprocess
+from pathlib import Path
 from urllib.parse import parse_qs, quote, urlsplit
 
 import yaml
-
 
 ROOT = Path(__file__).resolve().parents[2]
 ARENA_OVERLAY = ROOT / "deploy/launchpad/overlays/arena"
@@ -115,6 +114,95 @@ def test_named_tunnel_http_budget_covers_agent_workflows():
     assert 'value: "330"' in manifest
     assert router.UPSTREAM_TIMEOUT.connect == 10
     assert router.UPSTREAM_TIMEOUT.read >= 300
+
+
+def test_router_allows_a_cluster_specific_internal_keycloak_origin():
+    router = (ROOT / "deploy/tunnel-oncluster/router.py").read_text()
+
+    assert '"KEYCLOAK_INT_ORIGIN"' in router
+    assert 'os.environ.get(' in router
+
+
+def test_flightpath_tunnel_restores_router_and_connector_as_one_ha_unit():
+    resources = list(yaml.safe_load_all(
+        (ROOT / "deploy/tunnel-oncluster/flightpath-deployment.yaml").read_text()
+    ))
+    deployment = next(item for item in resources if item.get("kind") == "Deployment")
+    disruption_budget = next(
+        item for item in resources if item.get("kind") == "PodDisruptionBudget"
+    )
+    pod_spec = deployment["spec"]["template"]["spec"]
+    containers = {item["name"]: item for item in pod_spec["containers"]}
+    router_env = {
+        item["name"]: item.get("value") for item in containers["router"]["env"]
+    }
+
+    assert deployment["metadata"]["namespace"] == "launchpad-flightpath-candidate"
+    assert deployment["spec"]["replicas"] == 2
+    assert set(containers) == {"router", "cloudflared"}
+    assert router_env["BACKEND_URL"].startswith(
+        "http://backend.launchpad-flightpath-candidate.svc:8000/"
+    )
+    assert router_env["KEYCLOAK_ORIGIN"] == "http://keycloak.launchpad-stage.svc:8080"
+    assert router_env["KEYCLOAK_INT_ORIGIN"] == router_env["KEYCLOAK_ORIGIN"]
+    assert router_env["OPENSHIFT_INGRESS_DOMAIN"] == "apps.flightpath.fm2aihpcsed.com"
+    assert disruption_budget["spec"]["minAvailable"] == 1
+    assert pod_spec["automountServiceAccountToken"] is False
+
+
+def test_flightpath_public_activation_is_fenced_and_keeps_secrets_out_of_git():
+    activation = (
+        ROOT / "scripts/activate-flightpath-public-access.sh"
+    ).read_text()
+    tunnel_apply = (
+        ROOT / "deploy/tunnel-oncluster/apply-flightpath.sh"
+    ).read_text()
+
+    assert "flightpath-*" in activation
+    assert "flightpath-*" in tunnel_apply
+    assert "launchpad-flightpath-candidate" in activation
+    assert "launchpad-stage" in activation
+    assert "openssl rand" in activation
+    assert "launchpad-public-access" in activation
+    assert "OAUTH2_PROXY_SKIP_OIDC_DISCOVERY=true" in activation
+    assert "OAUTH2_PROXY_INSECURE_OIDC_SKIP_ISSUER_VERIFICATION=true" not in activation
+    assert "OAUTH2_PROXY_INSECURE_OIDC_SKIP_ISSUER_VERIFICATION=false" in activation
+    assert "public_console_url\"] = \"\"" in activation
+    assert "public_oauth_url\"] = \"\"" in activation
+    assert "tunnel-token" in tunnel_apply
+    assert "token:" not in tunnel_apply
+
+
+def test_flightpath_keycloak_policy_only_admits_public_edge_pods():
+    policy = (
+        ROOT
+        / "deploy"
+        / "launchpad"
+        / "overlays"
+        / "flightpath-stage"
+        / "network-policy.yaml"
+    ).read_text()
+
+    assert "launchpad-flightpath-candidate" in policy
+    assert "cloudflare-tunnel" in policy
+    assert "public-access-gateway" in policy
+    assert "port: 8080" in policy
+
+
+def test_flightpath_public_gateway_trusts_the_cluster_ingress_ca():
+    patch = (
+        ROOT
+        / "deploy"
+        / "launchpad"
+        / "overlays"
+        / "flightpath-candidate"
+        / "patch-runtime.yaml"
+    ).read_text()
+
+    assert "launchpad-cluster-ca-bundle" in patch
+    assert "SSL_CERT_FILE" in patch
+    assert "/etc/launchpad-ca/ca-bundle.crt" in patch
+    assert 'PUBLIC_UPSTREAM_TLS_VERIFY, value: "true"' in patch
 
 
 def test_named_tunnel_has_two_connection_aware_replicas_and_a_disruption_budget():

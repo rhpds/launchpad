@@ -9,6 +9,7 @@ resources:
   - candidate-clusters.yaml
   - candidate-rbac.yaml
   - candidate-maas.yaml
+  - public-access-ha.yaml
 
 configMapGenerator:
   - name: flightpath-candidate-serve-llms-catalog

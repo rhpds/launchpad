@@ -34,6 +34,20 @@ spec:
       ports:
         - {port: 7800, protocol: TCP}
         - {port: 57800, protocol: TCP}
+    # The public edge runs in the candidate namespace. Both the tunnel router
+    # (browser endpoints) and oauth2-proxy (token/JWKS backchannel) must reach
+    # Keycloak, while every other cross-namespace caller remains denied.
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: launchpad-flightpath-candidate
+          podSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values: [cloudflare-tunnel, public-access-gateway]
+      ports:
+        - {port: 8080, protocol: TCP}
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy

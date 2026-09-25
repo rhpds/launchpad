@@ -14,7 +14,11 @@ data:
         local: true
         priority: 1
         enabled: true
-        public_access_enabled: false
+        public_access_enabled: true
+        public_ingress_domain: labs.smg-helix.ai
+        # Public Console-through-tunnel is a separate certification gate.
+        public_console_url: ""
+        public_oauth_url: ""
         image_references:
           showroom_git_cloner: quay.io/rh-ee-jkershaw/launchpad-showroom-git-cloner@sha256:2dbcdc5955c5ece1b3bc88c26f85f18122eb317624e1cda160f9d347754d2cc5
           showroom_terminal: quay.io/rh-ee-jkershaw/launchpad-showroom-terminal@sha256:324dc5c4201f0da030a572dab389bc8cfdc2f66e800dff3fcee824b7e795daae

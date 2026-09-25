@@ -1,0 +1,91 @@
+evidence_id: EDD-FLIGHTPATH-PUBLIC-ACCESS-20260924
+result: GREEN-live
+recorded_at: 2026-09-24T21:55:00-05:00
+source:
+  branch: codex/flightpath-migration-20260922
+  base_commit: 85a3bb4a52de0026d8c565048c523d06939f68aa
+cluster:
+  cluster_ref: flightpath
+  infrastructure_id: flightpath-6c76l
+  control_namespace: launchpad-flightpath-candidate
+  identity_namespace: launchpad-stage
+public_edge:
+  origin: https://labs.smg-helix.ai
+  health_status: 200
+  root_status: 302
+  oidc_issuer: https://labs.smg-helix.ai/realms/launchpad-public
+  certificate:
+    subject: CN=smg-helix.ai
+    issuer: C=US, O=Let's Encrypt, CN=YE2
+    not_before: 2026-08-26T13:43:21Z
+    not_after: 2026-11-24T13:43:20Z
+  topology:
+    tunnel_replicas_ready: 2
+    tunnel_nodes: [fp2.fm2aihpcsed.com, fp3.fm2aihpcsed.com]
+    gateway_replicas_ready: 2
+    gateway_nodes: [fp1.fm2aihpcsed.com, fp2.fm2aihpcsed.com]
+runtime_images:
+  launchpad_backend: ghcr.io/rhpds/launchpad-backend@sha256:c12c36c485b310dd55f7dd0e16cf333ada0e3b393269649d62fe351eccc7b14c
+  oauth2_proxy: quay.io/oauth2-proxy/oauth2-proxy@sha256:786bed0f000c0f8a7b31619244ebab02406a8856a4faf3f5fb1df61fbd6c30ed
+  cloudflared: cloudflare/cloudflared@sha256:b7a6db450ae2e2f773d4fbe9ffb48e7b5fc451e17329daab1b4dda5a2487e2cc
+canary:
+  catalog_item_id: multi-agent-quickstart
+  workshop_id: 2a779f6f-549d-44ba-9539-918704cfce47
+  session_id: b15be0a6-3285-4566-b0f6-c42b6928c92a
+  namespace: launchpad-flightpath-candida-multi-agent-9d18de
+  public_url: https://labs.smg-helix.ai/labs/multi-agent-quickstart-2a779f6f
+  seats: 1
+  ready_seconds: 55
+  expires_at: 2026-09-25T06:46:26.900611Z
+  one_time_code_persisted: false
+checks:
+  - id: public-dns-tls
+    result: pass
+    evidence: Trusted Cloudflare edge certificate and HTTP 200 health response.
+  - id: oidc-discovery
+    result: pass
+    evidence: Public discovery document advertises the permanent public issuer.
+  - id: passwordless-form
+    result: pass
+    evidence: Intel x Red Hat branded form rendered email and instructor-code inputs.
+  - id: participant-claim
+    result: pass
+    evidence: Synthetic identity claimed the only seat and reached the participant home page.
+  - id: showroom-proxy
+    result: pass
+    evidence: Authenticated Showroom path returned HTTP 200 with internal ingress TLS verification enabled.
+  - id: workspace-proxy
+    result: pass
+    evidence: Authenticated Multi-Agent Workspace path returned HTTP 200 with internal ingress TLS verification enabled.
+  - id: functional-workflow
+    result: pass
+    evidence:
+      http_status: 200
+      workflow_type: comprehensive
+      agents: [research, analyst, executor]
+      steps: 3
+      errors: 0
+      total_latency_ms: 18327.9
+      ai_disclaimer_present: true
+  - id: namespace-rbac
+    result: pass
+    evidence:
+      assigned_namespace_get_pods: true
+      control_namespace_get_pods: false
+      cluster_get_nodes: false
+  - id: participant-removal
+    result: pass
+    evidence: Synthetic entitlement and RoleBinding were removed; claim count returned to zero while the seat remained ready.
+  - id: source-contracts
+    result: pass
+    evidence: 66 targeted public-access, network-policy, HA/DR, and Flightpath model tests passed; the full non-local backend suite passed 2270 tests with 27 skipped and 13 deselected.
+security:
+  tls_verification_disabled: false
+  public_console_enabled: false
+  plaintext_instructor_code_recorded: false
+  active_participant_claims_after_certification: 0
+  participant_rolebindings_after_certification: 0
+remaining_gates:
+  - Manual browser claim using the reopened canary seat.
+  - Public OpenShift Console remains a separate certification gate.
+  - Network Operations, Fraud Detection, and Agent Reliability remain internal-only until each passes its own public exposure certification.

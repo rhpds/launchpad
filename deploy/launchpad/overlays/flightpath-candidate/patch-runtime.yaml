@@ -267,7 +267,39 @@ kind: Deployment
 metadata:
   name: public-access-gateway
 spec:
-  replicas: 0
+  replicas: 2
+  template:
+    spec:
+      volumes:
+        - name: cluster-ca-bundle
+          configMap:
+            name: launchpad-cluster-ca-bundle
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - topologyKey: kubernetes.io/hostname
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: public-access-gateway
+      containers:
+        - name: gateway
+          env:
+            - {name: SSL_CERT_FILE, value: /etc/launchpad-ca/ca-bundle.crt}
+            - {name: REQUESTS_CA_BUNDLE, value: /etc/launchpad-ca/ca-bundle.crt}
+            - {name: PUBLIC_UPSTREAM_TLS_VERIFY, value: "true"}
+          volumeMounts:
+            - name: cluster-ca-bundle
+              mountPath: /etc/launchpad-ca
+              readOnly: true
+        - name: oidc-proxy
+          env:
+            - {name: OAUTH2_PROXY_OIDC_ISSUER_URL, value: "https://labs.smg-helix.ai/realms/launchpad-public"}
+            - {name: OAUTH2_PROXY_LOGIN_URL, value: "https://labs.smg-helix.ai/realms/launchpad-public/protocol/openid-connect/auth"}
+            - {name: OAUTH2_PROXY_REDEEM_URL, value: "http://keycloak.launchpad-stage.svc:8080/realms/launchpad-public/protocol/openid-connect/token"}
+            - {name: OAUTH2_PROXY_OIDC_JWKS_URL, value: "http://keycloak.launchpad-stage.svc:8080/realms/launchpad-public/protocol/openid-connect/certs"}
+            - {name: OAUTH2_PROXY_REDIRECT_URL, value: "https://labs.smg-helix.ai/oauth2/callback"}
+            - {name: OAUTH2_PROXY_SKIP_OIDC_DISCOVERY, value: "true"}
+            - {name: OAUTH2_PROXY_INSECURE_OIDC_SKIP_ISSUER_VERIFICATION, value: "false"}
 ---
 apiVersion: batch/v1
 kind: CronJob
