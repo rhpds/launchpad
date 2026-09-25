@@ -68,6 +68,11 @@ def test_public_canary_bundle_fails_closed_on_scope_or_image_drift() -> None:
     with pytest.raises(ValueError, match="sequentially"):
         module.validate(bundle, root=ROOT)
 
+    bundle = copy.deepcopy(_bundle_04())
+    bundle["gates"]["candidate_routes_reachable"] = False
+    with pytest.raises(ValueError, match="candidate_routes_reachable"):
+        module.validate(bundle, root=ROOT)
+
 
 @pytest.mark.parametrize("action", ["promotion", "rollback"])
 def test_pinned_overlay_renders_to_declared_hash(action: str) -> None:

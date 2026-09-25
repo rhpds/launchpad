@@ -31,6 +31,8 @@ Do not apply the promotion when any of these conditions is false:
 - `oc whoami --show-server` equals the API server in the bundle;
 - the candidate database contains zero active workshops and zero active lab
   sessions;
+- the requester, admin, and API hostnames all resolve to the active Flightpath
+  ingress and return their expected authenticated response;
 - no managed seat namespace or lifecycle mutation remains in flight;
 - the current encrypted database backup and checksum have been independently
   verified;
@@ -68,13 +70,16 @@ rollback from the current working tree.
 1. Select the explicit Flightpath kubeconfig; do not switch a shared context.
 2. Capture current workloads, routes, PVCs, image identities, and cluster-scoped
    objects named by the candidate. Do not export Secret values.
-3. Query the Launchpad API or database read-only and attach the zero-active-
+3. Resolve the requester, admin, API, Console, OAuth, and router hostnames. Stop
+   if an application hostname points at a different or unreachable ingress.
+   A healthy in-cluster Service does not satisfy this browser-access gate.
+4. Query the Launchpad API or database read-only and attach the zero-active-
    workshop/session result to the evidence run.
-4. Produce and verify an encrypted candidate database backup using the
+5. Produce and verify an encrypted candidate database backup using the
    procedure in `docs/flightpath-candidate-03-staging-runbook.md` with a new
    Candidate 04 filename and an externally supplied age recipient.
-5. Run server-side dry-run against the already rendered promotion payload.
-6. Save and review the diff. Stop on unexpected namespace, image, Route, RBAC,
+6. Run server-side dry-run against the already rendered promotion payload.
+7. Save and review the diff. Stop on unexpected namespace, image, Route, RBAC,
    storage, database, or Secret-reference changes.
 
 ## Promote the platform

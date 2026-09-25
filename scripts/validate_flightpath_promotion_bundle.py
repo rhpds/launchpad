@@ -130,6 +130,11 @@ def validate(bundle: dict[str, Any], *, root: Path = ROOT) -> dict[str, Any]:
         "rollback_decision_owner_required",
     ):
         _require(gates.get(gate) is True, f"required gate is not enabled: {gate}")
+    if schema_version.endswith("/v2"):
+        _require(
+            gates.get("candidate_routes_reachable") is True,
+            "required gate is not enabled: candidate_routes_reachable",
+        )
     expected_tls_gate = "blocked" if schema_version.endswith("/v1") else "verified"
     _require(
         gates.get("public_tls_gate") == expected_tls_gate,

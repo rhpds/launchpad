@@ -45,6 +45,7 @@ gates:
   approval_required: true
   dry_run_required: true
   exact_api_server_required: true
+  candidate_routes_reachable: true
   secrets_preexist_out_of_band: true
   public_tls_gate: verified
   retained_workshops_must_be_zero: true
