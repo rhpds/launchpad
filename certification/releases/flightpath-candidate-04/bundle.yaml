@@ -1,0 +1,39 @@
+schema_version: launchpad.redhat.com/staging-promotion-bundle/v2
+bundle_id: flightpath-candidate-04
+target:
+  cluster_id: flightpath
+  api_server: https://api.flightpath.fm2aihpcsed.com:6443
+  namespace: launchpad-flightpath-candidate
+  public_traffic: existing-gateway-canary-only
+  public_origin: https://labs.smg-helix.ai
+  public_max_seats: 1
+promotion:
+  candidate_id: launchpad-staging-20260925-04
+  candidate_path: certification/candidates/staging-candidate-20260925-04.yaml
+  revision: 2a6cce396146a3cbd6082d887cbe5806bf4dbd7a
+  overlay_path: deploy/launchpad/overlays/flightpath-candidate
+  rendered_sha256: ea287ce14b7bcdd28e055c85bb5bf291316ad2f82667e899f34409dbaea4af0b
+  backend_image: ghcr.io/rhpds/launchpad-backend@sha256:c5d74d8ce213ea6334227fd5d010f58168011283ee246de9f458f2165e51beef
+  requester_image: ghcr.io/rhpds/launchpad-portal@sha256:f6778b456d7e737fd5483f3338205c15b5003faa475fafb1ecdb712c6928c9d1
+  admin_image: ghcr.io/rhpds/launchpad-admin@sha256:9808230f3ad7686a1f3413004ef24f0d3eabf33a71243252b6368dcc643c44ce
+rollback:
+  candidate_id: launchpad-staging-20260923-03
+  candidate_path: certification/candidates/staging-candidate-20260923-03.yaml
+  revision: 51a9785ab61798a5e4921f31afc423ac984f1aa2
+  overlay_path: deploy/launchpad/overlays/flightpath-candidate
+  rendered_sha256: 3d8b3114c3f690da5e1687e8a1f1f90eb10ded8a4d37dec607ab8bb0342de9ac
+  backend_image: quay.io/rh-ee-jkershaw/launchpad-backend@sha256:e922ef53a5e08ae957de8b0a034652f7d64d605e09bdc032a6405279ba9c16e1
+  scope: application-manifests-only
+  database_restore: forbidden-without-separately-verified-compatible-backup
+render:
+  command: oc kustomize
+  kustomize_version: v5.7.1
+gates:
+  approval_required: true
+  dry_run_required: true
+  exact_api_server_required: true
+  secrets_preexist_out_of_band: true
+  public_tls_gate: verified
+  retained_workshops_must_be_zero: true
+  database_backup_required: true
+  rollback_decision_owner_required: true

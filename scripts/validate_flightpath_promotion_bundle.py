@@ -39,9 +39,12 @@ def _candidate(root: Path, relative_path: str) -> dict[str, Any]:
 
 
 def validate(bundle: dict[str, Any], *, root: Path = ROOT) -> dict[str, Any]:
+    schema_version = bundle.get("schema_version")
     _require(
-        bundle.get("schema_version")
-        == "launchpad.redhat.com/staging-promotion-bundle/v1",
+        schema_version in {
+            "launchpad.redhat.com/staging-promotion-bundle/v1",
+            "launchpad.redhat.com/staging-promotion-bundle/v2",
+        },
         "unsupported bundle schema",
     )
     target = bundle.get("target") or {}
@@ -50,7 +53,18 @@ def validate(bundle: dict[str, Any], *, root: Path = ROOT) -> dict[str, Any]:
         target.get("api_server") == "https://api.flightpath.fm2aihpcsed.com:6443",
         "unexpected Flightpath API server",
     )
-    _require(target.get("public_traffic") == "disabled", "public traffic must stay disabled")
+    if schema_version.endswith("/v1"):
+        _require(target.get("public_traffic") == "disabled", "public traffic must stay disabled")
+    else:
+        _require(
+            target.get("public_traffic") == "existing-gateway-canary-only",
+            "v2 public traffic must be limited to the existing canary gateway",
+        )
+        _require(
+            target.get("public_origin") == "https://labs.smg-helix.ai",
+            "unexpected public canary origin",
+        )
+        _require(target.get("public_max_seats") == 1, "public canary must be limited to one seat")
 
     identities: dict[str, Any] = {}
     for action in ("promotion", "rollback"):
@@ -80,6 +94,18 @@ def validate(bundle: dict[str, Any], *, root: Path = ROOT) -> dict[str, Any]:
         )
         identities[action] = {"candidate_id": release["candidate_id"], "revision": revision}
 
+        if schema_version.endswith("/v2") and action == "promotion":
+            for field in ("backend_image", "requester_image", "admin_image"):
+                image = release.get(field, "")
+                _require(
+                    bool(DIGEST_IMAGE.fullmatch(image)),
+                    f"promotion {field} must be digest pinned",
+                )
+                _require(
+                    candidate.get("platform", {}).get(field) == image,
+                    f"promotion {field} does not match the candidate",
+                )
+
     _require(
         bundle["rollback"].get("database_restore")
         == "forbidden-without-separately-verified-compatible-backup",
@@ -96,7 +122,11 @@ def validate(bundle: dict[str, Any], *, root: Path = ROOT) -> dict[str, Any]:
         "rollback_decision_owner_required",
     ):
         _require(gates.get(gate) is True, f"required gate is not enabled: {gate}")
-    _require(gates.get("public_tls_gate") == "blocked", "public TLS gate must remain blocked")
+    expected_tls_gate = "blocked" if schema_version.endswith("/v1") else "verified"
+    _require(
+        gates.get("public_tls_gate") == expected_tls_gate,
+        f"public TLS gate must be {expected_tls_gate}",
+    )
     return {"valid": True, "bundle_id": bundle["bundle_id"], "identities": identities}
 
 
