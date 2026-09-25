@@ -6,8 +6,8 @@ catalog:
   description: Repository-discovered onboarding draft for Evidence-Backed Network
     Operations Agent.
   category: guided_build
-  version: 0.1.0
-  status: draft
+  version: 0.2.0
+  status: candidate
 learning:
   learning_level: "301"
   learning_stage: Engineer
@@ -18,20 +18,20 @@ learning:
 sources:
   showroom:
     repo_url: https://github.com/jkershawrh/network-operations-agent.git
-    revision: c3965bb8c6d38d47abc70f79b9d3dbe03f0d9573
+    revision: b672eaf74467ef2e853befe3bdb3b34a3264a24c
     playbook: site-lab.yml
     start_path: showroom-lab
   workload:
     repo_url: https://github.com/jkershawrh/network-operations-agent.git
-    revision: c3965bb8c6d38d47abc70f79b9d3dbe03f0d9573
+    revision: b672eaf74467ef2e853befe3bdb3b34a3264a24c
     deploy_path: chart
 runtime:
   deployment_type: helm
   workload:
     helm_values:
       image:
-        repository: quay.io/rh-ee-jkershaw/network-operations-agent
-        digest: sha256:8595d9a490b6d300ca9d821249e97b5d5634239012c91decede7995f60228bbb
+        repository: ghcr.io/jkershawrh/network-operations-agent
+        digest: sha256:b240a34670db3009ec827ebe35dcb62bc5ae3ddd423b975fee08b17e114a040d
       route:
         enabled: true
         name: netops
@@ -51,30 +51,38 @@ runtime:
   required_models:
   - granite-3.2-8b-tools
   seat_resources:
-    cpu_millicores: 0
-    memory_mib: 0
-    pods: 0
-    storage_gib: 0
+    cpu_millicores: 100
+    memory_mib: 256
+    pods: 2
+    storage_gib: 2
   tabs:
+  - id: story
+    title: Story
+    source: workload.route.ui
+    path: /story/
   - id: terminal
     title: Terminal
+    source: showroom.terminal
   - id: workspace
     title: Network Operations Workspace
+    source: workload.route.ui
+  - id: openshift-console
+    title: OpenShift Console
+    source: cluster.console_url
   allowed_exposure_policies:
   - internal
 certification:
-  stage: repository-discovery
+  stage: one-seat-certified
   max_workshop_seats: 1
   promotion_sequence:
   - 1
   - 5
   - 25
   activation_blockers:
-  - Replace zero resource placeholders with measured per-seat resource measurements.
-  - Review required capabilities, models, participant tabs, routes, identity, and
-    runtime Secret sources.
-  - Complete source, one-seat, five-seat, and twenty-five-seat certification gates
-    before activation.
+  - Complete five-seat and twenty-five-seat certification gates before increasing
+    the one-seat catalog limit.
+  - Restore CI-owned Quay publication, signing, and provenance for the Flightpath
+    backend before promoting this candidate beyond internal one-seat use.
   - Review every unparsed manifest; templating or invalid YAML prevents complete static
     discovery.
   - Quickstart quality profile has unresolved required checks; review quality.gate.blocking_findings.
