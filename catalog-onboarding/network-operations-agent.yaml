@@ -72,15 +72,17 @@ runtime:
   allowed_exposure_policies:
   - internal
 certification:
-  stage: five-seat-certified
-  max_workshop_seats: 5
+  stage: twenty-five-seat-certified
+  max_workshop_seats: 25
   promotion_sequence:
   - 1
   - 5
   - 25
   activation_blockers:
-  - Complete the twenty-five-seat certification gate before increasing the
-    five-seat catalog limit.
+  - Certify public access separately before adding `public_code` to the allowed
+    exposure policies.
+  - Certify concurrent workshops and production SLOs before treating this
+    single-workshop result as production capacity.
   - Review every unparsed manifest; templating or invalid YAML prevents complete static
     discovery.
   - Quickstart quality profile has unresolved required checks; review quality.gate.blocking_findings.
