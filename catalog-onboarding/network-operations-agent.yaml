@@ -72,17 +72,15 @@ runtime:
   allowed_exposure_policies:
   - internal
 certification:
-  stage: one-seat-certified
-  max_workshop_seats: 1
+  stage: five-seat-certified
+  max_workshop_seats: 5
   promotion_sequence:
   - 1
   - 5
   - 25
   activation_blockers:
-  - Complete five-seat and twenty-five-seat certification gates before increasing
-    the one-seat catalog limit.
-  - Certify five seats against the CI-published, signed, and attested Flightpath
-    backend before increasing the one-seat catalog limit.
+  - Complete the twenty-five-seat certification gate before increasing the
+    five-seat catalog limit.
   - Review every unparsed manifest; templating or invalid YAML prevents complete static
     discovery.
   - Quickstart quality profile has unresolved required checks; review quality.gate.blocking_findings.
