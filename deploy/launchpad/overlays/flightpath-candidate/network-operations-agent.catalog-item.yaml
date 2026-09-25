@@ -2,7 +2,7 @@ catalog_item_id: network-operations-agent
 display_name: 'Intel AI 301: Build an Evidence-Backed Network Operations Agent'
 description: Investigate a simulated telecom network alarm with an evidence-backed agent, internal MCP diagnostics, and shared CPU model inference.
 category: guided_build
-version: 0.2.0-flightpath.3
+version: 0.2.0-flightpath.4
 status: active
 required_capabilities: [openshift, showroom, model_endpoint]
 default_hardware_profile: xeon-basic
@@ -37,16 +37,18 @@ metadata:
       title: Story
       source: workload.route.ui
       path: /story/
-      # Flightpath's wildcard certificate is not trusted yet. Opening the
-      # cross-host tool explicitly avoids a silently blocked iframe.
-      external: true
+      same_origin_path: /story/
     - id: terminal
       title: Terminal
       source: showroom.terminal
     - id: workspace
       title: Network Operations Workspace
       source: workload.route.ui
-      external: true
+      same_origin_path: /workspace
+      rewrite_target: /
+      proxy_paths:
+        - path: /api
+        - path: /health
     - id: openshift-console
       title: OpenShift Console
       source: cluster.console_url

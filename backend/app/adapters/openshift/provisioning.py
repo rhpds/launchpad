@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
 import os
@@ -411,6 +412,22 @@ class OpenShiftProvisioningAdapter:
                 if self._target and self._target.console_url
                 else os.environ.get("OPENSHIFT_CONSOLE_URL", "").rstrip("/")
             )
+            self._apply_showroom_same_origin_routes(
+                res.get("showroom_tabs", []),
+                namespace=demo_namespace,
+                apps_domain=apps_domain,
+                workload_routes=workload_routes,
+                labels={
+                    "app.kubernetes.io/managed-by": "launchpad",
+                    "launchpad.redhat.com/session-id": str(res.get("session_id", plan.request_id)),
+                    "launchpad.redhat.com/workshop-id": str(
+                        res.get("workshop_id", plan.request_id)
+                    ),
+                    "launchpad.redhat.com/seat-id": str(res.get("seat_id", plan.request_id)),
+                    "launchpad.redhat.com/tenant": tenant_id,
+                    "launchpad.redhat.com/cluster-id": str(plan.target_cluster or "oberon"),
+                },
+            )
             tool_tabs = self._resolve_showroom_tabs(
                 res.get("showroom_tabs", []),
                 namespace=demo_namespace,
@@ -714,6 +731,17 @@ http {{
             title = str(spec.get("title") or spec.get("name") or "").strip()
             source = str(spec.get("source", "")).strip()
             external = bool(spec.get("external", False))
+            same_origin_path = str(spec.get("same_origin_path", "")).strip()
+            if same_origin_path:
+                OpenShiftProvisioningAdapter._validate_showroom_proxy_path(same_origin_path, title)
+                resolved.append(
+                    ShowroomToolTab(
+                        name=title,
+                        path=same_origin_path,
+                        port=443,
+                    )
+                )
+                continue
             if source == "showroom.terminal":
                 resolved.append(
                     ShowroomToolTab(
@@ -778,6 +806,137 @@ http {{
                 continue
             raise ValueError(f"Cannot resolve Showroom tab '{title}' from source '{source}'")
         return tuple(resolved)
+
+    @staticmethod
+    def _validate_showroom_proxy_path(path: str, title: str) -> None:
+        if (
+            not path.startswith("/")
+            or path == "/"
+            or ".." in path.split("/")
+            or "?" in path
+            or "#" in path
+        ):
+            raise ValueError(f"Cannot resolve Showroom tab '{title}' with unsafe same-origin path")
+
+    @staticmethod
+    def _showroom_proxy_route_name(namespace: str, path: str) -> str:
+        slug = re.sub(r"[^a-z0-9]+", "-", path.lower()).strip("-") or "root"
+        base = f"showroom-proxy-{slug}"
+        if len(base) <= 63:
+            return base
+        digest = hashlib.sha256(f"{namespace}:{path}".encode()).hexdigest()[:8]
+        return f"{base[:54].rstrip('-')}-{digest}"
+
+    @staticmethod
+    def _build_showroom_proxy_route(
+        *,
+        namespace: str,
+        apps_domain: str,
+        path: str,
+        service_name: str,
+        target_port: str | int | None,
+        labels: dict[str, str],
+        rewrite_target: str = "",
+    ) -> dict:
+        OpenShiftProvisioningAdapter._validate_showroom_proxy_path(path, path)
+        annotations = {}
+        if rewrite_target:
+            if not rewrite_target.startswith("/") or ".." in rewrite_target.split("/"):
+                raise ValueError(f"Unsafe Showroom proxy rewrite target '{rewrite_target}'")
+            annotations["haproxy.router.openshift.io/rewrite-target"] = rewrite_target
+        route = {
+            "apiVersion": "route.openshift.io/v1",
+            "kind": "Route",
+            "metadata": {
+                "name": OpenShiftProvisioningAdapter._showroom_proxy_route_name(namespace, path),
+                "namespace": namespace,
+                "labels": labels,
+                "annotations": annotations,
+            },
+            "spec": {
+                "host": f"showroom-{namespace}.{apps_domain}",
+                "path": path.rstrip("/") or path,
+                "to": {"kind": "Service", "name": service_name, "weight": 100},
+                "tls": {"termination": "edge", "insecureEdgeTerminationPolicy": "Redirect"},
+                "wildcardPolicy": "None",
+            },
+        }
+        if target_port:
+            route["spec"]["port"] = {"targetPort": target_port}
+        return route
+
+    def _apply_showroom_same_origin_routes(
+        self,
+        tab_specs: list[dict],
+        *,
+        namespace: str,
+        apps_domain: str,
+        workload_routes: dict[str, str],
+        labels: dict[str, str],
+    ) -> None:
+        """Expose declared workload paths through the trusted Showroom origin.
+
+        This is deliberately opt-in. It avoids cross-host iframe certificate
+        failures without exposing undeclared workload Services or paths.
+        """
+        for spec in tab_specs:
+            same_origin_path = str(spec.get("same_origin_path", "")).strip()
+            if not same_origin_path:
+                continue
+            source = str(spec.get("source", "")).strip()
+            if not source.startswith("workload.route."):
+                raise ValueError("Same-origin Showroom tabs must use a workload Route source")
+            route_id = source.removeprefix("workload.route.")
+            source_route_name = workload_routes.get(route_id, "")
+            if not source_route_name:
+                raise ValueError(f"No workload Route is declared for '{route_id}'")
+            source_route = self._custom_objects.get_namespaced_custom_object(
+                "route.openshift.io",
+                "v1",
+                namespace,
+                "routes",
+                source_route_name,
+            )
+            source_spec = source_route.get("spec", {})
+            service_name = str(source_spec.get("to", {}).get("name", "")).strip()
+            if not service_name:
+                raise ValueError(f"Workload Route '{source_route_name}' has no target Service")
+            target_port = source_spec.get("port", {}).get("targetPort")
+            paths = [
+                {
+                    "path": same_origin_path,
+                    "rewrite_target": str(spec.get("rewrite_target", "")),
+                },
+                *list(spec.get("proxy_paths", [])),
+            ]
+            for path_spec in paths:
+                if isinstance(path_spec, str):
+                    path_spec = {"path": path_spec}
+                route = self._build_showroom_proxy_route(
+                    namespace=namespace,
+                    apps_domain=apps_domain,
+                    path=str(path_spec.get("path", "")),
+                    service_name=service_name,
+                    target_port=target_port,
+                    labels=labels,
+                    rewrite_target=str(path_spec.get("rewrite_target", "")),
+                )
+                route_name = route["metadata"]["name"]
+                try:
+                    self._custom_objects.create_namespaced_custom_object(
+                        "route.openshift.io", "v1", namespace, "routes", route
+                    )
+                except Exception as exc:
+                    if getattr(exc, "status", None) != 409:
+                        raise
+                    self._custom_objects.patch_namespaced_custom_object(
+                        "route.openshift.io",
+                        "v1",
+                        namespace,
+                        "routes",
+                        route_name,
+                        route,
+                    )
 
     @staticmethod
     def _resolve_workload_runtime_secret(

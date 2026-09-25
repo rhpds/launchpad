@@ -203,6 +203,11 @@ def test_resolves_declared_showroom_tabs_from_cluster_and_workload_contract():
             {"title": "Terminal", "source": "showroom.terminal"},
             {"title": "App", "source": "workload.route.ui"},
             {"title": "Story", "source": "workload.route.ui", "path": "/story/"},
+            {
+                "title": "Embedded Workspace",
+                "source": "workload.route.ui",
+                "same_origin_path": "/workspace",
+            },
             {"title": "Grafana", "source": "cluster.grafana_url"},
         ],
         namespace="launchpad-seat-1",
@@ -212,7 +217,14 @@ def test_resolves_declared_showroom_tabs_from_cluster_and_workload_contract():
         cluster_service_urls={"grafana": "https://grafana.example.com"},
     )
 
-    assert [tab.name for tab in tabs] == ["OpenShift", "Terminal", "App", "Story", "Grafana"]
+    assert [tab.name for tab in tabs] == [
+        "OpenShift",
+        "Terminal",
+        "App",
+        "Story",
+        "Embedded Workspace",
+        "Grafana",
+    ]
     assert tabs[0].url.endswith("/k8s/ns/launchpad-seat-1/core~v1~Pod")
     assert tabs[0].external is True
     assert tabs[1].path == "/terminal"
@@ -221,6 +233,41 @@ def test_resolves_declared_showroom_tabs_from_cluster_and_workload_contract():
     assert tabs[3].url == (
         "https://mortgage-ai-ui-route-launchpad-seat-1.apps.arena.example.com/story/"
     )
+    assert tabs[4].path == "/workspace"
+    assert tabs[4].port == 443
+    assert tabs[4].url == ""
+
+
+def test_builds_scoped_same_origin_showroom_proxy_route():
+    route = OpenShiftProvisioningAdapter._build_showroom_proxy_route(
+        namespace="launchpad-seat-1",
+        apps_domain="apps.flightpath.example.com",
+        path="/workspace",
+        service_name="network-operations-agent-app",
+        target_port="http",
+        labels={"app.kubernetes.io/managed-by": "launchpad"},
+        rewrite_target="/",
+    )
+
+    assert route["metadata"]["name"] == "showroom-proxy-workspace"
+    assert route["metadata"]["annotations"] == {"haproxy.router.openshift.io/rewrite-target": "/"}
+    assert route["spec"]["host"] == ("showroom-launchpad-seat-1.apps.flightpath.example.com")
+    assert route["spec"]["path"] == "/workspace"
+    assert route["spec"]["to"]["name"] == "network-operations-agent-app"
+    assert route["spec"]["port"] == {"targetPort": "http"}
+
+
+def test_same_origin_showroom_proxy_rejects_root_and_escape_paths():
+    for path in ("/", "../admin", "/../admin"):
+        with pytest.raises(ValueError, match="unsafe same-origin path"):
+            OpenShiftProvisioningAdapter._build_showroom_proxy_route(
+                namespace="launchpad-seat-1",
+                apps_domain="apps.flightpath.example.com",
+                path=path,
+                service_name="app",
+                target_port="http",
+                labels={},
+            )
 
 
 def test_declared_showroom_tab_rejects_unsafe_route_path():
