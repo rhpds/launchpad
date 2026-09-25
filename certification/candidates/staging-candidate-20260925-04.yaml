@@ -1,0 +1,84 @@
+schema_version: launchpad.redhat.com/convergence-candidate/v1
+candidate_id: launchpad-staging-20260925-04
+current_stage: green-integration
+catalog_scope: flightpath-candidate-all
+platform:
+  repository: https://github.com/rhpds/launchpad.git
+  revision: 2a6cce396146a3cbd6082d887cbe5806bf4dbd7a
+  runtime_source_revision: 864780b18caed1f40d35365e6eee033cb014f04f
+  backend_image: ghcr.io/rhpds/launchpad-backend@sha256:c5d74d8ce213ea6334227fd5d010f58168011283ee246de9f458f2165e51beef
+  requester_image: ghcr.io/rhpds/launchpad-portal@sha256:f6778b456d7e737fd5483f3338205c15b5003faa475fafb1ecdb712c6928c9d1
+  admin_image: ghcr.io/rhpds/launchpad-admin@sha256:9808230f3ad7686a1f3413004ef24f0d3eabf33a71243252b6368dcc643c44ce
+catalog_releases:
+  - catalog_id: agent-reliability
+    version: 0.1.0
+    showroom_revision: 99146600cbf3507527d59b73e569fbb642321721
+    workload_revision: 99146600cbf3507527d59b73e569fbb642321721
+    effective_release:
+      version: 0.1.0-flightpath.1
+      manifest_path: deploy/launchpad/overlays/flightpath-candidate/agent-reliability.catalog-item.yaml
+      manifest_sha256: 9b1c91c1f5e7ee6f3f0148479b2b179d5820253208ad35484aa3368a9ff00e3f
+  - catalog_id: hybrid-fraud-detection
+    version: 0.1.0
+    showroom_revision: 8f774c1dd1a37aebf3c40551ceb11ee1a9b501ef
+    workload_revision: 8f774c1dd1a37aebf3c40551ceb11ee1a9b501ef
+    effective_release:
+      version: 0.1.1-flightpath.2
+      manifest_path: deploy/launchpad/overlays/flightpath-candidate/hybrid-fraud-detection.catalog-item.yaml
+      manifest_sha256: 51d02e409e777732eae1515876d69f6b304f723f37568b6b8b7b4beded7c7a99
+  - catalog_id: intel-llm-cpu-serving
+    version: 1.0.11
+    showroom_revision: 5292234017bf3f538767e6b6a3c627d146fca086
+    workload_revision: 88867e14b1eede7d9aa563069aa093c122a4a53a
+    effective_release:
+      version: 1.0.12-flightpath.1
+      manifest_path: deploy/launchpad/overlays/flightpath-candidate/intel-llm-cpu-serving.catalog-item.yaml
+      manifest_sha256: 51e4c0a9c52bceba3d66523bb181155b8f31496737653c5602aaf6c0dbb8a68b
+  - catalog_id: intel-xeon6-agent-201
+    version: 1.0.7
+    showroom_revision: 5292234017bf3f538767e6b6a3c627d146fca086
+    workload_revision: 2f94711efc01384ee4c334caa1720e2962180b14
+    effective_release:
+      version: 1.0.8-flightpath.1
+      manifest_path: deploy/launchpad/overlays/flightpath-candidate/intel-xeon6-agent-201.catalog-item.yaml
+      manifest_sha256: f4844b06dc6b62c2f7060964ea272b0d68e87bdc0a2e3fb8674b3b3e4320b439
+  - catalog_id: multi-agent-quickstart
+    version: 0.2.14
+    showroom_revision: b4079dc38f0d441725a34e2cdf0d0d3bdb2901c3
+    workload_revision: 5292234017bf3f538767e6b6a3c627d146fca086
+    effective_release:
+      version: 0.2.15-flightpath.1
+      manifest_path: deploy/launchpad/overlays/flightpath-candidate/multi-agent-quickstart.catalog-item.yaml
+      manifest_sha256: 6c0d2eb38502de0d8cdf3dc594ec02033f987111ab352e46c80c25ecce401bad
+  - catalog_id: network-operations-agent
+    version: 0.2.0
+    showroom_revision: 287bffcca9c90336ed199ab2156d4471377b2c3e
+    workload_revision: 287bffcca9c90336ed199ab2156d4471377b2c3e
+    effective_release:
+      version: 0.2.0-flightpath.10
+      manifest_path: deploy/launchpad/overlays/flightpath-candidate/network-operations-agent.catalog-item.yaml
+      manifest_sha256: 6e2f1142e432a50ccd03a6a3914e7245297d429cbc27902f81970329d14023b3
+contracts:
+  delivery_streams: 1.0.0
+  convergence_matrix: 1.0.0
+  production_readiness: 1.0.0
+  sre_operating_model: 1.0.0
+  data_ai_governance: 1.0.0
+evidence:
+  - path: evidence/runs/convergence/flightpath-candidate-04-green-integration-20260925.json
+    sha256: 6c7e3dfc56b213c8c69c5efee44c0a31e6abcba01380d99b0b97a32e5d64a567
+  - path: docs/certifications/network-operations-agent-flightpath-full-participant-journey-20260925.md
+    sha256: 32394ab22646c146a4c0a1ce8ba804e7cc76e0a415377c7648e21e92cd18bcb5
+blockers_to_green_canary:
+  - deploy-and-verify-the-exact-pinned-platform-and-images
+  - complete-one-seat-order-claim-learn-execute-resume-and-reclaim-for-all-six-catalogs
+  - prove-public-identity-expiry-and-zero-residue-for-each-canary
+blockers_to_green_staging:
+  - production-shaped-5-and-25-or-30-seat-profiles
+  - load-spike-stress-endurance-and-soak
+  - security-and-cross-tenant-negative-tests
+  - database-backup-restore-upgrade-and-rollback
+approval:
+  required: true
+  approved_by: Jonathan Kershaw
+  approved_at: "2026-09-25T20:07:43Z"

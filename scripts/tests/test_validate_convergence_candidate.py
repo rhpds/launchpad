@@ -12,6 +12,7 @@ SCRIPT = ROOT / "scripts" / "validate_convergence_candidate.py"
 CANDIDATE = ROOT / "certification/candidates/staging-candidate-20260922.yaml"
 CANDIDATE_02 = ROOT / "certification/candidates/staging-candidate-20260922-02.yaml"
 CANDIDATE_03 = ROOT / "certification/candidates/staging-candidate-20260923-03.yaml"
+CANDIDATE_04 = ROOT / "certification/candidates/staging-candidate-20260925-04.yaml"
 
 
 def _module():
@@ -32,6 +33,10 @@ def _candidate_02() -> dict:
 
 def _candidate_03() -> dict:
     return yaml.safe_load(CANDIDATE_03.read_text(encoding="utf-8"))
+
+
+def _candidate_04() -> dict:
+    return yaml.safe_load(CANDIDATE_04.read_text(encoding="utf-8"))
 
 
 def test_repository_candidate_binds_platform_catalogs_and_evidence() -> None:
@@ -68,6 +73,19 @@ def test_third_candidate_binds_flightpath_lifecycle_and_requester_evidence() -> 
         "stage": "green-integration",
         "platform_revision": "51a9785ab61798a5e4921f31afc423ac984f1aa2",
         "catalog_count": 3,
+        "evidence_count": 2,
+        "next_stage": "green-canary",
+    }
+
+
+def test_fourth_candidate_binds_all_flightpath_catalogs_and_signed_images() -> None:
+    result = _module().validate(_candidate_04(), root=ROOT)
+    assert result == {
+        "valid": True,
+        "candidate_id": "launchpad-staging-20260925-04",
+        "stage": "green-integration",
+        "platform_revision": "2a6cce396146a3cbd6082d887cbe5806bf4dbd7a",
+        "catalog_count": 6,
         "evidence_count": 2,
         "next_stage": "green-canary",
     }

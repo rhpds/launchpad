@@ -1,0 +1,49 @@
+{
+  "schema_version": "launchpad.redhat.com/convergence-evidence/v1",
+  "candidate_id": "launchpad-staging-20260925-04",
+  "collected_at": "2026-09-25T20:07:43Z",
+  "stage": "green-integration",
+  "platform_revision": "2a6cce396146a3cbd6082d887cbe5806bf4dbd7a",
+  "runtime_source_revision": "864780b18caed1f40d35365e6eee033cb014f04f",
+  "image_pin_revision": "90942eddab1037c0d60d007cd962b25b2bec8018",
+  "tests": {
+    "backend_and_contract": {
+      "passed": 2421,
+      "skipped": 27,
+      "deselected_local": 4,
+      "failed": 0
+    },
+    "focused_convergence": {
+      "passed": 219,
+      "failed": 0
+    },
+    "frontend": {
+      "component_tests": "passed",
+      "typescript_build": "passed",
+      "eslint": "passed"
+    },
+    "repository": {
+      "secret_scan": "passed",
+      "roadmap_generation": "passed",
+      "diff_check": "passed",
+      "flightpath_overlay_render": "passed"
+    }
+  },
+  "images": {
+    "backend": "ghcr.io/rhpds/launchpad-backend@sha256:c5d74d8ce213ea6334227fd5d010f58168011283ee246de9f458f2165e51beef",
+    "requester": "ghcr.io/rhpds/launchpad-portal@sha256:f6778b456d7e737fd5483f3338205c15b5003faa475fafb1ecdb712c6928c9d1",
+    "admin": "ghcr.io/rhpds/launchpad-admin@sha256:9808230f3ad7686a1f3413004ef24f0d3eabf33a71243252b6368dcc643c44ce"
+  },
+  "release_runs": {
+    "backend": "https://github.com/rhpds/launchpad/actions/runs/36183127266",
+    "portal": "https://github.com/rhpds/launchpad/actions/runs/36183131295"
+  },
+  "live_evidence": [
+    "docs/certifications/network-operations-agent-flightpath-full-participant-journey-20260925.md"
+  ],
+  "boundaries": [
+    "No cluster deployment was performed by this convergence record.",
+    "The live Network Operations proof is one catalog canary, not full-catalog green-canary certification.",
+    "Local Podman execution was excluded from the release gate; its workstation container store was full."
+  ]
+}
