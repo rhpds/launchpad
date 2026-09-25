@@ -81,8 +81,8 @@ certification:
   activation_blockers:
   - Complete five-seat and twenty-five-seat certification gates before increasing
     the one-seat catalog limit.
-  - Restore CI-owned Quay publication, signing, and provenance for the Flightpath
-    backend before promoting this candidate beyond internal one-seat use.
+  - Certify five seats against the CI-published, signed, and attested Flightpath
+    backend before increasing the one-seat catalog limit.
   - Review every unparsed manifest; templating or invalid YAML prevents complete static
     discovery.
   - Quickstart quality profile has unresolved required checks; review quality.gate.blocking_findings.

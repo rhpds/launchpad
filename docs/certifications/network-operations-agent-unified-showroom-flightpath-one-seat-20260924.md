@@ -66,3 +66,15 @@ This receipt certifies one internal Flightpath seat for the exact immutable
 revisions above. It does not certify public access, five or 25 seats,
 concurrent provisioning, production SLOs, or the unsigned Flightpath backend
 candidate for broader promotion. Those remain later gates.
+
+## Follow-up supply-chain gate
+
+After this one-seat run, backend release workflow
+<https://github.com/rhpds/launchpad/actions/runs/36079597871> built exact revision
+`ee92d4bdcb283ceebad02c2e6517ba339b2174c5`, passed the fixable
+high/critical gate, retained its vulnerability reports and SBOM, and published,
+keylessly signed, and attested
+`ghcr.io/rhpds/launchpad-backend@sha256:c12c36c485b310dd55f7dd0e16cf333ada0e3b393269649d62fe351eccc7b14c`.
+A disposable Flightpath pod pulled that exact digest, ran successfully, and was
+deleted. This closes the publication blocker for the next five-seat run; it
+does not retroactively alter the immutable one-seat evidence above.
