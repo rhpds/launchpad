@@ -736,7 +736,24 @@ http {{
                     route_url = route_urls.get(route_name) or (
                         f"https://{route_name}-{namespace}.{apps_domain}"
                     )
-                    resolved.append(ShowroomToolTab(name=title, url=route_url))
+                    route_path = str(spec.get("path", "")).strip()
+                    if route_path and (
+                        not route_path.startswith("/")
+                        or ".." in route_path.split("/")
+                        or "?" in route_path
+                        or "#" in route_path
+                    ):
+                        raise ValueError(
+                            f"Cannot resolve Showroom tab '{title}' with unsafe path"
+                        )
+                    resolved.append(
+                        ShowroomToolTab(
+                            name=title,
+                            url=OpenShiftProvisioningAdapter._workspace_url(
+                                route_url, route_path
+                            ),
+                        )
+                    )
                     continue
             if source.startswith("https://"):
                 resolved.append(ShowroomToolTab(name=title, url=source))

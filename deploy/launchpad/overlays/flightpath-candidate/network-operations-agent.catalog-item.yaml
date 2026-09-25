@@ -2,7 +2,7 @@ catalog_item_id: network-operations-agent
 display_name: 'Intel AI 301: Build an Evidence-Backed Network Operations Agent'
 description: Investigate a simulated telecom network alarm with an evidence-backed agent, internal MCP diagnostics, and shared CPU model inference.
 category: guided_build
-version: 0.1.0-flightpath.2
+version: 0.2.0-flightpath.3
 status: active
 required_capabilities: [openshift, showroom, model_endpoint]
 default_hardware_profile: xeon-basic
@@ -19,8 +19,7 @@ metadata:
   workshop_cluster_ref: flightpath
   onboarding_managed: true
   onboarding_contract: catalog-onboarding/network-operations-agent.yaml
-  certification_stage: one-seat-certified
-  certification_receipt: docs/certifications/network-operations-agent-flightpath-one-seat-20260923.md
+  certification_stage: one-seat-recertification-pending
   max_workshop_seats: 1
   promotion_sequence: [1, 5, 25]
   activation_blockers: []
@@ -29,11 +28,15 @@ metadata:
   showroom_title: Evidence-Backed Network Operations Agent
   namespace_slug: network-ops
   showroom_content_repo_url: https://github.com/jkershawrh/network-operations-agent.git
-  showroom_content_ref: 5c463590cf51c565253a261a3bd0bed8f811f90d
+  showroom_content_ref: b672eaf74467ef2e853befe3bdb3b34a3264a24c
   showroom_content_playbook: site-lab.yml
   showroom_content_start_path: showroom-lab
   showroom_terminal_storage: true
   showroom_tabs:
+    - id: story
+      title: Story
+      source: workload.route.ui
+      path: /story/
     - id: terminal
       title: Terminal
       source: showroom.terminal
@@ -55,7 +58,7 @@ metadata:
   workshop_node_spread: false
   workshop_node_min_ready_seconds: 0
   workload_repo: https://github.com/jkershawrh/network-operations-agent.git
-  workload_revision: 5c463590cf51c565253a261a3bd0bed8f811f90d
+  workload_revision: b672eaf74467ef2e853befe3bdb3b34a3264a24c
   workload_deploy_type: helm
   workload_deployment_scope: seat
   workload_deploy_path: chart
@@ -65,7 +68,7 @@ metadata:
   workload_helm_values:
     image:
       repository: ghcr.io/jkershawrh/network-operations-agent
-      digest: sha256:4221d1cf50983ae9a283c79f039791beb00088aceb3c60a4e7ce98d69bef2919
+      digest: sha256:b240a34670db3009ec827ebe35dcb62bc5ae3ddd423b975fee08b17e114a040d
     route:
       enabled: true
       name: netops

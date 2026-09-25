@@ -198,6 +198,7 @@ def test_resolves_declared_showroom_tabs_from_cluster_and_workload_contract():
             {"title": "OpenShift", "source": "cluster.console_url"},
             {"title": "Terminal", "source": "showroom.terminal"},
             {"title": "App", "source": "workload.route.ui"},
+            {"title": "Story", "source": "workload.route.ui", "path": "/story/"},
             {"title": "Grafana", "source": "cluster.grafana_url"},
         ],
         namespace="launchpad-seat-1",
@@ -207,10 +208,25 @@ def test_resolves_declared_showroom_tabs_from_cluster_and_workload_contract():
         cluster_service_urls={"grafana": "https://grafana.example.com"},
     )
 
-    assert [tab.name for tab in tabs] == ["OpenShift", "Terminal", "App", "Grafana"]
+    assert [tab.name for tab in tabs] == ["OpenShift", "Terminal", "App", "Story", "Grafana"]
     assert tabs[0].url.endswith("/k8s/ns/launchpad-seat-1/core~v1~Pod")
     assert tabs[1].path == "/terminal"
     assert tabs[2].url == ("https://mortgage-ai-ui-route-launchpad-seat-1.apps.arena.example.com")
+    assert tabs[3].url == (
+        "https://mortgage-ai-ui-route-launchpad-seat-1.apps.arena.example.com/story/"
+    )
+
+
+def test_declared_showroom_tab_rejects_unsafe_route_path():
+    with pytest.raises(ValueError, match="unsafe path"):
+        OpenShiftProvisioningAdapter._resolve_showroom_tabs(
+            [{"title": "Escape", "source": "workload.route.ui", "path": "/../admin"}],
+            namespace="launchpad-seat-1",
+            apps_domain="apps.arena.example.com",
+            console_url="https://console.example.com",
+            workload_routes={"ui": "participant-ui"},
+            cluster_service_urls={},
+        )
 
 
 def test_unresolved_declared_showroom_tab_fails_closed():
