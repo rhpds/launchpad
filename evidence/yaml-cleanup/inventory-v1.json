@@ -45,7 +45,7 @@
         "scripts/tests/test_write_ci_test_receipt.py"
       ],
       "risk_flags": [],
-      "sha256": "4f5ada820b7ffcc581e7ce7f0b0a7ceec0a21ddef7464b9fc603e380dd51e8ca"
+      "sha256": "40af7582c2efcbcb66570ea4237761e49470f3d34b18d56c40346bcbdc7243d1"
     },
     {
       "area": ".github",
@@ -67,6 +67,25 @@
         "environment-specific"
       ],
       "sha256": "edb764b0485734fd1a6c5368ee93205df94f6bbcc5080e8b83fb51735d59d628"
+    },
+    {
+      "area": ".github",
+      "classification": "ci",
+      "deletion_eligible": false,
+      "dependency_flags": [],
+      "environment_markers": [],
+      "kinds": [],
+      "owner": "quality-engineering-owner",
+      "path": ".github/workflows/keycloak-release.yml",
+      "proposed_disposition": "preserve-test-or-delivery-input",
+      "protection_class": "test-or-delivery-input",
+      "reference_count": 2,
+      "referenced_by": [
+        "backend/tests/test_keycloak_release_workflow.py",
+        "docs/flightpath-keycloak-release-runbook.md"
+      ],
+      "risk_flags": [],
+      "sha256": "0e098b2dde9e3f7d3d137c0f30039c664ee5c54a70fc0d42aae3ef83f7c0bb88"
     },
     {
       "area": ".github",
@@ -9922,12 +9941,12 @@
   ],
   "safety_boundary": "Discovery only. No record authorizes deletion, movement, secret rotation, deployment, GitOps sync, catalog activation, or live mutation.",
   "schema_version": 1,
-  "source_commit": "159ac46b4f43a8089ce03fe2713c7c84c16cf761",
+  "source_commit": "1fc00286c8316ccb4b24e3dca3f919f6cdfbde17",
   "source_state": "working-tree",
   "summary": {
     "classification_counts": {
       "catalog-source": 15,
-      "ci": 5,
+      "ci": 6,
       "configuration": 11,
       "content-source": 18,
       "contract": 50,
@@ -9949,7 +9968,7 @@
       "rhpds-image-dependency": 4
     },
     "files_without_detected_repository_reference": 136,
-    "preserved_pending_review": 450,
+    "preserved_pending_review": 451,
     "protection_class_counts": {
       "authoritative-contract": 50,
       "catalog-release-input": 22,
@@ -9957,7 +9976,7 @@
       "participant-content-input": 128,
       "repository-governance-input": 10,
       "runtime-or-deployment-input": 189,
-      "test-or-delivery-input": 25
+      "test-or-delivery-input": 26
     },
     "risk_flag_counts": {
       "environment-specific": 164,
@@ -9966,8 +9985,8 @@
       "secret-object-review-required": 6,
       "status-field-review-required": 62
     },
-    "tracked_yaml_files": 450,
+    "tracked_yaml_files": 451,
     "unassigned_owners": 0
   },
-  "tracked_changes_present": true
+  "tracked_changes_present": false
 }
