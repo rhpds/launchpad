@@ -35,6 +35,14 @@ and allocation extension is `v1alpha2`; it requires the new analytics section
 and emits a `v1alpha2` claim. Consumers can therefore adopt the richer contract
 without silently changing legacy reports.
 
+The v1alpha2 adapter targets VEF's canonical `vef.claim.v1alpha2` contract at
+`value-evidence-framework@2e641b6dc8ce1223d131789ff36beb5e118b779f`.
+Launchpad retains ownership of its sanitized input and envelope schemas. VEF
+retains ownership of claim validation, confidence, attribution, calculations,
+and scorecard projection. Launchpad maps each sanitized evidence reference into
+a deterministic source record; it does not upgrade missing evidence or grant
+financial approval.
+
 ## Pilot boundary
 
 The planned boundary is 90 provisioned seats for 75 enrolled users. These are

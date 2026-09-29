@@ -8,6 +8,7 @@ contact a cluster, query the database, read environment variables, or alter labs
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 from decimal import ROUND_HALF_UP, Decimal
@@ -32,6 +33,8 @@ SENSITIVE_KEYS = {
     "credentials",
     "secret",
 }
+
+VEF_CLAIM_SCHEMA = "vef.claim.v1alpha2"
 
 
 def _require(value: dict[str, Any], fields: tuple[str, ...], prefix: str = "") -> None:
@@ -67,6 +70,21 @@ def _reject_sensitive(value: Any, path: str = "$") -> None:
     elif isinstance(value, list):
         for index, child in enumerate(value):
             _reject_sensitive(child, f"{path}[{index}]")
+
+
+def _vef_sources(data: dict[str, Any], eligible: bool) -> list[dict[str, Any]]:
+    """Map sanitized Launchpad references into deterministic VEF source records."""
+    return [
+        {
+            "id": "launchpad-source-" + hashlib.sha256(source.encode()).hexdigest()[:16],
+            "kind": "launchpad_receipt",
+            "uri": source,
+            "retrieved_at": data["period"]["end"],
+            "confidence": "high" if eligible else "unverified",
+            "validation_state": "accepted" if eligible else "candidate",
+        }
+        for source in sorted(data["evidence_sources"])
+    ]
 
 
 def _validate_economics_and_governance(data: dict[str, Any]) -> None:
@@ -517,6 +535,7 @@ def build_export(data: dict[str, Any]) -> dict[str, Any]:
         else ("directional" if baseline["method"] != "unmeasured" else "unproven")
     )
     claim = {
+        **({"schema_version": VEF_CLAIM_SCHEMA} if is_v2 else {}),
         "id": f"launchpad.{data['pilot_id']}.cost-per-successful-journey",
         "product": "launchpad",
         "outcome_id": "launchpad.cost-per-slo-qualified-journey",
@@ -559,8 +578,13 @@ def build_export(data: dict[str, Any]) -> dict[str, Any]:
         "evidence": {
             "confidence": "high" if eligible else "unverified",
             "source": "sanitized_launchpad_pilot",
-            "sources": sorted(data["evidence_sources"]),
+            "sources": _vef_sources(data, eligible) if is_v2 else sorted(data["evidence_sources"]),
             "reproducible": safety["accounting_complete"],
+            **(
+                {"validation_state": "accepted" if eligible else "candidate"}
+                if is_v2
+                else {}
+            ),
             "value_eligible": eligible,
         },
         "realization_cost": _money(realization),

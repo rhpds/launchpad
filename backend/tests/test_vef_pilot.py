@@ -158,6 +158,27 @@ def test_complete_pilot_is_value_eligible_and_keeps_population_distinct():
     assert measurement["active_users"] == 70
     assert report["claim"]["financial_model"]["gross_value"] == 200.0
     assert report["claim"]["realization_cost"] == 425.0
+    assert report["claim"]["schema_version"] == "vef.claim.v1alpha2"
+    assert report["claim"]["evidence"]["validation_state"] == "accepted"
+    assert report["claim"]["evidence"]["value_eligible"] is True
+    assert report["claim"]["evidence"]["sources"] == [
+        {
+            "id": "launchpad-source-e93c6029cb2c1dfc",
+            "kind": "launchpad_receipt",
+            "uri": "evidence/runs/release-decision.json",
+            "retrieved_at": "2026-09-17T21:00:00Z",
+            "confidence": "high",
+            "validation_state": "accepted",
+        },
+        {
+            "id": "launchpad-source-8747c59cb9f45b2b",
+            "kind": "launchpad_receipt",
+            "uri": "sanitized/pilot-summary.json",
+            "retrieved_at": "2026-09-17T21:00:00Z",
+            "confidence": "high",
+            "validation_state": "accepted",
+        },
+    ]
 
 
 def test_current_direct_endpoint_boundary_fails_closed():
@@ -174,6 +195,8 @@ def test_current_direct_endpoint_boundary_fails_closed():
     assert report["proof_state"] == "directional"
     assert report["claim"]["financial_model"]["gross_value"] == 0.0
     assert report["claim"]["measurement"]["observed_gross_value_candidate_usd"] == 200.0
+    assert report["claim"]["evidence"]["validation_state"] == "candidate"
+    assert report["claim"]["evidence"]["sources"][0]["confidence"] == "unverified"
     assert any("not authoritative" in gap for gap in report["eligibility_gaps"])
 
 
