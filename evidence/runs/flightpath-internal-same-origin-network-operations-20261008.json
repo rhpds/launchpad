@@ -1,0 +1,40 @@
+{
+  "schema_version": "launchpad.redhat.com/internal-same-origin-canary/v1",
+  "recorded_at": "2026-10-08T22:54:50Z",
+  "result": "GREEN-live-internal-seat",
+  "source_revision": "301d342060195be039472b4f3a96a976fecf9c51",
+  "release_pin_revision": "e3554158",
+  "cluster_ref": "flightpath",
+  "catalog_item": "network-operations-agent",
+  "request_id": "babcf516-4bbf-45ca-ae74-03e7ac072bf8",
+  "session_id": "5ccd5c5e-a426-49bd-b048-71f8c42f8b12",
+  "namespace": "launchpad-flightpath-candida-network-ops-babcf5",
+  "images": {
+    "backend": "ghcr.io/rhpds/launchpad-backend-flightpath@sha256:dda9b9779f31976d469305cf928362921b5ad1083dffb12cbd1d2fe87939fccd",
+    "requester": "ghcr.io/rhpds/launchpad-portal@sha256:1118c477e675d521cabaad071c315c08fe379ddc321b3a56b0c03f9cb486e2fe"
+  },
+  "checks": {
+    "owner_resolution": 200,
+    "unrelated_user_denial": 403,
+    "showroom_http": 200,
+    "story_http": 200,
+    "story_javascript_http": 200,
+    "story_css_http": 200,
+    "workspace_http": 200,
+    "terminal_http": 200,
+    "terminal_token_issued": true,
+    "same_origin_frame_policy": true,
+    "raw_cluster_hosts_in_rewritten_content": 0,
+    "live_investigation": true,
+    "live_model": "granite-3.2-8b-tools",
+    "qualification_scenarios_passed": 5,
+    "terminal_starts_in_assigned_namespace": true,
+    "own_namespace_edit": true,
+    "cross_namespace_access": false,
+    "cluster_node_access": false,
+    "console_fail_closed": true
+  },
+  "qualification_id": "bfb894d9147a",
+  "contains_sensitive_values": false,
+  "remaining_manual_check": "Authenticated visual browser pass through the requester session page"
+}
