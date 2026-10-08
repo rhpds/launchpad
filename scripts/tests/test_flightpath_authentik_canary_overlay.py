@@ -58,6 +58,16 @@ def test_authentik_canary_uses_signed_token_contract_and_pinned_proxy():
         assert "@sha256:" in container["image"]
         assert "--set-authorization-header=true" in container["args"]
         assert "--pass-authorization-header=true" in container["args"]
+        assert "--code-challenge-method=S256" in container["args"]
+        assert "--insecure-oidc-skip-nonce=false" in container["args"]
+        assert (
+            "--backend-logout-url=https://auth.smg-helix.ai/application/o/"
+            "launchpad-workforce/end-session/?id_token_hint={id_token}"
+        ) in container["args"]
+        assert "--cookie-csrf-per-request=true" in container["args"]
+        assert "--cookie-csrf-expire=5m" in container["args"]
+        assert "--skip-auth-strip-headers=false" not in container["args"]
+        assert container["readinessProbe"]["httpGet"]["path"] == "/ready"
         env = {entry["name"]: entry for entry in container["env"]}
         assert "value" not in env["OAUTH2_PROXY_CLIENT_SECRET"]
         assert "value" not in env["OAUTH2_PROXY_COOKIE_SECRET"]
@@ -82,3 +92,17 @@ def test_canary_ingress_is_limited_to_openshift_router():
     assert ingress[0]["from"][0]["namespaceSelector"]["matchLabels"] == {
         "kubernetes.io/metadata.name": "openshift-ingress"
     }
+
+
+def test_canary_routes_have_distinct_host_only_cookie_names():
+    items = _render()
+    expected = {
+        "launchpad-requester-authentik-canary": "__Host-launchpad_requester",
+        "launchpad-admin-authentik-canary": "__Host-launchpad_admin",
+    }
+    for deployment_name, cookie_name in expected.items():
+        deployment = _one(items, "Deployment", deployment_name)
+        args = deployment["spec"]["template"]["spec"]["containers"][0]["args"]
+        assert f"--cookie-name={cookie_name}" in args
+        assert "--cookie-path=/" in args
+        assert not any(arg.startswith("--cookie-domain=") for arg in args)

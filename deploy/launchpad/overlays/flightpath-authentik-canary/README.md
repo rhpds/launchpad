@@ -35,7 +35,24 @@ Render without applying:
 oc kustomize deploy/launchpad/overlays/flightpath-authentik-canary >/tmp/launchpad-authentik-canary.yaml
 ```
 
+Run the read-only identity preflight before any apply:
+
+```sh
+uv run python scripts/preflight_authentik_canary.py \
+  --check-cluster-secret \
+  --namespace launchpad-flightpath-candidate
+```
+
+The report verifies exact issuer/JWKS metadata, HTTPS endpoints, authorization
+code flow, S256 PKCE, required scopes, an RS256 signing key, and required
+Secret key strength. It never prints credential values.
+
 Promotion is forbidden until the validation matrix in
-`docs/authentik-workforce-access.md` is green. Applying the overlay restarts the
-backend so it can load the OIDC verifier configuration; schedule that canary
-test after current lab validation is complete.
+`docs/authentik-workforce-access.md` is green. This overlay includes the full
+Flightpath candidate base, so `oc apply -k` is a **full candidate
+reconciliation**, not an identity-only apply. Render and diff it against the
+live namespace first. The OIDC values are loaded by the shared backend at
+process start, so activation requires a controlled backend rollout. Existing
+lab workloads keep running, but requester/admin API traffic can experience a
+short control-plane interruption; do not schedule that activation during a
+live ordering window.

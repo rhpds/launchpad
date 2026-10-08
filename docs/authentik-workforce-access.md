@@ -44,12 +44,17 @@ user can authenticate.
 3. Existing OpenShift-authenticated hostnames retain their current behavior
    during the canary and cannot silently switch identity providers.
 4. Requester and admin cookies are separate, secure, SameSite=Lax, and bounded
-   to eight hours. Admin access also requires `launchpad-admins` at the proxy.
+   to eight hours. They use distinct host-only names, per-request CSRF cookies,
+   S256 PKCE, and nonce verification. Admin access also requires
+   `launchpad-admins` at the proxy.
 5. Client secrets and cookie keys are external secrets, never Git content.
 6. Disabled users, removed groups, expired tokens, wrong audiences, wrong
    issuers, missing keys, and unavailable JWKS all fail closed.
 7. Authentik has a tested database backup and restore path and an audited
    break-glass administrator. Privileged users use MFA.
+8. Application logout clears the proxy session and calls Authentik's provider
+   end-session endpoint. Administrative disable/revocation still requires the
+   deployed bounded-revocation test; logout configuration alone is not proof.
 
 ## Red/green validation matrix
 
@@ -73,6 +78,8 @@ user can authenticate.
 2. Create the `launchpad-workforce` OIDC provider and required groups.
 3. Invite one requester, one tenant manager, one operator, and one admin.
 4. Install the out-of-band Kubernetes secret and render the canary overlay.
+   Run `uv run python scripts/preflight_authentik_canary.py
+   --check-cluster-secret` and retain the red/green JSON output.
 5. Record the currently running deployment digests and active lab state.
 6. Apply during a controlled window, then test only the new canary routes.
 7. Prove correct tenant access, cross-tenant denial, admin denial, MFA,
@@ -86,7 +93,17 @@ user can authenticate.
 
 The repository package is deployable only after the Authentik hostname,
 trusted certificate, OIDC client, secret delivery, and persistence/restore
-decisions exist. Until then, it intentionally remains an unapplied canary.
+decisions exist. `auth.smg-helix.ai` did not resolve during the latest
+read-only preflight, so discovery, JWKS, login, logout, MFA, and revocation
+cannot yet receive live evidence. The exact callback URLs must also be entered
+in Authentik, and the `launchpad-authentik-workforce` Secret must be installed
+out of band. Until then, this intentionally remains an unapplied canary.
+
+Applying the current overlay reconciles the complete Flightpath candidate and
+loads OIDC verifier configuration into the shared backend. It does not restart
+or modify provisioned lab namespaces, but backend activation can briefly
+interrupt requester/admin API calls. Treat it as a controlled canary window,
+not as a zero-impact identity-only deployment.
 
 ## Internal lab path contract
 

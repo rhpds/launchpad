@@ -37,8 +37,15 @@ spec:
             - --set-xauthrequest=true
             - --cookie-secure=true
             - --cookie-samesite=lax
+            - --cookie-name=__Host-launchpad_requester
+            - --cookie-path=/
+            - --cookie-csrf-per-request=true
+            - --cookie-csrf-expire=5m
             - --cookie-refresh=5m
             - --cookie-expire=8h
+            - --code-challenge-method=S256
+            - --insecure-oidc-skip-nonce=false
+            - --backend-logout-url=https://auth.smg-helix.ai/application/o/launchpad-workforce/end-session/?id_token_hint={id_token}
             - --reverse-proxy=true
             - --skip-provider-button=true
           env:
@@ -55,7 +62,7 @@ spec:
                 secretKeyRef: {name: launchpad-authentik-workforce, key: requester-cookie-secret}
           ports:
             - {name: http, containerPort: 4180}
-          readinessProbe: {httpGet: {path: /ping, port: http}, periodSeconds: 10}
+          readinessProbe: {httpGet: {path: /ready, port: http}, periodSeconds: 10}
           livenessProbe: {httpGet: {path: /ping, port: http}, periodSeconds: 30}
           resources:
             requests: {cpu: 50m, memory: 64Mi}
@@ -139,8 +146,15 @@ spec:
             - --set-xauthrequest=true
             - --cookie-secure=true
             - --cookie-samesite=lax
+            - --cookie-name=__Host-launchpad_admin
+            - --cookie-path=/
+            - --cookie-csrf-per-request=true
+            - --cookie-csrf-expire=5m
             - --cookie-refresh=5m
             - --cookie-expire=8h
+            - --code-challenge-method=S256
+            - --insecure-oidc-skip-nonce=false
+            - --backend-logout-url=https://auth.smg-helix.ai/application/o/launchpad-workforce/end-session/?id_token_hint={id_token}
             - --reverse-proxy=true
             - --skip-provider-button=true
           env:
@@ -157,7 +171,7 @@ spec:
                 secretKeyRef: {name: launchpad-authentik-workforce, key: admin-cookie-secret}
           ports:
             - {name: http, containerPort: 4180}
-          readinessProbe: {httpGet: {path: /ping, port: http}, periodSeconds: 10}
+          readinessProbe: {httpGet: {path: /ready, port: http}, periodSeconds: 10}
           livenessProbe: {httpGet: {path: /ping, port: http}, periodSeconds: 30}
           resources:
             requests: {cpu: 50m, memory: 64Mi}
