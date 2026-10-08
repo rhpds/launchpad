@@ -54,4 +54,7 @@ data:
   OIDC_ISSUER: ""
   OIDC_JWKS_URL: ""
   OIDC_AUDIENCES: ""
+  # Requester-origin lab proxying is also host allowlisted. An overlay must
+  # opt in explicitly; an empty base keeps the path fail-closed.
+  INTERNAL_LAB_GATEWAY_HOSTS: ""
   CORS_ORIGINS: "https://launchpad.apps.example.com,https://launchpad-admin.apps.example.com"

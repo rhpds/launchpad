@@ -217,7 +217,7 @@ export default function SessionDetail() {
   const isSandbox =
     session.catalog_item_id.startsWith('sandbox-') ||
     'sandbox_type' in session.resources;
-  const guidedLinks = guidedLabLinks(session.resources || {});
+  const guidedLinks = guidedLabLinks(session.resources || {}, session.session_id);
   const parentWorkshopId = workshopIdForSession(session);
 
   return (
@@ -297,9 +297,9 @@ export default function SessionDetail() {
             <div>
               <dt className="text-[#6A6E73] mb-1">Lab URL</dt>
               <dd>
-                {session.lab_url ? (
-                  <a href={session.lab_url} target="_blank" rel="noopener noreferrer" className="text-[#0068B5] hover:underline break-all">
-                    {session.lab_url}
+                {guidedLinks.showroomUrl ? (
+                  <a href={guidedLinks.showroomUrl} target="_blank" rel="noopener noreferrer" className="text-[#0068B5] hover:underline break-all">
+                    {guidedLinks.showroomUrl}
                   </a>
                 ) : '—'}
               </dd>

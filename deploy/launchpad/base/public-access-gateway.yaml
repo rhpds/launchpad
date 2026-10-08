@@ -35,6 +35,9 @@ spec:
             # Multi-agent workflows may legitimately take several minutes. Keep
             # the participant proxy above the UI's 300-second workflow budget.
             - {name: PUBLIC_TOOL_PROXY_READ_TIMEOUT, value: "330"}
+            - name: INTERNAL_LAB_GATEWAY_HOSTS
+              valueFrom:
+                configMapKeyRef: {name: launchpad-config, key: INTERNAL_LAB_GATEWAY_HOSTS}
             - name: ACCESS_BROKER_KEY
               valueFrom:
                 secretKeyRef: {name: launchpad-public-access, key: ACCESS_BROKER_KEY, optional: true}
@@ -97,4 +100,5 @@ metadata:
 spec:
   selector: {app.kubernetes.io/name: public-access-gateway}
   ports:
-    - {name: oidc, port: 8443, targetPort: oidc}
+    - {name: internal, port: 8080, protocol: TCP, targetPort: http}
+    - {name: oidc, port: 8443, protocol: TCP, targetPort: oidc}

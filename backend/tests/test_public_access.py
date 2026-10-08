@@ -4,9 +4,11 @@ from types import SimpleNamespace
 
 import pytest
 from app.api.routers import public_access as public_access_router
-from app.api.routers.public_access import _participant_tool_urls
+from app.api.routers.public_access import _participant_tool_urls, resolve_internal_session
 from app.domain.access import EntitlementStatus, ExposurePolicy
 from app.domain.clusters import ClusterTarget
+from app.domain.enums import SessionStatus
+from app.domain.models import LabRequest, LabSession
 from app.services.cluster_registry import ClusterRegistry
 from app.services.public_access import (
     PublicAccessCodeRotationConflictError,
@@ -32,9 +34,7 @@ def test_same_origin_v2_contract_declares_order_scoped_showroom_and_tools():
     assert "/labs/{order_ref}" in contract["paths"]
     assert "/labs/{order_ref}/showroom/{path}" in contract["paths"]
     assert "/labs/{order_ref}/proxy/tool/{tool_id}/{path}" in contract["paths"]
-    assert contract["x-launchpad-security"]["upstream_tls"].endswith(
-        "verification required"
-    )
+    assert contract["x-launchpad-security"]["upstream_tls"].endswith("verification required")
 
 
 def test_public_gateway_receives_only_catalog_declared_tool_urls():
@@ -68,6 +68,104 @@ def test_public_gateway_receives_only_catalog_declared_tool_urls():
         "grafana": "https://grafana-seat.apps.arena.example",
         "mlflow": "https://mlflow.apps.arena.example",
     }
+
+
+def test_internal_gateway_resolves_only_an_authorized_requester_session(monkeypatch):
+    session = LabSession(
+        session_id="11111111-2222-4333-8444-555555555555",
+        request_id="request-1",
+        tenant_id="tenant-a",
+        catalog_item_id="network-operations-agent",
+        cluster_ref="flightpath",
+        namespace="launchpad-tenant-a-network-ops-seat1",
+        status=SessionStatus.READY,
+        lab_url="https://showroom-seat.apps.flightpath.example",
+        resources={"routes": {"netops": "https://netops-seat.apps.flightpath.example"}},
+    )
+    request = LabRequest(
+        request_id="request-1",
+        tenant_id="tenant-a",
+        requester_id="partner-user",
+        catalog_item_id="network-operations-agent",
+        requested_mode="guided_build",
+    )
+    catalog = SimpleNamespace(
+        metadata={
+            "showroom_tabs": [
+                {"id": "workspace", "source": "workload.route.ui"},
+                {"id": "openshift-console", "source": "cluster.console_url"},
+            ],
+            "workload_routes": {"ui": "netops"},
+        }
+    )
+    cluster = ClusterTarget(
+        cluster_id="flightpath",
+        display_name="Flightpath",
+        api_url="https://api.flightpath.example:6443",
+        ingress_domain="apps.flightpath.example",
+        console_url="https://console-openshift-console.apps.flightpath.example",
+        storage_class="ocs-storagecluster-ceph-rbd",
+        local=True,
+    )
+    monkeypatch.setenv("INTERNAL_LAB_GATEWAY_HOSTS", "launchpad.example.test")
+    monkeypatch.setenv("ACCESS_BROKER_KEY", "broker-key")
+    monkeypatch.setattr(
+        public_access_router.provisioning_service, "get_session", lambda _id: session
+    )
+    monkeypatch.setattr(
+        public_access_router.provisioning_service, "get_request", lambda _id: request
+    )
+    monkeypatch.setattr(
+        public_access_router.provisioning_service.catalog, "get_item", lambda _id: catalog
+    )
+    monkeypatch.setattr(
+        public_access_router.provisioning_service,
+        "cluster_registry",
+        ClusterRegistry([cluster]),
+    )
+
+    target = resolve_internal_session(
+        host="launchpad.example.test",
+        session_id=session.session_id,
+        username="partner-user",
+        groups="",
+        x_access_broker_key="broker-key",
+    )
+
+    assert target["showroom_url"] == session.lab_url
+    assert target["tool_urls"] == {"workspace": "https://netops-seat.apps.flightpath.example"}
+    assert target["console_url"] == ""
+    assert target["internal_access"] is True
+
+
+def test_internal_gateway_denies_cross_tenant_identity(monkeypatch):
+    session = SimpleNamespace(
+        session_id="11111111-2222-4333-8444-555555555555",
+        request_id="request-1",
+        tenant_id="tenant-a",
+        status=SessionStatus.READY,
+        expires_at=None,
+    )
+    request = SimpleNamespace(requester_id="owner-user")
+    monkeypatch.setenv("INTERNAL_LAB_GATEWAY_HOSTS", "launchpad.example.test")
+    monkeypatch.setenv("ACCESS_BROKER_KEY", "broker-key")
+    monkeypatch.setattr(
+        public_access_router.provisioning_service, "get_session", lambda _id: session
+    )
+    monkeypatch.setattr(
+        public_access_router.provisioning_service, "get_request", lambda _id: request
+    )
+
+    with pytest.raises(HTTPException) as exc_info:
+        resolve_internal_session(
+            host="launchpad.example.test",
+            session_id=session.session_id,
+            username="other-user",
+            groups="launchpad-tenant:tenant-b",
+            x_access_broker_key="broker-key",
+        )
+
+    assert exc_info.value.status_code == 403
 
 
 def test_public_gateway_preserves_real_paths_but_not_rewritten_showroom_mounts():
@@ -145,8 +243,7 @@ def test_public_gateway_derives_catalog_workspace_route_created_during_lab():
 
     assert _participant_tool_urls(session, catalog_item, cluster) == {
         "workspace": (
-            "https://rag-launchpad-tenant-intel-llm-cpu-serv-seat1."
-            "apps.arena.fm2aihpcsed.com"
+            "https://rag-launchpad-tenant-intel-llm-cpu-serv-seat1.apps.arena.fm2aihpcsed.com"
         ),
     }
 
@@ -209,10 +306,7 @@ def test_public_gateway_derives_declared_tool_route_created_during_lab():
     )
 
     assert _participant_tool_urls(session, catalog_item, cluster) == {
-        "workspace": (
-            "https://app-launchpad-tenant-agent-seat1."
-            "apps.flightpath.fm2aihpcsed.com"
-        ),
+        "workspace": ("https://app-launchpad-tenant-agent-seat1.apps.flightpath.fm2aihpcsed.com"),
     }
 
 
@@ -262,9 +356,7 @@ def test_concurrent_policy_activation_discloses_only_one_authoritative_code():
 
     store = AtomicPolicyStore()
     services = [
-        PublicAccessService(
-            public_domain="labs.example.io", enabled=True, store=store
-        )
+        PublicAccessService(public_domain="labs.example.io", enabled=True, store=store)
         for _ in range(2)
     ]
     barrier = threading.Barrier(3)
@@ -424,16 +516,12 @@ def test_concurrent_rotation_discloses_only_one_authoritative_code():
                 "sessions": [],
             }
 
-        def rotate_policy_once(
-            self, *, order_id, expected_version, replacement_hash, now
-        ):
+        def rotate_policy_once(self, *, order_id, expected_version, replacement_hash, now):
             del now
             with self.lock:
                 assert order_id == self.policy.order_id
                 if self.policy.code_version != expected_version:
-                    raise PublicAccessPolicyConflictError(
-                        "Access code changed concurrently"
-                    )
+                    raise PublicAccessPolicyConflictError("Access code changed concurrently")
                 self.policy = self.policy.model_copy(
                     update={
                         "code_hash": replacement_hash,
@@ -447,9 +535,7 @@ def test_concurrent_rotation_discloses_only_one_authoritative_code():
 
     store = AtomicRotationStore()
     services = [
-        PublicAccessService(
-            public_domain="labs.example.io", enabled=True, store=store
-        )
+        PublicAccessService(public_domain="labs.example.io", enabled=True, store=store)
         for _ in range(2)
     ]
     barrier = threading.Barrier(3)
@@ -600,12 +686,14 @@ def test_shared_origin_path_mode_supports_multiple_isolated_orders():
 
     assert first.public_url == "https://labs.example.io/labs/serve-llms-11111111"
     assert second.public_url == "https://labs.example.io/labs/build-an-agent-22222222"
-    assert access.get_policy_by_request(
-        "labs.example.io", "/labs/serve-llms-11111111"
-    ).order_id == first.order_id
-    assert access.get_policy_by_request(
-        "labs.example.io", "/labs/build-an-agent-22222222"
-    ).order_id == second.order_id
+    assert (
+        access.get_policy_by_request("labs.example.io", "/labs/serve-llms-11111111").order_id
+        == first.order_id
+    )
+    assert (
+        access.get_policy_by_request("labs.example.io", "/labs/build-an-agent-22222222").order_id
+        == second.order_id
+    )
     assert access.get_policy_by_host("labs.example.io") is None
 
 
@@ -842,9 +930,7 @@ def test_path_scoped_order_keeps_its_path_when_tunnel_origin_changes():
         "https://replacement.trycloudflare.com",
     )
 
-    assert updated.public_url == (
-        "https://replacement.trycloudflare.com/labs/serve-llms-abcdef12"
-    )
+    assert updated.public_url == ("https://replacement.trycloudflare.com/labs/serve-llms-abcdef12")
 
 
 def test_path_scoped_tunnel_migrates_a_legacy_origin_only_policy():
@@ -869,9 +955,7 @@ def test_path_scoped_tunnel_migrates_a_legacy_origin_only_policy():
         "https://replacement.trycloudflare.com",
     )
 
-    assert updated.public_url == (
-        "https://replacement.trycloudflare.com/labs/serve-llms-abcdef12"
-    )
+    assert updated.public_url == ("https://replacement.trycloudflare.com/labs/serve-llms-abcdef12")
 
 
 def test_public_access_never_uses_placeholder_workspace_url():
@@ -1034,9 +1118,7 @@ def test_parallel_process_refreshes_expired_policy_and_entitlement_from_store():
         seat_refs=["seat"],
         expires_at=datetime.utcnow() + timedelta(hours=1),
     )
-    claim = lifecycle_process.claim(
-        policy.order_id, "person@example.com", code, "192.0.2.40"
-    )
+    claim = lifecycle_process.claim(policy.order_id, "person@example.com", code, "192.0.2.40")
     gateway_process = PublicAccessService(
         public_domain="labs.example.io", enabled=True, store=store
     )
@@ -1088,9 +1170,7 @@ def test_expire_stale_orders_repairs_access_left_after_terminal_lifecycle():
         "192.0.2.41",
     )
 
-    result = access.expire_stale_orders(
-        now=policy.expires_at + timedelta(seconds=1)
-    )
+    result = access.expire_stale_orders(now=policy.expires_at + timedelta(seconds=1))
 
     assert result == {"orders_expired": 1, "order_ids": [policy.order_id]}
     assert access.get_policy(policy.order_id).enabled is False
@@ -1202,9 +1282,7 @@ def test_existing_oidc_session_can_claim_a_new_lab_after_last_entitlement_expire
     )
 
     assert response == {"order_id": "next-order", "seat_ref": "next-seat"}
-    assert claimed == [
-        ("next-order", "person@example.com", "valid-code", "oidc-gateway")
-    ]
+    assert claimed == [("next-order", "person@example.com", "valid-code", "oidc-gateway")]
     assert identity.disabled_at is None
 
 

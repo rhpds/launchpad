@@ -10,7 +10,8 @@ from fastapi import APIRouter, Cookie, Depends, Header, HTTPException, Request, 
 from pydantic import BaseModel
 
 from app.api.deps import provisioning_service, public_access_service
-from app.auth.oauth import User, require_admin
+from app.auth.oauth import User, can_access_tenant, require_admin, user_from_trusted_claims
+from app.domain.enums import SessionStatus
 from app.services.public_access import PublicAccessCodeRotationConflictError
 
 router = APIRouter(prefix="/public-access", tags=["public-access"])
@@ -20,13 +21,11 @@ def _deduplicate_showroom_workspace(
     showroom_url: str | None, workspace_url: str | None
 ) -> tuple[str | None, str | None]:
     """Do not advertise Showroom twice when it is the lab's only workspace."""
-    if (
-        showroom_url
-        and workspace_url
-        and showroom_url.rstrip("/") == workspace_url.rstrip("/")
-    ):
+    if showroom_url and workspace_url and showroom_url.rstrip("/") == workspace_url.rstrip("/"):
         workspace_url = None
     return showroom_url, workspace_url
+
+
 logger = logging.getLogger("launchpad.public_access")
 
 
@@ -67,6 +66,14 @@ def _require_broker(key: str) -> None:
         raise HTTPException(403, "Forbidden")
 
 
+def _internal_gateway_hosts() -> set[str]:
+    return {
+        host.strip().casefold()
+        for host in os.getenv("INTERNAL_LAB_GATEWAY_HOSTS", "").split(",")
+        if host.strip()
+    }
+
+
 def _participant_tool_urls(lab_session, catalog_item, cluster) -> dict[str, str]:
     """Return only catalog-declared tool endpoints for one persisted seat.
 
@@ -86,9 +93,7 @@ def _participant_tool_urls(lab_session, catalog_item, cluster) -> dict[str, str]
         if url:
             return url
         namespace = str(getattr(lab_session, "namespace", "") or "").strip()
-        ingress_domain = str(
-            getattr(cluster, "ingress_domain", "") or ""
-        ).strip()
+        ingress_domain = str(getattr(cluster, "ingress_domain", "") or "").strip()
         dns_label = re.compile(r"^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$")
         dns_name = re.compile(r"^[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?$")
         if (
@@ -158,6 +163,63 @@ def _session_tool_urls(lab_session) -> dict[str, str]:
     if lab_session.cluster_ref and provisioning_service.cluster_registry:
         cluster = provisioning_service.cluster_registry.get(lab_session.cluster_ref)
     return _participant_tool_urls(lab_session, catalog_item, cluster)
+
+
+@router.get("/private/resolve-internal")
+def resolve_internal_session(
+    host: str,
+    session_id: str,
+    username: str,
+    groups: str = "",
+    x_access_broker_key: str = Header(default=""),
+):
+    """Resolve one requester-owned session for the internal same-path gateway."""
+    _require_broker(x_access_broker_key)
+    if host.casefold() not in _internal_gateway_hosts():
+        raise HTTPException(403, "Access denied")
+    if not re.fullmatch(
+        r"[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}",
+        session_id.casefold(),
+    ):
+        raise HTTPException(404, "Lab session not found")
+
+    lab_session = provisioning_service.get_session(session_id)
+    if not lab_session or lab_session.status not in {SessionStatus.READY, SessionStatus.ACTIVE}:
+        raise HTTPException(404, "Lab session not found")
+    if lab_session.expires_at and lab_session.expires_at <= datetime.utcnow():
+        raise HTTPException(403, "Access denied")
+    request = provisioning_service.get_request(lab_session.request_id)
+    if not request:
+        raise HTTPException(403, "Access denied")
+
+    user = user_from_trusted_claims(
+        username,
+        groups=[group for group in groups.split(",") if group],
+    )
+    if not (
+        user.is_admin
+        or request.requester_id == user.username
+        or can_access_tenant(user, lab_session.tenant_id)
+    ):
+        raise HTTPException(403, "Access denied")
+
+    showroom_url = lab_session.metadata.get("showroom_url") or lab_session.lab_url
+    workspace_url = lab_session.metadata.get("workspace_url") or lab_session.dashboard_url
+    showroom_url, workspace_url = _deduplicate_showroom_workspace(showroom_url, workspace_url)
+    return {
+        "order_id": lab_session.request_id,
+        "seat_ref": lab_session.session_id,
+        "expires_at": lab_session.expires_at,
+        "showroom_url": showroom_url,
+        "workspace_url": workspace_url,
+        # Console cannot share the requester origin until its OAuth callback
+        # is certified for workforce identity. Omit it rather than emitting a
+        # known-broken raw cluster URL into the embedded Showroom.
+        "console_url": "",
+        "tool_urls": _session_tool_urls(lab_session),
+        "public_url": f"https://{host}/labs/{lab_session.session_id}",
+        "internal_access": True,
+    }
 
 
 def _bind_claim_or_fail_closed(order_id: str, result) -> None:
@@ -455,9 +517,7 @@ def resolve_gateway_target(
         if lab_session:
             showroom_url = lab_session.lab_url
             workspace_url = lab_session.metadata.get("workspace_url") or lab_session.dashboard_url
-    showroom_url, workspace_url = _deduplicate_showroom_workspace(
-        showroom_url, workspace_url
-    )
+    showroom_url, workspace_url = _deduplicate_showroom_workspace(showroom_url, workspace_url)
     if lab_session and lab_session.cluster_ref and provisioning_service.cluster_registry:
         target = provisioning_service.cluster_registry.get(lab_session.cluster_ref)
         # Public participants must never be redirected to the cluster's
@@ -546,9 +606,7 @@ def resolve_oidc_identity(
     elif lab_session:
         showroom_url = lab_session.metadata.get("showroom_url") or lab_session.lab_url
         workspace_url = lab_session.metadata.get("workspace_url") or lab_session.dashboard_url
-    showroom_url, workspace_url = _deduplicate_showroom_workspace(
-        showroom_url, workspace_url
-    )
+    showroom_url, workspace_url = _deduplicate_showroom_workspace(showroom_url, workspace_url)
     if lab_session and lab_session.cluster_ref and provisioning_service.cluster_registry:
         cluster = provisioning_service.cluster_registry.get(lab_session.cluster_ref)
         # Fail closed rather than leaking an internal Console hostname into a

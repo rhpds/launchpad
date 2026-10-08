@@ -18,4 +18,14 @@ describe('guided lab access contract', () => {
       workspaceUrl: undefined,
     });
   });
+
+  it('uses the requester same-path gateway for an internal session', () => {
+    expect(guidedLabLinks({
+      showroom_url: 'https://showroom-seat.apps.flightpath.example',
+      workspace_url: 'https://workspace-seat.apps.flightpath.example',
+    }, '11111111-2222-4333-8444-555555555555')).toEqual({
+      showroomUrl: '/labs/11111111-2222-4333-8444-555555555555/showroom/',
+      workspaceUrl: undefined,
+    });
+  });
 });

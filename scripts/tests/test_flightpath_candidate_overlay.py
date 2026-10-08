@@ -273,6 +273,30 @@ def test_public_gateway_uses_the_candidate_registry_credential() -> None:
     ]
 
 
+def test_requester_portal_can_reach_only_the_gateway_internal_port() -> None:
+    documents = _render()
+    policy = _one(documents, "NetworkPolicy", "public-access-gateway-ingress")
+    portal_rule = next(
+        rule
+        for rule in policy["spec"]["ingress"]
+        if rule.get("from", [{}])[0]
+        .get("podSelector", {})
+        .get("matchLabels", {})
+        .get("app.kubernetes.io/name")
+        == "partner-portal"
+    )
+    assert portal_rule["ports"] == [{"port": 8080, "protocol": "TCP"}]
+
+    service = _one(documents, "Service", "public-access-gateway")
+    internal = next(port for port in service["spec"]["ports"] if port["name"] == "internal")
+    assert internal == {
+        "name": "internal",
+        "port": 8080,
+        "protocol": "TCP",
+        "targetPort": "http",
+    }
+
+
 def test_bootstrap_has_an_explicit_database_migration_gate() -> None:
     documents = _render_bootstrap()
     migration = next(

@@ -4,21 +4,21 @@ from pathlib import Path
 from app.public_gateway import (
     TOOL_PROXY_TIMEOUT,
     _coalesce_resolution,
+    _internal_session_ref,
     _lab_cards,
     _public_order_prefix,
     _rewrite_showroom_config,
-    _terminal_ws_token,
     _rewrite_upstream_content,
+    _terminal_ws_token,
     _tool_proxy_attempts,
-    _tool_proxy_request_headers,
     _tool_proxy_redirect_location,
+    _tool_proxy_request_headers,
     _tool_proxy_response_headers,
     _tool_upstream_url,
     _username,
     app,
 )
-from fastapi import Response
-from fastapi import HTTPException
+from fastapi import HTTPException, Response
 from fastapi.testclient import TestClient
 
 
@@ -104,11 +104,35 @@ def test_gateway_exposes_participant_home_and_add_lab_routes():
 
 
 def test_gateway_extracts_only_a_valid_order_path_prefix():
-    request = type("Request", (), {"url": type("URL", (), {"path": "/labs/serve-llms-ab12cd34/showroom/"})()})()
+    request = type(
+        "Request", (), {"url": type("URL", (), {"path": "/labs/serve-llms-ab12cd34/showroom/"})()}
+    )()
     assert _public_order_prefix(request) == "/labs/serve-llms-ab12cd34"
 
     invalid = type("Request", (), {"url": type("URL", (), {"path": "/labs/../admin"})()})()
     assert _public_order_prefix(invalid) == ""
+
+
+def test_internal_gateway_extracts_only_an_exact_session_uuid():
+    request = type(
+        "Request",
+        (),
+        {
+            "url": type(
+                "URL",
+                (),
+                {"path": ("/labs/11111111-2222-4333-8444-555555555555/showroom/ui-config.yml")},
+            )()
+        },
+    )()
+    assert _internal_session_ref(request) == "11111111-2222-4333-8444-555555555555"
+
+    slug = type(
+        "Request",
+        (),
+        {"url": type("URL", (), {"path": "/labs/build-agent-ab12cd34/showroom/"})()},
+    )()
+    assert _internal_session_ref(slug) == ""
 
 
 def test_order_home_exposes_only_order_scoped_participant_links(monkeypatch):
@@ -119,9 +143,7 @@ def test_order_home_exposes_only_order_scoped_participant_links(monkeypatch):
             "showroom_url": "https://showroom-seat.apps.arena.fm2aihpcsed.com",
             "workspace_url": "https://rag-seat.apps.arena.fm2aihpcsed.com",
             "console_url": "https://console.example.test",
-            "tool_urls": {
-                "workspace": "https://rag-seat.apps.arena.fm2aihpcsed.com"
-            },
+            "tool_urls": {"workspace": "https://rag-seat.apps.arena.fm2aihpcsed.com"},
         }
 
     monkeypatch.setattr("app.public_gateway._resolve", resolved)
@@ -142,9 +164,7 @@ def test_root_home_uses_the_resolved_order_path_for_showroom_and_tools(monkeypat
             "showroom_url": "https://showroom-seat.apps.flightpath.example",
             "workspace_url": "https://app-seat.apps.flightpath.example",
             "console_url": "",
-            "tool_urls": {
-                "workspace": "https://app-seat.apps.flightpath.example"
-            },
+            "tool_urls": {"workspace": "https://app-seat.apps.flightpath.example"},
         }
 
     monkeypatch.setattr("app.public_gateway._resolve", resolved)
@@ -152,10 +172,7 @@ def test_root_home_uses_the_resolved_order_path_for_showroom_and_tools(monkeypat
 
     assert response.status_code == 200
     assert "href='/labs/build-agent-ab12cd34/showroom/'" in response.text
-    assert (
-        "href='/labs/build-agent-ab12cd34/proxy/tool/workspace/'"
-        in response.text
-    )
+    assert "href='/labs/build-agent-ab12cd34/proxy/tool/workspace/'" in response.text
 
 
 def test_order_home_hides_duplicate_workspace_when_showroom_is_the_workspace(monkeypatch):
@@ -243,9 +260,7 @@ tabs:
         )
     )
 
-    assert config["tabs"][0]["url"] == (
-        "/labs/serve-llms-order-123/proxy/tool/rag/"
-    )
+    assert config["tabs"][0]["url"] == ("/labs/serve-llms-order-123/proxy/tool/rag/")
 
 
 def test_public_showroom_config_scopes_terminal_to_the_selected_order():
@@ -348,9 +363,7 @@ tabs:
     url: https://docs.redhat.com/example
 """
 
-    config = __import__("yaml").safe_load(
-        _rewrite_showroom_config(source, {})
-    )
+    config = __import__("yaml").safe_load(_rewrite_showroom_config(source, {}))
 
     assert config["tabs"] == [
         {"name": "External documentation", "url": "https://docs.redhat.com/example"}
@@ -424,8 +437,7 @@ def test_tool_proxy_read_timeout_covers_the_multi_agent_ui_workflow_budget():
     assert TOOL_PROXY_TIMEOUT.read >= 300
 
     manifest = (
-        Path(__file__).resolve().parents[2]
-        / "deploy/launchpad/base/public-access-gateway.yaml"
+        Path(__file__).resolve().parents[2] / "deploy/launchpad/base/public-access-gateway.yaml"
     ).read_text()
     assert 'name: PUBLIC_TOOL_PROXY_READ_TIMEOUT, value: "330"' in manifest
     assert "--upstream-timeout=330s" in manifest
@@ -439,9 +451,7 @@ def test_tool_proxy_retries_only_read_only_requests():
 
 
 def test_tool_proxy_rewrites_textual_cluster_urls_to_the_order_mount():
-    source = (
-        b'<script>window.api="https://rag-seat.apps.arena.fm2aihpcsed.com/api"</script>'
-    )
+    source = b'<script>window.api="https://rag-seat.apps.arena.fm2aihpcsed.com/api"</script>'
 
     rewritten = _rewrite_upstream_content(
         source,
@@ -451,7 +461,7 @@ def test_tool_proxy_rewrites_textual_cluster_urls_to_the_order_mount():
     )
 
     assert b"apps.arena.fm2aihpcsed.com" not in rewritten
-    assert b'/labs/serve-llms-ab12cd34/proxy/tool/workspace/api' in rewritten
+    assert b"/labs/serve-llms-ab12cd34/proxy/tool/workspace/api" in rewritten
 
 
 def test_tool_proxy_rewrites_root_relative_html_assets_to_the_order_mount():
@@ -487,8 +497,7 @@ def test_tool_proxy_adapts_solution_architect_inline_api_base_to_the_order_mount
     ).decode()
 
     assert (
-        "const AGENT_URL = window.AGENT_URL || "
-        "'/labs/build-agent-ab12cd34/proxy/tool/workspace';"
+        "const AGENT_URL = window.AGENT_URL || '/labs/build-agent-ab12cd34/proxy/tool/workspace';"
     ) in rewritten
     assert "fetch(AGENT_URL + '/api/v1/advise')" in rewritten
 
@@ -512,8 +521,8 @@ def test_tool_proxy_leaves_gradio_api_prefix_for_gradio_to_join_to_its_root():
 
 def test_tool_proxy_adapts_demo_story_assets_and_live_api_to_the_order_mount():
     source = (
-        b'const redhat=`/logos/redhat.svg`,intel=`/logos/intel.png`;'
-        b'load(`/api/v1/agents`);load(`/health`);'
+        b"const redhat=`/logos/redhat.svg`,intel=`/logos/intel.png`;"
+        b"load(`/api/v1/agents`);load(`/health`);"
     )
 
     rewritten = _rewrite_upstream_content(
@@ -524,10 +533,10 @@ def test_tool_proxy_adapts_demo_story_assets_and_live_api_to_the_order_mount():
     ).decode()
 
     mount = "/labs/multi-agent-ab12cd34/proxy/tool/presentation"
-    assert f'`{mount}/logos/redhat.svg`' in rewritten
-    assert f'`{mount}/logos/intel.png`' in rewritten
-    assert f'`{mount}/api/v1/agents`' in rewritten
-    assert f'`{mount}/health`' in rewritten
+    assert f"`{mount}/logos/redhat.svg`" in rewritten
+    assert f"`{mount}/logos/intel.png`" in rewritten
+    assert f"`{mount}/api/v1/agents`" in rewritten
+    assert f"`{mount}/health`" in rewritten
 
 
 def test_tool_proxy_adapts_demo_story_handoff_to_the_order_mount():
@@ -544,29 +553,29 @@ def test_tool_proxy_adapts_demo_story_handoff_to_the_order_mount():
         "/labs/multi-agent-ab12cd34/proxy/tool/presentation",
     ).decode()
 
-    assert (
-        "link.href = '/labs/multi-agent-ab12cd34/proxy/tool/presentation/lab';"
-        in rewritten
-    )
+    assert "link.href = '/labs/multi-agent-ab12cd34/proxy/tool/presentation/lab';" in rewritten
     assert "document.querySelector('.stage')" in rewritten
     assert "get('finale') === '1'" in rewritten
 
 
 def test_demo_story_handoff_redirects_to_the_public_order_showroom():
-    assert _tool_proxy_redirect_location(
-        "https://story-seat.apps.flightpath.example",
-        "https://showroom-seat.apps.flightpath.example/",
-        "/labs/multi-agent-ab12cd34/proxy/tool/presentation",
-        "presentation",
-        "lab",
-    ) == "/labs/multi-agent-ab12cd34/showroom/"
+    assert (
+        _tool_proxy_redirect_location(
+            "https://story-seat.apps.flightpath.example",
+            "https://showroom-seat.apps.flightpath.example/",
+            "/labs/multi-agent-ab12cd34/proxy/tool/presentation",
+            "presentation",
+            "lab",
+        )
+        == "/labs/multi-agent-ab12cd34/showroom/"
+    )
 
 
 def test_tool_proxy_adapts_anythingllm_bundle_to_the_order_mount():
     source = (
         b'const O="modulepreload",P=function(e){return"/"+e};'
         b'const C={}.VITE_API_BASE||"/api";'
-        b'function socket(){return new URL({}.VITE_API_BASE).host}'
+        b"function socket(){return new URL({}.VITE_API_BASE).host}"
         b'const DR=Iz([{path:"/",children:[]}]);'
         b'au.createRoot(document.getElementById("root"));'
         b'const logo="/anything-llm.png";'
@@ -615,12 +624,15 @@ def test_rewritten_tool_assets_cannot_reuse_an_upstream_cached_representation():
 
 def test_tool_proxy_does_not_rewrite_binary_content():
     source = b"\x89PNG\r\n\x1a\nhttps://rag-seat.apps.arena.fm2aihpcsed.com"
-    assert _rewrite_upstream_content(
-        source,
-        "image/png",
-        "https://rag-seat.apps.arena.fm2aihpcsed.com",
-        "/labs/serve-llms-ab12cd34/proxy/tool/workspace",
-    ) == source
+    assert (
+        _rewrite_upstream_content(
+            source,
+            "image/png",
+            "https://rag-seat.apps.arena.fm2aihpcsed.com",
+            "/labs/serve-llms-ab12cd34/proxy/tool/workspace",
+        )
+        == source
+    )
 
 
 def test_gateway_uses_generated_per_lab_showroom_config():

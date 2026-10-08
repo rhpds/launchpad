@@ -35,3 +35,4 @@ data:
   DEMO_GATEWAY_IMAGE: "quay.io/redhat-gpte/intel-inference-gateway@sha256:5fe683a15fdc98c4c1dde6f0055138f9ff7f39fc39d8c15b31cce0ce56ae5a51"
   CORS_ORIGINS: "https://launchpad-candidate.apps.flightpath.fm2aihpcsed.com,https://launchpad-admin-candidate.apps.flightpath.fm2aihpcsed.com,https://launchpad-api-candidate.apps.flightpath.fm2aihpcsed.com"
   TRUSTED_OAUTH_HOSTS: "launchpad-candidate.apps.flightpath.fm2aihpcsed.com,launchpad-admin-candidate.apps.flightpath.fm2aihpcsed.com,launchpad-api-candidate.apps.flightpath.fm2aihpcsed.com"
+  INTERNAL_LAB_GATEWAY_HOSTS: "launchpad-candidate.apps.flightpath.fm2aihpcsed.com"

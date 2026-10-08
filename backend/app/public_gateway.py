@@ -3,8 +3,8 @@ from __future__ import annotations
 import asyncio
 import base64
 import hashlib
-import html
 import hmac
+import html
 import json
 import os
 import re
@@ -43,9 +43,7 @@ TOOL_PROXY_TIMEOUT = httpx.Timeout(
     write=30,
     pool=10,
 )
-_PRIVATE_CLUSTER_ROUTE = re.compile(
-    r"^(?:[a-z0-9-]+\.)*apps\.[a-z0-9-]+\.fm2aihpcsed\.com$"
-)
+_PRIVATE_CLUSTER_ROUTE = re.compile(r"^(?:[a-z0-9-]+\.)*apps\.[a-z0-9-]+\.fm2aihpcsed\.com$")
 _RESOLVE_INFLIGHT: dict[tuple[str, str, str, str], asyncio.Task] = {}
 
 
@@ -61,6 +59,22 @@ def _public_order_prefix(request: Request) -> str:
     return match.group(1) if match else ""
 
 
+def _internal_session_ref(request: Request) -> str:
+    match = re.match(
+        r"^/labs/([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})(?:/|$)",
+        request.url.path.casefold(),
+    )
+    return match.group(1) if match else ""
+
+
+def _internal_lab_hosts() -> set[str]:
+    return {
+        host.strip().casefold()
+        for host in os.getenv("INTERNAL_LAB_GATEWAY_HOSTS", "").split(",")
+        if host.strip()
+    }
+
+
 def _username(request: Request) -> str:
     # oauth2-proxy always uses the OIDC subject for X-Forwarded-User.  The
     # configured email claim carries Launchpad's stable preferred_username.
@@ -74,8 +88,10 @@ def _username(request: Request) -> str:
 
 def _terminal_ws_token(username: str, public_path: str, ttl_seconds: int = 60) -> str:
     """Issue a short-lived, order-scoped terminal upgrade credential."""
-    if not BROKER_KEY or not username or not re.fullmatch(
-        r"/labs/[a-z0-9]+(?:-[a-z0-9]+)*", public_path
+    if (
+        not BROKER_KEY
+        or not username
+        or not re.fullmatch(r"/labs/[a-z0-9]+(?:-[a-z0-9]+)*", public_path)
     ):
         raise HTTPException(403, "Terminal access cannot be completed")
     payload = json.dumps(
@@ -107,7 +123,21 @@ async def _resolve_uncached(request: Request) -> dict:
     public_path = _public_order_prefix(request)
     try:
         async with httpx.AsyncClient(timeout=10) as client:
-            if username:
+            if _host(request) in _internal_lab_hosts():
+                session_ref = _internal_session_ref(request)
+                if not username or not session_ref:
+                    raise HTTPException(403, "Access denied")
+                result = await client.get(
+                    f"{BACKEND}/public-access/private/resolve-internal",
+                    params={
+                        "host": _host(request),
+                        "session_id": session_ref,
+                        "username": username,
+                        "groups": request.headers.get("x-forwarded-groups", ""),
+                    },
+                    headers={"X-Access-Broker-Key": BROKER_KEY},
+                )
+            elif username:
                 result = await client.get(
                     f"{BACKEND}/public-access/private/resolve-identity",
                     params={
@@ -133,9 +163,7 @@ async def _resolve_uncached(request: Request) -> dict:
 
 async def _resolve(request: Request) -> dict:
     username = _username(request)
-    cookie_digest = hashlib.sha256(
-        request.cookies.get("launchpad_access", "").encode()
-    ).hexdigest()
+    cookie_digest = hashlib.sha256(request.cookies.get("launchpad_access", "").encode()).hexdigest()
     key = (_host(request), _public_order_prefix(request), username, cookie_digest)
     return await _coalesce_resolution(key, lambda: _resolve_uncached(request))
 
@@ -167,7 +195,8 @@ def _is_textual_content_type(content_type: str) -> bool:
     media_type = content_type.split(";", 1)[0].strip().casefold()
     return (
         media_type.startswith("text/")
-        or media_type in {
+        or media_type
+        in {
             "application/javascript",
             "application/json",
             "application/manifest+json",
@@ -186,8 +215,7 @@ def _tool_proxy_request_headers(headers: Mapping[str, str]) -> dict[str, str]:
     return {
         key: value
         for key, value in headers.items()
-        if key.casefold()
-        in {"accept", "accept-language", "content-type", "range", "user-agent"}
+        if key.casefold() in {"accept", "accept-language", "content-type", "range", "user-agent"}
     }
 
 
@@ -203,9 +231,7 @@ def _tool_proxy_response_headers(
     }
     if _is_textual_content_type(headers.get("content-type", "")):
         excluded.update({"cache-control", "etag", "expires", "last-modified"})
-    response = {
-        key: value for key, value in headers.items() if key.casefold() not in excluded
-    }
+    response = {key: value for key, value in headers.items() if key.casefold() not in excluded}
     if _is_textual_content_type(headers.get("content-type", "")):
         response["cache-control"] = "no-store, no-cache, must-revalidate"
     return response
@@ -293,8 +319,7 @@ def _rewrite_upstream_content(
             source = re.sub(
                 r'(?P<quote>["\'`])/(?P<path>(?:logos/[A-Za-z0-9_.-]+\.(?:png|svg)|api/v1/[A-Za-z0-9_./?&=-]+|health))(?P=quote)',
                 lambda match: (
-                    f'{match.group("quote")}{public}/{match.group("path")}'
-                    f'{match.group("quote")}'
+                    f"{match.group('quote')}{public}/{match.group('path')}{match.group('quote')}"
                 ),
                 source,
             )
@@ -310,9 +335,7 @@ def _rewrite_upstream_content(
             )
             source = re.sub(
                 r'(?P<quote>["\'`])/lab(?P=quote)',
-                lambda match: (
-                    f'{match.group("quote")}{public}/lab{match.group("quote")}'
-                ),
+                lambda match: f"{match.group('quote')}{public}/lab{match.group('quote')}",
                 source,
             )
         # AnythingLLM's published image is a Vite SPA compiled for `/` and it
@@ -321,13 +344,9 @@ def _rewrite_upstream_content(
         # adapter needed by the entitlement gateway: API calls, WebSockets,
         # React Router navigation, and root-relative image assets all retain
         # the order mount. Unknown JavaScript bundles remain untouched.
-        api_pattern = re.compile(
-            r'const (?P<name>[$A-Za-z_][$\w]*)=\{\}\.VITE_API_BASE\|\|"/api"'
-        )
+        api_pattern = re.compile(r'const (?P<name>[$A-Za-z_][$\w]*)=\{\}\.VITE_API_BASE\|\|"/api"')
         source, api_rewrites = api_pattern.subn(
-            lambda match: (
-                f'const {match.group("name")}=window.location.origin+"{public}/api"'
-            ),
+            lambda match: f'const {match.group("name")}=window.location.origin+"{public}/api"',
             source,
             count=1,
         )
@@ -340,7 +359,7 @@ def _rewrite_upstream_content(
                 r'(?P<prefix>["\']modulepreload["\'],)'
                 r'(?P<name>[$A-Za-z_][$\w]*)=function\(e\)\{return"/"\+e\}',
                 lambda match: (
-                    f'{match.group("prefix")}{match.group("name")}=function(e)'
+                    f"{match.group('prefix')}{match.group('name')}=function(e)"
                     f'{{return"{public}/"+e}}'
                 ),
                 source,
@@ -351,7 +370,7 @@ def _rewrite_upstream_content(
                 f'window.location.host+"{public}"',
             )
             source = re.sub(
-                r'\]\}\]\);(?P<react>[$A-Za-z_][$\w]*)\.createRoot\('
+                r"\]\}\]\);(?P<react>[$A-Za-z_][$\w]*)\.createRoot\("
                 r'document\.getElementById\("root"\)\)',
                 lambda match: (
                     f']}}],{{basename:"{public}"}});{match.group("react")}.createRoot('
@@ -361,11 +380,10 @@ def _rewrite_upstream_content(
                 count=1,
             )
             source = re.sub(
-                r'(?P<quote>[\"\'`])/(?!/)(?P<path>[A-Za-z0-9_@./-]+\.'
-                r'(?:css|gif|ico|jpe?g|js|json|png|svg|webp|woff2?))(?P=quote)',
+                r"(?P<quote>[\"\'`])/(?!/)(?P<path>[A-Za-z0-9_@./-]+\."
+                r"(?:css|gif|ico|jpe?g|js|json|png|svg|webp|woff2?))(?P=quote)",
                 lambda match: (
-                    f'{match.group("quote")}{public}/{match.group("path")}'
-                    f'{match.group("quote")}'
+                    f"{match.group('quote')}{public}/{match.group('path')}{match.group('quote')}"
                 ),
                 source,
             )
@@ -718,9 +736,7 @@ async def proxy(
 
 
 @app.api_route("/proxy/tool/{tool_id}/{path:path}", methods=PROXY_METHODS)
-@app.api_route(
-    "/labs/{order_ref}/proxy/tool/{tool_id}/{path:path}", methods=PROXY_METHODS
-)
+@app.api_route("/labs/{order_ref}/proxy/tool/{tool_id}/{path:path}", methods=PROXY_METHODS)
 async def proxy_tool(
     tool_id: str,
     path: str,
@@ -921,9 +937,7 @@ async def order_showroom(
         # browsers and tunnel edges don't reliably forward large split OIDC
         # cookies on WebSocket upgrades.
         await _resolve(request)
-        return JSONResponse(
-            {"token": _terminal_ws_token(_username(request), f"/labs/{order_ref}")}
-        )
+        return JSONResponse({"token": _terminal_ws_token(_username(request), f"/labs/{order_ref}")})
     upstream_path = f"www/{path}" if path == "ui-config.yml" else path
     return await _showroom_alias(
         request,

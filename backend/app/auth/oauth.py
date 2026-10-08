@@ -6,6 +6,7 @@ Three auth methods supported:
 2. API key (X-API-Key header) — programmatic/CLI access
 3. Disabled (AUTH_ENABLED=false) — local dev only
 """
+
 from __future__ import annotations
 
 import json
@@ -53,6 +54,33 @@ def require_tenant_access(user: User, tenant_id: str) -> None:
         raise HTTPException(403, f"User {user.username} is not assigned to tenant {tenant_id}.")
 
 
+def user_from_trusted_claims(
+    username: str,
+    *,
+    email: str | None = None,
+    groups: list[str] | None = None,
+    subject: str | None = None,
+) -> User:
+    """Map claims already authenticated by a trusted in-cluster proxy."""
+    normalized_groups = [group.strip() for group in (groups or []) if group.strip()]
+    is_admin = username in ADMIN_USERS or bool(ADMIN_GROUPS & set(normalized_groups))
+    tenant_ids = set(_tenant_user_map().get(username, []))
+    tenant_ids.update(
+        group.removeprefix("launchpad-tenant:")
+        for group in normalized_groups
+        if group.startswith("launchpad-tenant:")
+    )
+    return User(
+        subject=subject,
+        username=username,
+        email=email,
+        groups=normalized_groups,
+        tenant_ids=sorted(tenant_ids),
+        is_admin=is_admin,
+        identity_verified=True,
+    )
+
+
 def get_current_user(request: Request) -> User:
     if not AUTH_ENABLED:
         return User(
@@ -67,7 +95,11 @@ def get_current_user(request: Request) -> User:
         if api_key in ADMIN_API_KEYS:
             return User(username="api-admin", is_admin=True)
         if api_key in API_KEYS or api_key in ADMIN_API_KEYS:
-            return User(username="api-user", tenant_ids=_tenant_user_map().get("api-user", []), is_admin=False)
+            return User(
+                username="api-user",
+                tenant_ids=_tenant_user_map().get("api-user", []),
+                is_admin=False,
+            )
         raise HTTPException(401, "Invalid API key")
 
     request_host = (request.url.hostname or "").lower()
@@ -82,30 +114,16 @@ def get_current_user(request: Request) -> User:
             raise HTTPException(401, "OIDC token validation failed") from exc
 
         subject = str(claims["sub"])
-        username = str(
-            claims.get("preferred_username")
-            or claims.get("email")
-            or subject
-        )
+        username = str(claims.get("preferred_username") or claims.get("email") or subject)
         email_value = claims.get("email")
         email = str(email_value) if email_value else None
         groups_claim = claims.get("groups", [])
         groups = [str(group) for group in groups_claim] if isinstance(groups_claim, list) else []
-        is_admin = username in ADMIN_USERS or bool(ADMIN_GROUPS & set(groups))
-        tenant_ids = set(_tenant_user_map().get(username, []))
-        tenant_ids.update(
-            group.removeprefix("launchpad-tenant:")
-            for group in groups
-            if group.startswith("launchpad-tenant:")
-        )
-        return User(
+        return user_from_trusted_claims(
+            username,
             subject=subject,
-            username=username,
             email=email,
             groups=groups,
-            tenant_ids=sorted(tenant_ids),
-            is_admin=is_admin,
-            identity_verified=True,
         )
 
     username = request.headers.get("X-Forwarded-User")
@@ -114,25 +132,18 @@ def get_current_user(request: Request) -> User:
     groups = [g.strip() for g in groups_header.split(",") if g.strip()]
 
     if not username:
-        raise HTTPException(401, "Not authenticated — provide X-API-Key header or authenticate via SSO")
+        raise HTTPException(
+            401, "Not authenticated — provide X-API-Key header or authenticate via SSO"
+        )
     if request_host not in TRUSTED_OAUTH_HOSTS:
         raise HTTPException(401, "OAuth identity headers are not accepted on this endpoint")
 
-    is_admin = username in ADMIN_USERS or bool(ADMIN_GROUPS & set(groups))
-    tenant_ids = set(_tenant_user_map().get(username, []))
-    tenant_ids.update(group.removeprefix("launchpad-tenant:") for group in groups if group.startswith("launchpad-tenant:"))
-
-    return User(
-        username=username,
-        email=email,
-        groups=groups,
-        tenant_ids=sorted(tenant_ids),
-        is_admin=is_admin,
-        identity_verified=True,
-    )
+    return user_from_trusted_claims(username, email=email, groups=groups)
 
 
 def require_admin(user: User = Depends(get_current_user)) -> User:
     if not user.is_admin:
-        raise HTTPException(403, f"Admin access required. User {user.username} is not in admin groups.")
+        raise HTTPException(
+            403, f"Admin access required. User {user.username} is not in admin groups."
+        )
     return user

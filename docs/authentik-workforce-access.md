@@ -87,3 +87,30 @@ user can authenticate.
 The repository package is deployable only after the Authentik hostname,
 trusted certificate, OIDC client, secret delivery, and persistence/restore
 decisions exist. Until then, it intentionally remains an unapplied canary.
+
+## Internal lab path contract
+
+Internal requester sessions and public participant sessions use the same
+same-origin lab URL shapes. Authentication is the only intended difference:
+
+- internal: `/labs/<session-uuid>/showroom/` under the workforce-authenticated
+  requester origin;
+- public: `/labs/<order-slug>/showroom/` under the participant gateway origin;
+- tools: `/labs/<ref>/proxy/tool/<catalog-declared-tool>/`;
+- terminal: `/labs/<ref>/showroom/terminal/` and its short-lived WebSocket
+  token flow;
+- Console: `/labs/<ref>/console/` only after the matching identity provider,
+  callback, and namespace RBAC path has live certification.
+
+The requester portal never exposes raw execution-cluster Showroom or tool
+routes. Its gateway resolves the exact session UUID, verifies that the session
+is active, and authorizes only an administrator, the original requester, or a
+member of the assigned tenant. Catalog-declared routes are then rewritten into
+the same-origin Showroom tabs.
+
+The internal Console tab currently remains fail-closed. A raw Flightpath
+Console URL would leave the workforce-authenticated origin and start a second,
+uncertified login flow. It must not be enabled until Authentik/OpenShift
+workforce identity mapping (or an equivalently scoped broker) is certified
+end-to-end. This limitation does not prevent Story, Terminal, or catalog
+workspace tabs from using the converged internal path.
