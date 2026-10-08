@@ -105,3 +105,12 @@ def test_both_portals_share_the_versioned_proxy_contract() -> None:
         config = (ROOT / relative_path).read_text()
         assert "location /api/" in config
         assert "proxy_pass http://backend:8000/api/v1/;" in config
+
+
+def test_requester_lab_proxy_allows_only_same_origin_embedding() -> None:
+    config = (ROOT / "frontend/nginx.conf").read_text()
+    lab_location = config.split("location /labs/ {", 1)[1].split("\n        }", 1)[0]
+
+    assert "proxy_hide_header X-Frame-Options;" in lab_location
+    assert 'add_header X-Frame-Options "SAMEORIGIN" always;' in lab_location
+    assert "add_header Content-Security-Policy \"frame-ancestors 'self'\" always;" in lab_location
