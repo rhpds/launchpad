@@ -6,7 +6,7 @@ catalog:
   description: Qualify a production-shaped multi-agent architecture through correlated
     evidence, deterministic policy, resilience trials, and human-controlled promotion.
   category: guided_build
-  version: 0.3.0-flightpath.1
+  version: 0.3.1-flightpath.1
   status: active
 learning:
   learning_level: '501'
@@ -25,12 +25,12 @@ learning:
 sources:
   showroom:
     repo_url: https://github.com/jkershawrh/agentic-scale-501.git
-    revision: 3a2ad3aee3df7b0b0f0bd58e1f348caa1e65c08f
+    revision: b1c2f380a13220259ffae5e41d760cc730524a05
     playbook: site.yml
     start_path: showroom
   workload:
     repo_url: https://github.com/jkershawrh/agentic-scale-501.git
-    revision: 3a2ad3aee3df7b0b0f0bd58e1f348caa1e65c08f
+    revision: b1c2f380a13220259ffae5e41d760cc730524a05
     deploy_path: charts/agentic-scale-501
 runtime:
   namespace_slug: agentic-scale
@@ -113,8 +113,8 @@ certification:
 factory_receipt:
   schema_version: demo-story.redhat-intel.com/launchpad-handoff/v1
   handoff_path: /Users/jkershaw/Documents/agentic-scale-501/handoff/launchpad-handoff.yaml
-  source_revision: 3a2ad3aee3df7b0b0f0bd58e1f348caa1e65c08f
-  artifact_source_revision: 3a2ad3aee3df7b0b0f0bd58e1f348caa1e65c08f
+  source_revision: b1c2f380a13220259ffae5e41d760cc730524a05
+  artifact_source_revision: b1c2f380a13220259ffae5e41d760cc730524a05
   evidence_mode: rehearsal
   orderable: true
   certified: true

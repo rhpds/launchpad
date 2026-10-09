@@ -3,7 +3,7 @@ display_name: 'Intel AI 501: Production Multi-Agent Blueprint'
 description: Qualify a production-shaped multi-agent architecture through correlated
   evidence, deterministic policy, resilience trials, and human-controlled promotion.
 category: guided_build
-version: 0.3.0-flightpath.1
+version: 0.3.1-flightpath.1
 status: active
 required_capabilities:
 - openshift
@@ -37,7 +37,7 @@ metadata:
   solution_family: agentic_ai
   showroom: true
   showroom_content_repo_url: https://github.com/jkershawrh/agentic-scale-501.git
-  showroom_content_ref: 3a2ad3aee3df7b0b0f0bd58e1f348caa1e65c08f
+  showroom_content_ref: b1c2f380a13220259ffae5e41d760cc730524a05
   showroom_content_playbook: site.yml
   showroom_content_start_path: showroom
   showroom_antora_name: agentic-scale-501
@@ -90,7 +90,7 @@ metadata:
   workshop_node_headroom_pods: 0
   workshop_node_required_labels: {}
   workload_repo: https://github.com/jkershawrh/agentic-scale-501.git
-  workload_revision: 3a2ad3aee3df7b0b0f0bd58e1f348caa1e65c08f
+  workload_revision: b1c2f380a13220259ffae5e41d760cc730524a05
   workload_deploy_type: helm
   workload_deployment_scope: seat
   workload_deploy_path: charts/agentic-scale-501
@@ -123,7 +123,7 @@ metadata:
     qualifier: agentic-scale-501-qualifier
   workload_readiness: []
   source_content_repo: https://github.com/jkershawrh/agentic-scale-501.git
-  source_content_revision: 3a2ad3aee3df7b0b0f0bd58e1f348caa1e65c08f
+  source_content_revision: b1c2f380a13220259ffae5e41d760cc730524a05
   source_references:
     certification_evidence: evidence/runs/catalog/scale-agentic-blueprint-flightpath-qualification-operator-one-seat-20261005.json
     activation_review: evidence/runs/catalog/agentic-advanced-one-seat-activation-review-20261002.json

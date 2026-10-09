@@ -64,7 +64,7 @@ spec:
       - path: live_claim
         equals: false
       - path: provenance.source_revision
-        equals: 3a2ad3aee3df7b0b0f0bd58e1f348caa1e65c08f
+        equals: b1c2f380a13220259ffae5e41d760cc730524a05
       - path: runtime_images.presentation
         equals: "ghcr.io/jkershawrh/agentic-scale-501-presentation@sha256:b05888db2a3247eeae15a98fda8cfabdc0a46e4aa378ec99d4199e1634b52f28"
       - path: runtime_images.qualifier

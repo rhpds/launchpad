@@ -4,7 +4,7 @@ set -euo pipefail
 namespace="${1:?usage: certify-scale-agentic-blueprint-seat.sh <namespace> <cluster-id>}"
 expected_cluster="${2:?usage: certify-scale-agentic-blueprint-seat.sh <namespace> <cluster-id>}"
 : "${KUBECONFIG:?KUBECONFIG must point to the expected execution cluster credential}"
-source_revision="3a2ad3aee3df7b0b0f0bd58e1f348caa1e65c08f"
+source_revision="b1c2f380a13220259ffae5e41d760cc730524a05"
 expected_presentation_image="ghcr.io/jkershawrh/agentic-scale-501-presentation@sha256:b05888db2a3247eeae15a98fda8cfabdc0a46e4aa378ec99d4199e1634b52f28"
 expected_qualifier_image="ghcr.io/jkershawrh/agentic-scale-501-qualifier@sha256:1c4683117f58f2ee77a4a323e0c73d33a1b7efabb5beac0da0e3f80396fc71a6"
 
