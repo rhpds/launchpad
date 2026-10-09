@@ -1,3 +1,20 @@
+FROM registry.access.redhat.com/ubi9/go-toolset:1.25 AS oc-builder
+
+ARG OPENSHIFT_CLIENT_COMMIT=d0f23b14fbf35493e5b713e25ecf662ec239e76c
+ARG GO_X_TEXT_VERSION=v0.41.0
+
+WORKDIR /tmp/oc
+RUN git clone https://github.com/openshift/oc.git . \
+    && git checkout --detach "${OPENSHIFT_CLIENT_COMMIT}" \
+    && go mod edit \
+      -replace=golang.org/x/text=golang.org/x/text@${GO_X_TEXT_VERSION} \
+    && CGO_ENABLED=0 go build -mod=mod \
+      -tags "include_gcs include_oss containers_image_openpgp" \
+      -trimpath -o /tmp/oc-bin ./cmd/oc \
+    && go version -m /tmp/oc-bin \
+    | grep -F "golang.org/x/text" \
+    | grep -F "v0.41.0"
+
 FROM registry.access.redhat.com/ubi9/python-311:latest
 
 LABEL name="partner-ai-launchpad-backend" \
@@ -7,19 +24,16 @@ LABEL name="partner-ai-launchpad-backend" \
 WORKDIR /opt/app-root/src
 
 USER 0
-ARG OPENSHIFT_CLIENT_VERSION=4.22.14
 ARG HELM_VERSION=4.3.0
 RUN dnf -y upgrade \
     && (dnf -y remove npm 'nodejs*' || true) \
     && dnf clean all \
     && curl --fail --silent --show-error --location \
-      "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${OPENSHIFT_CLIENT_VERSION}/openshift-client-linux.tar.gz" \
-    | tar xz -C /usr/local/bin oc \
-    && chmod +x /usr/local/bin/oc \
-    && curl --fail --silent --show-error --location \
       "https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz" \
     | tar xz -C /usr/local/bin --strip-components=1 linux-amd64/helm \
     && chmod +x /usr/local/bin/helm
+
+COPY --from=oc-builder /tmp/oc-bin /usr/local/bin/oc
 
 RUN pip install --no-cache-dir --upgrade setuptools \
     && pip install --no-cache-dir pydantic pyyaml fastapi uvicorn httpx websockets python-multipart sqlalchemy psycopg2-binary kubernetes requests "celery[redis]" kafka-python-ng argon2-cffi cryptography
