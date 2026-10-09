@@ -116,19 +116,19 @@ def test_agentic_501_is_mounted_as_a_bounded_one_seat_rehearsal():
     metadata = item["metadata"]
 
     assert item["status"] == "active"
-    assert metadata["certification_stage"] == "one-seat-destination-qualified"
+    assert metadata["certification_stage"] == "pending"
     assert metadata["max_workshop_seats"] == 1
     assert metadata["allowed_exposure_policies"] == ["internal"]
-    assert metadata["workload_revision"] == "960d295025faf3d8f45bb916163a90ec4e43770a"
+    assert metadata["workload_revision"] == "3a2ad3aee3df7b0b0f0bd58e1f348caa1e65c08f"
     assert metadata["showroom_content_ref"] == metadata["workload_revision"]
     assert metadata["workload_helm_values"]["images"] == {
         "presentation": {
             "repository": "ghcr.io/jkershawrh/agentic-scale-501-presentation",
-            "digest": "sha256:cfbb376c62903a96e4c85a5e2bcceaa663d915a109b69df4c20a21f4e3bf882b",
+            "digest": "sha256:b05888db2a3247eeae15a98fda8cfabdc0a46e4aa378ec99d4199e1634b52f28",
         },
         "qualifier": {
             "repository": "ghcr.io/jkershawrh/agentic-scale-501-qualifier",
-            "digest": "sha256:160c9cf301dd0699e5eaf130c7eb9632051fd959a1e28001ec460d85488ef0a3",
+            "digest": "sha256:1c4683117f58f2ee77a4a323e0c73d33a1b7efabb5beac0da0e3f80396fc71a6",
         },
     }
     assert metadata["workload_helm_values"]["routes"] == {

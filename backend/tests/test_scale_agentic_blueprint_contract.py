@@ -11,9 +11,10 @@ CATALOG_PATH = ROOT / "catalog/scale-agentic-blueprint/catalog-item.yaml"
 INTAKE_PATH = ROOT / "catalog-onboarding/scale-agentic-blueprint.yaml"
 CERTIFIER_PATH = ROOT / "scripts/certify-scale-agentic-blueprint-seat.sh"
 REVIEW_PATH = ROOT / "evidence/lab-experience-review-20260930.yaml"
-SOURCE_REVISION = "960d295025faf3d8f45bb916163a90ec4e43770a"
-PRESENTATION_IMAGE = "ghcr.io/jkershawrh/agentic-scale-501-presentation@sha256:cfbb376c62903a96e4c85a5e2bcceaa663d915a109b69df4c20a21f4e3bf882b"
-QUALIFIER_IMAGE = "ghcr.io/jkershawrh/agentic-scale-501-qualifier@sha256:160c9cf301dd0699e5eaf130c7eb9632051fd959a1e28001ec460d85488ef0a3"
+SOURCE_REVISION = "3a2ad3aee3df7b0b0f0bd58e1f348caa1e65c08f"
+PREVIOUS_CERTIFIED_REVISION = "960d295025faf3d8f45bb916163a90ec4e43770a"
+PRESENTATION_IMAGE = "ghcr.io/jkershawrh/agentic-scale-501-presentation@sha256:b05888db2a3247eeae15a98fda8cfabdc0a46e4aa378ec99d4199e1634b52f28"
+QUALIFIER_IMAGE = "ghcr.io/jkershawrh/agentic-scale-501-qualifier@sha256:1c4683117f58f2ee77a4a323e0c73d33a1b7efabb5beac0da0e3f80396fc71a6"
 
 
 def _load(path: Path) -> dict:
@@ -190,8 +191,8 @@ def test_one_seat_experience_proof_does_not_claim_multi_seat_or_live_inference()
     }
     assert catalog["metadata"]["promotion_sequence"] == [1]
     assert intake["certification"]["promotion_sequence"] == [1]
-    assert intake["certification"]["stage"] == "one-seat-destination-qualified"
-    assert catalog["metadata"]["certification_stage"] == "one-seat-destination-qualified"
+    assert intake["certification"]["stage"] == "pending"
+    assert catalog["metadata"]["certification_stage"] == "pending"
     evidence = "evidence/runs/catalog/scale-agentic-blueprint-flightpath-qualification-operator-one-seat-20261005.json"
     assert intake["certification"]["certification_evidence"] == evidence
     assert catalog["metadata"]["source_references"]["certification_evidence"] == evidence
@@ -240,7 +241,8 @@ def test_review_evidence_marks_the_exact_release_as_published_and_nontransferabl
     review = _load(REVIEW_PATH)["labs"]["scale-agentic-blueprint"]
 
     assert review["overall_status"] == "one-seat-rehearsal-active"
-    assert review["source_state"]["published_revision"] == SOURCE_REVISION
+    assert review["source_state"]["published_revision"] == PREVIOUS_CERTIFIED_REVISION
+    assert review["source_state"]["published_revision"] != SOURCE_REVISION
     assert review["source_state"]["certification_transfer"] == "none"
 
 

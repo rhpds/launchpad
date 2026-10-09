@@ -3,7 +3,7 @@ display_name: 'Intel AI 501: Production Multi-Agent Blueprint'
 description: Qualify a production-shaped multi-agent architecture through correlated
   evidence, deterministic policy, resilience trials, and human-controlled promotion.
 category: guided_build
-version: 0.2.0-flightpath.1
+version: 0.3.0-flightpath.1
 status: active
 required_capabilities:
 - openshift
@@ -37,7 +37,7 @@ metadata:
   solution_family: agentic_ai
   showroom: true
   showroom_content_repo_url: https://github.com/jkershawrh/agentic-scale-501.git
-  showroom_content_ref: 960d295025faf3d8f45bb916163a90ec4e43770a
+  showroom_content_ref: 3a2ad3aee3df7b0b0f0bd58e1f348caa1e65c08f
   showroom_content_playbook: site.yml
   showroom_content_start_path: showroom
   showroom_antora_name: agentic-scale-501
@@ -46,7 +46,7 @@ metadata:
   content_only: false
   onboarding_managed: true
   onboarding_contract: catalog-onboarding/scale-agentic-blueprint.yaml
-  certification_stage: one-seat-destination-qualified
+  certification_stage: pending
   max_workshop_seats: 1
   promotion_sequence:
   - 1
@@ -90,7 +90,7 @@ metadata:
   workshop_node_headroom_pods: 0
   workshop_node_required_labels: {}
   workload_repo: https://github.com/jkershawrh/agentic-scale-501.git
-  workload_revision: 960d295025faf3d8f45bb916163a90ec4e43770a
+  workload_revision: 3a2ad3aee3df7b0b0f0bd58e1f348caa1e65c08f
   workload_deploy_type: helm
   workload_deployment_scope: seat
   workload_deploy_path: charts/agentic-scale-501
@@ -101,10 +101,10 @@ metadata:
     images:
       presentation:
         repository: ghcr.io/jkershawrh/agentic-scale-501-presentation
-        digest: sha256:cfbb376c62903a96e4c85a5e2bcceaa663d915a109b69df4c20a21f4e3bf882b
+        digest: sha256:b05888db2a3247eeae15a98fda8cfabdc0a46e4aa378ec99d4199e1634b52f28
       qualifier:
         repository: ghcr.io/jkershawrh/agentic-scale-501-qualifier
-        digest: sha256:160c9cf301dd0699e5eaf130c7eb9632051fd959a1e28001ec460d85488ef0a3
+        digest: sha256:1c4683117f58f2ee77a4a323e0c73d33a1b7efabb5beac0da0e3f80396fc71a6
     routes:
       enabled: true
       ingressDomain: apps.flightpath.fm2aihpcsed.com
@@ -123,7 +123,7 @@ metadata:
     qualifier: agentic-scale-501-qualifier
   workload_readiness: []
   source_content_repo: https://github.com/jkershawrh/agentic-scale-501.git
-  source_content_revision: 960d295025faf3d8f45bb916163a90ec4e43770a
+  source_content_revision: 3a2ad3aee3df7b0b0f0bd58e1f348caa1e65c08f
   source_references:
     certification_evidence: evidence/runs/catalog/scale-agentic-blueprint-flightpath-qualification-operator-one-seat-20261005.json
     activation_review: evidence/runs/catalog/agentic-advanced-one-seat-activation-review-20261002.json

@@ -4,9 +4,9 @@ set -euo pipefail
 namespace="${1:?usage: certify-scale-agentic-blueprint-seat.sh <namespace> <cluster-id>}"
 expected_cluster="${2:?usage: certify-scale-agentic-blueprint-seat.sh <namespace> <cluster-id>}"
 : "${KUBECONFIG:?KUBECONFIG must point to the expected execution cluster credential}"
-source_revision="960d295025faf3d8f45bb916163a90ec4e43770a"
-expected_presentation_image="ghcr.io/jkershawrh/agentic-scale-501-presentation@sha256:cfbb376c62903a96e4c85a5e2bcceaa663d915a109b69df4c20a21f4e3bf882b"
-expected_qualifier_image="ghcr.io/jkershawrh/agentic-scale-501-qualifier@sha256:160c9cf301dd0699e5eaf130c7eb9632051fd959a1e28001ec460d85488ef0a3"
+source_revision="3a2ad3aee3df7b0b0f0bd58e1f348caa1e65c08f"
+expected_presentation_image="ghcr.io/jkershawrh/agentic-scale-501-presentation@sha256:b05888db2a3247eeae15a98fda8cfabdc0a46e4aa378ec99d4199e1634b52f28"
+expected_qualifier_image="ghcr.io/jkershawrh/agentic-scale-501-qualifier@sha256:1c4683117f58f2ee77a4a323e0c73d33a1b7efabb5beac0da0e3f80396fc71a6"
 
 stage="setup"
 trap 'rc=$?; printf "seat_probe_failure stage=%s exit_code=%s\n" "$stage" "$rc" >&2' ERR
@@ -73,7 +73,7 @@ profile="$(jq -cn '{profile:{
   id:"flightpath-destination-qualification",
   version:"policy-v1",
   phase:"baseline",
-  workloadImageDigest:"sha256:160c9cf301dd0699e5eaf130c7eb9632051fd959a1e28001ec460d85488ef0a3",
+  workloadImageDigest:"sha256:1c4683117f58f2ee77a4a323e0c73d33a1b7efabb5beac0da0e3f80396fc71a6",
   evaluationSetVersion:"agentic-scale-501-v1",
   target:"flightpath/agentic-scale-501",
   concurrency:1,

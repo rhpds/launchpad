@@ -35,16 +35,16 @@ spec:
         marker: "Agentic AI 501"
       - id: baseline
         path: /www/agentic-scale-501/02-baseline.html
-        marker: "Baseline: establish the reference state"
+        marker: "Establish a baseline"
       - id: controlled-pressure
         path: /www/agentic-scale-501/04-controlled-pressure.html
-        marker: "Controlled pressure: cross one named boundary"
+        marker: "Apply controlled pressure"
       - id: score-review
         path: /www/agentic-scale-501/06-score-review.html
-        marker: "Score and review: fail closed"
+        marker: "Score and make the human decision"
       - id: close-handoff
         path: /www/agentic-scale-501/07-close-handoff.html
-        marker: "Close and handoff: certify the envelope"
+        marker: "Package your evidence"
 
   seat_probe:
     argv:
@@ -64,11 +64,11 @@ spec:
       - path: live_claim
         equals: false
       - path: provenance.source_revision
-        equals: 960d295025faf3d8f45bb916163a90ec4e43770a
+        equals: 3a2ad3aee3df7b0b0f0bd58e1f348caa1e65c08f
       - path: runtime_images.presentation
-        equals: "ghcr.io/jkershawrh/agentic-scale-501-presentation@sha256:cfbb376c62903a96e4c85a5e2bcceaa663d915a109b69df4c20a21f4e3bf882b"
+        equals: "ghcr.io/jkershawrh/agentic-scale-501-presentation@sha256:b05888db2a3247eeae15a98fda8cfabdc0a46e4aa378ec99d4199e1634b52f28"
       - path: runtime_images.qualifier
-        equals: "ghcr.io/jkershawrh/agentic-scale-501-qualifier@sha256:160c9cf301dd0699e5eaf130c7eb9632051fd959a1e28001ec460d85488ef0a3"
+        equals: "ghcr.io/jkershawrh/agentic-scale-501-qualifier@sha256:1c4683117f58f2ee77a4a323e0c73d33a1b7efabb5beac0da0e3f80396fc71a6"
       - path: inference.synthetic
         equals: true
       - path: inference.model_participated

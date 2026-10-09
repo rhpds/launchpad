@@ -139,7 +139,7 @@ def test_scale_blueprint_extends_401_as_a_separate_gated_catalog_item():
     assert scale["metadata"]["prerequisites"] == ["operate-agentic-blueprint"]
     assert scale["metadata"]["shared_blueprint"] == operate["metadata"]["shared_blueprint"]
     assert scale["metadata"]["solution_family"] == "agentic_ai"
-    assert scale["metadata"]["certification_stage"] == "one-seat-destination-qualified"
+    assert scale["metadata"]["certification_stage"] == "pending"
     assert scale["metadata"]["activation_blockers"] == []
     assert scale["metadata"]["production_blockers"]
 
