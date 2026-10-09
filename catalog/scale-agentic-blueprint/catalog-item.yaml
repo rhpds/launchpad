@@ -46,7 +46,7 @@ metadata:
   content_only: false
   onboarding_managed: true
   onboarding_contract: catalog-onboarding/scale-agentic-blueprint.yaml
-  certification_stage: pending
+  certification_stage: one-seat-destination-qualified
   max_workshop_seats: 1
   promotion_sequence:
   - 1
@@ -125,5 +125,5 @@ metadata:
   source_content_repo: https://github.com/jkershawrh/agentic-scale-501.git
   source_content_revision: b1c2f380a13220259ffae5e41d760cc730524a05
   source_references:
-    certification_evidence: evidence/runs/catalog/scale-agentic-blueprint-flightpath-qualification-operator-one-seat-20261005.json
+    certification_evidence: evidence/runs/catalog/scale-agentic-blueprint-flightpath-one-seat-participant-r1-20261009.json
     activation_review: evidence/runs/catalog/agentic-advanced-one-seat-activation-review-20261002.json

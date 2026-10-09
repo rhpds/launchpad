@@ -24,9 +24,10 @@ spec:
       maximum_cleanup_seconds: 600
 
   execution_blockers:
-    - The destination run proves rehearsal-mode deployment only and must not be represented as live inference certification.
+    - The destination run proves participant-owned offline execution plus a rehearsal qualifier; it must not be represented as live inference certification.
     - Approved OpenTelemetry and Intel Xeon telemetry are not connected.
     - Live dependency fault injection and recovery assertions remain unverified on Flightpath.
+    - Flightpath application-route TLS remains untrusted and is recorded as an infrastructure blocker.
 
   showroom:
     pages:
@@ -56,7 +57,7 @@ spec:
     result_format: json
     json_assertions:
       - path: result
-        equals: GREEN-destination-rehearsal-seat
+        equals: GREEN-destination-participant-seat
       - path: cluster_ref
         equals: flightpath
       - path: evidence_source
@@ -94,6 +95,16 @@ spec:
       - path: operator_journey.console_url_present
         equals: true
       - path: operator_journey.qualification_service_verified
+        equals: true
+      - path: participant_journey.sources
+        contains: offline
+      - path: participant_journey.completed
+        equals: true
+      - path: participant_journey.unauthorized_actions
+        equals: 0
+      - path: participant_journey.automated_promotion
+        equals: false
+      - path: participant_journey.human_review_required
         equals: true
       - path: presentation_restarts
         equals: 0

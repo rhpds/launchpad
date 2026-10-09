@@ -191,14 +191,14 @@ def test_one_seat_experience_proof_does_not_claim_multi_seat_or_live_inference()
     }
     assert catalog["metadata"]["promotion_sequence"] == [1]
     assert intake["certification"]["promotion_sequence"] == [1]
-    assert intake["certification"]["stage"] == "pending"
-    assert catalog["metadata"]["certification_stage"] == "pending"
-    evidence = "evidence/runs/catalog/scale-agentic-blueprint-flightpath-qualification-operator-one-seat-20261005.json"
+    assert intake["certification"]["stage"] == "one-seat-destination-qualified"
+    assert catalog["metadata"]["certification_stage"] == "one-seat-destination-qualified"
+    evidence = "evidence/runs/catalog/scale-agentic-blueprint-flightpath-one-seat-participant-r1-20261009.json"
     assert intake["certification"]["certification_evidence"] == evidence
     assert catalog["metadata"]["source_references"]["certification_evidence"] == evidence
     assert [profile["seats"] for profile in certification["spec"]["scale_profiles"]] == [1]
     assert certification["spec"]["seat_probe"]["json_assertions"][:4] == [
-        {"path": "result", "equals": "GREEN-destination-rehearsal-seat"},
+        {"path": "result", "equals": "GREEN-destination-participant-seat"},
         {"path": "cluster_ref", "equals": "flightpath"},
         {"path": "evidence_source", "equals": "rehearsal"},
         {"path": "live_claim", "equals": False},

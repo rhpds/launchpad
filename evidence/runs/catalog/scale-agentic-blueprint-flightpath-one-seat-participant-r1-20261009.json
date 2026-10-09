@@ -1,0 +1,70 @@
+{
+  "schema_version": "launchpad.catalog-certification-evidence/v1",
+  "catalog_item_id": "scale-agentic-blueprint",
+  "catalog_version": "0.3.1-flightpath.1",
+  "result": "GREEN-destination-participant-seat",
+  "cluster_ref": "flightpath",
+  "source_revision": "b1c2f380a13220259ffae5e41d760cc730524a05",
+  "launchpad_revision": "726b7e926f05f26f71c353ee9123c5687b46148d",
+  "session_id": "f039b83b-4634-4c0e-b7d9-4962c814cbdd",
+  "request_id": "972bea57-2286-480a-9b77-8c6b92fb894e",
+  "namespace": "launchpad-flightpath-candida-agentic-scale-972bea",
+  "runtime_images": {
+    "presentation": "ghcr.io/jkershawrh/agentic-scale-501-presentation@sha256:b05888db2a3247eeae15a98fda8cfabdc0a46e4aa378ec99d4199e1634b52f28",
+    "qualifier": "ghcr.io/jkershawrh/agentic-scale-501-qualifier@sha256:1c4683117f58f2ee77a4a323e0c73d33a1b7efabb5beac0da0e3f80396fc71a6"
+  },
+  "provisioning": {
+    "requested_at": "2026-10-09T19:59:20.389440Z",
+    "ready_at": "2026-10-09T20:00:01.246734Z",
+    "ready_seconds": 41,
+    "pods_ready": true,
+    "routes_reachable": true,
+    "route_tls_verified": false,
+    "route_tls_note": "Flightpath application routes currently present an untrusted certificate chain; functional probes used the explicitly recorded internal-candidate exception."
+  },
+  "participant_journey": {
+    "source": "offline",
+    "run_id": "a501-7fab8300-71e9-475f-b972-00b4cb1c428d",
+    "baseline_p95_ms": 17.09,
+    "sustained_p95_ms": 21.1,
+    "pressure_p95_ms": 54.13,
+    "recovery_p95_ms": 19.1,
+    "all_journeys_completed": true,
+    "unauthorized_actions": 0,
+    "evidence_manifest_verified": true,
+    "portable_archive_created": true,
+    "automated_promotion": false,
+    "human_review_required": true
+  },
+  "operator_journey": {
+    "presentation": true,
+    "showroom_content": true,
+    "terminal": true,
+    "qualification_evidence": true,
+    "openshift_console_url_present": true,
+    "namespace_edit": true,
+    "cross_namespace_access": false,
+    "node_list_access": false
+  },
+  "truth_boundaries": {
+    "live_inference_claim": false,
+    "production_capacity_claim": false,
+    "approved_intel_xeon_telemetry_claim": false,
+    "qualifier_service_source": "rehearsal",
+    "participant_execution_source": "offline"
+  },
+  "cleanup": {
+    "requested_at": "2026-10-09T20:02:40Z",
+    "lifecycle_reclaimed_at": "2026-10-09T20:02:46.882766Z",
+    "residue_checked_at": "2026-10-09T20:04:58Z",
+    "session_status": "reclaimed",
+    "namespace_exists": false,
+    "applications": 0,
+    "rolebindings": 0,
+    "persistent_volume_claims": 0,
+    "routes": 0,
+    "secrets": 0,
+    "model_key_revoked": true
+  },
+  "contains_sensitive_values": false
+}

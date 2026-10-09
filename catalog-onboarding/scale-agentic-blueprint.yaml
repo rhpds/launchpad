@@ -97,7 +97,7 @@ runtime:
       qualifier: agentic-scale-501-qualifier
     readiness: []
 certification:
-  stage: pending
+  stage: one-seat-destination-qualified
   certified_seats: 1
   max_workshop_seats: 1
   promotion_sequence:
@@ -108,7 +108,7 @@ certification:
   - Replace rehearsal evidence with approved live execution and Intel Xeon telemetry before any live-execution or production claim.
   - Five- and twenty-five-seat scale certification is deferred.
   - Complete human authority review before promotion.
-  certification_evidence: evidence/runs/catalog/scale-agentic-blueprint-flightpath-qualification-operator-one-seat-20261005.json
+  certification_evidence: evidence/runs/catalog/scale-agentic-blueprint-flightpath-one-seat-participant-r1-20261009.json
   activation_review: evidence/runs/catalog/agentic-advanced-one-seat-activation-review-20261002.json
 factory_receipt:
   schema_version: demo-story.redhat-intel.com/launchpad-handoff/v1

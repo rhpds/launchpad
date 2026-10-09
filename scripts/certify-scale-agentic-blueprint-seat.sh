@@ -46,7 +46,14 @@ presentation_host="$(oc --kubeconfig "$KUBECONFIG" get route agentic-scale-501-p
   -n "$namespace" -o jsonpath='{.spec.host}')"
 qualifier_host="$(oc --kubeconfig "$KUBECONFIG" get route agentic-scale-501-qualifier \
   -n "$namespace" -o jsonpath='{.spec.host}')"
+showroom_host="$(oc --kubeconfig "$KUBECONFIG" get route showroom \
+  -n "$namespace" -o jsonpath='{.spec.host}')"
 curl_options=(-fsS --retry 4 --retry-all-errors --retry-delay 2 --max-time 180)
+route_tls_verified=true
+if [[ "${LAUNCHPAD_ROUTE_INSECURE:-false}" == "true" ]]; then
+  curl_options+=(--insecure)
+  route_tls_verified=false
+fi
 
 stage="presentation"
 presentation="$(curl "${curl_options[@]}" "https://${presentation_host}/")"
@@ -96,6 +103,57 @@ jq -e '
   and .authority.reviewerDisposition == "pending"
 ' <<<"$proof" >/dev/null
 
+stage="showroom-content"
+showroom_page="$(curl "${curl_options[@]}" "https://${showroom_host}/www/agentic-scale-501/00-preflight.html")"
+grep -q 'create your run' <<<"$showroom_page"
+grep -q 'qualification-runner.py' <<<"$showroom_page"
+curl "${curl_options[@]}" \
+  "https://${showroom_host}/www/agentic-scale-501/_attachments/tools/qualification-runner.py" \
+  | grep -q 'Agentic AI 501 qualification runner'
+
+stage="participant-qualification"
+oc --kubeconfig "$KUBECONFIG" exec -n "$namespace" deployment/showroom -c terminal -- bash -lc '
+  set -euo pipefail
+  rm -rf "$HOME/agentic-501-evidence" "$HOME/agentic-501-evidence.tgz"
+  mkdir -p "$HOME/agentic-501"
+  curl -fsSLo "$HOME/agentic-501/qualification-runner.py" \
+    http://127.0.0.1:8080/www/agentic-scale-501/_attachments/tools/qualification-runner.py
+  python3 -m py_compile "$HOME/agentic-501/qualification-runner.py"
+  python3 "$HOME/agentic-501/qualification-runner.py" init --scenario certification-journey
+  for phase in baseline sustained pressure recovery; do
+    python3 "$HOME/agentic-501/qualification-runner.py" run "$phase"
+  done
+  python3 "$HOME/agentic-501/qualification-runner.py" report
+  python3 "$HOME/agentic-501/qualification-runner.py" package
+  cd "$HOME/agentic-501-evidence"
+  sha256sum -c evidence-manifest.sha256
+' >/dev/null
+participant_proof="$(oc --kubeconfig "$KUBECONFIG" exec -n "$namespace" deployment/showroom -c terminal -- sh -c '
+  cd "$HOME/agentic-501-evidence"
+  jq -s '\''{
+    sources:(map(.source)|unique),
+    run_ids:(map(.runId)|unique),
+    completed:(map(.workload.completedJourneys == .workload.attemptedJourneys)|all),
+    unauthorized_actions:(map(.policy.unauthorizedActions)|add),
+    baseline_p95:.[0].workload.latencyMs.p95,
+    sustained_p95:.[1].workload.latencyMs.p95,
+    pressure_p95:.[2].workload.latencyMs.p95,
+    recovery_p95:.[3].workload.latencyMs.p95,
+    automated_promotion:(map(.authority.automatedPromotion)|any),
+    human_review_required:(map(.authority.humanReviewRequired)|all)
+  }'\'' baseline.json sustained.json pressure.json recovery.json
+')"
+jq -e '
+  .sources == ["offline"]
+  and (.run_ids | length) == 1
+  and .completed == true
+  and .unauthorized_actions == 0
+  and .pressure_p95 > .sustained_p95
+  and .recovery_p95 < .pressure_p95
+  and .automated_promotion == false
+  and .human_review_required == true
+' <<<"$participant_proof" >/dev/null
+
 stage="terminal-scope"
 terminal_scope="$(oc --kubeconfig "$KUBECONFIG" exec -n "$namespace" deployment/showroom \
   -c terminal -- sh -c '
@@ -119,18 +177,22 @@ jq -cn \
   --arg cluster_ref "$expected_cluster" \
   --arg presentation_host "$presentation_host" \
   --arg qualifier_host "$qualifier_host" \
+  --arg showroom_host "$showroom_host" \
   --arg terminal_scope "$terminal_scope" \
   --arg source_revision "$source_revision" \
   --arg presentation_image "$presentation_image" \
   --arg qualifier_image "$qualifier_image" \
   --arg console_url "$console_url" \
   --argjson presentation_restarts "$presentation_restarts" \
+  --argjson route_tls_verified "$route_tls_verified" \
   --argjson proof "$proof" \
+  --argjson participant_proof "$participant_proof" \
   '{
-    result: "GREEN-destination-rehearsal-seat",
+    result: "GREEN-destination-participant-seat",
     namespace: $namespace,
     cluster_ref: $cluster_ref,
     readiness: {presentation: true, qualifier: true, routes: true},
+    route_tls_verified: $route_tls_verified,
     evidence_source: $proof.source,
     live_claim: false,
     provenance: {source_revision: $source_revision},
@@ -146,6 +208,7 @@ jq -cn \
     },
     presentation_host: $presentation_host,
     qualifier_host: $qualifier_host,
+    showroom_host: $showroom_host,
     presentation_restarts: $presentation_restarts,
     operator_journey: {
       terminal_scope_verified: true,
@@ -162,6 +225,7 @@ jq -cn \
       automated_promotion: $proof.authority.automatedPromotion,
       human_review_required: $proof.authority.humanReviewRequired
     },
+    participant_journey: $participant_proof,
     terminal_scope: ($terminal_scope | split("\n")),
     contains_sensitive_values: false
   }'

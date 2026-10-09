@@ -116,7 +116,7 @@ def test_agentic_501_is_mounted_as_a_bounded_one_seat_rehearsal():
     metadata = item["metadata"]
 
     assert item["status"] == "active"
-    assert metadata["certification_stage"] == "pending"
+    assert metadata["certification_stage"] == "one-seat-destination-qualified"
     assert metadata["max_workshop_seats"] == 1
     assert metadata["allowed_exposure_policies"] == ["internal"]
     assert metadata["workload_revision"] == "b1c2f380a13220259ffae5e41d760cc730524a05"
