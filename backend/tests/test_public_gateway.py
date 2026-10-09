@@ -695,6 +695,26 @@ def test_gateway_accepts_oauth_proxy_websocket_identity_headers():
     assert _username(request) == "lp-87bd01a6f6c73d54ece70b489ceb3957"
 
 
+def test_internal_gateway_prefers_workforce_username_over_email_alias(monkeypatch):
+    monkeypatch.setenv(
+        "INTERNAL_LAB_GATEWAY_HOSTS",
+        "launchpad-candidate.apps.flightpath.fm2aihpcsed.com",
+    )
+    request = type(
+        "Request",
+        (),
+        {
+            "headers": {
+                "host": "launchpad-candidate.apps.flightpath.fm2aihpcsed.com",
+                "x-forwarded-user": "kube:admin",
+                "x-forwarded-email": "kube:admin@cluster.local",
+            }
+        },
+    )()
+
+    assert _username(request) == "kube:admin"
+
+
 def test_terminal_upgrade_token_is_order_scoped_and_short_lived(monkeypatch):
     from app import public_gateway
 

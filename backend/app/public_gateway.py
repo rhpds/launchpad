@@ -76,6 +76,17 @@ def _internal_lab_hosts() -> set[str]:
 
 
 def _username(request: Request) -> str:
+    if _host(request) in _internal_lab_hosts():
+        # The OpenShift workforce proxy exposes the canonical username in the
+        # user claim and may synthesize an email-shaped alias for the email
+        # claim (for example kube:admin@cluster.local). Orders are owned by
+        # the canonical username, so internal authorization must use it too.
+        return (
+            request.headers.get("x-forwarded-user", "")
+            or request.headers.get("x-auth-request-user", "")
+            or request.headers.get("x-forwarded-email", "")
+            or request.headers.get("x-auth-request-email", "")
+        )
     # oauth2-proxy always uses the OIDC subject for X-Forwarded-User.  The
     # configured email claim carries Launchpad's stable preferred_username.
     return (
