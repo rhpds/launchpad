@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/ubi9/go-toolset:1.25 AS oc-builder
+FROM registry.access.redhat.com/ubi9/go-toolset:1.26 AS oc-builder
 
 ARG OPENSHIFT_CLIENT_COMMIT=d0f23b14fbf35493e5b713e25ecf662ec239e76c
 ARG GO_X_TEXT_VERSION=v0.41.0

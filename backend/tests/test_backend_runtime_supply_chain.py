@@ -7,6 +7,7 @@ CONTAINERFILE = Path(__file__).resolve().parents[1] / "Containerfile"
 def test_cluster_clients_are_explicitly_versioned() -> None:
     text = CONTAINERFILE.read_text()
 
+    assert "FROM registry.access.redhat.com/ubi9/go-toolset:1.26 AS oc-builder" in text
     assert "ARG OPENSHIFT_CLIENT_COMMIT=" in text
     assert "ARG GO_X_TEXT_VERSION=v0.41.0" in text
     assert "ARG HELM_VERSION=" in text
