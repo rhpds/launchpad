@@ -40,6 +40,8 @@ metadata:
   showroom_content_ref: 960d295025faf3d8f45bb916163a90ec4e43770a
   showroom_content_playbook: site.yml
   showroom_content_start_path: showroom
+  showroom_antora_name: agentic-scale-501
+  showroom_antora_version: ''
   operator_workshop: true
   content_only: false
   onboarding_managed: true

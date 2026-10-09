@@ -38,6 +38,8 @@ runtime:
   deployment_type: helm
   deployment_scope: seat
   showroom_terminal_storage: false
+  showroom_antora_name: agentic-scale-501
+  showroom_antora_version: ''
   required_capabilities:
   - openshift
   - showroom

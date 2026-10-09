@@ -20,6 +20,16 @@ def _load(path: Path) -> dict:
     return yaml.safe_load(path.read_text())
 
 
+def test_showroom_antora_coordinates_match_the_built_unversioned_component():
+    catalog = _load(CATALOG_PATH)
+    intake = _load(INTAKE_PATH)
+
+    assert catalog["metadata"]["showroom_antora_name"] == "agentic-scale-501"
+    assert catalog["metadata"]["showroom_antora_version"] == ""
+    assert intake["runtime"]["showroom_antora_name"] == "agentic-scale-501"
+    assert intake["runtime"]["showroom_antora_version"] == ""
+
+
 def test_scale_contract_extends_the_canonical_blueprint_and_401():
     contract = _load(WORKLOAD_CONTRACT_PATH)
     catalog = _load(CATALOG_PATH)
