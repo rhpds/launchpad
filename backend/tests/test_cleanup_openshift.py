@@ -200,6 +200,7 @@ class TestOrphanedRoleBindingCleanup:
             "showroom_application": 0,
             "workload_application": 1,
             "shared_cluster_role_binding_subject": 0,
+            "persistent_volume": 0,
         }
         adapter._core_v1.delete_namespace.assert_not_called()
 

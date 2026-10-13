@@ -1,0 +1,20 @@
+{
+  "schema": "launchpad/red-green-evidence/v1",
+  "phase": "RED-local",
+  "observed_failures": {
+    "retained_volume_inventory": 2,
+    "execute_terminal_contract": 1,
+    "source_participant_experience": 11,
+    "cleanup_completion_gate": 3,
+    "ledger_storage_precedence": 1
+  },
+  "requirements": [
+    "VIRT-UX-201-BOOT",
+    "VIRT-UX-301-DENIAL",
+    "VIRT-UX-FIXTURE-TLS",
+    "VIRT-UX-EXECUTE",
+    "VIRT-UX-BRANDING",
+    "VIRT-LC-501-RETAINED-PV"
+  ],
+  "note": "The source experience tests were subsequently refactored into unittest classes so the existing source release workflows actually discover them. Local green does not imply a deployed or live-green candidate."
+}

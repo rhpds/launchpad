@@ -12,7 +12,7 @@ spec:
       - {id: welcome, path: /www/virtualization-ai-201/main/index.html, marker: "Build and Qualify a VM-to-AI Contract"}
       - {id: prerequisite, path: /www/virtualization-ai-201/main/01-prerequisite.html, marker: "Confirm the 101 boundary"}
       - {id: frame, path: /www/virtualization-ai-201/main/02-frame.html, marker: "Frame the acceptance contract"}
-      - {id: author, path: /www/virtualization-ai-201/main/03-author.html, marker: "Author schemas and VM client"}
+      - {id: author, path: /www/virtualization-ai-201/main/03-author.html, marker: "Author schemas and the VM client"}
       - {id: wire, path: /www/virtualization-ai-201/main/04-wire.html, marker: "Wire Secret, Service, and policy"}
       - {id: prove, path: /www/virtualization-ai-201/main/05-prove.html, marker: "Prove the healthy path"}
       - {id: break, path: /www/virtualization-ai-201/main/06-break.html, marker: "Break it safely"}

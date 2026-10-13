@@ -128,6 +128,15 @@ class OpenShiftCleanupAdapter:
         showroom = self._showroom_gitops
         workload = self._workload_gitops
         shared_binding_subjects = 0
+        # Namespace absence does not imply storage absence: a Retain-policy PV
+        # keeps its claimRef after the PVC and namespace have disappeared.
+        # Inventory failure must propagate, never masquerade as zero residue.
+        persistent_volumes = sum(
+            1
+            for volume in self._core_v1.list_persistent_volume().items
+            if getattr(getattr(volume.spec, "claim_ref", None), "namespace", None)
+            == namespace
+        )
         for binding_name in PIPELINES_SHARED_BINDINGS:
             try:
                 binding = self._rbac_v1.read_cluster_role_binding(binding_name)
@@ -169,6 +178,7 @@ class OpenShiftCleanupAdapter:
                 )
             ),
             "shared_cluster_role_binding_subject": shared_binding_subjects,
+            "persistent_volume": persistent_volumes,
         }
 
     def _wait_for_deletion(self, namespace: str, timeout: int = 60) -> None:

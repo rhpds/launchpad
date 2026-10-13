@@ -6,7 +6,7 @@ catalog:
     through platform networking to governed Intel Xeon CPU inference and human authority.
   category: guided_build
   version: 0.1.0
-  status: draft
+  status: active
 learning:
   learning_level: '101'
   learning_stage: Learn
@@ -111,7 +111,7 @@ runtime:
     readiness: []
 certification:
   stage: 1-seat-certified
-  certified_seats: 0
+  certified_seats: 1
   max_workshop_seats: 1
   promotion_sequence:
   - 1

@@ -1,0 +1,80 @@
+schema: launchpad/participant-experience-review/v1
+cluster: flightpath
+seat_limit: 1
+scope: Fresh single-seat public participant walkthroughs, plus normal internal/public capacity previews.
+overall_result: ORDERABILITY-PROVEN-PARTICIPANT-JOURNEYS-NOT-ALL-GREEN
+activation:
+  catalog_item_id: virtualization-ai-foundations-101
+  evidence: evidence/runs/virt101-refreshed-one-seat-20261013-r7.json
+  score: 100
+  method: Existing checksum-verified catalog promotion tool; catalog-only reload after lifecycle queue became idle.
+  limitation: The runtime certification rubric is not a substitute for the additional participant usability findings below.
+participant_runs:
+  - evidence/runs/virtualization-ai-foundations-101-participant-pass-20261013.json
+  - evidence/runs/virtualization-ai-201-participant-pass-20261013.json
+  - evidence/runs/virtualization-ai-301-participant-pass-20261013.json
+  - evidence/runs/virtualization-ai-401-participant-pass-20261013.json
+  - evidence/runs/virtualization-ai-501-participant-pass-20261013.json
+observed_successes:
+  - All five fresh one-seat public orders became ready on Flightpath.
+  - All five email/code logins reached the participant landing page and My Lab Access.
+  - Story, Terminal, and authenticated namespace Console remained embedded; no popups observed.
+  - Story scene navigation worked on all five; not all interactive scenario conditions were exercised.
+  - All 19 rendered 101 command blocks passed, including actual VM-origin live Granite inference, failure containment, evidence export, and local artifact cleanup.
+findings:
+  - id: VIRT-UX-201-BOOT
+    priority: high
+    catalog_items: [virtualization-ai-201]
+    observed: The opening command block runs git rev-parse HEAD from the terminal home directory without first obtaining or entering the lab repository; it fails before learner authoring begins.
+    required_fix: Explicit pinned repository bootstrap and working-directory setup before relative-file commands. Then complete the intended authoring exercise and re-run every subsequent step.
+  - id: VIRT-CD-201-MARKER
+    priority: low
+    catalog_items: [virtualization-ai-201]
+    observed: The author page is HTTP 200, but the certification heading marker differs from the rendered heading.
+    required_fix: Align the heading contract with the intended page title; do not mistake this wording mismatch for an unavailable page.
+  - id: VIRT-UX-301-DENIAL
+    priority: medium
+    catalog_items: [virtualization-ai-301]
+    observed: Nineteen of twenty command blocks passed. The final expected oc auth can-i denial exits nonzero under strict pipefail and prevents the following preservation checks.
+    required_fix: Assert the expected denial explicitly, handling its nonzero status without accepting an unexpected success or unrelated error.
+    limitation: This is a strict-shell robustness finding; a non-pipefail interactive shell may complete the original pipeline.
+  - id: VIRT-UX-FIXTURE-TLS
+    priority: high
+    catalog_items: [virtualization-ai-401, virtualization-ai-501]
+    observed: The rendered terminal fixture-download commands fail with curl exit 60 against Flightpath's cluster-local certificate chain.
+    required_fix: Use a verified trust bundle or the approved namespace-local fixture Service path. Do not globally disable TLS verification.
+  - id: VIRT-UX-EXECUTE
+    priority: medium
+    catalog_items: [virtualization-ai-201, virtualization-ai-301, virtualization-ai-401, virtualization-ai-501]
+    observed: Rendered executable code blocks have Copy controls but no Execute control.
+    required_fix: Package the reviewed shared Showroom skin and verify actual command delivery to the embedded terminal.
+    limitation: Execute interaction was not measured in this turn's 101 browser run; do not assume it passed.
+  - id: VIRT-UX-BRANDING
+    priority: medium
+    catalog_items: [virtualization-ai-401, virtualization-ai-501]
+    observed: The instruction header loads the legacy Red Hat Developer Program header_logo.png rather than the Red Hat x Intel partnership lockup.
+    required_fix: Apply the reviewed partnership skin to rendered Showroom instruction content, not only the presentation.
+    limitation: Header image dimensions and assets were not measured in the earlier 101/201/301 processes.
+  - id: VIRT-LC-501-RETAINED-PV
+    priority: high
+    catalog_items: [virtualization-ai-501]
+    observed: Reclaim reported completed and the namespace disappeared, but a Released evidence PV remained with Retain policy.
+    required_fix: Define and enforce the intended evidence-retention policy and make completion depend on independently checked residue. Do not silently treat retained storage as zero residue.
+    remediation: Only the identified synthetic test PV was changed to Delete; the storage controller then removed it. No cluster-wide StorageClass policy changed.
+    evidence: evidence/runs/virt-family-participant-reclaim-observer-verified-r2-20261013.json
+    automatic_cleanup_passed: false
+cleanup:
+  final_evidence: evidence/runs/virt-family-participant-reclaim-observer-post-manual-cleanup-r3-20261013.json
+  require_counts: [namespace_count, pv_count, application_count, external_rolebinding_count]
+  model_key_receipts: Confirmed Litellm revocation for all five test sessions.
+  limitation: Keycloak account disablement, cached-session denial, and OpenShift token deletion were not independently checked by this observer.
+ordering:
+  evidence: evidence/runs/virt-family-normal-one-seat-orderability-post-activation-20261013.json
+  certification_override: false
+  expected_checks: 10
+  limitation: Capacity previews prove normal admission eligibility, not a full requester-form browser submission.
+local_regression:
+  passed: 54
+  activation_red: evidence/runs/virt101-one-seat-activation-red-20261013.json
+  scope: Eight scoped Virt101/probe tests, six Virtualization experience-review tests, and forty certification/promotion tests.
+next_action: Fix and re-test the identified participant blockers without raising seat limits or calling the entire family staging-qualified.

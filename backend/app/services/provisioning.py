@@ -1257,6 +1257,35 @@ class ProvisioningService:
         self._save_session(updated)
         return updated
 
+    def _verify_cleanup_completion(self, cleanup, namespace, lifecycle_guard) -> None:
+        """Opt-in durable-worker gate: deletion acknowledgment is not completion."""
+        if os.environ.get("CLEANUP_VERIFY_RESIDUE", "false").lower() != "true":
+            return
+        inspect = getattr(cleanup, "inspect_residue", None)
+        if not callable(inspect):
+            raise ValueError("Cleanup completion inventory is unavailable")
+        required = {
+            "namespace", "showroom_application", "workload_application",
+            "image_puller_role_binding", "persistent_volume",
+        }
+        timeout = int(os.environ.get("CLEANUP_VERIFICATION_TIMEOUT_SECONDS", "600"))
+        if not 0 <= timeout <= 600:
+            raise ValueError("Cleanup verification timeout must be between 0 and 600 seconds")
+        deadline = time.monotonic() + timeout
+        while True:
+            self._require_lifecycle_ownership(lifecycle_guard)
+            observed = inspect(namespace)
+            if not required.issubset(observed):
+                raise ValueError("Cleanup completion inventory is incomplete")
+            if any(type(value) is not int or value < 0 for value in observed.values()):
+                raise ValueError("Cleanup completion inventory contains invalid counts")
+            remaining = {key: value for key, value in observed.items() if value}
+            if not remaining:
+                return
+            if time.monotonic() >= deadline:
+                raise ValueError(f"Cleanup residue remains: {remaining}")
+            time.sleep(min(2, max(0, deadline - time.monotonic())))
+
     def reclaim_session(
         self,
         session_id: str,
@@ -1302,6 +1331,9 @@ class ProvisioningService:
             self._require_lifecycle_ownership(lifecycle_guard)
             try:
                 cleanup_adapter.cleanup(session.namespace)
+                self._verify_cleanup_completion(
+                    cleanup_adapter, session.namespace, lifecycle_guard
+                )
             except Exception as e:
                 cleanup_errors.append(str(e))
 
@@ -1627,6 +1659,11 @@ class ProvisioningService:
                 f"{session.cluster_ref or 'local'}"
             )
         observed = inspect(session.namespace)
+        if "persistent_volume" in observed:
+            value = observed["persistent_volume"]
+            if type(value) is not int or value < 0:
+                raise ValueError("Invalid cleanup residue count for persistent_volume")
+            residue["persistent_volume"] = value
         for key in residue:
             if key in {"credentials", "model_key_revocation"}:
                 continue

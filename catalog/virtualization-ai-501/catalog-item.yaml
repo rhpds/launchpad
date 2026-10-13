@@ -103,7 +103,10 @@ metadata:
     workload_image: ghcr.io/jkershawrh/virtualization-ai-501-qualification-adapter@sha256:e14a5dc17dfb1a63321a99d4e76ad904dd271e5fb57b359c62c263891b8173bf
     presentation_image: ghcr.io/jkershawrh/virtualization-ai-501-presentation@sha256:06e5e51b88f561bd401dd634acdcc07e3c6112caf4316fb46c989ac8baf3f762
     presentation_enabled: true
-    storage_class: nfs-storage
+    storage_class: ocs-storagecluster-ceph-rbd
+    qualificationAdapter:
+      ledger:
+        storageClassName: ocs-storagecluster-ceph-rbd
   workload_ignore_differences: []
   workload_runtime_secret_name: ''
   workload_runtime_secret_sources: {}

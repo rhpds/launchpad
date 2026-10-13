@@ -19,9 +19,9 @@ def test_101_records_certification_without_claiming_browser_console_sso() -> Non
     contract = _load(CERTIFICATION)
     metadata = catalog["metadata"]
 
-    assert catalog["status"] == intake["catalog"]["status"] == "draft"
-    assert intake["certification"]["certified_seats"] == 0
-    assert metadata["certification_stage"] == "1-seat-security-refresh-pending"
+    assert catalog["status"] == intake["catalog"]["status"] == "active"
+    assert intake["certification"]["certified_seats"] == 1
+    assert metadata["certification_stage"] == "1-seat-certified"
     assert metadata["allowed_exposure_policies"] == ["internal", "public_code"]
     assert intake["runtime"]["allowed_exposure_policies"] == [
         "internal",

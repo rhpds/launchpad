@@ -596,8 +596,8 @@ def test_virtualization_foundations_records_exact_one_seat_proof_before_activati
         )
     )
 
-    assert catalog["status"] == "draft"
-    assert catalog["metadata"]["certification_stage"] == "1-seat-security-refresh-pending"
+    assert catalog["status"] == "active"
+    assert catalog["metadata"]["certification_stage"] == "1-seat-certified"
     assert catalog["metadata"]["workload_runtime_value_bindings"] == {
         "vm.sshAuthorizedKey": "VM_SSH_PUBLIC_KEY"
     }
@@ -610,8 +610,8 @@ def test_virtualization_foundations_records_exact_one_seat_proof_before_activati
         }
     )
     assert catalog["metadata"]["activation_blockers"] == []
-    assert intake["catalog"]["status"] == "draft"
-    assert intake["certification"]["certified_seats"] == 0
+    assert intake["catalog"]["status"] == "active"
+    assert intake["certification"]["certified_seats"] == 1
     assert catalog["metadata"]["showroom_content_ref"] == intake["sources"][
         "showroom"
     ]["revision"] == "3f622615f544c75db87a37833fc209b3d1b60731"

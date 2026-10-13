@@ -162,8 +162,9 @@
     document.body.removeChild(textarea)
   }
 
-  function pasteToTerminal (code, target) {
-    if (this.classList.contains('clicked')) return
+  async function pasteToTerminal (code, target) {
+    if (this.classList.contains('clicked') || this._executing) return
+    this._executing = true
     if (this._errorTimer) {
       clearTimeout(this._errorTimer)
       this._errorTimer = null
@@ -174,16 +175,25 @@
     const text = code.innerText.replace(TRAILING_SPACE_RX, '')
     try {
       const parentDoc = window.parent.document
-      let iframe
-      if (target === 'bottom') {
-        iframe = parentDoc.querySelector('.tabcontent.active .split.bottom iframe')
-      }
-      if (!iframe) {
-        iframe = parentDoc.querySelector('.tabcontent.active .main-content')
+      // Nookbag owns tab layout; resolve the terminal by its stable path,
+      // not the obsolete tabcontent/split CSS used by an older Showroom shell.
+      const tabs = Array.from(parentDoc.querySelectorAll('button'))
+      const terminalTab = tabs.find(function (button) {
+        return button.getAttribute("role") === 'tab' && button.textContent.trim() === 'Terminal'
+      })
+      if (terminalTab) terminalTab.click()
+      let iframe, textArea
+      for (let attempt = 0; attempt < 40; attempt++) {
+        const frames = Array.from(parentDoc.querySelectorAll('iframe[src*="/terminal"]'))
+        iframe = frames[target === 'bottom' ? 1 : 0]
+        if (iframe && iframe.contentDocument) {
+          textArea = iframe.contentDocument.querySelector('.xterm-helper-textarea') ||
+            iframe.contentDocument.getElementsByTagName('textarea')[0]
+          if (textArea) break
+        }
+        await new Promise(function (resolve) { window.setTimeout(resolve, 100) })
       }
       if (!iframe || !iframe.contentDocument) throw new Error('Terminal iframe not accessible.')
-      const textArea = iframe.contentDocument.querySelector('.xterm-helper-textarea') ||
-        iframe.contentDocument.getElementsByTagName('textarea')[0]
       if (!textArea) throw new Error('Textarea not found in terminal iframe.')
 
       textArea.focus()
@@ -207,6 +217,8 @@
     } catch (err) {
       console.error('Failed to paste to terminal:', err)
       showErrorFeedback(this)
+    } finally {
+      this._executing = false
     }
   }
 })()
