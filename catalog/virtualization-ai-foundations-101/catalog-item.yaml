@@ -4,7 +4,7 @@ description: Trace one attributable request from an OpenShift Virtualization VM 
   platform networking to governed Intel Xeon CPU inference and human authority.
 category: guided_build
 version: 0.1.0
-status: active
+status: draft
 required_capabilities:
 - openshift
 - showroom
@@ -41,15 +41,15 @@ metadata:
   certification_transfer: none
   showroom: true
   showroom_content_repo_url: https://github.com/jkershawrh/virtualization-ai-foundations.git
-  showroom_content_ref: e74393d0def1a7a2749911b3a421c62f3f1c2558
+  showroom_content_ref: 7079b405d380d531e9d7e33b41f66be88daa4c8c
   showroom_content_playbook: default-site.yml
   showroom_content_start_path: showroom/content
-  showroom_content_image: ghcr.io/jkershawrh/virtualization-ai-foundations-showroom-content@sha256:09474d2dc78aeced64efb8095cd23fe7ef62ce2409bfe742dccc6c8490f4eb20
+  showroom_content_image: ghcr.io/jkershawrh/virtualization-ai-foundations-showroom-content@sha256:aefbd49e58dbbbf42a854b5439668c828054e2dbbcc2233d77f3c63bc2d434ff
   operator_workshop: true
   content_only: false
   onboarding_managed: true
   onboarding_contract: catalog-onboarding/virtualization-ai-foundations-101.yaml
-  certification_stage: 1-seat-certified
+  certification_stage: 1-seat-security-refresh-pending
   max_workshop_seats: 1
   promotion_sequence:
   - 1
@@ -90,7 +90,7 @@ metadata:
   workshop_node_headroom_pods: 0
   workshop_node_required_labels: {}
   workload_repo: https://github.com/jkershawrh/virtualization-ai-foundations.git
-  workload_revision: e74393d0def1a7a2749911b3a421c62f3f1c2558
+  workload_revision: 7079b405d380d531e9d7e33b41f66be88daa4c8c
   workload_deploy_type: helm
   workload_deployment_scope: seat
   workload_deploy_path: charts/virtualization-ai-foundations
@@ -99,8 +99,8 @@ metadata:
   workload_release_name: virtualization-ai-foundations-101
   workload_helm_values:
     values_overlay: charts/virtualization-ai-foundations/values.published.yaml
-    workload_image: ghcr.io/jkershawrh/virtualization-ai-foundations-adapter@sha256:fef33f72569296df84888102c0dab19b607b56a14a5516de7eed1279dbb3fbad
-    presentation_image: ghcr.io/jkershawrh/virtualization-ai-foundations-presentation@sha256:c0e16f6c63a59989f0da349a97a8e661cb5eca3e356e1664ff571979551f50f0
+    workload_image: ghcr.io/jkershawrh/virtualization-ai-foundations-adapter@sha256:b2063555da50c79c195ea4145dda4b5a339e18febc4fa9e2d8d0bab10cc0f289
+    presentation_image: ghcr.io/jkershawrh/virtualization-ai-foundations-presentation@sha256:58a79075e9dde6e852314fcc60f4a292cde1939926bfdf0098a3817075162514
     presentation_enabled: true
     adapter:
       mode: live
@@ -132,5 +132,5 @@ metadata:
     ui: lab
   workload_readiness: []
   source_content_repo: https://github.com/jkershawrh/virtualization-ai-foundations.git
-  source_content_revision: e74393d0def1a7a2749911b3a421c62f3f1c2558
+  source_content_revision: 7079b405d380d531e9d7e33b41f66be88daa4c8c
   source_references: {}

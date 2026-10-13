@@ -1,0 +1,67 @@
+{
+  "schema": "launchpad.redhat.com/security-refresh-participant-review/v1",
+  "result": "SECURITY-GREEN-PARTICIPANT-JOURNEY-RED",
+  "catalog_item_id": "virtualization-ai-foundations-101",
+  "cluster": "flightpath",
+  "source_revision": "7079b405d380d531e9d7e33b41f66be88daa4c8c",
+  "release_workflow": "https://github.com/jkershawrh/virtualization-ai-foundations/actions/runs/38442396491",
+  "release_status": "success",
+  "security_exceptions_added": false,
+  "images": {
+    "adapter": "ghcr.io/jkershawrh/virtualization-ai-foundations-adapter@sha256:b2063555da50c79c195ea4145dda4b5a339e18febc4fa9e2d8d0bab10cc0f289",
+    "presentation": "ghcr.io/jkershawrh/virtualization-ai-foundations-presentation@sha256:58a79075e9dde6e852314fcc60f4a292cde1939926bfdf0098a3817075162514",
+    "showroom_content": "ghcr.io/jkershawrh/virtualization-ai-foundations-showroom-content@sha256:aefbd49e58dbbbf42a854b5439668c828054e2dbbcc2233d77f3c63bc2d434ff"
+  },
+  "supply_chain": {
+    "all_images_linux_amd64": true,
+    "all_images_high_critical_findings": 0,
+    "sboms_generated": true,
+    "signatures_verified": true,
+    "sbom_and_provenance_attestations_verified": true,
+    "exact_digests_observed_in_fresh_seat": true
+  },
+  "tests": {
+    "base_retirement_red": {"failed_subtests": 3, "passed": 9},
+    "source_release_green": {"python": 35, "ui": 34, "helm": "PASS", "build": "PASS", "offline_assets": "PASS"},
+    "launchpad_regression_before_catalog_refresh": {"passed": 52},
+    "candidate_catalog_and_historical_proof_separation": {"passed": 24}
+  },
+  "public_browser": {
+    "started_at": "2026-10-13T18:01:41.705Z",
+    "finished_at": "2026-10-13T18:04:59.213Z",
+    "order_id": "bcd7962f-24a9-4860-b47f-333029b52d8e",
+    "session_id": "1824c024-a603-4841-b8a8-839d14fc1d78",
+    "namespace": "launchpad-flightpath-candida-virtualization-ai-466d84",
+    "login": "PASS",
+    "landing_and_open_lab": "PASS",
+    "embedded_story_splash": "PASS",
+    "embedded_terminal_rendering": "PASS",
+    "embedded_console_authenticated_assigned_namespace": "PASS",
+    "unexpected_popups": 0,
+    "content_pages_passed": 9,
+    "my_lab_access_contains_claimed_seat": "PASS",
+    "rendered_command_blocks_collected": 19,
+    "rendered_command_execution": "FAIL",
+    "failed_stage": "verify",
+    "failed_block_index": 2,
+    "error": "install: cannot create directory '/opt/app-root': Permission denied",
+    "complete_live_inference_and_learner_cleanup": "NOT-REACHED"
+  },
+  "content_followup": {
+    "writable_key_path": "/tmp/virtualization-ai-101/ssh/lab-key",
+    "ssh_syntax": "Use virtctl --command and lab@vm/<vm-name>; supply namespace context to the guest client.",
+    "host_key_policy": "accept-new, not disabled",
+    "source_regression_red": {"failed": 1, "passed": 10},
+    "source_regression_green": {"passed": 11},
+    "status": "LOCAL-TESTED-NOT-PUBLISHED"
+  },
+  "cleanup": {
+    "workshop_status": "completed",
+    "remaining_labeled_namespaces": 0,
+    "all_resource_and_identity_residue_gate": "NOT-INDEPENDENTLY-REPEATED"
+  },
+  "catalog_status": "draft",
+  "certification_promoted": false,
+  "existing_seat_workloads_modified": false,
+  "contains_codes_keys_or_participant_emails": false
+}

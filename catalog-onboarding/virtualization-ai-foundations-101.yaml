@@ -6,7 +6,7 @@ catalog:
     through platform networking to governed Intel Xeon CPU inference and human authority.
   category: guided_build
   version: 0.1.0
-  status: active
+  status: draft
 learning:
   learning_level: '101'
   learning_stage: Learn
@@ -24,14 +24,14 @@ learning:
 sources:
   showroom:
     repo_url: https://github.com/jkershawrh/virtualization-ai-foundations.git
-    revision: e74393d0def1a7a2749911b3a421c62f3f1c2558
+    revision: 7079b405d380d531e9d7e33b41f66be88daa4c8c
     playbook: default-site.yml
     start_path: showroom/content
     gitops_repo_url: https://github.com/jkershawrh/virtualization-ai-foundations.git
-    content_image: ghcr.io/jkershawrh/virtualization-ai-foundations-showroom-content@sha256:09474d2dc78aeced64efb8095cd23fe7ef62ce2409bfe742dccc6c8490f4eb20
+    content_image: ghcr.io/jkershawrh/virtualization-ai-foundations-showroom-content@sha256:aefbd49e58dbbbf42a854b5439668c828054e2dbbcc2233d77f3c63bc2d434ff
   workload:
     repo_url: https://github.com/jkershawrh/virtualization-ai-foundations.git
-    revision: e74393d0def1a7a2749911b3a421c62f3f1c2558
+    revision: 7079b405d380d531e9d7e33b41f66be88daa4c8c
     deploy_path: charts/virtualization-ai-foundations
     gitops_repo_url: https://github.com/jkershawrh/virtualization-ai-foundations.git
 runtime:
@@ -79,8 +79,8 @@ runtime:
     release_name: virtualization-ai-foundations-101
     helm_values:
       values_overlay: charts/virtualization-ai-foundations/values.published.yaml
-      workload_image: ghcr.io/jkershawrh/virtualization-ai-foundations-adapter@sha256:fef33f72569296df84888102c0dab19b607b56a14a5516de7eed1279dbb3fbad
-      presentation_image: ghcr.io/jkershawrh/virtualization-ai-foundations-presentation@sha256:c0e16f6c63a59989f0da349a97a8e661cb5eca3e356e1664ff571979551f50f0
+      workload_image: ghcr.io/jkershawrh/virtualization-ai-foundations-adapter@sha256:b2063555da50c79c195ea4145dda4b5a339e18febc4fa9e2d8d0bab10cc0f289
+      presentation_image: ghcr.io/jkershawrh/virtualization-ai-foundations-presentation@sha256:58a79075e9dde6e852314fcc60f4a292cde1939926bfdf0098a3817075162514
       presentation_enabled: true
       adapter:
         mode: live
@@ -111,7 +111,7 @@ runtime:
     readiness: []
 certification:
   stage: 1-seat-certified
-  certified_seats: 1
+  certified_seats: 0
   max_workshop_seats: 1
   promotion_sequence:
   - 1

@@ -596,8 +596,8 @@ def test_virtualization_foundations_records_exact_one_seat_proof_before_activati
         )
     )
 
-    assert catalog["status"] == "active"
-    assert catalog["metadata"]["certification_stage"] == "1-seat-certified"
+    assert catalog["status"] == "draft"
+    assert catalog["metadata"]["certification_stage"] == "1-seat-security-refresh-pending"
     assert catalog["metadata"]["workload_runtime_value_bindings"] == {
         "vm.sshAuthorizedKey": "VM_SSH_PUBLIC_KEY"
     }
@@ -610,11 +610,11 @@ def test_virtualization_foundations_records_exact_one_seat_proof_before_activati
         }
     )
     assert catalog["metadata"]["activation_blockers"] == []
-    assert intake["catalog"]["status"] == "active"
-    assert intake["certification"]["certified_seats"] == 1
+    assert intake["catalog"]["status"] == "draft"
+    assert intake["certification"]["certified_seats"] == 0
     assert catalog["metadata"]["showroom_content_ref"] == intake["sources"][
         "showroom"
-    ]["revision"] == "e74393d0def1a7a2749911b3a421c62f3f1c2558"
+    ]["revision"] == "7079b405d380d531e9d7e33b41f66be88daa4c8c"
     assert catalog["metadata"]["showroom_content_image"] == intake["sources"][
         "showroom"
     ]["content_image"]
@@ -644,13 +644,14 @@ def test_virtualization_foundations_records_exact_one_seat_proof_before_activati
             "critical_inventory_findings": 0,
         },
     }
-    assert review["immutable_images"]["adapter"] == intake["runtime"]["workload"][
+    # This historical proof must not be silently transferred to refreshed images.
+    assert review["immutable_images"]["adapter"] != intake["runtime"]["workload"][
         "helm_values"
     ]["workload_image"]
-    assert review["immutable_images"]["presentation"] == intake["runtime"][
+    assert review["immutable_images"]["presentation"] != intake["runtime"][
         "workload"
     ]["helm_values"]["presentation_image"]
-    assert review["immutable_images"]["showroom_content"] == intake["sources"][
+    assert review["immutable_images"]["showroom_content"] != intake["sources"][
         "showroom"
     ]["content_image"]
     assert review["live_certification"]["result"] == "GREEN-live"

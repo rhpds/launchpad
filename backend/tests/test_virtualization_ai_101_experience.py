@@ -19,16 +19,16 @@ def test_101_records_certification_without_claiming_browser_console_sso() -> Non
     contract = _load(CERTIFICATION)
     metadata = catalog["metadata"]
 
-    assert catalog["status"] == intake["catalog"]["status"] == "active"
-    assert intake["certification"]["certified_seats"] == 1
-    assert metadata["certification_stage"] == "1-seat-certified"
+    assert catalog["status"] == intake["catalog"]["status"] == "draft"
+    assert intake["certification"]["certified_seats"] == 0
+    assert metadata["certification_stage"] == "1-seat-security-refresh-pending"
     assert metadata["allowed_exposure_policies"] == ["internal", "public_code"]
     assert intake["runtime"]["allowed_exposure_policies"] == [
         "internal",
         "public_code",
     ]
     assert metadata["showroom_journey"] == "virtualization-ai-101"
-    assert metadata["workload_revision"] == "e74393d0def1a7a2749911b3a421c62f3f1c2558"
+    assert metadata["workload_revision"] == "7079b405d380d531e9d7e33b41f66be88daa4c8c"
     assert metadata["recommended_next_items"] == ["virtualization-ai-201"]
     assert intake["learning"]["recommended_next_items"] == ["virtualization-ai-201"]
     assert metadata["showroom_tabs"] == intake["runtime"]["tabs"]
