@@ -31,4 +31,13 @@ def test_runtime_removes_unused_node_toolchain_and_updates_packaging_metadata() 
 def test_downloads_fail_closed() -> None:
     text = CONTAINERFILE.read_text()
 
-    assert text.count("curl --fail --silent --show-error --location") == 1
+    assert "https://get.helm.sh/" not in text
+    assert 'git checkout --detach "${HELM_SOURCE_COMMIT}"' in text
+
+
+def test_cluster_clients_use_patched_toolchain_and_network_module() -> None:
+    text = CONTAINERFILE.read_text()
+    assert "ENV GOTOOLCHAIN=go1.26.9" in text
+    assert "ARG GO_X_NET_VERSION=v0.60.0" in text
+    assert "golang.org/x/net=golang.org/x/net@${GO_X_NET_VERSION}" in text
+    assert "COPY --from=oc-builder /tmp/helm-bin /usr/local/bin/helm" in text

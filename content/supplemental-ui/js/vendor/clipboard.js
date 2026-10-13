@@ -8,6 +8,13 @@
   Array.from(document.querySelectorAll('.doc .listingblock pre.highlight')).forEach(function (pre) {
     const code = pre.querySelector('code')
     if (!code) return
+    if (pre.dataset.launchpadClipboard === 'ready') return
+    // The base theme may have already installed its legacy controls. Replace
+    // them rather than leaving a nonfunctional or duplicate Execute button.
+    Array.from(pre.parentNode.children).forEach(function (child) {
+      if (child.classList.contains('source-toolbox')) child.remove()
+    })
+    pre.dataset.launchpadClipboard = 'ready'
 
     const language = code.dataset.lang
     const toolbox = document.createElement('div')
