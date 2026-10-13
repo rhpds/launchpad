@@ -11,7 +11,13 @@ spec:
     pages:
       - {id: welcome, path: /www/virtualization-ai-501/index.html, marker: "Qualify a Governed VM Inference Fleet"}
       - {id: discover, path: /www/virtualization-ai-501/01-discover.html, marker: "DISCOVER"}
+      - {id: baseline, path: /www/virtualization-ai-501/02-baseline.html, marker: "BASELINE"}
+      - {id: migrate, path: /www/virtualization-ai-501/03-migrate.html, marker: "MIGRATE"}
+      - {id: disrupt, path: /www/virtualization-ai-501/04-disrupt.html, marker: "DISRUPT"}
+      - {id: correlate, path: /www/virtualization-ai-501/05-correlate.html, marker: "CORRELATE"}
       - {id: qualify, path: /www/virtualization-ai-501/06-qualify.html, marker: "QUALIFY"}
+      - {id: handoff, path: /www/virtualization-ai-501/07-handoff-reclaim.html, marker: "HANDOFF and participant cleanup"}
+      - {id: conclusion, path: /www/virtualization-ai-501/99-conclusion.html, marker: "Conclusion"}
   seat_probe:
     argv: [bash, scripts/certify-virtualization-ai-seat.sh, virtualization-ai-501, "{namespace}", "{cluster_ref}"]
     timeout_seconds: 1200
