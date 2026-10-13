@@ -10,8 +10,14 @@ spec:
   showroom:
     pages:
       - {id: welcome, path: /www/virtualization-ai-401/index.html, marker: "Operate Hybrid VM and AI Workloads"}
+      - {id: observe, path: /www/virtualization-ai-401/01-observe.html, marker: "OBSERVE"}
       - {id: preflight, path: /www/virtualization-ai-401/02-preflight.html, marker: "PREFLIGHT"}
+      - {id: propose, path: /www/virtualization-ai-401/03-propose.html, marker: "PROPOSE"}
+      - {id: approve, path: /www/virtualization-ai-401/04-approve.html, marker: "APPROVE"}
+      - {id: execute, path: /www/virtualization-ai-401/05-execute.html, marker: "EXECUTE the rehearsal"}
       - {id: validate, path: /www/virtualization-ai-401/06-validate.html, marker: "VALIDATE"}
+      - {id: learn, path: /www/virtualization-ai-401/07-learn-reclaim.html, marker: "LEARN and hand off"}
+      - {id: conclusion, path: /www/virtualization-ai-401/99-conclusion.html, marker: "Conclusion"}
   seat_probe:
     argv: [bash, scripts/certify-virtualization-ai-seat.sh, virtualization-ai-401, "{namespace}", "{cluster_ref}"]
     timeout_seconds: 900

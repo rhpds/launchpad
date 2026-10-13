@@ -55,3 +55,17 @@ def test_virtualization_ai_301_certifies_the_complete_learner_journey() -> None:
         "/www/virtualization-ai-301/main/07-reclaim.html",
         "/www/virtualization-ai-301/main/99-conclusion.html",
     ]
+
+
+def test_virtualization_ai_401_certifies_the_complete_learner_journey() -> None:
+    assert _page_paths("virtualization-ai-401") == [
+        "/www/virtualization-ai-401/index.html",
+        "/www/virtualization-ai-401/01-observe.html",
+        "/www/virtualization-ai-401/02-preflight.html",
+        "/www/virtualization-ai-401/03-propose.html",
+        "/www/virtualization-ai-401/04-approve.html",
+        "/www/virtualization-ai-401/05-execute.html",
+        "/www/virtualization-ai-401/06-validate.html",
+        "/www/virtualization-ai-401/07-learn-reclaim.html",
+        "/www/virtualization-ai-401/99-conclusion.html",
+    ]
