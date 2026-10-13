@@ -1,0 +1,220 @@
+{
+  "schema": "launchpad/public-browser-exploration/v1",
+  "catalog": "virtualization-ai-foundations-101",
+  "cluster": "flightpath",
+  "started_at": "2026-10-13T18:57:36.642Z",
+  "checks": [
+    {
+      "id": "order_created",
+      "passed": true,
+      "detail": {
+        "order_id": "b6c1d5a2-31d9-46ac-b196-94373678fadc",
+        "public_url": "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-b6c1d5a2"
+      }
+    },
+    {
+      "id": "one_seat_ready",
+      "passed": true,
+      "detail": [
+        {
+          "seat_id": "1d2232ee-1bf5-48e6-b234-5e0938815601",
+          "session_id": "d87442e2-ba9c-4fc8-b253-9e0673d11567"
+        }
+      ]
+    },
+    {
+      "id": "participant_landing",
+      "passed": true,
+      "detail": {
+        "url": "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-b6c1d5a2",
+        "text": "×\n|\nPartner AI Launchpad\nPARTICIPANT\nCurrent lab\nMy Lab Access\nLog out of lab\nPARTICIPANT WORKSPACE\nYour lab is ready\n\nSeat 1d2232ee-1bf5-48e6-b234-5e0938815601\n\nOpen Lab\nMy Lab Access\nLog out of lab\nLogging out preserves your seat. Access ends at 2026-10-13T20:57:40.590745."
+      }
+    },
+    {
+      "id": "showroom_shell",
+      "passed": true,
+      "detail": {
+        "url": "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-b6c1d5a2/showroom/",
+        "frames": [
+          "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-b6c1d5a2/showroom/",
+          "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-b6c1d5a2/showroom/www/virtualization-ai-101/main/index.html",
+          "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-b6c1d5a2/proxy/tool/story/",
+          "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-b6c1d5a2/showroom/terminal",
+          "https://labs.smg-helix.ai/k8s/ns/launchpad-flightpath-candida-virtualization-ai-1d2232/core~v1~Pod"
+        ],
+        "text": "Story\nTerminal\nOpenShift Console"
+      }
+    },
+    {
+      "id": "active_tab_story",
+      "passed": true,
+      "detail": {
+        "url": "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-b6c1d5a2/proxy/tool/story/",
+        "text": "×\nVirtualization + AI 101\n\nTrace a VM-hosted workload to governed Intel Xeon CPU inference\n\nCLICK OR PRESS SPACE TO BEGIN",
+        "canvas": 0,
+        "popups": []
+      }
+    },
+    {
+      "id": "active_tab_terminal",
+      "passed": true,
+      "detail": {
+        "url": "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-b6c1d5a2/showroom/terminal",
+        "text": "",
+        "canvas": 3,
+        "popups": []
+      }
+    },
+    {
+      "id": "active_tab_openshift_console",
+      "passed": true,
+      "detail": {
+        "url": "https://labs.smg-helix.ai/k8s/ns/launchpad-flightpath-candida-virtualization-ai-1d2232/core~v1~Pod?page=1&perPage=50",
+        "text": "Skip to content\nCore platform\nHome\nFavorites\nEcosystem\nWorkloads\nVirtualization\nMigration\nServerless\nNetworking\nStorage\nBuilds\nObserve\nUser Management\nAdministration\nProject: launchpad-flightpath-candida-virtualization-ai-1d2232\nPods\nCreate Pod\n1 - 4 of 4 items\nName\n\t\nStatus\n\t\nReady\n\t\nRestarts\n\t\nOwner\n\t\nMemory\n\t\nCPU\n\t\nCreated\n\t\nActions\n\n\nPod\nP\nai-analysis-adapter-8ffbc4cb5-5tfgj\n\t\nRunning\n\t1/1\t0\t\nReplicaSet\nRS\nai-analysis-adapter-8ffbc4cb5\n\t21.6 MiB\t0.000 cores\t\n1 minute ago\n\t\n\n\nPod\nP\nshowroom-67455db85f-szgg5\n\t\nRunning\n\t4/4\t0\t\nReplicaSet\nRS\nshowroom-67455db85f\n\t110.0 MiB\t-\t\n1 minute ago\n\t\n\n\nPod\nP\nvirt-launcher-operations-vm-7kp5g\n\t\nRunning\n\t3/3\t0\t\nVirtualMachineInstance\nVMI\noperations-vm\n\t750.2 MiB\t-\t\n1 minute ago\n\t\n\n\nPod\nP\nvirtualization-ai-presentation-9b756c4c-qm6hx\n\t\nRunning\n\t1/1\t0\t\nReplicaSet\nRS\nvirtualization-ai-presentation-9b756c4c\n\t12.2 MiB\t0.000 cores\t\n1 minute ago\n\t\nWelcome to the new OpenShift experience!\n\nIntroducing a fresh modern look to the console! With this update, we made changes to the user interface to enhance usability and streamline your workflow. This includes improved navigation and visual refinement to help manage your applications and infrastructure more easily.\n\nWhat do you want to do next?\nLaunch tour\nSkip tour",
+        "canvas": 0,
+        "popups": []
+      }
+    },
+    {
+      "id": "content_welcome",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Trace a VM to Governed AI"
+      }
+    },
+    {
+      "id": "content_verify",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Verify the runtime"
+      }
+    },
+    {
+      "id": "content_trace",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Trace the boundaries"
+      }
+    },
+    {
+      "id": "content_invoke",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Invoke from inside the VM"
+      }
+    },
+    {
+      "id": "content_inspect",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Inspect AI evidence"
+      }
+    },
+    {
+      "id": "content_failure",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Exercise safe failure"
+      }
+    },
+    {
+      "id": "content_evidence",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Export the evidence map"
+      }
+    },
+    {
+      "id": "content_cleanup",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Clean learner artifacts"
+      }
+    },
+    {
+      "id": "content_conclusion",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Conclusion"
+      }
+    },
+    {
+      "id": "learner_tool_dependencies",
+      "passed": true,
+      "detail": {
+        "tools": [
+          "/usr/local/bin/oc",
+          "/usr/bin/curl",
+          "/usr/bin/jq",
+          "/usr/local/bin/virtctl",
+          "/usr/bin/ssh",
+          "/usr/bin/uuidgen",
+          "/usr/bin/base64",
+          "/usr/bin/install",
+          "/usr/bin/chmod",
+          "/usr/bin/tee",
+          "/usr/bin/grep"
+        ]
+      }
+    },
+    {
+      "id": "complete_rendered_command_journey",
+      "passed": false,
+      "detail": {
+        "blocks": 19,
+        "completed_blocks": [
+          "JOURNEY_PASS_0_verify",
+          "JOURNEY_PASS_1_verify",
+          "JOURNEY_PASS_2_verify",
+          "JOURNEY_PASS_3_verify",
+          "JOURNEY_PASS_4_trace",
+          "JOURNEY_PASS_5_trace",
+          "JOURNEY_PASS_6_invoke"
+        ],
+        "live_vm_inference": false,
+        "output_tail": "ponent\":\"ai-adapter\",\"app.kubernetes.io/instance\":\"virtualization-ai-foundations-101\"}},\"policyTypes\":[\"Ingress\",\"Egress\"]}}\n    creationTimestamp: \"2026-10-13T18:57:46Z\"\n    generation: 1\n    labels:\n      app.kubernetes.io/instance: virtualization-ai-foundations-101\n      app.kubernetes.io/name: virtualization-ai-foundations\n      app.kubernetes.io/part-of: virtualization-ai-101\n      app.kubernetes.io/version: 0.1.0\n    name: ai-adapter-ingress\n    namespace: launchpad-flightpath-candida-virtualization-ai-1d2232\n    resourceVersion: \"128822074\"\n    uid: 98e7ad18-831c-4643-8688-c8b0884243d9\n  spec:\n    egress:\n    - ports:\n      - port: 53\n        protocol: UDP\n      - port: 53\n        protocol: TCP\n      - port: 5353\n        protocol: UDP\n      - port: 5353\n        protocol: TCP\n      to:\n      - namespaceSelector:\n          matchLabels:\n            kubernetes.io/metadata.name: openshift-dns\n        podSelector: {}\n    - ports:\n      - port: 443\n        protocol: TCP\n    - ports:\n      - port: 4000\n        protocol: TCP\n      to:\n      - namespaceSelector:\n          matchLabels:\n            kubernetes.io/metadata.name: launchpad-flightpath-candidate\n        podSelector: {}\n    ingress:\n    - from:\n      - podSelector: {}\n      ports:\n      - port: 8080\n        protocol: TCP\n    podSelector:\n      matchLabels:\n        app.kubernetes.io/component: ai-adapter\n        app.kubernetes.io/instance: virtualization-ai-foundations-101\n    policyTypes:\n    - Ingress\n    - Egress\nkind: List\nmetadata:\n  resourceVersion: \"\"\nJOURNEY_PASS_5_trace\nJOURNEY_BLOCK_6_invoke\n0a2760ee-8748-4bc7-ad14-89d88305bcccJOURNEY_PASS_6_invoke\nJOURNEY_BLOCK_7_invoke\nOperator note: intermittent vibration appears after restart and clears when load is reduced; inspect before the next production window.\n"
+      }
+    },
+    {
+      "id": "my_labs_contains_seat",
+      "passed": true,
+      "detail": {
+        "text": "×\n|\nPartner AI Launchpad\nPARTICIPANT\nCurrent lab\nMy Lab Access\nLog out of lab\nPARTICIPANT WORKSPACE\nMy Lab Access\n\nResume any active environment associated with your participant identity.\n\nvirtualization-ai-foundations-101\n\nAvailable until 2026-10-13T20:57:40.590745\n\nResume lab\nAdd another lab\n\nEnter the instructor code for another active lab.\n\nAdd lab"
+      }
+    },
+    {
+      "id": "reclaim_completed",
+      "passed": true,
+      "detail": {
+        "status": "completed",
+        "remaining_labeled_namespaces": 0
+      }
+    }
+  ],
+  "certified": false,
+  "order_id": "b6c1d5a2-31d9-46ac-b196-94373678fadc",
+  "public_url": "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-b6c1d5a2",
+  "seats": [
+    {
+      "seat_id": "1d2232ee-1bf5-48e6-b234-5e0938815601",
+      "session_id": "d87442e2-ba9c-4fc8-b253-9e0673d11567"
+    }
+  ],
+  "namespace": "launchpad-flightpath-candida-virtualization-ai-1d2232",
+  "cleanup_status": "completed",
+  "remaining_labeled_namespaces": 0,
+  "finished_at": "2026-10-13T19:01:04.946Z",
+  "source_revision": "e8e24527f85e663dac15db5366047e430e0740b0",
+  "release_run": "https://github.com/jkershawrh/virtualization-ai-foundations/actions/runs/38450150812",
+  "result": "INCONCLUSIVE-TEST-HARNESS-STDIN",
+  "harness_defect": "Interactive virtctl SSH consumed bash -s input, preventing later commands from executing. Repeating unchanged candidate with script pre-read before execution."
+}

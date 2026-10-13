@@ -44,9 +44,9 @@ oc --kubeconfig "$KUBECONFIG" create rolebinding "$probe_binding" --clusterrole=
 case "$catalog_id" in
   virtualization-ai-foundations-101)
     vm_names=(operations-vm); service=ai-analysis; route=lab; endpoint=/api/v1/analyze
-    source_revision="49cfe274b7dc191f786b1c5d8ff9e37869dc8170"
-    expected_presentation_image="ghcr.io/jkershawrh/virtualization-ai-foundations-presentation@sha256:a7f4339792038c299f08a5bf5076b50fb3cbcd44176c5b3737ba908566078c04"
-    expected_adapter_image="ghcr.io/jkershawrh/virtualization-ai-foundations-adapter@sha256:db4f9979a0dd2147d29120d8d32989b9ed3df6ef41c7d3f09c399b184d21146e" ;;
+    source_revision="3f622615f544c75db87a37833fc209b3d1b60731"
+    expected_presentation_image="ghcr.io/jkershawrh/virtualization-ai-foundations-presentation@sha256:205fb61bf069e59ce84817d5b69abbfc9f9bf3dd224206d29287b811af98368b"
+    expected_adapter_image="ghcr.io/jkershawrh/virtualization-ai-foundations-adapter@sha256:8046e653246f5cf6d35bbc841cf10a405c76a79d6d94b4c9ac47ca6781b57cf7" ;;
   virtualization-ai-201)
     vm_names=(contract-author-vm); service=virtualization-ai-201-adapter; route=lab; endpoint=/api/v1/qualify
     source_revision="3c94600ca8808a55693e94d5a1f169efbadbedd1"

@@ -1,0 +1,21 @@
+{
+  "schema": "launchpad/reclamation-check/v1",
+  "cluster": "flightpath",
+  "order_id": "e9779f85-f5be-434e-aa0c-78eef074448e",
+  "session_id": "49c12912-72da-439e-ba99-deca5f074ede",
+  "namespace": "launchpad-flightpath-candida-virtualization-ai-688a41",
+  "session_status": "reclaimed",
+  "maas_key_absent": true,
+  "maas_key_revocation": {
+    "provider": "litellm",
+    "confirmed_at": "2026-10-13T19:03:59.792171Z",
+    "confirmation_id": "http-success"
+  },
+  "public_access_enabled": false,
+  "active_claim_count": 0,
+  "remaining_namespace_count": 0,
+  "remaining_destination_applications": 0,
+  "remaining_claim_bound_persistent_volumes": 0,
+  "remaining_external_role_bindings_or_subjects": 0,
+  "limitations": ["Keycloak identity removal and public cookie revocation were not independently inspected."]
+}

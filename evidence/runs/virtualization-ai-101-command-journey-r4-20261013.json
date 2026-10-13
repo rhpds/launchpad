@@ -1,0 +1,235 @@
+{
+  "schema": "launchpad/public-browser-exploration/v1",
+  "catalog": "virtualization-ai-foundations-101",
+  "cluster": "flightpath",
+  "started_at": "2026-10-13T19:01:44.069Z",
+  "checks": [
+    {
+      "id": "order_created",
+      "passed": true,
+      "detail": {
+        "order_id": "e9779f85-f5be-434e-aa0c-78eef074448e",
+        "public_url": "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-e9779f85"
+      }
+    },
+    {
+      "id": "one_seat_ready",
+      "passed": true,
+      "detail": [
+        {
+          "seat_id": "688a4133-7b70-4184-84da-6d0acf85c18e",
+          "session_id": "49c12912-72da-439e-ba99-deca5f074ede"
+        }
+      ]
+    },
+    {
+      "id": "participant_landing",
+      "passed": true,
+      "detail": {
+        "url": "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-e9779f85",
+        "text": "×\n|\nPartner AI Launchpad\nPARTICIPANT\nCurrent lab\nMy Lab Access\nLog out of lab\nPARTICIPANT WORKSPACE\nYour lab is ready\n\nSeat 688a4133-7b70-4184-84da-6d0acf85c18e\n\nOpen Lab\nMy Lab Access\nLog out of lab\nLogging out preserves your seat. Access ends at 2026-10-13T21:01:47.509159."
+      }
+    },
+    {
+      "id": "showroom_shell",
+      "passed": true,
+      "detail": {
+        "url": "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-e9779f85/showroom/",
+        "frames": [
+          "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-e9779f85/showroom/",
+          "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-e9779f85/showroom/www/virtualization-ai-101/main/index.html",
+          "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-e9779f85/proxy/tool/story/",
+          "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-e9779f85/showroom/terminal",
+          "https://labs.smg-helix.ai/k8s/ns/launchpad-flightpath-candida-virtualization-ai-688a41/core~v1~Pod"
+        ],
+        "text": "Story\nTerminal\nOpenShift Console"
+      }
+    },
+    {
+      "id": "active_tab_story",
+      "passed": true,
+      "detail": {
+        "url": "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-e9779f85/proxy/tool/story/",
+        "text": "×\nVirtualization + AI 101\n\nTrace a VM-hosted workload to governed Intel Xeon CPU inference\n\nCLICK OR PRESS SPACE TO BEGIN",
+        "canvas": 0,
+        "popups": []
+      }
+    },
+    {
+      "id": "active_tab_terminal",
+      "passed": true,
+      "detail": {
+        "url": "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-e9779f85/showroom/terminal",
+        "text": "",
+        "canvas": 3,
+        "popups": []
+      }
+    },
+    {
+      "id": "active_tab_openshift_console",
+      "passed": false,
+      "detail": {
+        "url": "https://labs.smg-helix.ai/k8s/ns/launchpad-flightpath-candida-virtualization-ai-688a41/core~v1~Pod",
+        "text": "",
+        "canvas": 0,
+        "popups": []
+      }
+    },
+    {
+      "id": "content_welcome",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Trace a VM to Governed AI"
+      }
+    },
+    {
+      "id": "content_verify",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Verify the runtime"
+      }
+    },
+    {
+      "id": "content_trace",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Trace the boundaries"
+      }
+    },
+    {
+      "id": "content_invoke",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Invoke from inside the VM"
+      }
+    },
+    {
+      "id": "content_inspect",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Inspect AI evidence"
+      }
+    },
+    {
+      "id": "content_failure",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Exercise safe failure"
+      }
+    },
+    {
+      "id": "content_evidence",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Export the evidence map"
+      }
+    },
+    {
+      "id": "content_cleanup",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Clean learner artifacts"
+      }
+    },
+    {
+      "id": "content_conclusion",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Conclusion"
+      }
+    },
+    {
+      "id": "learner_tool_dependencies",
+      "passed": true,
+      "detail": {
+        "tools": [
+          "/usr/local/bin/oc",
+          "/usr/bin/curl",
+          "/usr/bin/jq",
+          "/usr/local/bin/virtctl",
+          "/usr/bin/ssh",
+          "/usr/bin/uuidgen",
+          "/usr/bin/base64",
+          "/usr/bin/install",
+          "/usr/bin/chmod",
+          "/usr/bin/tee",
+          "/usr/bin/grep"
+        ]
+      }
+    },
+    {
+      "id": "complete_rendered_command_journey",
+      "passed": false,
+      "detail": {
+        "blocks": 19,
+        "completed_blocks": [
+          "JOURNEY_PASS_0_verify",
+          "JOURNEY_PASS_1_verify",
+          "JOURNEY_PASS_2_verify",
+          "JOURNEY_PASS_3_verify",
+          "JOURNEY_PASS_4_trace",
+          "JOURNEY_PASS_5_trace",
+          "JOURNEY_PASS_6_invoke",
+          "JOURNEY_PASS_7_invoke",
+          "JOURNEY_PASS_8_invoke",
+          "JOURNEY_PASS_9_invoke",
+          "JOURNEY_PASS_10_inspect",
+          "JOURNEY_PASS_11_inspect",
+          "JOURNEY_PASS_12_failure",
+          "JOURNEY_PASS_13_failure",
+          "JOURNEY_PASS_14_failure",
+          "JOURNEY_PASS_15_evidence",
+          "JOURNEY_PASS_16_cleanup",
+          "JOURNEY_PASS_17_cleanup"
+        ],
+        "output_tail": "\n  \"condition\": \"model-unavailable\",\n  \"ai_participated\": false,\n  \"model\": null,\n  \"result\": null,\n  \"validation\": {\n    \"schema_valid\": true,\n    \"category_valid\": false\n  },\n  \"authority\": {\n    \"model\": \"advisory-only\",\n    \"final_decision_owner\": \"human operator\",\n    \"actions_permitted\": []\n  }\n}\nJOURNEY_PASS_14_failure\nJOURNEY_BLOCK_15_evidence\n{\n  \"schema_version\": \"learner-evidence-map/v1\",\n  \"claims\": [\n    {\n      \"claim\": \"The request originated inside the VM and crossed the Service boundary\",\n      \"evidence_ids\": [\n        \"vm-request-receipt\",\n        \"service-route-receipt\"\n      ],\n      \"request_id\": \"c0051cda-f9c4-4ca6-a651-970d2f106da3\",\n      \"source_state\": \"LIVE\"\n    },\n    {\n      \"claim\": \"A named Intel Xeon CPU model produced a schema-valid advisory result\",\n      \"evidence_ids\": [\n        \"model-invocation-receipt\",\n        \"output-validation-receipt\"\n      ],\n      \"model\": {\n        \"id\": \"granite-3.2-8b-tools\",\n        \"provider\": \"openai-compatible\",\n        \"hardware\": \"Intel Xeon CPU\"\n      },\n      \"ai_participated\": true\n    },\n    {\n      \"claim\": \"The unavailable condition returned no model result and no action authority\",\n      \"evidence_ids\": [\n        \"model-unavailable-receipt\"\n      ],\n      \"request_id\": \"05fd85ae-ef6d-4b29-be7c-c2e78e986be2\",\n      \"ai_participated\": false,\n      \"final_decision_owner\": \"human operator\"\n    }\n  ],\n  \"limitations\": [\n    \"No performance, cost, capacity, quality, or fleet-scale claim was tested\",\n    \"The model output is advisory; the human operator owns the decision\",\n    \"REHEARSAL or OFFLINE state cannot satisfy a live inference claim\"\n  ]\n}\nJOURNEY_PASS_15_evidence\nJOURNEY_BLOCK_16_cleanup\ntrue\nJOURNEY_PASS_16_cleanup\nJOURNEY_BLOCK_17_cleanup\nJOURNEY_PASS_17_cleanup\nJOURNEY_BLOCK_18_cleanup\n",
+        "error_tail": "Warning: Permanently added 'vm.operations-vm.launchpad-flightpath-candida-virtualization-ai-688a41' (ED25519) to the list of known hosts.\r\nVM_REQUEST_RECEIPT {\"schema_version\":\"vm-request-receipt/v1\",\"request_id\":\"c0051cda-f9c4-4ca6-a651-970d2f106da3\",\"guest_hostname\":\"operations-vm\",\"observed_at\":\"2026-10-13T19:03:49.167646Z\"}\nVM_REQUEST_RECEIPT {\"schema_version\":\"vm-request-receipt/v1\",\"request_id\":\"05fd85ae-ef6d-4b29-be7c-c2e78e986be2\",\"guest_hostname\":\"operations-vm\",\"observed_at\":\"2026-10-13T19:03:55.667179Z\"}\nWarning: resource 'namespaces' is not namespace scoped\n\ncommand terminated with exit code 1\n"
+      }
+    },
+    {
+      "id": "my_labs_contains_seat",
+      "passed": true,
+      "detail": {
+        "text": "×\n|\nPartner AI Launchpad\nPARTICIPANT\nCurrent lab\nMy Lab Access\nLog out of lab\nPARTICIPANT WORKSPACE\nMy Lab Access\n\nResume any active environment associated with your participant identity.\n\nvirtualization-ai-foundations-101\n\nAvailable until 2026-10-13T21:01:47.509159\n\nResume lab\nAdd another lab\n\nEnter the instructor code for another active lab.\n\nAdd lab"
+      }
+    },
+    {
+      "id": "reclaim_completed",
+      "passed": true,
+      "detail": {
+        "status": "completed",
+        "remaining_labeled_namespaces": 0
+      }
+    }
+  ],
+  "certified": false,
+  "order_id": "e9779f85-f5be-434e-aa0c-78eef074448e",
+  "public_url": "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-e9779f85",
+  "seats": [
+    {
+      "seat_id": "688a4133-7b70-4184-84da-6d0acf85c18e",
+      "session_id": "49c12912-72da-439e-ba99-deca5f074ede"
+    }
+  ],
+  "namespace": "launchpad-flightpath-candida-virtualization-ai-688a41",
+  "cleanup_status": "completed",
+  "remaining_labeled_namespaces": 0,
+  "finished_at": "2026-10-13T19:05:25.878Z",
+  "source_revision": "e8e24527f85e663dac15db5366047e430e0740b0",
+  "release_run": "https://github.com/jkershawrh/virtualization-ai-foundations/actions/runs/38450150812",
+  "result": "PARTICIPANT-JOURNEY-RED-FINAL-DENIAL-CHECK",
+  "live_inference_assertion_passed": true,
+  "caveats": [
+    "OpenShift Console body was blank at the 12-second sample; browser success remains unproven for this run.",
+    "Namespace deletion verified; identity/model-key/PV/Application residue not independently checked."
+  ]
+}

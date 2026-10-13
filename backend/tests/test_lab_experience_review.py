@@ -614,7 +614,7 @@ def test_virtualization_foundations_records_exact_one_seat_proof_before_activati
     assert intake["certification"]["certified_seats"] == 0
     assert catalog["metadata"]["showroom_content_ref"] == intake["sources"][
         "showroom"
-    ]["revision"] == "49cfe274b7dc191f786b1c5d8ff9e37869dc8170"
+    ]["revision"] == "3f622615f544c75db87a37833fc209b3d1b60731"
     assert catalog["metadata"]["showroom_content_image"] == intake["sources"][
         "showroom"
     ]["content_image"]

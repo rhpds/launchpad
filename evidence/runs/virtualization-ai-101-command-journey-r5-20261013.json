@@ -1,0 +1,299 @@
+{
+  "schema": "launchpad/public-browser-exploration/v1",
+  "catalog": "virtualization-ai-foundations-101",
+  "cluster": "flightpath",
+  "started_at": "2026-10-13T19:09:57.874Z",
+  "checks": [
+    {
+      "id": "order_created",
+      "passed": true,
+      "detail": {
+        "order_id": "9d4bd6d8-f9cb-4804-b382-b15c2291dd5b",
+        "public_url": "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-9d4bd6d8"
+      }
+    },
+    {
+      "id": "one_seat_ready",
+      "passed": true,
+      "detail": [
+        {
+          "seat_id": "58310596-1737-45e4-a8b0-9fc3600a7eea",
+          "session_id": "d53f360e-2d75-4157-9720-91420d1c45ac"
+        }
+      ]
+    },
+    {
+      "id": "participant_landing",
+      "passed": true,
+      "detail": {
+        "url": "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-9d4bd6d8",
+        "text": "×\n|\nPartner AI Launchpad\nPARTICIPANT\nCurrent lab\nMy Lab Access\nLog out of lab\nPARTICIPANT WORKSPACE\nYour lab is ready\n\nSeat 58310596-1737-45e4-a8b0-9fc3600a7eea\n\nOpen Lab\nMy Lab Access\nLog out of lab\nLogging out preserves your seat. Access ends at 2026-10-13T21:10:02.174440."
+      }
+    },
+    {
+      "id": "showroom_shell",
+      "passed": true,
+      "detail": {
+        "url": "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-9d4bd6d8/showroom/",
+        "frames": [
+          "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-9d4bd6d8/showroom/",
+          "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-9d4bd6d8/showroom/www/virtualization-ai-101/main/index.html",
+          "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-9d4bd6d8/proxy/tool/story/",
+          "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-9d4bd6d8/showroom/terminal",
+          "https://labs.smg-helix.ai/k8s/ns/launchpad-flightpath-candida-virtualization-ai-583105/core~v1~Pod"
+        ],
+        "text": "Story\nTerminal\nOpenShift Console"
+      }
+    },
+    {
+      "id": "active_tab_story",
+      "passed": true,
+      "detail": {
+        "url": "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-9d4bd6d8/proxy/tool/story/",
+        "text": "×\nVirtualization + AI 101\n\nTrace a VM-hosted workload to governed Intel Xeon CPU inference\n\nCLICK OR PRESS SPACE TO BEGIN",
+        "canvas": 0,
+        "popups": []
+      }
+    },
+    {
+      "id": "active_tab_terminal",
+      "passed": true,
+      "detail": {
+        "url": "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-9d4bd6d8/showroom/terminal",
+        "text": "",
+        "canvas": 3,
+        "popups": []
+      }
+    },
+    {
+      "id": "active_tab_openshift_console",
+      "passed": true,
+      "detail": {
+        "url": "https://labs.smg-helix.ai/k8s/ns/launchpad-flightpath-candida-virtualization-ai-583105/core~v1~Pod?page=1&perPage=50",
+        "text": "Skip to content\nCore platform\nHome\nFavorites\nEcosystem\nWorkloads\nVirtualization\nMigration\nServerless\nNetworking\nStorage\nBuilds\nObserve\nUser Management\nAdministration\nProject: launchpad-flightpath-candida-virtualization-ai-583105\nPods\nCreate Pod\n1 - 4 of 4 items\nName\n\t\nStatus\n\t\nReady\n\t\nRestarts\n\t\nOwner\n\t\nMemory\n\t\nCPU\n\t\nCreated\n\t\nActions\n\n\nPod\nP\nai-analysis-adapter-644749fbf-n44g6\n\t\nRunning\n\t1/1\t0\t\nReplicaSet\nRS\nai-analysis-adapter-644749fbf\n\t21.6 MiB\t0.000 cores\t\n1 minute ago\n\t\n\n\nPod\nP\nshowroom-bb8446b69-5gdtz\n\t\nRunning\n\t4/4\t0\t\nReplicaSet\nRS\nshowroom-bb8446b69\n\t114.1 MiB\t0.002 cores\t\n1 minute ago\n\t\n\n\nPod\nP\nvirt-launcher-operations-vm-n6g52\n\t\nRunning\n\t3/3\t0\t\nVirtualMachineInstance\nVMI\noperations-vm\n\t746.5 MiB\t0.074 cores\t\n1 minute ago\n\t\n\n\nPod\nP\nvirtualization-ai-presentation-648585f849-ttd49\n\t\nRunning\n\t1/1\t0\t\nReplicaSet\nRS\nvirtualization-ai-presentation-648585f849\n\t12.2 MiB\t0.000 cores\t\n1 minute ago\n\t\nWelcome to the new OpenShift experience!\n\nIntroducing a fresh modern look to the console! With this update, we made changes to the user interface to enhance usability and streamline your workflow. This includes improved navigation and visual refinement to help manage your applications and infrastructure more easily.\n\nWhat do you want to do next?\nLaunch tour\nSkip tour",
+        "canvas": 0,
+        "popups": []
+      }
+    },
+    {
+      "id": "content_welcome",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Trace a VM to Governed AI"
+      }
+    },
+    {
+      "id": "content_verify",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Verify the runtime"
+      }
+    },
+    {
+      "id": "content_trace",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Trace the boundaries"
+      }
+    },
+    {
+      "id": "content_invoke",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Invoke from inside the VM"
+      }
+    },
+    {
+      "id": "content_inspect",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Inspect AI evidence"
+      }
+    },
+    {
+      "id": "content_failure",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Exercise safe failure"
+      }
+    },
+    {
+      "id": "content_evidence",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Export the evidence map"
+      }
+    },
+    {
+      "id": "content_cleanup",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Clean learner artifacts"
+      }
+    },
+    {
+      "id": "content_conclusion",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Conclusion"
+      }
+    },
+    {
+      "id": "learner_tool_dependencies",
+      "passed": true,
+      "detail": {
+        "tools": [
+          "/usr/local/bin/oc",
+          "/usr/bin/curl",
+          "/usr/bin/jq",
+          "/usr/local/bin/virtctl",
+          "/usr/bin/ssh",
+          "/usr/bin/uuidgen",
+          "/usr/bin/base64",
+          "/usr/bin/install",
+          "/usr/bin/chmod",
+          "/usr/bin/tee",
+          "/usr/bin/grep"
+        ]
+      }
+    },
+    {
+      "id": "complete_rendered_command_journey",
+      "passed": true,
+      "detail": {
+        "blocks": 19,
+        "completed_blocks": [
+          "JOURNEY_PASS_0_verify",
+          "JOURNEY_PASS_1_verify",
+          "JOURNEY_PASS_2_verify",
+          "JOURNEY_PASS_3_verify",
+          "JOURNEY_PASS_4_trace",
+          "JOURNEY_PASS_5_trace",
+          "JOURNEY_PASS_6_invoke",
+          "JOURNEY_PASS_7_invoke",
+          "JOURNEY_PASS_8_invoke",
+          "JOURNEY_PASS_9_invoke",
+          "JOURNEY_PASS_10_inspect",
+          "JOURNEY_PASS_11_inspect",
+          "JOURNEY_PASS_12_failure",
+          "JOURNEY_PASS_13_failure",
+          "JOURNEY_PASS_14_failure",
+          "JOURNEY_PASS_15_evidence",
+          "JOURNEY_PASS_16_cleanup",
+          "JOURNEY_PASS_17_cleanup",
+          "JOURNEY_PASS_18_cleanup"
+        ],
+        "live_vm_inference": true,
+        "output_tail": " \"final_decision_owner\": \"human operator\",\n    \"actions_permitted\": []\n  }\n}\nJOURNEY_PASS_14_failure\nJOURNEY_BLOCK_15_evidence\n{\n  \"schema_version\": \"learner-evidence-map/v1\",\n  \"claims\": [\n    {\n      \"claim\": \"The request originated inside the VM and crossed the Service boundary\",\n      \"evidence_ids\": [\n        \"vm-request-receipt\",\n        \"service-route-receipt\"\n      ],\n      \"request_id\": \"82d3a8a0-bee5-4dfa-9c46-3972dd391a8c\",\n      \"source_state\": \"LIVE\"\n    },\n    {\n      \"claim\": \"A named Intel Xeon CPU model produced a schema-valid advisory result\",\n      \"evidence_ids\": [\n        \"model-invocation-receipt\",\n        \"output-validation-receipt\"\n      ],\n      \"model\": {\n        \"id\": \"granite-3.2-8b-tools\",\n        \"provider\": \"openai-compatible\",\n        \"hardware\": \"Intel Xeon CPU\"\n      },\n      \"ai_participated\": true\n    },\n    {\n      \"claim\": \"The unavailable condition returned no model result and no action authority\",\n      \"evidence_ids\": [\n        \"model-unavailable-receipt\"\n      ],\n      \"request_id\": \"0ab658f5-18b2-4ea4-89a3-7007d761d60b\",\n      \"ai_participated\": false,\n      \"final_decision_owner\": \"human operator\"\n    }\n  ],\n  \"limitations\": [\n    \"No performance, cost, capacity, quality, or fleet-scale claim was tested\",\n    \"The model output is advisory; the human operator owns the decision\",\n    \"REHEARSAL or OFFLINE state cannot satisfy a live inference claim\"\n  ]\n}\nJOURNEY_PASS_15_evidence\nJOURNEY_BLOCK_16_cleanup\ntrue\nJOURNEY_PASS_16_cleanup\nJOURNEY_BLOCK_17_cleanup\nJOURNEY_PASS_17_cleanup\nJOURNEY_BLOCK_18_cleanup\nvirtualmachine.kubevirt.io/operations-vm\nvirtualmachineinstance.kubevirt.io/operations-vm\ndeployment.apps/ai-analysis-adapter\ndeployment.apps/virtualization-ai-presentation\nJOURNEY_PASS_18_cleanup\nFULL_LEARNER_JOURNEY_COMPLETE\n"
+      }
+    },
+    {
+      "id": "my_labs_contains_seat",
+      "passed": true,
+      "detail": {
+        "text": "×\n|\nPartner AI Launchpad\nPARTICIPANT\nCurrent lab\nMy Lab Access\nLog out of lab\nPARTICIPANT WORKSPACE\nMy Lab Access\n\nResume any active environment associated with your participant identity.\n\nvirtualization-ai-foundations-101\n\nAvailable until 2026-10-13T21:10:02.174440\n\nResume lab\nAdd another lab\n\nEnter the instructor code for another active lab.\n\nAdd lab"
+      }
+    },
+    {
+      "id": "reclaim_completed",
+      "passed": true,
+      "detail": {
+        "status": "completed",
+        "remaining_labeled_namespaces": 0
+      }
+    }
+  ],
+  "certified": false,
+  "order_id": "9d4bd6d8-f9cb-4804-b382-b15c2291dd5b",
+  "public_url": "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-9d4bd6d8",
+  "seats": [
+    {
+      "seat_id": "58310596-1737-45e4-a8b0-9fc3600a7eea",
+      "session_id": "d53f360e-2d75-4157-9720-91420d1c45ac"
+    }
+  ],
+  "namespace": "launchpad-flightpath-candida-virtualization-ai-583105",
+  "cleanup_status": "completed",
+  "remaining_labeled_namespaces": 0,
+  "finished_at": "2026-10-13T19:13:35.501Z",
+  "source_revision": "3f622615f544c75db87a37833fc209b3d1b60731",
+  "launchpad_commit_before_run": "4ab4700a",
+  "launchpad_candidate_state": "Scoped Virt AI 101 draft pins applied from the working tree; application image unchanged.",
+  "release_run": "https://github.com/jkershawrh/virtualization-ai-foundations/actions/runs/38452042420",
+  "runtime_images": [
+    {
+      "name": "ai-analysis-adapter-644749fbf-n44g6",
+      "images": [
+        "ghcr.io/jkershawrh/virtualization-ai-foundations-adapter@sha256:8046e653246f5cf6d35bbc841cf10a405c76a79d6d94b4c9ac47ca6781b57cf7"
+      ],
+      "init_images": []
+    },
+    {
+      "name": "showroom-bb8446b69-5gdtz",
+      "images": [
+        "quay.io/rhpds/traefik:v3.7.9",
+        "quay.io/rhpds/showroom-content:v1.4.2",
+        "quay.io/rh-ee-jkershaw/launchpad-showroom-terminal@sha256:324dc5c4201f0da030a572dab389bc8cfdc2f66e800dff3fcee824b7e795daae",
+        "quay.io/rhpds/wetty:v3.2.1"
+      ],
+      "init_images": [
+        "ghcr.io/jkershawrh/virtualization-ai-foundations-showroom-content@sha256:b3db1c123fa309d25fb3df00fc1f4ef6f60b8da9c741d52c0f0313ccf23ed9b3",
+        "quay.io/rhpds/antora:v1.3.0"
+      ]
+    },
+    {
+      "name": "virt-launcher-operations-vm-n6g52",
+      "images": [
+        "registry.redhat.io/container-native-virtualization/virt-launcher-rhel9@sha256:77f30db178a2088a6010c5a531118d24a37c69ac9c200277cdc14ff6d70268a3",
+        "quay.io/containerdisks/fedora@sha256:ae48475e213bd3d34415e8f123f5a79166b1eb142fdf851654e3adb9d02fb73f"
+      ],
+      "init_images": [
+        "registry.redhat.io/container-native-virtualization/virt-launcher-rhel9@sha256:77f30db178a2088a6010c5a531118d24a37c69ac9c200277cdc14ff6d70268a3",
+        "registry.redhat.io/container-native-virtualization/virt-launcher-rhel9@sha256:77f30db178a2088a6010c5a531118d24a37c69ac9c200277cdc14ff6d70268a3",
+        "quay.io/containerdisks/fedora@sha256:ae48475e213bd3d34415e8f123f5a79166b1eb142fdf851654e3adb9d02fb73f"
+      ]
+    },
+    {
+      "name": "virtualization-ai-presentation-648585f849-ttd49",
+      "images": [
+        "ghcr.io/jkershawrh/virtualization-ai-foundations-presentation@sha256:205fb61bf069e59ce84817d5b69abbfc9f9bf3dd224206d29287b811af98368b"
+      ],
+      "init_images": []
+    }
+  ],
+  "release_high_critical_matches": {
+    "adapter": 0,
+    "presentation": 0,
+    "showroom_content": 0
+  },
+  "result": "GREEN-live-public-learner-command-journey",
+  "cleanup": {
+    "remaining_namespace": 0,
+    "remaining_destination_applications": 0,
+    "remaining_claim_bound_persistent_volumes": 0,
+    "remaining_external_bindings_or_subjects": 0,
+    "public_access_enabled": false,
+    "active_claims": 0,
+    "maas_key_absent": true,
+    "maas_key_revocation": {
+      "provider": "litellm",
+      "confirmed_at": "2026-10-13T19:12:09.795674Z",
+      "confirmation_id": "http-success"
+    }
+  },
+  "limitations": [
+    "Rendered commands executed in the real seat terminal via its existing credentials; Execute-button interaction was not exercised.",
+    "Story splash/tab loading passed; complete presentation navigation was not exercised.",
+    "Keycloak identity removal, cookie revocation, and additional cross-namespace/cluster authorization checks remain outside this run.",
+    "Catalog promotion and full release certification remain pending."
+  ]
+}
