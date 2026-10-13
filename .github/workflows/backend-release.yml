@@ -68,6 +68,16 @@ jobs:
             org.opencontainers.image.revision=${{ inputs.expected_sha }}
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
 
+      - name: Release build cache before security scanning
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Preserve the loaded candidate; discard only this ephemeral runner's
+          # build cache so the scanner can unpack it and its vulnerability DB.
+          docker buildx prune --all --force
+          docker builder prune --all --force
+          df -h / /tmp
+
       - name: Inventory all candidate vulnerabilities
         uses: anchore/scan-action@1638637db639e0ade3258b51db49a9a137574c3e
         with:

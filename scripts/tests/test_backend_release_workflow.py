@@ -56,7 +56,7 @@ def test_backend_release_uses_pinned_actions_and_repository_scoped_ghcr_identity
     )
     assert workflow["permissions"]["packages"] == "write"
     assert workflow["env"]["IMAGE_REPOSITORY"] == (
-        "ghcr.io/${{ github.repository_owner }}/launchpad-backend"
+        "ghcr.io/${{ github.repository_owner }}/${{ inputs.image_name }}"
     )
     assert login["with"]["registry"] == "ghcr.io"
     assert login["with"]["username"] == "${{ github.actor }}"
@@ -65,3 +65,14 @@ def test_backend_release_uses_pinned_actions_and_repository_scoped_ghcr_identity
     credential_value = login["with"][credential_fields.pop()]
     assert credential_value == "${{ secrets.GITHUB_TOKEN }}"
     assert "LAUNCHPAD_QUAY" not in text
+
+
+def test_backend_release_reclaims_only_build_cache_before_scan() -> None:
+    text, workflow = _workflow()
+    steps = workflow["jobs"]["release"]["steps"]
+    names = [step.get("name") for step in steps]
+    assert names.index("Release build cache before security scanning") < names.index(
+        "Inventory all candidate vulnerabilities"
+    )
+    assert "docker builder prune --all --force" in text
+    assert "docker image prune" not in text
