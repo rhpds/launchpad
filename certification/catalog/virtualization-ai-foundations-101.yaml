@@ -27,9 +27,9 @@ spec:
     json_assertions: &assertions
       - {path: result, equals: GREEN-live-internal-seat}
       - {path: cluster_ref, equals: flightpath}
-      - {path: provenance.source_revision, equals: 7079b405d380d531e9d7e33b41f66be88daa4c8c}
-      - {path: runtime_images.presentation, equals: "ghcr.io/jkershawrh/virtualization-ai-foundations-presentation@sha256:58a79075e9dde6e852314fcc60f4a292cde1939926bfdf0098a3817075162514"}
-      - {path: runtime_images.adapter, equals: "ghcr.io/jkershawrh/virtualization-ai-foundations-adapter@sha256:b2063555da50c79c195ea4145dda4b5a339e18febc4fa9e2d8d0bab10cc0f289"}
+      - {path: provenance.source_revision, equals: 49cfe274b7dc191f786b1c5d8ff9e37869dc8170}
+      - {path: runtime_images.presentation, equals: "ghcr.io/jkershawrh/virtualization-ai-foundations-presentation@sha256:a7f4339792038c299f08a5bf5076b50fb3cbcd44176c5b3737ba908566078c04"}
+      - {path: runtime_images.adapter, equals: "ghcr.io/jkershawrh/virtualization-ai-foundations-adapter@sha256:db4f9979a0dd2147d29120d8d32989b9ed3df6ef41c7d3f09c399b184d21146e"}
       - {path: readiness.vms_running, equals: 1}
       - {path: readiness.vmis_ready, equals: 1}
       - {path: readiness.presentation_http_status, equals: 200}

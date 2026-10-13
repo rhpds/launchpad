@@ -1,0 +1,198 @@
+{
+  "schema": "launchpad/public-browser-exploration/v1",
+  "catalog": "virtualization-ai-foundations-101",
+  "cluster": "flightpath",
+  "started_at": "2026-10-13T18:28:26.192Z",
+  "checks": [
+    {
+      "id": "order_created",
+      "passed": true,
+      "detail": {
+        "order_id": "18679f3b-12a0-4adb-8193-c3e3d4ccf4ea",
+        "public_url": "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-18679f3b"
+      }
+    },
+    {
+      "id": "one_seat_ready",
+      "passed": true,
+      "detail": [
+        {
+          "seat_id": "93832688-90ba-4ac7-a697-5df1e9da47b8",
+          "session_id": "d4dba363-7f22-45da-bb75-0ea33619f29c"
+        }
+      ]
+    },
+    {
+      "id": "participant_landing",
+      "passed": true,
+      "detail": {
+        "url": "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-18679f3b",
+        "text": "×\n|\nPartner AI Launchpad\nPARTICIPANT\nCurrent lab\nMy Lab Access\nLog out of lab\nPARTICIPANT WORKSPACE\nYour lab is ready\n\nSeat 93832688-90ba-4ac7-a697-5df1e9da47b8\n\nOpen Lab\nMy Lab Access\nLog out of lab\nLogging out preserves your seat. Access ends at 2026-10-13T20:28:29.540123."
+      }
+    },
+    {
+      "id": "showroom_shell",
+      "passed": true,
+      "detail": {
+        "url": "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-18679f3b/showroom/",
+        "frames": [
+          "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-18679f3b/showroom/",
+          "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-18679f3b/showroom/www/virtualization-ai-101/main/index.html",
+          "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-18679f3b/proxy/tool/story/",
+          "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-18679f3b/showroom/terminal",
+          "https://labs.smg-helix.ai/k8s/ns/launchpad-flightpath-candida-virtualization-ai-938326/core~v1~Pod"
+        ],
+        "text": "Story\nTerminal\nOpenShift Console"
+      }
+    },
+    {
+      "id": "active_tab_story",
+      "passed": true,
+      "detail": {
+        "url": "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-18679f3b/proxy/tool/story/",
+        "text": "×\nVirtualization + AI 101\n\nTrace a VM-hosted workload to governed Intel Xeon CPU inference\n\nCLICK OR PRESS SPACE TO BEGIN",
+        "canvas": 0,
+        "popups": []
+      }
+    },
+    {
+      "id": "active_tab_terminal",
+      "passed": true,
+      "detail": {
+        "url": "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-18679f3b/showroom/terminal",
+        "text": "",
+        "canvas": 3,
+        "popups": []
+      }
+    },
+    {
+      "id": "active_tab_openshift_console",
+      "passed": true,
+      "detail": {
+        "url": "https://labs.smg-helix.ai/k8s/ns/launchpad-flightpath-candida-virtualization-ai-938326/core~v1~Pod?page=1&perPage=50",
+        "text": "Skip to content\nCore platform\nHome\nFavorites\nEcosystem\nWorkloads\nVirtualization\nMigration\nServerless\nNetworking\nStorage\nBuilds\nObserve\nUser Management\nAdministration\nProject: launchpad-flightpath-candida-virtualization-ai-938326\nPods\nCreate Pod\n1 - 4 of 4 items\nName\n\t\nStatus\n\t\nReady\n\t\nRestarts\n\t\nOwner\n\t\nMemory\n\t\nCPU\n\t\nCreated\n\t\nActions\n\n\nPod\nP\nai-analysis-adapter-7f955f65dd-w9524\n\t\nRunning\n\t1/1\t0\t\nReplicaSet\nRS\nai-analysis-adapter-7f955f65dd\n\t21.6 MiB\t0.000 cores\t\n1 minute ago\n\t\n\n\nPod\nP\nshowroom-98b8d8b6c-zs4fl\n\t\nRunning\n\t4/4\t0\t\nReplicaSet\nRS\nshowroom-98b8d8b6c\n\t96.3 MiB\t-\t\n1 minute ago\n\t\n\n\nPod\nP\nvirt-launcher-operations-vm-5fqjf\n\t\nRunning\n\t3/3\t0\t\nVirtualMachineInstance\nVMI\noperations-vm\n\t792.2 MiB\t0.071 cores\t\n1 minute ago\n\t\n\n\nPod\nP\nvirtualization-ai-presentation-5b9bbb9465-6fg68\n\t\nRunning\n\t1/1\t0\t\nReplicaSet\nRS\nvirtualization-ai-presentation-5b9bbb9465\n\t12.2 MiB\t0.000 cores\t\n1 minute ago\n\t\nWelcome to the new OpenShift experience!\n\nIntroducing a fresh modern look to the console! With this update, we made changes to the user interface to enhance usability and streamline your workflow. This includes improved navigation and visual refinement to help manage your applications and infrastructure more easily.\n\nWhat do you want to do next?\nLaunch tour\nSkip tour",
+        "canvas": 0,
+        "popups": []
+      }
+    },
+    {
+      "id": "content_welcome",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Trace a VM to Governed AI"
+      }
+    },
+    {
+      "id": "content_verify",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Verify the runtime"
+      }
+    },
+    {
+      "id": "content_trace",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Trace the boundaries"
+      }
+    },
+    {
+      "id": "content_invoke",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Invoke from inside the VM"
+      }
+    },
+    {
+      "id": "content_inspect",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Inspect AI evidence"
+      }
+    },
+    {
+      "id": "content_failure",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Exercise safe failure"
+      }
+    },
+    {
+      "id": "content_evidence",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Export the evidence map"
+      }
+    },
+    {
+      "id": "content_cleanup",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Clean learner artifacts"
+      }
+    },
+    {
+      "id": "content_conclusion",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Conclusion"
+      }
+    },
+    {
+      "id": "complete_rendered_command_journey",
+      "passed": false,
+      "detail": {
+        "blocks": 19,
+        "output_tail": "JOURNEY_BLOCK_0_verify\nvirtualmachineinstance.kubevirt.io/operations-vm condition met\nJOURNEY_BLOCK_1_verify\nNAME                                       AGE    STATUS    READY\nvirtualmachine.kubevirt.io/operations-vm   102s   Running   True\n\nNAME                                               AGE    PHASE     IP             NODENAME              READY   LIVE-MIGRATABLE   PAUSED\nvirtualmachineinstance.kubevirt.io/operations-vm   102s   Running   10.130.0.218   fp1.fm2aihpcsed.com   True    True              \nJOURNEY_BLOCK_2_verify\nseat VM credential ready\nJOURNEY_BLOCK_3_verify\n",
+        "error_tail": "executable file `wget` not found in $PATH: No such file or directory\ncommand terminated with exit code 1\ncommand terminated with exit code 1\n"
+      }
+    },
+    {
+      "id": "my_labs_contains_seat",
+      "passed": true,
+      "detail": {
+        "text": "×\n|\nPartner AI Launchpad\nPARTICIPANT\nCurrent lab\nMy Lab Access\nLog out of lab\nPARTICIPANT WORKSPACE\nMy Lab Access\n\nResume any active environment associated with your participant identity.\n\nvirtualization-ai-foundations-101\n\nAvailable until 2026-10-13T20:28:29.540123\n\nResume lab\nAdd another lab\n\nEnter the instructor code for another active lab.\n\nAdd lab"
+      }
+    },
+    {
+      "id": "reclaim_completed",
+      "passed": true,
+      "detail": {
+        "status": "completed",
+        "remaining_labeled_namespaces": 0
+      }
+    }
+  ],
+  "certified": false,
+  "order_id": "18679f3b-12a0-4adb-8193-c3e3d4ccf4ea",
+  "public_url": "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-18679f3b",
+  "seats": [
+    {
+      "seat_id": "93832688-90ba-4ac7-a697-5df1e9da47b8",
+      "session_id": "d4dba363-7f22-45da-bb75-0ea33619f29c"
+    }
+  ],
+  "cleanup_status": "completed",
+  "remaining_labeled_namespaces": 0,
+  "finished_at": "2026-10-13T18:31:49.881Z",
+  "source_revision": "85cedff80e0550cd016b2f5cd373207d89303f53",
+  "release_run": "https://github.com/jkershawrh/virtualization-ai-foundations/actions/runs/38446358216",
+  "release_high_critical_matches": {
+    "adapter": 0,
+    "presentation": 0,
+    "showroom_content": 0
+  },
+  "result": "SECURITY-GREEN-PARTICIPANT-COMMANDS-RED",
+  "cleanup_limitations": [
+    "Namespace deletion verified; identity/model-key/PV/Application residue not independently rechecked."
+  ]
+}

@@ -3,10 +3,10 @@ from pathlib import Path
 import yaml
 
 ROOT = Path(__file__).resolve().parents[2]
-REVISION = "7079b405d380d531e9d7e33b41f66be88daa4c8c"
+REVISION = "49cfe274b7dc191f786b1c5d8ff9e37869dc8170"
 IMAGES = {
-    "workload_image": "ghcr.io/jkershawrh/virtualization-ai-foundations-adapter@sha256:b2063555da50c79c195ea4145dda4b5a339e18febc4fa9e2d8d0bab10cc0f289",
-    "presentation_image": "ghcr.io/jkershawrh/virtualization-ai-foundations-presentation@sha256:58a79075e9dde6e852314fcc60f4a292cde1939926bfdf0098a3817075162514",
+    "workload_image": "ghcr.io/jkershawrh/virtualization-ai-foundations-adapter@sha256:db4f9979a0dd2147d29120d8d32989b9ed3df6ef41c7d3f09c399b184d21146e",
+    "presentation_image": "ghcr.io/jkershawrh/virtualization-ai-foundations-presentation@sha256:a7f4339792038c299f08a5bf5076b50fb3cbcd44176c5b3737ba908566078c04",
 }
 
 
@@ -17,6 +17,6 @@ def test_101_security_refresh_pins_one_exact_release():
     assert meta["showroom_content_ref"] == meta["workload_revision"] == REVISION
     assert all(source["revision"] == REVISION for source in intake["sources"].values())
     assert meta["showroom_content_image"] == intake["sources"]["showroom"]["content_image"]
-    assert meta["showroom_content_image"].endswith("@sha256:aefbd49e58dbbbf42a854b5439668c828054e2dbbcc2233d77f3c63bc2d434ff")
+    assert meta["showroom_content_image"].endswith("@sha256:f2f134d9b5f35dd5833b729404176ef615466ad53062ab6c87dbbb30cde91190")
     for key, image in IMAGES.items():
         assert meta["workload_helm_values"][key] == intake["runtime"]["workload"]["helm_values"][key] == image
