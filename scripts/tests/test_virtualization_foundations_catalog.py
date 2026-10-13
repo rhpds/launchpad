@@ -45,7 +45,7 @@ def test_virtualization_301_overrides_chart_images_with_immutable_candidates() -
     assert values["values_overlay"].endswith("values.published.yaml")
     assert values["adapter"]["image"]["digest"].startswith("sha256:")
     assert values["presentation"]["image"]["digest"].startswith("sha256:")
-    assert catalog["metadata"]["workload_revision"] == "2fb50bfb5f597591e3851735706e9cef77534ab5"
+    assert catalog["metadata"]["workload_revision"] == "30f51e19223faf64c689a07e254870fbc43fd0c6"
     assert catalog["metadata"]["workload_routes"]["ui"] == "virt301"
     assert catalog["metadata"]["showroom_content_repo_url"].startswith("https://")
 
@@ -59,9 +59,15 @@ def test_virtualization_301_overrides_chart_images_with_immutable_candidates() -
     )
     paths = [page["path"] for page in certification["spec"]["showroom"]["pages"]]
     assert paths == [
-        "/www/virtualization-ai-301/index.html",
-        "/www/virtualization-ai-301/04-compare.html",
-        "/www/virtualization-ai-301/05-refuse.html",
+        "/www/virtualization-ai-301/main/index.html",
+        "/www/virtualization-ai-301/main/01-prerequisites.html",
+        "/www/virtualization-ai-301/main/02-declare.html",
+        "/www/virtualization-ai-301/main/03-observe.html",
+        "/www/virtualization-ai-301/main/04-compare.html",
+        "/www/virtualization-ai-301/main/05-refuse.html",
+        "/www/virtualization-ai-301/main/06-review.html",
+        "/www/virtualization-ai-301/main/07-reclaim.html",
+        "/www/virtualization-ai-301/main/99-conclusion.html",
     ]
 
     probe = (REPO_ROOT / "scripts/certify-virtualization-ai-seat.sh").read_text()

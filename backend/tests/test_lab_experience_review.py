@@ -138,7 +138,7 @@ def test_review_standard_preserves_show_learn_do_prove_order() -> None:
     ]
 
 
-def test_sovereign_201_exact_release_requires_live_inference_recertification() -> None:
+def test_sovereign_201_exact_release_is_one_seat_live_certified() -> None:
     review = yaml.safe_load(REVIEW.read_text(encoding="utf-8"))
     lab = review["labs"]["sovereign-ai-201"]
     catalog = yaml.safe_load(
@@ -163,19 +163,14 @@ def test_sovereign_201_exact_release_requires_live_inference_recertification() -
         intake["certification"]["stage"]
     ) == "1-seat-certified"
     assert intake["certification"]["certified_seats"] == 1
-    assert catalog["metadata"]["allowed_exposure_policies"] == [
-        "internal",
-        "public_code",
-    ]
-    assert intake["runtime"]["allowed_exposure_policies"] == [
-        "internal",
-        "public_code",
-    ]
+    assert catalog["metadata"]["activation_blockers"] == []
+    assert catalog["metadata"]["allowed_exposure_policies"] == ["internal"]
+    assert intake["runtime"]["allowed_exposure_policies"] == ["internal"]
     assert intake["sources"]["workload"]["revision"] == (
-        "0fdcfba6c2db35190a768e561ac6b0665c76484b"
+        "29e45a00e89f36a7b5180bb5884c541a9694cc0c"
     )
     assert intake["sources"]["showroom"]["revision"] == (
-        "0fdcfba6c2db35190a768e561ac6b0665c76484b"
+        "29e45a00e89f36a7b5180bb5884c541a9694cc0c"
     )
     assert intake["sources"]["showroom"]["playbook"] == (
         "showroom/default-site.yml"
@@ -389,8 +384,14 @@ def test_virtualization_401_certification_capabilities_match_flightpath() -> Non
     showroom_paths = [page["path"] for page in contract["spec"]["showroom"]["pages"]]
     assert showroom_paths == [
         "/www/virtualization-ai-401/index.html",
+        "/www/virtualization-ai-401/01-observe.html",
         "/www/virtualization-ai-401/02-preflight.html",
+        "/www/virtualization-ai-401/03-propose.html",
+        "/www/virtualization-ai-401/04-approve.html",
+        "/www/virtualization-ai-401/05-execute.html",
         "/www/virtualization-ai-401/06-validate.html",
+        "/www/virtualization-ai-401/07-learn-reclaim.html",
+        "/www/virtualization-ai-401/99-conclusion.html",
     ]
     assert catalog["metadata"]["workload_helm_values"]["presentation"][
         "ingressDomain"
@@ -459,7 +460,13 @@ def test_virtualization_501_truthful_rehearsal_does_not_allocate_a_model_secret(
     assert [page["path"] for page in contract["spec"]["showroom"]["pages"]] == [
         "/www/virtualization-ai-501/index.html",
         "/www/virtualization-ai-501/01-discover.html",
+        "/www/virtualization-ai-501/02-baseline.html",
+        "/www/virtualization-ai-501/03-migrate.html",
+        "/www/virtualization-ai-501/04-disrupt.html",
+        "/www/virtualization-ai-501/05-correlate.html",
         "/www/virtualization-ai-501/06-qualify.html",
+        "/www/virtualization-ai-501/07-handoff-reclaim.html",
+        "/www/virtualization-ai-501/99-conclusion.html",
     ]
 
 
