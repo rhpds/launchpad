@@ -22,6 +22,33 @@ observed_successes:
   - Story scene navigation worked on all five; not all interactive scenario conditions were exercised.
   - All 19 rendered 101 command blocks passed, including actual VM-origin live Granite inference, failure containment, evidence export, and local artifact cleanup.
 findings:
+  - id: VIRT-UX-EXECUTE-DUPLICATE
+    priority: medium
+    catalog_items: [virtualization-ai-foundations-101, virtualization-ai-201, virtualization-ai-301, virtualization-ai-401, virtualization-ai-501]
+    observed: The base theme and explicit skin bridge both add source toolboxes, producing two Execute controls for each executable block on the refreshed 101 page.
+    required_fix: Replace legacy toolboxes with the reviewed bridge and guard repeated bridge initialization. Verify one usable control per target and actual ttyd command output on a fresh candidate.
+    local_status: GREEN-component
+    live_status: NOT-YET-TESTED
+    limitation: The live harness also needs to hover over the code block before clicking controls that the theme hides until hover. Its click timeout does not prove terminal delivery failed.
+  - id: VIRT-UX-201-STAGE-ORDER
+    priority: high
+    catalog_items: [virtualization-ai-201]
+    observed: The stage-three contract qualifier requires all six starter files, including the YAML wiring artifacts the participant is not instructed to complete until stage four.
+    required_fix: Add an explicit contract-only stage to the qualifier, retain the complete six-artifact gate for stage four, and rerun the full learner-authored journey.
+    local_status: GREEN-local
+    live_status: NOT-YET-TESTED
+    corrected_source_revision: a82b5ec
+    release_run: https://github.com/jkershawrh/virtualization-ai-201/actions/runs/38480615901
+  - id: VIRT-UX-101-PACKAGED-SKIN
+    priority: high
+    catalog_items: [virtualization-ai-foundations-101]
+    observed: The refreshed immutable package produced HTTP 404 for every instruction page. Its root playbook references ./supplemental-ui, but the package shipped that directory only beneath showroom/.
+    required_fix: Package the skin beside the root playbook and repeat the full fresh-seat browser journey; do not infer live success from packaging tests.
+    local_status: GREEN-local
+    live_status: RED
+    corrected_source_revision: 67ae61d
+    release_run: https://github.com/jkershawrh/virtualization-ai-foundations/actions/runs/38479874154
+    evidence: evidence/runs/virtualization-ai-foundations-101-participant-exploratory-green-r2-20261013.json
   - id: VIRT-UX-201-BOOT
     priority: high
     catalog_items: [virtualization-ai-201]

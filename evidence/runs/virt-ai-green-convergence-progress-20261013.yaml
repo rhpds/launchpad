@@ -1,0 +1,59 @@
+schema: launchpad/green-convergence-progress/v1
+cluster: flightpath
+seat_limit: 1
+result: IN_PROGRESS_NOT_ALL_GREEN
+rule: Signed builds and local regression passes do not replace fresh participant or zero-residue proof.
+passed_local:
+  - Cleanup completion gate rejects retained or missing residue inventory.
+  - Persistent volume residue inspection is namespace-targeted and read-only.
+  - Embedded Execute bridge component delivers terminal input without legacy tab selectors.
+  - 101 root-playbook content packaging includes its referenced supplemental UI folder.
+  - Backend release frees only ephemeral build cache before the unchanged security scan gates.
+qualified_source_releases:
+  virtualization-ai-foundations-101:
+    revision: e881ece208528720974f4e7bc659a0c8ad0627fb
+    run: https://github.com/jkershawrh/virtualization-ai-foundations/actions/runs/38480888501
+  virtualization-ai-201:
+    revision: 78bf0c80787aaee71890a979128d4b303ad53ebd
+    run: https://github.com/jkershawrh/virtualization-ai-201/actions/runs/38480893837
+  virtualization-ai-301:
+    revision: e5888aeac1042cbcf909b540eee1281fdc3c4dac
+    run: https://github.com/jkershawrh/virtualization-ai-301/actions/runs/38480906690
+  virtualization-ai-401:
+    revision: aee89597b325da490fa837b5639e6e71892c0ca1
+    run: https://github.com/jkershawrh/virtualization-ai-401/actions/runs/38480912766
+  virtualization-ai-501:
+    revision: 78442e22eeed56b54d1e910ad8c2b847e3cd241a
+    run: https://github.com/jkershawrh/virtualization-ai-501/actions/runs/38480918274
+pending_release_gates:
+  backend:
+    revision_prefix: 02e22ae8
+    run: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/38481201342
+observed_red:
+  - Refreshed 101 instructions returned HTTP 404; the failed browser report remains intact.
+  - Backend scan attempts 1 and 2 ran out of runner disk and produced no valid vulnerability report.
+  - After build-cache cleanup the scanner produced a valid report and blocked fixable high/critical Go standard-library and x/net findings in oc and Helm. Patched pinned-source tool rebuilds are pending; the security gate was not weakened.
+  - Historical review tests reject new 301/401/501 pins as previously certified revisions; no historical proof was rewritten.
+deployed_safety:
+  - Restored the prior earned 101 catalog pin after the exploratory regression.
+  - Reloaded backend and workers only after the lifecycle queue reported zero queued, running, and reclaim-pending operations.
+  - Backend image has not been replaced with an unqualified candidate.
+  - PV inspection grant adds only get/list; PV delete remains forbidden.
+  - Latest synthetic 101 order 4bd83e88-ac0a-4cd6-9a75-0942b3e8bacc reclaimed automatically; independent namespace/PV/Application/external-RoleBinding counts were all zero.
+  - Final-control 101 staging was deferred twice because the lifecycle inventory reported running work; no busy-worker rollout was forced.
+latest_partial_live_proof:
+  evidence: evidence/runs/virtualization-ai-foundations-101-participant-root-skin-r3-20261013.json
+  source_revision_prefix: 67ae61d
+  passed: [public_login, embedded_story, embedded_terminal, embedded_namespace_console, story_live_xeon_condition, story_unavailable_condition, rendered_instructions, loaded_partnership_logos, automatic_reclaim]
+  incomplete: [actual_execute_delivery, complete_rendered_command_journey]
+  limitation: The browser harness stopped on a hidden-until-hover control. Duplicate controls were separately reproduced and fixed in the component test; neither the harness repair nor the component pass proves live ttyd delivery.
+  formal_certified: false
+next_required:
+  - Qualify the patched backend image release.
+  - Prove existing pull credentials can retrieve the private backend candidate.
+  - Deploy the cleanup verifier behind its Flightpath-only feature flag while idle.
+  - Execute fresh one-seat journeys for all five exact candidate revisions.
+  - Complete the 201 learner-authored artifacts before running its proof steps.
+  - Verify real Execute delivery, readable loaded logos, all Story conditions, embedded namespace Console, and all rendered commands.
+  - Independently prove automatic cleanup including zero PV residue, revoked model keys, and participant access denial.
+  - Update certification and activation records only after those live checks pass.
