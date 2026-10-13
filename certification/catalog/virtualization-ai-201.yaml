@@ -10,9 +10,14 @@ spec:
   showroom:
     pages:
       - {id: welcome, path: /www/virtualization-ai-201/main/index.html, marker: "Build and Qualify a VM-to-AI Contract"}
+      - {id: prerequisite, path: /www/virtualization-ai-201/main/01-prerequisite.html, marker: "Confirm the 101 boundary"}
+      - {id: frame, path: /www/virtualization-ai-201/main/02-frame.html, marker: "Frame the acceptance contract"}
+      - {id: author, path: /www/virtualization-ai-201/main/03-author.html, marker: "Author schemas and VM client"}
+      - {id: wire, path: /www/virtualization-ai-201/main/04-wire.html, marker: "Wire Secret, Service, and policy"}
       - {id: prove, path: /www/virtualization-ai-201/main/05-prove.html, marker: "Prove the healthy path"}
       - {id: break, path: /www/virtualization-ai-201/main/06-break.html, marker: "Break it safely"}
       - {id: cleanup, path: /www/virtualization-ai-201/main/07-evidence-reclaim.html, marker: "Export evidence and clean learner artifacts"}
+      - {id: conclusion, path: /www/virtualization-ai-201/main/99-conclusion.html, marker: "Conclusion"}
   seat_probe:
     argv: [bash, scripts/certify-virtualization-ai-seat.sh, virtualization-ai-201, "{namespace}", "{cluster_ref}"]
     timeout_seconds: 900

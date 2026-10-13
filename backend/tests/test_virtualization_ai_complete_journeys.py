@@ -27,3 +27,17 @@ def test_virtualization_ai_101_certifies_the_complete_learner_journey() -> None:
         "/www/virtualization-ai-101/main/07-cleanup.html",
         "/www/virtualization-ai-101/main/99-conclusion.html",
     ]
+
+
+def test_virtualization_ai_201_certifies_the_complete_learner_journey() -> None:
+    assert _page_paths("virtualization-ai-201") == [
+        "/www/virtualization-ai-201/main/index.html",
+        "/www/virtualization-ai-201/main/01-prerequisite.html",
+        "/www/virtualization-ai-201/main/02-frame.html",
+        "/www/virtualization-ai-201/main/03-author.html",
+        "/www/virtualization-ai-201/main/04-wire.html",
+        "/www/virtualization-ai-201/main/05-prove.html",
+        "/www/virtualization-ai-201/main/06-break.html",
+        "/www/virtualization-ai-201/main/07-evidence-reclaim.html",
+        "/www/virtualization-ai-201/main/99-conclusion.html",
+    ]
