@@ -41,3 +41,17 @@ def test_virtualization_ai_201_certifies_the_complete_learner_journey() -> None:
         "/www/virtualization-ai-201/main/07-evidence-reclaim.html",
         "/www/virtualization-ai-201/main/99-conclusion.html",
     ]
+
+
+def test_virtualization_ai_301_certifies_the_complete_learner_journey() -> None:
+    assert _page_paths("virtualization-ai-301") == [
+        "/www/virtualization-ai-301/main/index.html",
+        "/www/virtualization-ai-301/main/01-prerequisites.html",
+        "/www/virtualization-ai-301/main/02-declare.html",
+        "/www/virtualization-ai-301/main/03-observe.html",
+        "/www/virtualization-ai-301/main/04-compare.html",
+        "/www/virtualization-ai-301/main/05-refuse.html",
+        "/www/virtualization-ai-301/main/06-review.html",
+        "/www/virtualization-ai-301/main/07-reclaim.html",
+        "/www/virtualization-ai-301/main/99-conclusion.html",
+    ]
