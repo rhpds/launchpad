@@ -13,8 +13,13 @@ spec:
     pages:
       - {id: welcome, path: /www/virtualization-ai-101/main/index.html, marker: "Trace a VM to Governed AI"}
       - {id: verify, path: /www/virtualization-ai-101/main/01-verify.html, marker: "Verify the runtime"}
+      - {id: trace, path: /www/virtualization-ai-101/main/02-trace.html, marker: "Trace the boundaries"}
+      - {id: invoke, path: /www/virtualization-ai-101/main/03-invoke.html, marker: "Invoke from inside the VM"}
+      - {id: inspect, path: /www/virtualization-ai-101/main/04-inspect.html, marker: "Inspect AI evidence"}
+      - {id: failure, path: /www/virtualization-ai-101/main/05-failure.html, marker: "Exercise safe failure"}
       - {id: evidence, path: /www/virtualization-ai-101/main/06-evidence.html, marker: "Export the evidence map"}
       - {id: cleanup, path: /www/virtualization-ai-101/main/07-cleanup.html, marker: "Clean learner artifacts"}
+      - {id: conclusion, path: /www/virtualization-ai-101/main/99-conclusion.html, marker: "Conclusion"}
   seat_probe:
     argv: [bash, scripts/certify-virtualization-ai-seat.sh, virtualization-ai-foundations-101, "{namespace}", "{cluster_ref}"]
     timeout_seconds: 900
