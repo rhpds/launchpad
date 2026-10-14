@@ -2,7 +2,6 @@ from pathlib import Path
 
 import yaml
 
-
 ROOT = Path(__file__).resolve().parents[2]
 WORKFLOW = ROOT / ".github/workflows/portal-release.yml"
 
@@ -45,7 +44,21 @@ def test_portal_release_scans_sboms_signs_and_attests() -> None:
     assert "anchore/sbom-action@" in text
     assert "cosign sign --yes" in text
     assert "actions/attest-build-provenance@" in text
-    assert "LAUNCHPAD_QUAY_TOKEN" in text
+    # The portal release moved to GHCR in 864780b1; do not require the retired
+    # registry credential or weaken verification to make this contract pass.
+    workflow = _workflow()
+    assert workflow["permissions"]["packages"] == "write"
+    steps = workflow["jobs"]["release"]["steps"]
+    login = next(step for step in steps if step.get("name") == "Log in to GHCR")
+    assert login["if"] == "${{ inputs.publish }}"
+    assert login["with"]["registry"] == "ghcr.io"
+    assert login["with"]["username"] == "${{ github.actor }}"
+    assert login["with"]["password"] == "${{ secrets.GITHUB_TOKEN }}"
+    assert "LAUNCHPAD_QUAY_TOKEN" not in text
+    assert all(
+        entry["repository"].startswith("ghcr.io/${{ github.repository_owner }}/")
+        for entry in workflow["jobs"]["release"]["strategy"]["matrix"]["include"]
+    )
 
 
 def test_ci_builds_both_portal_containerfiles() -> None:

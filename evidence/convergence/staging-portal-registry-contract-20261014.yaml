@@ -1,0 +1,14 @@
+schema: launchpad/staging-portal-registry-contract/v1
+date: '2026-10-14'
+status: GREEN-local
+finding: A stale release test required the removed Quay token after the portal workflow moved to GHCR in commit 864780b18caed1f40d35365e6eee033cb014f04f.
+fix: Verify the existing repository-owned GHCR destinations, publish-only login, actor identity, GitHub token and package-write permission while retaining scan/SBOM/signature/attestation assertions.
+production_workflow_changed: false
+runtime_changed: false
+cluster_changed: false
+proof:
+  red: evidence/runs/staging-portal-release-contracts-20261014.xml
+  green: evidence/runs/staging-portal-release-contracts-green-r2-20261014.xml
+limits:
+  - This closes a stale source contract, not deployed browser or release-image certification.
+  - Backend security and live Console qualification remain separate gates.
