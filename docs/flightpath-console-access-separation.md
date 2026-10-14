@@ -4,6 +4,34 @@ Status: Proposed; preparation approved, live cutover not approved or performed.
 Date: 2026-10-14.
 Decision owners: Launchpad owner and Flightpath/network owner.
 
+## Update: native-route option worth testing before new DNS
+
+October 14 local tests confirm the existing tunnel code can translate public
+Console authorization to a native operator-managed callback, rewrite native
+Console responses back to the public participant origin, and keep participant
+root versus namespace Console dispatch separate. This is a counterfactual
+configuration test, not a live route or browser certification.
+
+Therefore the separate Console hostname below is an option, not a proven
+infrastructure requirement. Before asking for more DNS, evaluate restoring the
+native Console hostname while configuring the tunnel's Console upstream Host
+and accepted callback to that native hostname. Keep the labs hostname, Keycloak
+issuer, existing participant links, namespace RBAC, and participant-only proxy
+IDP selection unchanged.
+
+Live prerequisites include reviewing both Console and ingress component-route
+settings, capturing a rollback snapshot, approving a change window, and testing
+native kubeadmin login plus one complete embedded participant Console journey.
+Do not remove the live custom route or change the tunnel environment from the
+local tests alone. Native browser certificate trust remains a separate issue.
+
+Scoped evidence:
+`evidence/runs/flightpath-native-console-counterfactual-green-scoped-20261014.xml`.
+The broader attempt is preserved as
+`evidence/runs/flightpath-native-console-counterfactual-attempt-r1-20261014.xml`:
+one legacy Arena overlay render fails on its existing NetworkPolicy patch. It
+is excluded from the scoped Flightpath/router result, not declared passing.
+
 ## Outcome
 
 Ordinary Flightpath cluster access must reach OpenShift authentication, not

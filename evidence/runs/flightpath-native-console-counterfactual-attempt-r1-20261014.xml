@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="46" time="3.000" timestamp="2026-10-14T16:05:57.190643-05:00" hostname="jkershaw-mac"><testcase classname="backend.tests.test_flightpath_native_console_contract" name="test_participant_authorization_can_use_native_operator_callback" time="0.770" /><testcase classname="backend.tests.test_flightpath_native_console_contract" name="test_console_bootstrap_and_namespace_path_remain_on_participant_origin" time="0.025" /><testcase classname="backend.tests.test_flightpath_native_console_contract" name="test_native_console_redirect_stays_public_for_participant_browser" time="0.066" /><testcase classname="backend.tests.test_flightpath_native_console_contract" name="test_labs_root_and_namespace_console_remain_separate_dispatches" time="0.018" /><testcase classname="backend.tests.test_public_tunnel_contract" name="test_router_requires_provider_neutral_target_hosts" time="0.002" /><testcase classname="backend.tests.test_public_tunnel_contract" name="test_console_embed_requires_an_explicit_target_ingress_domain" time="0.001" /><testcase classname="backend.tests.test_public_tunnel_contract" name="test_on_cluster_tunnel_has_a_dedicated_unprivileged_identity" time="0.000" /><testcase classname="backend.tests.test_public_tunnel_contract" name="test_named_tunnel_has_checked_in_kustomize_source_for_the_router_config" time="0.865" /><testcase classname="backend.tests.test_public_tunnel_contract" name="test_named_tunnel_uses_the_precreated_token_without_a_shell" time="0.001" /><testcase classname="backend.tests.test_public_tunnel_contract" name="test_named_tunnel_http_budget_covers_agent_workflows" time="0.013" /><testcase classname="backend.tests.test_public_tunnel_contract" name="test_router_allows_a_cluster_specific_internal_keycloak_origin" time="0.001" /><testcase classname="backend.tests.test_public_tunnel_contract" name="test_flightpath_tunnel_restores_router_and_connector_as_one_ha_unit" time="0.015" /><testcase classname="backend.tests.test_public_tunnel_contract" name="test_flightpath_public_activation_is_fenced_and_keeps_secrets_out_of_git" time="0.001" /><testcase classname="backend.tests.test_public_tunnel_contract" name="test_flightpath_keycloak_policy_only_admits_public_edge_pods" time="0.001" /><testcase classname="backend.tests.test_public_tunnel_contract" name="test_flightpath_public_gateway_trusts_the_cluster_ingress_ca" time="0.001" /><testcase classname="backend.tests.test_public_tunnel_contract" name="test_named_tunnel_has_two_connection_aware_replicas_and_a_disruption_budget" time="0.203" /><testcase classname="backend.tests.test_public_tunnel_contract" name="test_arena_reliability_alerts_on_tunnel_connector_degradation_and_loss" time="0.006" /><testcase classname="backend.tests.test_public_tunnel_contract" name="test_public_validation_matrix_does_not_overstate_scale_or_worker_ha" time="0.008" /><testcase classname="backend.tests.test_public_tunnel_contract" name="test_tunnel_does_not_take_ownership_of_managed_console_or_authentication" time="0.002" /><testcase classname="backend.tests.test_public_tunnel_contract" name="test_console_proxy_preserves_http_only_oauth_cookies" time="0.001" /><testcase classname="backend.tests.test_public_tunnel_contract" name="test_tunnel_scripts_pin_every_cluster_call_to_arena_kubeconfig" time="0.001" /><testcase classname="backend.tests.test_public_tunnel_contract" name="test_pilot_can_start_before_an_order_and_configures_only_arena_public_placement" time="0.000" /><testcase classname="backend.tests.test_public_tunnel_contract" name="test_stopping_the_named_tunnel_fails_public_ordering_closed" time="0.000" /><testcase classname="backend.tests.test_public_tunnel_contract" name="test_arena_overlay_persists_the_named_public_origin_and_strict_oidc_contract" time="0.346"><failure message="subprocess.CalledProcessError: Command '['oc', 'kustomize', '/Users/jkershaw/Documents/launchpad/deploy/launchpad/overlays/arena']' returned non-zero exit status 1.">def test_arena_overlay_persists_the_named_public_origin_and_strict_oidc_contract():
+&gt;       rendered = subprocess.run(
+            ["oc", "kustomize", str(ARENA_OVERLAY)],
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout
+
+backend/tests/test_public_tunnel_contract.py:382: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (['oc', 'kustomize', '/Users/jkershaw/Documents/launchpad/deploy/launchpad/overlays/arena'],)
+kwargs = {'text': True, 'stdout': -1, 'stderr': -1}
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output &amp; stderr attributes if those streams
+        were captured.
+    
+        If timeout is given, and the process takes too long, a TimeoutExpired
+        exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+&gt;               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['oc', 'kustomize', '/Users/jkershaw/Documents/launchpad/deploy/launchpad/overlays/arena']' returned non-zero exit status 1.
+
+../../.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/subprocess.py:571: CalledProcessError</failure></testcase><testcase classname="backend.tests.test_public_tunnel_contract" name="test_keycloak_persists_the_permanent_frontend_issuer_and_checks_it_directly" time="0.005" /><testcase classname="backend.tests.test_public_tunnel_contract" name="test_named_tunnel_source_has_no_disposable_hostname_discovery" time="0.001" /><testcase classname="backend.tests.test_public_tunnel_contract" name="test_console_router_rewrites_origins_and_the_exact_console_redirect_uri" time="0.009" /><testcase classname="backend.tests.test_public_tunnel_contract" name="test_console_router_uses_root_spa_paths_after_oauth_callback" time="0.012" /><testcase classname="backend.tests.test_public_tunnel_contract" name="test_console_url_rewrite_preserves_valid_showroom_yaml" time="0.010" /><testcase classname="backend.tests.test_public_tunnel_contract" name="test_console_url_rewrite_preserves_json_boundaries" time="0.013" /><testcase classname="backend.tests.test_public_tunnel_contract" name="test_console_callback_is_public_but_idp_callback_binding_stays_native" time="0.010" /><testcase classname="backend.tests.test_public_tunnel_contract" name="test_console_oauth_request_uses_operator_managed_native_callback" time="0.012" /><testcase classname="backend.tests.test_public_tunnel_contract" name="test_console_oauth_request_accepts_a_custom_operator_callback" time="0.008" /><testcase classname="backend.tests.test_public_tunnel_contract" name="test_same_origin_router_forwards_only_cookies_needed_by_each_service" time="0.011" /><testcase classname="backend.tests.test_public_tunnel_contract" name="test_console_router_keeps_http_only_and_scopes_proxy_cookie_paths" time="0.016" /><testcase classname="backend.tests.test_public_tunnel_contract" name="test_gateway_cookie_preserves_first_party_samesite_policy" time="0.011" /><testcase classname="backend.tests.test_public_tunnel_contract" name="test_missing_csrf_cookie_recovers_the_original_lab_path" time="0.012" /><testcase classname="backend.tests.test_public_tunnel_contract" name="test_csrf_recovery_does_not_override_valid_or_unsafe_callbacks" time="0.008" /><testcase classname="backend.tests.test_public_tunnel_contract" name="test_tunnel_websocket_keeps_the_public_host_while_dialing_the_gateway_service" time="0.007" /><testcase classname="backend.tests.test_public_tunnel_contract" name="test_console_websocket_uses_the_console_route_host_while_dialing_internal_ingress" time="0.011" /><testcase classname="backend.tests.test_public_tunnel_contract" name="test_shared_origin_terminal_websocket_resolves_the_order_and_ttyd_endpoint" time="0.007" /><testcase classname="backend.tests.test_public_tunnel_contract" name="test_terminal_websocket_token_is_bound_to_the_public_order" time="0.041" /><testcase classname="backend.tests.test_public_tunnel_contract" name="test_public_terminal_websockets_use_bounded_keepalive_timeouts" time="0.002" /><testcase classname="backend.tests.test_public_tunnel_contract" name="test_tunnel_accepts_shared_origin_websocket_session_headers" time="0.028" /><testcase classname="backend.tests.test_public_tunnel_contract" name="test_named_tunnel_preserves_runtime_contract_when_reconciled" time="0.014" /><testcase classname="backend.tests.test_public_tunnel_contract" name="test_arena_console_canary_uses_supported_route_and_audited_order_flag" time="0.003" /></testsuite></testsuites>

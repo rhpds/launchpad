@@ -1,0 +1,30 @@
+schema: launchpad/console-native-callback-counterfactual/v1
+date: '2026-10-14'
+status: GREEN-local-NOT-LIVE-CERTIFIED
+deployment_performed: false
+cluster_or_dns_mutations: false
+implementation_changed: false
+new_tests: backend/tests/test_flightpath_native_console_contract.py
+checks:
+  - Participant public callback translates to the native Console callback while retaining state and participant IDP.
+  - Native Console bootstrap origin and namespace paths rewrite to the public participant origin.
+  - Native OAuth redirects preserve the browser-facing public callback.
+  - Labs root and participant namespace Console routes retain distinct dispatch targets.
+proof:
+  broader_attempt: evidence/runs/flightpath-native-console-counterfactual-attempt-r1-20261014.xml
+  scoped_green: evidence/runs/flightpath-native-console-counterfactual-green-scoped-20261014.xml
+  passing_scoped_checks: 45
+  excluded_legacy_arena_test: test_arena_overlay_persists_the_named_public_origin_and_strict_oidc_contract
+  legacy_error: NetworkPolicy JSON replace path /spec/ingress/0/from/1/podSelector/matchLabels does not exist.
+  legacy_failure_reproduced_in_clean_2580f065_snapshot: true
+decision:
+  separate_console_hostname: Proposed alternative, not established as mandatory.
+  preferred_next_investigation: Confirm whether restoring native canonical Console routing can preserve the existing public participant proxy.
+  live_cutover_approved_by_this_record: false
+  full_staging_qualified: false
+required_live_gates:
+  - Inspect Console and ingress component-route settings with fresh Flightpath credentials.
+  - Capture rollback data without exporting credentials.
+  - Approve a window for coordinated native-host, callback and proxy upstream changes.
+  - Prove native kubeadmin login and participant namespace-scoped iframe SSO, refresh and logout.
+  - Keep direct Console certificate trust separate from Cloudflare participant edge TLS.
