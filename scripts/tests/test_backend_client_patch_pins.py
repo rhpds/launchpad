@@ -44,10 +44,8 @@ def test_telemetry_and_fulcio_pins_are_verified_and_same_major():
     assert 'grep -F "${FULCIO_VERSION}"' in text
 
 
-def test_archive_fix_is_pinned_and_verified_without_rewriting_client_source():
+def test_incompatible_archive_override_is_not_left_in_candidate():
     text = (ROOT / "backend/Containerfile").read_text()
-    assert "ARG GO_ARCHIVE_VERSION=v0.3.0" in text
-    assert "-replace=github.com/moby/go-archive=github.com/moby/go-archive@${GO_ARCHIVE_VERSION}" in text
-    assert 'grep -F "github.com/moby/go-archive"' in text
-    assert 'grep -F "${GO_ARCHIVE_VERSION}"' in text
+    assert "GO_ARCHIVE_VERSION" not in text
+    assert "-replace=github.com/moby/go-archive" not in text
     assert "OPENSHIFT_CLIENT_COMMIT=d0f23b14fbf35493e5b713e25ecf662ec239e76c" in text

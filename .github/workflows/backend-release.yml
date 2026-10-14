@@ -80,6 +80,31 @@ jobs:
             "${IMAGE_REPOSITORY}:git-${{ inputs.expected_sha }}" \
             scripts/runtime_smoke.py
 
+      - name: Inventory named client security surfaces
+        shell: bash
+        run: |
+          set -euo pipefail
+          image="${IMAGE_REPOSITORY}:git-${{ inputs.expected_sha }}"
+          container_id="$(docker create "$image")"
+          trap 'docker rm "$container_id" >/dev/null' EXIT
+          docker cp "$container_id:/usr/local/bin/oc" "$RUNNER_TEMP/launchpad-oc"
+          go version -m "$RUNNER_TEMP/launchpad-oc" > client-build-info.txt
+          go tool nm "$RUNNER_TEMP/launchpad-oc" > "$RUNNER_TEMP/launchpad-oc-symbols.txt"
+          python3 scripts/inventory_backend_client_symbols.py \
+            "$RUNNER_TEMP/launchpad-oc-symbols.txt" \
+            --binary "$RUNNER_TEMP/launchpad-oc" \
+            --source-revision "${{ inputs.expected_sha }}" \
+            > client-symbol-inventory.json
+
+      - name: Retain client symbol evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: backend-client-symbols-${{ inputs.expected_sha }}
+          path: |
+            client-build-info.txt
+            client-symbol-inventory.json
+
       - name: Release build cache before security scanning
         shell: bash
         run: |

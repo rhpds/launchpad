@@ -9,7 +9,6 @@ ARG GO_GIT_VERSION=v5.19.2
 ARG GO_BILLY_VERSION=v5.9.0
 ARG OTEL_VERSION=v1.41.0
 ARG FULCIO_VERSION=v1.8.6
-ARG GO_ARCHIVE_VERSION=v0.3.0
 ENV GOTOOLCHAIN=go1.26.9
 ARG HELM_VERSION=4.3.0
 ARG HELM_SOURCE_COMMIT=bec5b06ed841fe5269972d864d5177944fd5970f
@@ -27,7 +26,6 @@ RUN git clone https://github.com/openshift/oc.git . \
       -replace=go.opentelemetry.io/otel=go.opentelemetry.io/otel@${OTEL_VERSION} \
       -replace=go.opentelemetry.io/otel/trace=go.opentelemetry.io/otel/trace@${OTEL_VERSION} \
       -replace=github.com/sigstore/fulcio=github.com/sigstore/fulcio@${FULCIO_VERSION} \
-      -replace=github.com/moby/go-archive=github.com/moby/go-archive@${GO_ARCHIVE_VERSION} \
     && CGO_ENABLED=0 go build -mod=mod \
       -tags "include_gcs include_oss containers_image_openpgp" \
       -trimpath -o /tmp/oc-bin ./cmd/oc \
@@ -51,10 +49,7 @@ RUN git clone https://github.com/openshift/oc.git . \
     | grep -F "${OTEL_VERSION}" \
     && go version -m /tmp/oc-bin \
     | grep -F "github.com/sigstore/fulcio" \
-    | grep -F "${FULCIO_VERSION}" \
-    && go version -m /tmp/oc-bin \
-    | grep -F "github.com/moby/go-archive" \
-    | grep -F "${GO_ARCHIVE_VERSION}"
+    | grep -F "${FULCIO_VERSION}"
 
 WORKDIR /tmp/helm
 RUN git clone https://github.com/helm/helm.git . \

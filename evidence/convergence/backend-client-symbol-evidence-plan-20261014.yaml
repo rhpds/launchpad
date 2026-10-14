@@ -1,0 +1,29 @@
+schema: launchpad/backend-client-symbol-evidence/v1
+date: '2026-10-14'
+status: GREEN-local-PENDING-BUILT-INVENTORY
+live_changes: false
+client_dependencies: Restore the last compile-proven set by removing the incompatible archive override.
+collection:
+  source: A stopped container created from the exact candidate image; no application or cluster connection is started.
+  binary: /usr/local/bin/oc
+  tools: [go-version-metadata, go-tool-nm]
+  binary_hash_and_source_binding: required
+  stopped_container_cleanup: EXIT trap removes only the created container ID.
+  report_artifact: backend-client-symbols-<exact-source-revision>
+  script: scripts/inventory_backend_client_symbols.py
+surfaces:
+  - distribution-proxy
+  - distribution-redis-cache
+  - buildkit-git-source
+  - buildkit-solver
+  - buildkit-gateway
+  - archive-extraction
+proof:
+  red: evidence/runs/backend-client-symbol-inventory-red-20261014.xml
+  local_green: evidence/runs/backend-client-symbol-inventory-green-local-20261014.xml
+  regression_green: evidence/runs/backend-client-symbol-inventory-green-regression-20261014.xml
+limits:
+  - Missing or unrecognizable symbol inventory fails closed.
+  - Named-symbol absence does not prove missing inlined logic or non-reachability.
+  - Presence does not prove invocation of the vulnerable function.
+  - No VEX non-affected claim, waiver, deployment, or staging promotion is granted by this report.

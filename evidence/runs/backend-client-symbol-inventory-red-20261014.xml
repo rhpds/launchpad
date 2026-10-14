@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="5" skipped="0" tests="5" time="0.143" timestamp="2026-10-14T15:47:27.834987-05:00" hostname="jkershaw-mac"><testcase classname="scripts.tests.test_backend_client_symbol_inventory" name="test_module_presence_does_not_imply_vulnerable_server_symbols" time="0.001"><failure message="FileNotFoundError: [Errno 2] No such file or directory: '/Users/jkershaw/Documents/launchpad/scripts/inventory_backend_client_symbols.py'">def test_module_presence_does_not_imply_vulnerable_server_symbols():
+&gt;       result = _module().inventory(BASE + "003 T github.com/distribution/distribution/v3/registry/client.New\n")
+                 ^^^^^^^^^
+
+scripts/tests/test_backend_client_symbol_inventory.py:22: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/tests/test_backend_client_symbol_inventory.py:14: in _module
+    spec.loader.exec_module(module)
+&lt;frozen importlib._bootstrap_external&gt;:936: in exec_module
+    ???
+&lt;frozen importlib._bootstrap_external&gt;:1073: in get_code
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;_frozen_importlib_external.SourceFileLoader object at 0x106dc5190&gt;
+path = '/Users/jkershaw/Documents/launchpad/scripts/inventory_backend_client_symbols.py'
+
+&gt;   ???
+E   FileNotFoundError: [Errno 2] No such file or directory: '/Users/jkershaw/Documents/launchpad/scripts/inventory_backend_client_symbols.py'
+
+&lt;frozen importlib._bootstrap_external&gt;:1130: FileNotFoundError</failure></testcase><testcase classname="scripts.tests.test_backend_client_symbol_inventory" name="test_vulnerable_subsystem_symbols_are_reported_not_waived" time="0.001"><failure message="FileNotFoundError: [Errno 2] No such file or directory: '/Users/jkershaw/Documents/launchpad/scripts/inventory_backend_client_symbols.py'">def test_vulnerable_subsystem_symbols_are_reported_not_waived():
+        text = BASE + (
+            "003 T github.com/distribution/distribution/v3/registry/proxy.getAuthURLs\n"
+            "004 T github.com/moby/buildkit/source/git.NewSource\n"
+            "005 T github.com/moby/go-archive.Unpack\n"
+        )
+&gt;       result = _module().inventory(text)
+                 ^^^^^^^^^
+
+scripts/tests/test_backend_client_symbol_inventory.py:35: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/tests/test_backend_client_symbol_inventory.py:14: in _module
+    spec.loader.exec_module(module)
+&lt;frozen importlib._bootstrap_external&gt;:936: in exec_module
+    ???
+&lt;frozen importlib._bootstrap_external&gt;:1073: in get_code
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;_frozen_importlib_external.SourceFileLoader object at 0x106dccdd0&gt;
+path = '/Users/jkershaw/Documents/launchpad/scripts/inventory_backend_client_symbols.py'
+
+&gt;   ???
+E   FileNotFoundError: [Errno 2] No such file or directory: '/Users/jkershaw/Documents/launchpad/scripts/inventory_backend_client_symbols.py'
+
+&lt;frozen importlib._bootstrap_external&gt;:1130: FileNotFoundError</failure></testcase><testcase classname="scripts.tests.test_backend_client_symbol_inventory" name="test_failed_or_unrecognizable_symbol_inventory_fails_closed[]" time="0.001"><failure message="FileNotFoundError: [Errno 2] No such file or directory: '/Users/jkershaw/Documents/launchpad/scripts/inventory_backend_client_symbols.py'">text = ''
+
+    @pytest.mark.parametrize("text", ["", "nm: no symbols", "001 T unknown.package.Function\n"])
+    def test_failed_or_unrecognizable_symbol_inventory_fails_closed(text):
+        with pytest.raises(ValueError):
+&gt;           _module().inventory(text)
+            ^^^^^^^^^
+
+scripts/tests/test_backend_client_symbol_inventory.py:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/tests/test_backend_client_symbol_inventory.py:14: in _module
+    spec.loader.exec_module(module)
+&lt;frozen importlib._bootstrap_external&gt;:936: in exec_module
+    ???
+&lt;frozen importlib._bootstrap_external&gt;:1073: in get_code
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;_frozen_importlib_external.SourceFileLoader object at 0x106dcdbd0&gt;
+path = '/Users/jkershaw/Documents/launchpad/scripts/inventory_backend_client_symbols.py'
+
+&gt;   ???
+E   FileNotFoundError: [Errno 2] No such file or directory: '/Users/jkershaw/Documents/launchpad/scripts/inventory_backend_client_symbols.py'
+
+&lt;frozen importlib._bootstrap_external&gt;:1130: FileNotFoundError</failure></testcase><testcase classname="scripts.tests.test_backend_client_symbol_inventory" name="test_failed_or_unrecognizable_symbol_inventory_fails_closed[nm: no symbols]" time="0.001"><failure message="FileNotFoundError: [Errno 2] No such file or directory: '/Users/jkershaw/Documents/launchpad/scripts/inventory_backend_client_symbols.py'">text = 'nm: no symbols'
+
+    @pytest.mark.parametrize("text", ["", "nm: no symbols", "001 T unknown.package.Function\n"])
+    def test_failed_or_unrecognizable_symbol_inventory_fails_closed(text):
+        with pytest.raises(ValueError):
+&gt;           _module().inventory(text)
+            ^^^^^^^^^
+
+scripts/tests/test_backend_client_symbol_inventory.py:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/tests/test_backend_client_symbol_inventory.py:14: in _module
+    spec.loader.exec_module(module)
+&lt;frozen importlib._bootstrap_external&gt;:936: in exec_module
+    ???
+&lt;frozen importlib._bootstrap_external&gt;:1073: in get_code
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;_frozen_importlib_external.SourceFileLoader object at 0x106db7bd0&gt;
+path = '/Users/jkershaw/Documents/launchpad/scripts/inventory_backend_client_symbols.py'
+
+&gt;   ???
+E   FileNotFoundError: [Errno 2] No such file or directory: '/Users/jkershaw/Documents/launchpad/scripts/inventory_backend_client_symbols.py'
+
+&lt;frozen importlib._bootstrap_external&gt;:1130: FileNotFoundError</failure></testcase><testcase classname="scripts.tests.test_backend_client_symbol_inventory" name="test_failed_or_unrecognizable_symbol_inventory_fails_closed[001 T unknown.package.Function\n]" time="0.001"><failure message="FileNotFoundError: [Errno 2] No such file or directory: '/Users/jkershaw/Documents/launchpad/scripts/inventory_backend_client_symbols.py'">text = '001 T unknown.package.Function\n'
+
+    @pytest.mark.parametrize("text", ["", "nm: no symbols", "001 T unknown.package.Function\n"])
+    def test_failed_or_unrecognizable_symbol_inventory_fails_closed(text):
+        with pytest.raises(ValueError):
+&gt;           _module().inventory(text)
+            ^^^^^^^^^
+
+scripts/tests/test_backend_client_symbol_inventory.py:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/tests/test_backend_client_symbol_inventory.py:14: in _module
+    spec.loader.exec_module(module)
+&lt;frozen importlib._bootstrap_external&gt;:936: in exec_module
+    ???
+&lt;frozen importlib._bootstrap_external&gt;:1073: in get_code
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;_frozen_importlib_external.SourceFileLoader object at 0x106de0bd0&gt;
+path = '/Users/jkershaw/Documents/launchpad/scripts/inventory_backend_client_symbols.py'
+
+&gt;   ???
+E   FileNotFoundError: [Errno 2] No such file or directory: '/Users/jkershaw/Documents/launchpad/scripts/inventory_backend_client_symbols.py'
+
+&lt;frozen importlib._bootstrap_external&gt;:1130: FileNotFoundError</failure></testcase></testsuite></testsuites>

@@ -1,6 +1,13 @@
 schema: launchpad/backend-client-patch-experiment/v1
 date: '2026-10-14'
-status: PENDING-BUILT-COMPATIBILITY
+status: BLOCKED-INCOMPATIBLE-OVERRIDE-ROLLED-BACK
+source_revision: ea4d815255331a34966b8f87d2d8d7a29f4ac874
+release_run: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/38634223553
+observed_failure: github.com/docker/docker@v28.5.2+incompatible/pkg/archive/archive_deprecated.go expects archive.Compression, removed by the proposed archive upgrade.
+runtime_smoke_reached: false
+security_scan_reached: false
+published: false
+rollback_scope: Remove only the experimental archive override; retain the previously compile-proven client dependency fixes.
 cluster_mutations: false
 publish_requested: false
 client_source_revision: d0f23b14fbf35493e5b713e25ecf662ec239e76c
@@ -20,6 +27,8 @@ controls:
 proof:
   red: evidence/runs/backend-client-archive-pins-red-20261014.xml
   green: evidence/runs/backend-client-archive-pins-green-local-20261014.xml
+  rollback_red: evidence/runs/backend-client-archive-rollback-red-20261014.xml
+  rollback_green: evidence/runs/backend-client-symbol-inventory-green-regression-20261014.xml
 limits:
   - A v0 version bump does not guarantee API or behavioral compatibility.
   - Four other fixable client findings and the residual OS/nonfixable inventory remain open even if this target is removed.
