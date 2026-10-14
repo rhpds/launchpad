@@ -48,6 +48,9 @@ def main() -> None:
     forbidden = {
         "httpd", "httpd-core", "httpd-devel", "httpd-filesystem", "httpd-tools",
         "mod_ldap", "mod_lua", "mod_session", "mod_ssl", "gd", "gd-devel",
+        "kernel-headers", "python3.11-devel", "expat-devel", "libblkid-devel",
+        "libmount-devel", "go-srpm-macros", "qt5-srpm-macros",
+        "emacs-filesystem", "vim-filesystem", "vim-minimal", "libX11-devel",
     }
     remaining = forbidden.intersection(installed.stdout.splitlines())
     if remaining:

@@ -38,3 +38,33 @@ def test_smoke_preserves_platform_dependencies_and_cli_tools():
     assert "get_ca_certs" in text
     assert "httpd" in text
     assert "check=True" in text
+
+
+def test_runtime_drops_unused_headers_editors_and_development_packages():
+    text = (ROOT / "backend/Containerfile").read_text()
+    smoke = (ROOT / "backend/scripts/runtime_smoke.py").read_text()
+    for package in (
+        "kernel-headers", "python3.11-devel", "expat-devel", "libblkid-devel",
+        "libmount-devel", "go-srpm-macros", "qt5-srpm-macros",
+        "emacs-filesystem", "vim-filesystem", "vim-minimal", "libX11-devel",
+    ):
+        assert package in text
+        assert f'"{package}"' in smoke
+    assert "clean_requirements_on_remove=False" in text
+
+
+def test_scans_still_collect_after_symbol_failure_but_publication_stays_gated():
+    workflow = yaml.safe_load((ROOT / ".github/workflows/backend-release.yml").read_text())
+    steps = workflow["jobs"]["release"]["steps"]
+    smoke = next(step for step in steps if step.get("name") == "Verify backend runtime surface")
+    assert smoke["id"] == "runtime_smoke"
+    for name in (
+        "Release build cache before security scanning", "Inventory all candidate vulnerabilities",
+        "Block fixable high and critical vulnerabilities",
+    ):
+        step = next(step for step in steps if step.get("name") == name)
+        assert "!cancelled()" in step["if"]
+        assert "steps.runtime_smoke.outcome == 'success'" in step["if"]
+        assert step.get("continue-on-error", False) is False
+    publish = next(step for step in steps if step.get("name") == "Publish immutable candidate and record digest")
+    assert publish["if"] == "${{ inputs.publish }}"

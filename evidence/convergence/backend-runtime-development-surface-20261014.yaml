@@ -1,0 +1,44 @@
+schema: launchpad/backend-runtime-surface-experiment/v1
+date: '2026-10-14'
+status: GREEN-local-PENDING-BUILT-PROOF
+cluster_scope: flightpath
+live_changes: false
+published: false
+deployed: false
+change:
+  removed_optional_packages:
+    - kernel-headers
+    - python3.11-devel
+    - expat-devel
+    - libblkid-devel
+    - libmount-devel
+    - go-srpm-macros
+    - qt5-srpm-macros
+    - emacs-filesystem
+    - vim-filesystem
+    - vim-minimal
+    - libX11-devel
+  dependency_autoremove: disabled
+  preserve: Runtime interpreters, core shared libraries, TLS trust, application dependencies and required platform CLI tools.
+  built_smoke: Require package absence plus existing offline runtime import, CLI, trust, SQLite and filesystem probes.
+scan_context:
+  report_source: d63fdfade11467aee1e43a74a006f21609641245
+  suppressed_high_kernel_header_matches: 144
+  interpretation: Installed header-package matches are not evidence of a running kernel vulnerability; removal must be verified against the actual image.
+  remaining_five_fixable_client_findings: OPEN
+  security_acceptance: NOT-GRANTED
+evidence_collection:
+  change: Run both vulnerability inventories after successful build/runtime smoke even if independent symbol parsing fails.
+  collector_failure_remains_fatal: true
+  publication_requires_all_prior_gates: true
+proof:
+  package_red: evidence/runs/backend-runtime-dev-surface-red-20261014.xml
+  initial_local_green: evidence/runs/backend-runtime-dev-surface-green-20261014.xml
+  scan_independence_red: evidence/runs/backend-security-evidence-independence-red-20261014.xml
+  combined_local_green: evidence/runs/backend-runtime-dev-surface-green-r2-20261014.xml
+  cleanup_access_regression: evidence/runs/staging-regression-current-20261014.xml
+  cleanup_access_passing: 66
+limits:
+  - Local source contracts do not prove built-image package removal or runtime compatibility.
+  - No removal of a scanner match constitutes a security waiver for remaining findings.
+  - Flightpath reachable but current session credentials returned Unauthorized; live qualification is not performed.

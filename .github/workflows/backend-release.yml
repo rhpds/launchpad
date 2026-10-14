@@ -69,6 +69,7 @@ jobs:
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
 
       - name: Verify backend runtime surface
+        id: runtime_smoke
         shell: bash
         run: |
           set -euo pipefail
@@ -107,6 +108,7 @@ jobs:
             ${{ runner.temp }}/launchpad-oc-symbols.txt
 
       - name: Release build cache before security scanning
+        if: ${{ !cancelled() && steps.runtime_smoke.outcome == 'success' }}
         shell: bash
         run: |
           set -euo pipefail
@@ -117,6 +119,7 @@ jobs:
           df -h / /tmp
 
       - name: Inventory all candidate vulnerabilities
+        if: ${{ !cancelled() && steps.runtime_smoke.outcome == 'success' }}
         uses: anchore/scan-action@1638637db639e0ade3258b51db49a9a137574c3e
         with:
           image: ${{ env.IMAGE_REPOSITORY }}:git-${{ inputs.expected_sha }}
@@ -126,6 +129,7 @@ jobs:
           output-file: vulnerability-report.json
 
       - name: Block fixable high and critical vulnerabilities
+        if: ${{ !cancelled() && steps.runtime_smoke.outcome == 'success' }}
         uses: anchore/scan-action@1638637db639e0ade3258b51db49a9a137574c3e
         with:
           image: ${{ env.IMAGE_REPOSITORY }}:git-${{ inputs.expected_sha }}

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="5" time="0.973" timestamp="2026-10-14T16:20:04.252535-05:00" hostname="jkershaw-mac"><testcase classname="scripts.tests.test_backend_runtime_surface" name="test_runtime_removes_unused_web_server_without_autoremoving_dependencies" time="0.002" /><testcase classname="scripts.tests.test_backend_runtime_surface" name="test_release_smokes_built_image_before_scan_and_publication" time="0.336" /><testcase classname="scripts.tests.test_backend_runtime_surface" name="test_smoke_preserves_platform_dependencies_and_cli_tools" time="0.019" /><testcase classname="scripts.tests.test_backend_runtime_surface" name="test_runtime_drops_unused_headers_editors_and_development_packages" time="0.035" /><testcase classname="scripts.tests.test_backend_runtime_surface" name="test_scans_still_collect_after_symbol_failure_but_publication_stays_gated" time="0.055"><failure message="KeyError: 'id'">def test_scans_still_collect_after_symbol_failure_but_publication_stays_gated():
+        workflow = yaml.safe_load((ROOT / ".github/workflows/backend-release.yml").read_text())
+        steps = workflow["jobs"]["release"]["steps"]
+        smoke = next(step for step in steps if step.get("name") == "Verify backend runtime surface")
+&gt;       assert smoke["id"] == "runtime_smoke"
+               ^^^^^^^^^^^
+E       KeyError: 'id'
+
+scripts/tests/test_backend_runtime_surface.py:60: KeyError</failure></testcase></testsuite></testsuites>
