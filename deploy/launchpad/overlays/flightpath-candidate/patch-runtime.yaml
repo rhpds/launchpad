@@ -9,10 +9,11 @@ spec:
   template:
     spec:
       imagePullSecrets:
+        - name: launchpad-backend-ghcr-pull
         - name: launchpad-registry-pull
       containers:
         - name: backend
-          image: ghcr.io/rhpds/launchpad-backend-flightpath@sha256:298527ffe9d9af75c21481d4ddc09e927a04406aac16a80ec808cb2321558d6c
+          image: ghcr.io/jkershawrh/launchpad-backend-flightpath-candidate@sha256:3bedbc0cef3c09c86e440eff8a883043c9dde9687fd686fe7c9fd1e1a24aabd8
           env:
             - name: SSL_CERT_FILE
               value: /etc/launchpad-ca/ca-bundle.crt
@@ -230,9 +231,11 @@ spec:
   template:
     spec:
       imagePullSecrets:
+        - name: launchpad-backend-ghcr-pull
         - name: launchpad-registry-pull
       containers:
         - name: lifecycle-worker
+          image: ghcr.io/jkershawrh/launchpad-backend-flightpath-candidate@sha256:3bedbc0cef3c09c86e440eff8a883043c9dde9687fd686fe7c9fd1e1a24aabd8
           env:
             - name: SSL_CERT_FILE
               value: /etc/launchpad-ca/ca-bundle.crt

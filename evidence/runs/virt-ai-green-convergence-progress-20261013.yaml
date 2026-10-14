@@ -2,6 +2,9 @@ schema: launchpad/green-convergence-progress/v1
 cluster: flightpath
 seat_limit: 1
 result: ONE-SEAT-LAB-GATES-PASSED-BACKEND-ROLLOUT-BLOCKED
+historical_snapshot_date: '2026-10-13'
+later_private_pull_blocker_closure: evidence/runs/flightpath-backend-private-pull-rollout-20261014.yaml
+later_closure_scope: Private pull, backend rollout and normal one-seat reclaim passed on October 14; full cleanup-hardening and security gates remain separate.
 rule: Signed builds and local regression passes do not replace fresh participant or zero-residue proof.
 passed_local:
   - Cleanup completion gate rejects retained or missing residue inventory.

@@ -1,0 +1,109 @@
+{
+  "timestamp": "2026-10-14T16:48:12.053Z",
+  "cluster": "flightpath",
+  "mutation": false,
+  "result": "GREEN-orderability",
+  "scope": "Normal one-seat capacity contracts; does not independently prove every requester form browser flow",
+  "checks": [
+    {
+      "catalog": "virtualization-ai-foundations-101",
+      "exposure": "internal",
+      "http_status": 200,
+      "can_provision": true,
+      "selected_cluster": "flightpath",
+      "reason": "Cluster can support 46 seats (CPU: 342, Memory: 652, Pods: 46; Eligible nodes: 3; 20.0% headroom)",
+      "certification_override": false,
+      "passed": true
+    },
+    {
+      "catalog": "virtualization-ai-foundations-101",
+      "exposure": "public_code",
+      "http_status": 200,
+      "can_provision": true,
+      "selected_cluster": "flightpath",
+      "reason": "Cluster can support 46 seats (CPU: 342, Memory: 652, Pods: 46; Eligible nodes: 3; 20.0% headroom)",
+      "certification_override": false,
+      "passed": true
+    },
+    {
+      "catalog": "virtualization-ai-201",
+      "exposure": "internal",
+      "http_status": 200,
+      "can_provision": true,
+      "selected_cluster": "flightpath",
+      "reason": "Cluster can support 45 seats (CPU: 615, Memory: 1148, Pods: 45; Eligible nodes: 3; 20.0% headroom)",
+      "certification_override": false,
+      "passed": true
+    },
+    {
+      "catalog": "virtualization-ai-201",
+      "exposure": "public_code",
+      "http_status": 200,
+      "can_provision": true,
+      "selected_cluster": "flightpath",
+      "reason": "Cluster can support 45 seats (CPU: 615, Memory: 1148, Pods: 45; Eligible nodes: 3; 20.0% headroom)",
+      "certification_override": false,
+      "passed": true
+    },
+    {
+      "catalog": "virtualization-ai-301",
+      "exposure": "internal",
+      "http_status": 200,
+      "can_provision": true,
+      "selected_cluster": "flightpath",
+      "reason": "Cluster can support 46 seats (CPU: 616, Memory: 1150, Pods: 46; Eligible nodes: 3; 20.0% headroom)",
+      "certification_override": false,
+      "passed": true
+    },
+    {
+      "catalog": "virtualization-ai-301",
+      "exposure": "public_code",
+      "http_status": 200,
+      "can_provision": true,
+      "selected_cluster": "flightpath",
+      "reason": "Cluster can support 46 seats (CPU: 616, Memory: 1150, Pods: 46; Eligible nodes: 3; 20.0% headroom)",
+      "certification_override": false,
+      "passed": true
+    },
+    {
+      "catalog": "virtualization-ai-401",
+      "exposure": "internal",
+      "http_status": 200,
+      "can_provision": true,
+      "selected_cluster": "flightpath",
+      "reason": "Cluster can support 46 seats (CPU: 616, Memory: 1150, Pods: 46; Eligible nodes: 3; 20.0% headroom)",
+      "certification_override": false,
+      "passed": true
+    },
+    {
+      "catalog": "virtualization-ai-401",
+      "exposure": "public_code",
+      "http_status": 200,
+      "can_provision": true,
+      "selected_cluster": "flightpath",
+      "reason": "Cluster can support 46 seats (CPU: 616, Memory: 1150, Pods: 46; Eligible nodes: 3; 20.0% headroom)",
+      "certification_override": false,
+      "passed": true
+    },
+    {
+      "catalog": "virtualization-ai-501",
+      "exposure": "internal",
+      "http_status": 200,
+      "can_provision": true,
+      "selected_cluster": "flightpath",
+      "reason": "Cluster can support 28 seats (CPU: 236, Memory: 455, Pods: 28; Eligible nodes: 3; 20.0% headroom)",
+      "certification_override": false,
+      "passed": true
+    },
+    {
+      "catalog": "virtualization-ai-501",
+      "exposure": "public_code",
+      "http_status": 200,
+      "can_provision": true,
+      "selected_cluster": "flightpath",
+      "reason": "Cluster can support 28 seats (CPU: 236, Memory: 455, Pods: 28; Eligible nodes: 3; 20.0% headroom)",
+      "certification_override": false,
+      "passed": true
+    }
+  ]
+}

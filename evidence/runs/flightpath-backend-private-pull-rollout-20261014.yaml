@@ -1,0 +1,96 @@
+schema: launchpad/backend-private-pull-rollout/v1
+cluster: flightpath
+namespace: launchpad-flightpath-candidate
+result: GREEN-PRIVATE-PULL-ROLLOUT-AND-NORMAL-ONE-SEAT-JOURNEY
+image: ghcr.io/jkershawrh/launchpad-backend-flightpath-candidate@sha256:3bedbc0cef3c09c86e440eff8a883043c9dde9687fd686fe7c9fd1e1a24aabd8
+source_revision: a59d503c38f6063dd487779a62b01b8f488cf461
+release_run: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/38489410096
+private_source_and_package_preserved: true
+credential:
+  secret_reference: launchpad-backend-ghcr-pull
+  namespace_boundary: launchpad-flightpath-candidate
+  verified_scopes: [read:packages]
+  account_match_verified: true
+  observed_expiration_utc: '2027-01-12T17:34:31Z'
+  differs_from_previously_exposed_token_identifier: true
+  values_recorded: false
+  copied_to_learner_namespaces: false
+  shared_lab_secret_changed: false
+cold_pull:
+  pod: launchpad-backend-ghcr-pull-20261014
+  result: GREEN-component
+  phase: Succeeded
+  resolved_image_digest_matches: true
+  dependency_imports: true
+  python: 3.11.13
+  oc_go: go1.26.9
+  helm: v4.3.0+gbec5b06
+  api_token_automount: false
+  exposed_via_service_or_route: false
+  owned_test_pod_removed_after_verification: true
+rollout:
+  backend_ready_replicas: 1
+  worker_ready_replicas: 2
+  private_credential_attached_only_to: [backend, lifecycle-worker]
+  legacy_pull_reference_preserved: true
+  lifecycle_queued_before_deploy: 0
+  lifecycle_running_before_deploy: 0
+  lifecycle_reclaim_pending_before_deploy: 0
+  feature_enabled_after_image_ready_and_idle: true
+  cleanup_verify_residue: true
+  cleanup_verification_timeout_seconds: 600
+  persistent_volume_list_allowed: true
+  persistent_volume_delete_allowed: false
+  live_gate_code_present: true
+  existing_user_lab_resources_changed: false
+normal_order_admission:
+  evidence: evidence/runs/virt-family-normal-one-seat-orderability-final-20261014.json
+  result: GREEN-orderability
+  passed_checks: 10
+  exposures: [internal, public_code]
+  certification_override: false
+participant_proofs:
+  first_run: evidence/runs/virtualization-ai-501-participant-backend-verifier-live-r1-20261014.json
+  first_run_observer_failure: CLI output exceeded the collector's default buffer; the failed report remains unchanged.
+  independent_recheck: evidence/runs/virtualization-ai-501-independent-cleanup-backend-verifier-r1-buffer-fixed-20261014.json
+  independent_recheck_result: PASS
+  independent_resource_counts: {namespace: 0, persistent_volume: 0, application: 0, external_role_binding: 0}
+  final_run: evidence/runs/virtualization-ai-501-participant-backend-verifier-live-r2-20261014.json
+  final_run_status: ALL-CHECKS-PASSED
+  automatic_reclaim: completed
+  independent_zero_residue: true
+  model_key_revocation_confirmed: true
+  public_policy_and_claims_disabled: true
+  cached_participant_session_denied: true
+local_proof:
+  red: evidence/runs/backend-private-pull-red-20261014.xml
+  green: evidence/runs/backend-private-pull-green-regression-20261014.xml
+  passing_regression_tests: 50
+review_followups:
+  - id: CLEANUP-IMAGE-PULLER-INVENTORY-SHADOW
+    status: OPEN-SOURCE-REVIEW
+    source: backend/app/adapters/openshift/cleanup.py
+    finding: The loop over shared ClusterRoleBinding names shadows the per-namespace image-puller binding name before its namespaced lookup.
+    impact: Normal successful cleanup and independent zero-residue proof do not establish detection of a deliberately surviving image-puller binding.
+    next_required: Add a failing namespace-binding regression, fix the loop variable, publish an immutable candidate, and prove surviving-binding denial.
+  - id: CLEANUP-FORCE-FALLBACK-VERIFICATION
+    status: OPEN-SOURCE-REVIEW
+    source: backend/app/services/provisioning.py
+    finding: Normal reclaim invokes the new residue gate; the force-reclaim fallback does not independently invoke it after deletion acknowledgment.
+    impact: This positive normal-reclaim run does not qualify failure/fallback paths or prove all retained-storage cases fail closed.
+    next_required: Add a failing forced/fallback residue regression, define override semantics, and qualify the corrected candidate without bypassing the gate.
+security_scope:
+  fixable_high: 0
+  critical: 0
+  full_scan_high_matches: 107
+  full_security_gate_green: false
+  risk_acceptance_granted: false
+limits:
+  - This closes private image-pull access and proves the recorded normal one-seat workflow, not full cleanup hardening, staging, or production certification.
+  - The 501 scenario controls remain rehearsal; no real model-throughput or infrastructure-remediation claim is made.
+  - Admission checks do not prove every requester form browser flow.
+  - Cached route denial is not independent proof of external Keycloak account deletion.
+rollback:
+  trigger: Backend readiness or critical API flow fails; lifecycle workers cannot execute the normal test reclaim.
+  action: Disable CLEANUP_VERIFY_RESIDUE, restore the prior backend/worker image after the lifecycle queue is safe, and retain the failed evidence.
+  previous_image: ghcr.io/rhpds/launchpad-backend-flightpath@sha256:298527ffe9d9af75c21481d4ddc09e927a04406aac16a80ec808cb2321558d6c

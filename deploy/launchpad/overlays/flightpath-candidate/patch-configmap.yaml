@@ -10,9 +10,9 @@ data:
   LAUNCHPAD_CONTROL_PLANE_ID: "flightpath-candidate"
   LAUNCHPAD_CONTROL_PLANE_ROLE: "active"
   LIFECYCLE_HA_ENABLED: "true"
-  # Enable only with the qualified verifier image after its private cold pull
-  # succeeds. The current deployed image does not implement this feature.
-  CLEANUP_VERIFY_RESIDUE: "false"
+  # Qualified private backend cold-pull and live reclaim evidence are retained
+  # separately. Completion requires a complete zero-residue inventory.
+  CLEANUP_VERIFY_RESIDUE: "true"
   CLEANUP_VERIFICATION_TIMEOUT_SECONDS: "600"
   WORKSHOP_AUTO_RECOVERY: "false"
   SMART_PLACEMENT_ENABLED: "false"

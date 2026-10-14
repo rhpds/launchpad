@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="2" time="0.110" timestamp="2026-10-14T11:43:22.162608-05:00" hostname="jkershaw-mac"><testcase classname="scripts.tests.test_backend_private_pull_boundary" name="test_backend_private_pull_credential_is_only_on_backend_and_workers" time="0.031"><failure message="AssertionError: assert [{'name': 'la...gistry-pull'}] == [{'name': 'la...gistry-pull'}]&#10;  &#10;  At index 0 diff: {'name': 'launchpad-registry-pull'} != {'name': 'launchpad-backend-ghcr-pull'}&#10;  Right contains one more item: {'name': 'launchpad-registry-pull'}&#10;  Use -v to get more diff">def test_backend_private_pull_credential_is_only_on_backend_and_workers():
+        documents = list(yaml.safe_load_all((OVERLAY / 'patch-runtime.yaml').read_text()))
+        for document in documents:
+            spec = document.get('spec', {}).get('template', {}).get('spec', {})
+            name = document['metadata']['name']
+            secrets = spec.get('imagePullSecrets', [])
+            if name in {'backend', 'lifecycle-worker'}:
+&gt;               assert secrets == [{'name': 'launchpad-backend-ghcr-pull'}, {'name': 'launchpad-registry-pull'}]
+E               AssertionError: assert [{'name': 'la...gistry-pull'}] == [{'name': 'la...gistry-pull'}]
+E
+E                 At index 0 diff: {'name': 'launchpad-registry-pull'} != {'name': 'launchpad-backend-ghcr-pull'}
+E                 Right contains one more item: {'name': 'launchpad-registry-pull'}
+E                 Use -v to get more diff
+
+scripts/tests/test_backend_private_pull_boundary.py:17: AssertionError</failure></testcase><testcase classname="scripts.tests.test_backend_private_pull_boundary" name="test_cleanup_verifier_is_enabled_with_a_bounded_wait" time="0.003"><failure message="AssertionError: assert 'false' == 'true'&#10;  &#10;  - true&#10;  + false">def test_cleanup_verifier_is_enabled_with_a_bounded_wait():
+        config = yaml.safe_load((OVERLAY / 'patch-configmap.yaml').read_text())['data']
+&gt;       assert config['CLEANUP_VERIFY_RESIDUE'] == 'true'
+E       AssertionError: assert 'false' == 'true'
+E
+E         - true
+E         + false
+
+scripts/tests/test_backend_private_pull_boundary.py:26: AssertionError</failure></testcase></testsuite></testsuites>
