@@ -20,3 +20,14 @@ def test_compiled_client_dependency_versions_are_verified():
     assert 'grep -F "${GO_JOSE_VERSION}"' in text
     assert 'grep -F "github.com/moby/spdystream"' in text
     assert 'grep -F "${SPDYSTREAM_VERSION}"' in text
+
+
+def test_git_and_billy_fixes_stay_on_supported_v5_major():
+    text = (ROOT / "backend/Containerfile").read_text()
+    assert "ARG GO_GIT_VERSION=v5.19.2" in text
+    assert "ARG GO_BILLY_VERSION=v5.9.0" in text
+    assert "-replace=github.com/go-git/go-git/v5=github.com/go-git/go-git/v5@${GO_GIT_VERSION}" in text
+    assert "-replace=github.com/go-git/go-billy/v5=github.com/go-git/go-billy/v5@${GO_BILLY_VERSION}" in text
+    assert 'grep -F "${GO_GIT_VERSION}"' in text
+    assert 'grep -F "${GO_BILLY_VERSION}"' in text
+    assert "github.com/go-git/go-git/v6" not in text

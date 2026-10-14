@@ -1,0 +1,33 @@
+schema: launchpad/backend-client-patch-experiment/v1
+date: '2026-10-14'
+status: GREEN-local-PENDING-BUILT-COMPATIBILITY
+cluster_mutations: false
+publish_requested: false
+client_source_revision: d0f23b14fbf35493e5b713e25ecf662ec239e76c
+patches:
+  - module: github.com/go-git/go-git/v5
+    from: v5.13.1
+    to: v5.19.2
+    advisories:
+      - https://github.com/advisories/GHSA-389r-gv7p-r3rp
+      - https://github.com/advisories/GHSA-hc8v-wwc9-vgxm
+    primary_advisory_review: Addresses malformed Git object interpretation and filesystem-backed worktree symlink traversal. No unreachability waiver is inferred.
+  - module: github.com/go-git/go-billy/v5
+    from: v5.6.1
+    to: v5.9.0
+    advisory: https://github.com/advisories/GHSA-qw64-3x98-g7q2
+    primary_advisory_review: Mitigates path traversal in the existing major version; this is not a claim that all filesystem isolation has the stronger v6 semantics.
+controls:
+  exact_release_source_retained: true
+  major_version_changes: false
+  compiled_dependency_version_checks_added: true
+  built_runtime_smoke_required: true
+  scanner_exceptions_active: false
+  risk_acceptance: NOT-GRANTED
+proof:
+  red: evidence/runs/backend-client-git-pins-red-20261014.xml
+  green: evidence/runs/backend-client-git-pins-green-local-20261014.xml
+  passing_local_checks: 41
+limits:
+  - No build, advisory-removal, live adapter, or deployment proof is claimed for these new overrides yet.
+  - Other client and OS findings remain release/staging blockers; expected next build must preserve its failed security evidence if those remain.

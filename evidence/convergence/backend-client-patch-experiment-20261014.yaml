@@ -1,6 +1,17 @@
 schema: launchpad/backend-client-patch-experiment/v1
 date: '2026-10-14'
-status: GREEN-local-PENDING-BUILT-COMPATIBILITY
+status: GREEN-BUILD-AND-OFFLINE-SMOKE-SECURITY-GATE-BLOCKED
+source_revision: 82031d9ab930a9e98101a73b66e02b5eab6989f5
+release_run: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/38622201974
+observed_build_result: PASS
+observed_runtime_smoke: PASS
+observed_target_advisories_remaining: 0
+observed_fixable_high_remaining: 11
+observed_active_high: 56
+observed_critical: 0
+observed_repository_ignore_rules: 0
+gate_failed_at: Block fixable high and critical vulnerabilities
+published: false
 cluster_mutations: false
 deployment: NOT-PERFORMED
 publish_requested: false
@@ -27,7 +38,7 @@ local_proof:
   red: evidence/runs/backend-client-patch-pins-red-20261014.xml
   green: evidence/runs/backend-client-patch-pins-green-local-20261014.xml
 limits:
-  - Source-contract tests do not establish build or runtime compatibility.
-  - Expect the existing release gate to block other fixable High findings when the retired ignores are absent; retain the complete report even if it fails.
+  - Build and offline smoke passed; authenticated live client/adapter compatibility is not yet proved.
+  - The gate correctly blocked 11 other fixable High findings; retained artifact is backend-vulnerability-scan-82031d9ab930a9e98101a73b66e02b5eab6989f5.
   - Compare advisory identifiers and compiled versions, not only total visible counts, because removing suppressions changes the visible count basis.
   - Do not deploy until the broader security disposition and live proof requirements are satisfied.

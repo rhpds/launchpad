@@ -5,6 +5,8 @@ ARG GO_X_TEXT_VERSION=v0.41.0
 ARG GO_X_NET_VERSION=v0.60.0
 ARG GO_JOSE_VERSION=v4.1.4
 ARG SPDYSTREAM_VERSION=v0.5.1
+ARG GO_GIT_VERSION=v5.19.2
+ARG GO_BILLY_VERSION=v5.9.0
 ENV GOTOOLCHAIN=go1.26.9
 ARG HELM_VERSION=4.3.0
 ARG HELM_SOURCE_COMMIT=bec5b06ed841fe5269972d864d5177944fd5970f
@@ -17,6 +19,8 @@ RUN git clone https://github.com/openshift/oc.git . \
       -replace=golang.org/x/net=golang.org/x/net@${GO_X_NET_VERSION} \
       -replace=github.com/go-jose/go-jose/v4=github.com/go-jose/go-jose/v4@${GO_JOSE_VERSION} \
       -replace=github.com/moby/spdystream=github.com/moby/spdystream@${SPDYSTREAM_VERSION} \
+      -replace=github.com/go-git/go-git/v5=github.com/go-git/go-git/v5@${GO_GIT_VERSION} \
+      -replace=github.com/go-git/go-billy/v5=github.com/go-git/go-billy/v5@${GO_BILLY_VERSION} \
     && CGO_ENABLED=0 go build -mod=mod \
       -tags "include_gcs include_oss containers_image_openpgp" \
       -trimpath -o /tmp/oc-bin ./cmd/oc \
@@ -28,7 +32,13 @@ RUN git clone https://github.com/openshift/oc.git . \
     | grep -F "${GO_JOSE_VERSION}" \
     && go version -m /tmp/oc-bin \
     | grep -F "github.com/moby/spdystream" \
-    | grep -F "${SPDYSTREAM_VERSION}"
+    | grep -F "${SPDYSTREAM_VERSION}" \
+    && go version -m /tmp/oc-bin \
+    | grep -F "github.com/go-git/go-git/v5" \
+    | grep -F "${GO_GIT_VERSION}" \
+    && go version -m /tmp/oc-bin \
+    | grep -F "github.com/go-git/go-billy/v5" \
+    | grep -F "${GO_BILLY_VERSION}"
 
 WORKDIR /tmp/helm
 RUN git clone https://github.com/helm/helm.git . \
