@@ -3,6 +3,8 @@ FROM registry.access.redhat.com/ubi9/go-toolset:1.26 AS oc-builder
 ARG OPENSHIFT_CLIENT_COMMIT=d0f23b14fbf35493e5b713e25ecf662ec239e76c
 ARG GO_X_TEXT_VERSION=v0.41.0
 ARG GO_X_NET_VERSION=v0.60.0
+ARG GO_JOSE_VERSION=v4.1.4
+ARG SPDYSTREAM_VERSION=v0.5.1
 ENV GOTOOLCHAIN=go1.26.9
 ARG HELM_VERSION=4.3.0
 ARG HELM_SOURCE_COMMIT=bec5b06ed841fe5269972d864d5177944fd5970f
@@ -13,12 +15,20 @@ RUN git clone https://github.com/openshift/oc.git . \
     && go mod edit \
       -replace=golang.org/x/text=golang.org/x/text@${GO_X_TEXT_VERSION} \
       -replace=golang.org/x/net=golang.org/x/net@${GO_X_NET_VERSION} \
+      -replace=github.com/go-jose/go-jose/v4=github.com/go-jose/go-jose/v4@${GO_JOSE_VERSION} \
+      -replace=github.com/moby/spdystream=github.com/moby/spdystream@${SPDYSTREAM_VERSION} \
     && CGO_ENABLED=0 go build -mod=mod \
       -tags "include_gcs include_oss containers_image_openpgp" \
       -trimpath -o /tmp/oc-bin ./cmd/oc \
     && go version -m /tmp/oc-bin \
     | grep -F "golang.org/x/text" \
-    | grep -F "v0.41.0"
+    | grep -F "v0.41.0" \
+    && go version -m /tmp/oc-bin \
+    | grep -F "github.com/go-jose/go-jose/v4" \
+    | grep -F "${GO_JOSE_VERSION}" \
+    && go version -m /tmp/oc-bin \
+    | grep -F "github.com/moby/spdystream" \
+    | grep -F "${SPDYSTREAM_VERSION}"
 
 WORKDIR /tmp/helm
 RUN git clone https://github.com/helm/helm.git . \

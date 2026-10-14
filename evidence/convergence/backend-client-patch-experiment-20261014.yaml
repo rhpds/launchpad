@@ -1,0 +1,33 @@
+schema: launchpad/backend-client-patch-experiment/v1
+date: '2026-10-14'
+status: GREEN-local-PENDING-BUILT-COMPATIBILITY
+cluster_mutations: false
+deployment: NOT-PERFORMED
+publish_requested: false
+client_source_revision: d0f23b14fbf35493e5b713e25ecf662ec239e76c
+patches:
+  - module: github.com/go-jose/go-jose/v4
+    from: v4.1.3
+    to: v4.1.4
+    advisory: https://github.com/advisories/GHSA-78h2-9frx-2jm8
+    primary_advisory_review: JWE decryption key-unwrapping panic; upstream patched version is 4.1.4.
+  - module: github.com/moby/spdystream
+    from: v0.5.0
+    to: v0.5.1
+    advisory: https://github.com/advisories/GHSA-pc3f-x583-g7j2
+    primary_advisory_review: Attacker-controlled SPDY frame counts and lengths can cause excessive allocation; upstream patched version is 0.5.1.
+controls:
+  exact_release_source_retained: true
+  compiled_dependency_version_checks_added: true
+  offline_built_runtime_smoke_required: true
+  expired_scanner_exceptions_removed: true
+  major_version_dependency_changes: false
+  vulnerability_risk_acceptance: NOT-GRANTED
+local_proof:
+  red: evidence/runs/backend-client-patch-pins-red-20261014.xml
+  green: evidence/runs/backend-client-patch-pins-green-local-20261014.xml
+limits:
+  - Source-contract tests do not establish build or runtime compatibility.
+  - Expect the existing release gate to block other fixable High findings when the retired ignores are absent; retain the complete report even if it fails.
+  - Compare advisory identifiers and compiled versions, not only total visible counts, because removing suppressions changes the visible count basis.
+  - Do not deploy until the broader security disposition and live proof requirements are satisfied.

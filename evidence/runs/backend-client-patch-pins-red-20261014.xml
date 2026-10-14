@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="2" time="0.037" timestamp="2026-10-14T14:14:50.179926-05:00" hostname="jkershaw-mac"><testcase classname="scripts.tests.test_backend_client_patch_pins" name="test_client_retains_exact_release_source_with_reviewed_patch_pins" time="0.001"><failure message="assert 'ARG GO_JOSE_VERSION=v4.1.4' in 'FROM registry.access.redhat.com/ubi9/go-toolset:1.26 AS oc-builder\n\nARG OPENSHIFT_CLIENT_COMMIT=d0f23b14fbf35493e5b...http://localhost:8000/health\')&quot; || exit 1\n\nCMD [&quot;uvicorn&quot;, &quot;app.main:app&quot;, &quot;--host&quot;, &quot;0.0.0.0&quot;, &quot;--port&quot;, &quot;8000&quot;]\n'">def test_client_retains_exact_release_source_with_reviewed_patch_pins():
+        text = (ROOT / "backend/Containerfile").read_text()
+        assert "OPENSHIFT_CLIENT_COMMIT=d0f23b14fbf35493e5b713e25ecf662ec239e76c" in text
+&gt;       assert "ARG GO_JOSE_VERSION=v4.1.4" in text
+E       assert 'ARG GO_JOSE_VERSION=v4.1.4' in 'FROM registry.access.redhat.com/ubi9/go-toolset:1.26 AS oc-builder\n\nARG OPENSHIFT_CLIENT_COMMIT=d0f23b14fbf35493e5b...http://localhost:8000/health\')" || exit 1\n\nCMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]\n'
+
+scripts/tests/test_backend_client_patch_pins.py:11: AssertionError</failure></testcase><testcase classname="scripts.tests.test_backend_client_patch_pins" name="test_compiled_client_dependency_versions_are_verified" time="0.000"><failure message="assert 'grep -F &quot;github.com/go-jose/go-jose/v4&quot;' in 'FROM registry.access.redhat.com/ubi9/go-toolset:1.26 AS oc-builder\n\nARG OPENSHIFT_CLIENT_COMMIT=d0f23b14fbf35493e5b...http://localhost:8000/health\')&quot; || exit 1\n\nCMD [&quot;uvicorn&quot;, &quot;app.main:app&quot;, &quot;--host&quot;, &quot;0.0.0.0&quot;, &quot;--port&quot;, &quot;8000&quot;]\n'">def test_compiled_client_dependency_versions_are_verified():
+        text = (ROOT / "backend/Containerfile").read_text()
+&gt;       assert 'grep -F "github.com/go-jose/go-jose/v4"' in text
+E       assert 'grep -F "github.com/go-jose/go-jose/v4"' in 'FROM registry.access.redhat.com/ubi9/go-toolset:1.26 AS oc-builder\n\nARG OPENSHIFT_CLIENT_COMMIT=d0f23b14fbf35493e5b...http://localhost:8000/health\')" || exit 1\n\nCMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]\n'
+
+scripts/tests/test_backend_client_patch_pins.py:19: AssertionError</failure></testcase></testsuite></testsuites>
