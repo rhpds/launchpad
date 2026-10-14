@@ -1,0 +1,42 @@
+schema: launchpad/backend-security-disposition/v1
+status: OPEN-NOT-ACCEPTED
+owner_role: launchpad-platform-security-reviewer
+candidate_source: 27b6d2b1ae96d0f80d97bbb7d405a80c23a52f22
+candidate_digest: sha256:43c9e691a912fc6a10e20d239164f741cf6b6fc2cc340850968b8e16a920c12c
+default_disposition: Remediation or applicability review required; no vulnerability is accepted by this record.
+runtime_groups:
+  - group: Python interpreters, Python RPM tooling, Expat and GnuTLS
+    status: OPEN-RUNTIME-DEPENDENCY-REVIEW
+    constraints: Preserve interpreter, Python native extensions, package tooling needed during build, TLS, and certificate trust. Do not remove shared libraries based only on scanner counts.
+  - group: Editor, graphical, development and RPM build-macro packages
+    status: OPEN-OPTIONAL-PACKAGE-REVIEW
+    next: Test another bounded removal only if dependent-package effects and the built-image smoke remain acceptable.
+  - group: util-linux and core filesystem libraries
+    status: OPEN-UPSTREAM-AND-APPLICABILITY-REVIEW
+    constraints: Do not remove core libraries or accept scanner wont-fix status as a waiver.
+client_findings:
+  - {id: GHSA-389r-gv7p-r3rp, package: github.com/go-git/go-git/v5, recorded_fix: '5.19.0'}
+  - {id: GHSA-hc8v-wwc9-vgxm, package: github.com/go-git/go-git/v5, recorded_fix: '5.19.2'}
+  - {id: GHSA-qw64-3x98-g7q2, package: github.com/go-git/go-billy/v5, recorded_fix: '5.9.0'}
+  - {id: GHSA-78h2-9frx-2jm8, package: github.com/go-jose/go-jose/v4, recorded_fix: '4.1.4'}
+  - {id: GHSA-3p65-76g6-3w7r, package: github.com/distribution/distribution/v3, recorded_fix: '3.1.0'}
+  - {id: GHSA-f2g3-hh2r-cwgc, package: github.com/distribution/distribution/v3, recorded_fix: '3.1.0'}
+  - {id: GHSA-4c29-8rgm-jvjj, package: github.com/moby/buildkit, recorded_fix: '0.28.1'}
+  - {id: GHSA-4vrq-3vrq-g6gg, package: github.com/moby/buildkit, recorded_fix: '0.28.1'}
+  - {id: GHSA-hfg8-hc9c-6c3h, package: github.com/moby/go-archive, recorded_fix: '0.3.0'}
+  - {id: GHSA-f5mr-q85p-6hh6, package: github.com/sigstore/fulcio, recorded_fix: '1.8.6'}
+  - {id: GHSA-f83f-xpx7-ffpw, package: github.com/sigstore/fulcio, recorded_fix: '1.8.3'}
+  - {id: GHSA-mh2q-q3fh-2475, package: go.opentelemetry.io/otel, recorded_fix: '1.41.0'}
+  - {id: GHSA-pc3f-x583-g7j2, package: github.com/moby/spdystream, recorded_fix: '0.5.1'}
+client_usage_review:
+  observed_backend_operations: [get-resources, create-edge-route, apply-manifests, kustomize-apply]
+  other_tools: Helm and external Git have independent command paths.
+  absent_direct_calls: No direct backend invocation of oc build or oc image was identified in the scoped review.
+  reachability_proven: false
+  exploitability_disposition: NOT-DETERMINED
+  required_before_acceptance: Advisory-specific affected-function review, input/trust-boundary analysis, dependency compatibility results, and named-owner approval with scope and expiry if an exception is necessary.
+not_performed:
+  - No live backend rollout, cluster restart, or lab mutation.
+  - No replacement of the supported client with upstream main.
+  - No blind major-version dependency overrides.
+  - No renewed scanner exception or security acceptance.

@@ -1,0 +1,49 @@
+schema: launchpad/backend-runtime-surface/v1
+source_revision: 27b6d2b1ae96d0f80d97bbb7d405a80c23a52f22
+release_run: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/38617346837
+observed_date: '2026-10-14'
+last_observed_status: success
+image_digest: sha256:43c9e691a912fc6a10e20d239164f741cf6b6fc2cc340850968b8e16a920c12c
+release_attestations_verified_in_ci: true
+reviewed_provenance_source_matches: true
+deployed: false
+staging_qualified: false
+change:
+  scope: Remove explicit Apache and graphics development RPMs from the backend candidate only.
+  dependency_autoremove: disabled
+  required_runtime_tools: [python, oc, helm, git, curl, openssl]
+  origin_certificate_verification_changed: false
+  catalog_changes_included: false
+runtime_smoke:
+  network: none
+  user: 1001
+  root_filesystem: read-only
+  temporary_storage: isolated tmpfs
+  checks: [dependency-imports, certificate-trust-store, sqlite, writable-tmp, cli-versions, package-absence, platform-content-directories]
+  runs_before_security_scan_and_publication: true
+  observed_result: PASS
+  observed_modules: 18
+  observed_unused_packages: 0
+  observed_timestamp: '2026-10-14T18:49:20.3694404Z'
+local_proof:
+  red: evidence/runs/backend-runtime-surface-red-20261014.xml
+  green: evidence/runs/backend-runtime-surface-green-local-20261014.xml
+  green_passing_checks: 27
+comparison_baseline:
+  source_revision: 2580f06568d4f1a005856545beb1ddd5cd58c047
+  image_digest: sha256:61ddc08cf4a9bbb3b2d4b4b46b8b31f98b01759b1033714c421b6a165f58dc68
+  high_matches: 108
+  distinct_high_ids: 28
+  critical_matches: 0
+security_improvement_proven: true
+security_improvement_scope: Active High match reduction only; no suppressed finding is waived and platform staging is not granted.
+scan_result:
+  active_high_matches: 45
+  active_high_reduction: 63
+  critical_matches: 0
+  suppressed_high_matches: 157
+  suppressed_cli_fixable_high_matches: 13
+  report_sha256: 09bdd3533788dff1589c6e60eaadff064682cea11fcf8ed94fb849f4fab8f558
+  scanner_config_contains_expired_suppressions: true
+  staging_security_gate: BLOCKED
+next: Assess remaining runtime package necessity and client vulnerability applicability; rescan with retired exceptions absent and require compatible fixes or explicitly approved risk disposition before deployment.

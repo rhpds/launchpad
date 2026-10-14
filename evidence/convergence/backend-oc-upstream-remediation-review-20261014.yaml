@@ -1,0 +1,40 @@
+schema: launchpad/backend-oc-remediation-review/v1
+date: '2026-10-14'
+status: OPEN-SECURITY-DISPOSITION
+live_changes: false
+official_sources:
+  release_4_22:
+    revision: d0f23b14fbf35493e5b713e25ecf662ec239e76c
+    same_as_candidate_client_source: true
+    url: https://github.com/openshift/oc/blob/d0f23b14fbf35493e5b713e25ecf662ec239e76c/go.mod
+  main:
+    revision: 758dbfa96d00a3e7a1baef5d05f01a1ef620f661
+    url: https://github.com/openshift/oc/blob/758dbfa96d00a3e7a1baef5d05f01a1ef620f661/go.mod
+observations:
+  release_branch:
+    go_git: v5.13.1
+    go_billy: v5.6.1
+    go_jose: v4.1.3
+    buildkit: v0.12.5
+    fulcio: v1.6.6
+    spdystream: v0.5.0
+    otel: v1.36.0
+  main_branch:
+    go_git: v5.19.1
+    go_billy: v5.9.0
+    go_jose: v4.1.4
+    buildkit: v0.12.5
+    fulcio: v1.8.5
+    spdystream: v0.5.1
+    otel: v1.43.0
+  limits: Main updates some dependencies but still does not meet all fixed-version thresholds in the recorded scanner report. It is not certified as a Flightpath replacement.
+decision:
+  replace_release_client_with_main: NOT-APPROVED-OR-PERFORMED
+  blind_major_dependency_replacements: NOT-PERFORMED
+  renew_expired_exceptions: NOT-GRANTED
+  deployment: HELD
+next:
+  - Finish the existing bounded runtime-reduction build and compare its actual scan.
+  - Review CLI findings individually against Launchpad's invoked commands and reachable behavior.
+  - Prefer compatible upstream fixes with build, offline runtime, and live adapter proof.
+  - Submit any residual applicability or risk-acceptance decision to the designated security/platform owner; do not equate unavailable fixes with acceptance.
