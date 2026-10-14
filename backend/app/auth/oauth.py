@@ -60,11 +60,18 @@ def user_from_trusted_claims(
     email: str | None = None,
     groups: list[str] | None = None,
     subject: str | None = None,
+    oidc_identity: bool = False,
 ) -> User:
     """Map claims already authenticated by a trusted in-cluster proxy."""
     normalized_groups = [group.strip() for group in (groups or []) if group.strip()]
-    is_admin = username in ADMIN_USERS or bool(ADMIN_GROUPS & set(normalized_groups))
-    tenant_ids = set(_tenant_user_map().get(username, []))
+    # Workforce subjects are independent of legacy OpenShift usernames. Never
+    # inherit a legacy account's permissions from a matching display name.
+    if oidc_identity:
+        is_admin = "launchpad-admins" in normalized_groups
+        tenant_ids: set[str] = set()
+    else:
+        is_admin = username in ADMIN_USERS or bool(ADMIN_GROUPS & set(normalized_groups))
+        tenant_ids = set(_tenant_user_map().get(username, []))
     tenant_ids.update(
         group.removeprefix("launchpad-tenant:")
         for group in normalized_groups
@@ -124,6 +131,7 @@ def get_current_user(request: Request) -> User:
             subject=subject,
             email=email,
             groups=groups,
+            oidc_identity=True,
         )
 
     username = request.headers.get("X-Forwarded-User")

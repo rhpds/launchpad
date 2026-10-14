@@ -1,0 +1,1261 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="7" skipped="0" tests="36" time="4.332" timestamp="2026-10-14T13:06:25.222609-05:00" hostname="jkershaw-mac"><testcase classname="backend.tests.test_staging_access_cleanup_gaps" name="test_residue_checks_exact_namespace_image_puller_name" time="0.005" /><testcase classname="backend.tests.test_staging_access_cleanup_gaps" name="test_force_reclaim_cannot_bypass_enabled_residue_gate[persistent_volume-False]" time="0.002"><failure message="NameError: name 'LifecycleOwnershipLost' is not defined">self = &lt;app.services.provisioning.ProvisioningService object at 0x1097a0750&gt;
+session_id = 'test-session', require_cleanup_success = False
+lifecycle_guard = None, cleanup_timeout = 0
+
+    def force_reclaim_session(
+        self,
+        session_id: str,
+        *,
+        require_cleanup_success: bool = False,
+        lifecycle_guard: Callable[[], bool] | None = None,
+        cleanup_timeout: int = 0,
+    ) -&gt; LabSession:
+        self._require_lifecycle_ownership(lifecycle_guard)
+        session = self._sessions.get(session_id)
+        if not session:
+            raise ValueError(f"Session {session_id} not found")
+        key_revocation_error = None
+        if self.maas_key_broker and (
+            session.maas_api_key
+            or (
+                session.metadata.get("maas_key_id")
+                and not session.metadata.get("maas_key_revocation")
+            )
+        ):
+            self._require_lifecycle_ownership(lifecycle_guard)
+            try:
+                session = self._revoke_maas_key(session)
+            except Exception as exc:
+                key_revocation_error = str(exc)
+        cleanup_adapter = self._get_cleanup(session.cluster_ref)
+        if cleanup_adapter and session.resources.get("compose_file"):
+            self._require_lifecycle_ownership(lifecycle_guard)
+            cleanup_adapter.cleanup(session.resources["compose_file"])
+        if cleanup_adapter and session.resources.get("container_name"):
+            self._require_lifecycle_ownership(lifecycle_guard)
+            cleanup_adapter.cleanup(session.resources["container_name"])
+        if cleanup_adapter and session.namespace:
+            self._require_lifecycle_ownership(lifecycle_guard)
+            try:
+                if cleanup_timeout &gt; 0:
+                    cleanup_adapter.cleanup(
+                        session.namespace, timeout=cleanup_timeout
+                    )
+                else:
+                    cleanup_adapter.cleanup(session.namespace)
+            except Exception as e:
+                logger.error("Cleanup failed during force-reclaim of session %s namespace %s: %s", session_id, session.namespace, e)
+                if require_cleanup_success or os.environ.get("CLEANUP_VERIFY_RESIDUE", "false").lower() == "true":
+                    reason = (
+                        "force-reclaim cleanup failed — credentials scrubbed — "
+                        f"error: {e}"
+                    )
+                    event = LifecycleEvent(
+                        from_status=session.status,
+                        to_status=SessionStatus.CLEANUP_FAILED,
+                        reason=reason,
+                    )
+                    session = session.model_copy(update={
+                        "status": SessionStatus.CLEANUP_FAILED,
+                        "lifecycle_events": session.lifecycle_events + [event],
+                    })
+                    self._require_lifecycle_ownership(lifecycle_guard)
+                    session = self._scrub_credentials(session)
+                    self._save_session(session)
+                    return session
+        if session.namespace:
+            self._require_lifecycle_ownership(lifecycle_guard)
+            try:
+                # An admin force operation and workshop fallback must obey the
+                # same enabled completion gate as ordinary reclaim. Force is
+                # not permission to mark surviving resources as reclaimed.
+&gt;               self._verify_cleanup_completion(
+                    cleanup_adapter, session.namespace, lifecycle_guard
+                )
+
+backend/app/services/provisioning.py:1458: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;app.services.provisioning.ProvisioningService object at 0x1097a0750&gt;
+cleanup = &lt;MagicMock id='4457253072'&gt;, namespace = 'seat-a'
+lifecycle_guard = None
+
+    def _verify_cleanup_completion(self, cleanup, namespace, lifecycle_guard) -&gt; None:
+        """Opt-in durable-worker gate: deletion acknowledgment is not completion."""
+        if os.environ.get("CLEANUP_VERIFY_RESIDUE", "false").lower() != "true":
+            return
+        inspect = getattr(cleanup, "inspect_residue", None)
+        if not callable(inspect):
+            raise ValueError("Cleanup completion inventory is unavailable")
+        required = {
+            "namespace", "showroom_application", "workload_application",
+            "image_puller_role_binding", "persistent_volume",
+        }
+        timeout = int(os.environ.get("CLEANUP_VERIFICATION_TIMEOUT_SECONDS", "600"))
+        if not 0 &lt;= timeout &lt;= 600:
+            raise ValueError("Cleanup verification timeout must be between 0 and 600 seconds")
+        deadline = time.monotonic() + timeout
+        while True:
+            self._require_lifecycle_ownership(lifecycle_guard)
+            observed = inspect(namespace)
+            if not required.issubset(observed):
+                raise ValueError("Cleanup completion inventory is incomplete")
+            if any(type(value) is not int or value &lt; 0 for value in observed.values()):
+                raise ValueError("Cleanup completion inventory contains invalid counts")
+            remaining = {key: value for key, value in observed.items() if value}
+            if not remaining:
+                return
+            if time.monotonic() &gt;= deadline:
+&gt;               raise ValueError(f"Cleanup residue remains: {remaining}")
+E               ValueError: Cleanup residue remains: {'persistent_volume': 1}
+
+backend/app/services/provisioning.py:1286: ValueError
+
+During handling of the above exception, another exception occurred:
+
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x109ac4310&gt;
+require_success = False, residue = 'persistent_volume'
+
+    @pytest.mark.parametrize("require_success", [False, True])
+    @pytest.mark.parametrize("residue", ["persistent_volume", "image_puller_role_binding"])
+    def test_force_reclaim_cannot_bypass_enabled_residue_gate(monkeypatch, require_success, residue):
+        monkeypatch.setenv("CLEANUP_VERIFY_RESIDUE", "true")
+        monkeypatch.setenv("CLEANUP_VERIFICATION_TIMEOUT_SECONDS", "0")
+        cleanup = MagicMock()
+        cleanup.inspect_residue.return_value = {
+            "namespace": 0, "showroom_application": 0, "workload_application": 0,
+            "image_puller_role_binding": 0, "persistent_volume": 0,
+        }
+        cleanup.inspect_residue.return_value[residue] = 1
+        service = _force_service(cleanup)
+&gt;       result = service.force_reclaim_session("test-session", require_cleanup_success=require_success)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend/tests/test_staging_access_cleanup_gaps.py:69: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;app.services.provisioning.ProvisioningService object at 0x1097a0750&gt;
+session_id = 'test-session', require_cleanup_success = False
+lifecycle_guard = None, cleanup_timeout = 0
+
+    def force_reclaim_session(
+        self,
+        session_id: str,
+        *,
+        require_cleanup_success: bool = False,
+        lifecycle_guard: Callable[[], bool] | None = None,
+        cleanup_timeout: int = 0,
+    ) -&gt; LabSession:
+        self._require_lifecycle_ownership(lifecycle_guard)
+        session = self._sessions.get(session_id)
+        if not session:
+            raise ValueError(f"Session {session_id} not found")
+        key_revocation_error = None
+        if self.maas_key_broker and (
+            session.maas_api_key
+            or (
+                session.metadata.get("maas_key_id")
+                and not session.metadata.get("maas_key_revocation")
+            )
+        ):
+            self._require_lifecycle_ownership(lifecycle_guard)
+            try:
+                session = self._revoke_maas_key(session)
+            except Exception as exc:
+                key_revocation_error = str(exc)
+        cleanup_adapter = self._get_cleanup(session.cluster_ref)
+        if cleanup_adapter and session.resources.get("compose_file"):
+            self._require_lifecycle_ownership(lifecycle_guard)
+            cleanup_adapter.cleanup(session.resources["compose_file"])
+        if cleanup_adapter and session.resources.get("container_name"):
+            self._require_lifecycle_ownership(lifecycle_guard)
+            cleanup_adapter.cleanup(session.resources["container_name"])
+        if cleanup_adapter and session.namespace:
+            self._require_lifecycle_ownership(lifecycle_guard)
+            try:
+                if cleanup_timeout &gt; 0:
+                    cleanup_adapter.cleanup(
+                        session.namespace, timeout=cleanup_timeout
+                    )
+                else:
+                    cleanup_adapter.cleanup(session.namespace)
+            except Exception as e:
+                logger.error("Cleanup failed during force-reclaim of session %s namespace %s: %s", session_id, session.namespace, e)
+                if require_cleanup_success or os.environ.get("CLEANUP_VERIFY_RESIDUE", "false").lower() == "true":
+                    reason = (
+                        "force-reclaim cleanup failed — credentials scrubbed — "
+                        f"error: {e}"
+                    )
+                    event = LifecycleEvent(
+                        from_status=session.status,
+                        to_status=SessionStatus.CLEANUP_FAILED,
+                        reason=reason,
+                    )
+                    session = session.model_copy(update={
+                        "status": SessionStatus.CLEANUP_FAILED,
+                        "lifecycle_events": session.lifecycle_events + [event],
+                    })
+                    self._require_lifecycle_ownership(lifecycle_guard)
+                    session = self._scrub_credentials(session)
+                    self._save_session(session)
+                    return session
+        if session.namespace:
+            self._require_lifecycle_ownership(lifecycle_guard)
+            try:
+                # An admin force operation and workshop fallback must obey the
+                # same enabled completion gate as ordinary reclaim. Force is
+                # not permission to mark surviving resources as reclaimed.
+                self._verify_cleanup_completion(
+                    cleanup_adapter, session.namespace, lifecycle_guard
+                )
+&gt;           except LifecycleOwnershipLost:
+                   ^^^^^^^^^^^^^^^^^^^^^^
+E           NameError: name 'LifecycleOwnershipLost' is not defined
+
+backend/app/services/provisioning.py:1461: NameError</failure></testcase><testcase classname="backend.tests.test_staging_access_cleanup_gaps" name="test_force_reclaim_cannot_bypass_enabled_residue_gate[persistent_volume-True]" time="0.002"><failure message="NameError: name 'LifecycleOwnershipLost' is not defined">self = &lt;app.services.provisioning.ProvisioningService object at 0x107972090&gt;
+session_id = 'test-session', require_cleanup_success = True
+lifecycle_guard = None, cleanup_timeout = 0
+
+    def force_reclaim_session(
+        self,
+        session_id: str,
+        *,
+        require_cleanup_success: bool = False,
+        lifecycle_guard: Callable[[], bool] | None = None,
+        cleanup_timeout: int = 0,
+    ) -&gt; LabSession:
+        self._require_lifecycle_ownership(lifecycle_guard)
+        session = self._sessions.get(session_id)
+        if not session:
+            raise ValueError(f"Session {session_id} not found")
+        key_revocation_error = None
+        if self.maas_key_broker and (
+            session.maas_api_key
+            or (
+                session.metadata.get("maas_key_id")
+                and not session.metadata.get("maas_key_revocation")
+            )
+        ):
+            self._require_lifecycle_ownership(lifecycle_guard)
+            try:
+                session = self._revoke_maas_key(session)
+            except Exception as exc:
+                key_revocation_error = str(exc)
+        cleanup_adapter = self._get_cleanup(session.cluster_ref)
+        if cleanup_adapter and session.resources.get("compose_file"):
+            self._require_lifecycle_ownership(lifecycle_guard)
+            cleanup_adapter.cleanup(session.resources["compose_file"])
+        if cleanup_adapter and session.resources.get("container_name"):
+            self._require_lifecycle_ownership(lifecycle_guard)
+            cleanup_adapter.cleanup(session.resources["container_name"])
+        if cleanup_adapter and session.namespace:
+            self._require_lifecycle_ownership(lifecycle_guard)
+            try:
+                if cleanup_timeout &gt; 0:
+                    cleanup_adapter.cleanup(
+                        session.namespace, timeout=cleanup_timeout
+                    )
+                else:
+                    cleanup_adapter.cleanup(session.namespace)
+            except Exception as e:
+                logger.error("Cleanup failed during force-reclaim of session %s namespace %s: %s", session_id, session.namespace, e)
+                if require_cleanup_success or os.environ.get("CLEANUP_VERIFY_RESIDUE", "false").lower() == "true":
+                    reason = (
+                        "force-reclaim cleanup failed — credentials scrubbed — "
+                        f"error: {e}"
+                    )
+                    event = LifecycleEvent(
+                        from_status=session.status,
+                        to_status=SessionStatus.CLEANUP_FAILED,
+                        reason=reason,
+                    )
+                    session = session.model_copy(update={
+                        "status": SessionStatus.CLEANUP_FAILED,
+                        "lifecycle_events": session.lifecycle_events + [event],
+                    })
+                    self._require_lifecycle_ownership(lifecycle_guard)
+                    session = self._scrub_credentials(session)
+                    self._save_session(session)
+                    return session
+        if session.namespace:
+            self._require_lifecycle_ownership(lifecycle_guard)
+            try:
+                # An admin force operation and workshop fallback must obey the
+                # same enabled completion gate as ordinary reclaim. Force is
+                # not permission to mark surviving resources as reclaimed.
+&gt;               self._verify_cleanup_completion(
+                    cleanup_adapter, session.namespace, lifecycle_guard
+                )
+
+backend/app/services/provisioning.py:1458: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;app.services.provisioning.ProvisioningService object at 0x107972090&gt;
+cleanup = &lt;MagicMock id='4456880336'&gt;, namespace = 'seat-a'
+lifecycle_guard = None
+
+    def _verify_cleanup_completion(self, cleanup, namespace, lifecycle_guard) -&gt; None:
+        """Opt-in durable-worker gate: deletion acknowledgment is not completion."""
+        if os.environ.get("CLEANUP_VERIFY_RESIDUE", "false").lower() != "true":
+            return
+        inspect = getattr(cleanup, "inspect_residue", None)
+        if not callable(inspect):
+            raise ValueError("Cleanup completion inventory is unavailable")
+        required = {
+            "namespace", "showroom_application", "workload_application",
+            "image_puller_role_binding", "persistent_volume",
+        }
+        timeout = int(os.environ.get("CLEANUP_VERIFICATION_TIMEOUT_SECONDS", "600"))
+        if not 0 &lt;= timeout &lt;= 600:
+            raise ValueError("Cleanup verification timeout must be between 0 and 600 seconds")
+        deadline = time.monotonic() + timeout
+        while True:
+            self._require_lifecycle_ownership(lifecycle_guard)
+            observed = inspect(namespace)
+            if not required.issubset(observed):
+                raise ValueError("Cleanup completion inventory is incomplete")
+            if any(type(value) is not int or value &lt; 0 for value in observed.values()):
+                raise ValueError("Cleanup completion inventory contains invalid counts")
+            remaining = {key: value for key, value in observed.items() if value}
+            if not remaining:
+                return
+            if time.monotonic() &gt;= deadline:
+&gt;               raise ValueError(f"Cleanup residue remains: {remaining}")
+E               ValueError: Cleanup residue remains: {'persistent_volume': 1}
+
+backend/app/services/provisioning.py:1286: ValueError
+
+During handling of the above exception, another exception occurred:
+
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x109a6b210&gt;
+require_success = True, residue = 'persistent_volume'
+
+    @pytest.mark.parametrize("require_success", [False, True])
+    @pytest.mark.parametrize("residue", ["persistent_volume", "image_puller_role_binding"])
+    def test_force_reclaim_cannot_bypass_enabled_residue_gate(monkeypatch, require_success, residue):
+        monkeypatch.setenv("CLEANUP_VERIFY_RESIDUE", "true")
+        monkeypatch.setenv("CLEANUP_VERIFICATION_TIMEOUT_SECONDS", "0")
+        cleanup = MagicMock()
+        cleanup.inspect_residue.return_value = {
+            "namespace": 0, "showroom_application": 0, "workload_application": 0,
+            "image_puller_role_binding": 0, "persistent_volume": 0,
+        }
+        cleanup.inspect_residue.return_value[residue] = 1
+        service = _force_service(cleanup)
+&gt;       result = service.force_reclaim_session("test-session", require_cleanup_success=require_success)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend/tests/test_staging_access_cleanup_gaps.py:69: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;app.services.provisioning.ProvisioningService object at 0x107972090&gt;
+session_id = 'test-session', require_cleanup_success = True
+lifecycle_guard = None, cleanup_timeout = 0
+
+    def force_reclaim_session(
+        self,
+        session_id: str,
+        *,
+        require_cleanup_success: bool = False,
+        lifecycle_guard: Callable[[], bool] | None = None,
+        cleanup_timeout: int = 0,
+    ) -&gt; LabSession:
+        self._require_lifecycle_ownership(lifecycle_guard)
+        session = self._sessions.get(session_id)
+        if not session:
+            raise ValueError(f"Session {session_id} not found")
+        key_revocation_error = None
+        if self.maas_key_broker and (
+            session.maas_api_key
+            or (
+                session.metadata.get("maas_key_id")
+                and not session.metadata.get("maas_key_revocation")
+            )
+        ):
+            self._require_lifecycle_ownership(lifecycle_guard)
+            try:
+                session = self._revoke_maas_key(session)
+            except Exception as exc:
+                key_revocation_error = str(exc)
+        cleanup_adapter = self._get_cleanup(session.cluster_ref)
+        if cleanup_adapter and session.resources.get("compose_file"):
+            self._require_lifecycle_ownership(lifecycle_guard)
+            cleanup_adapter.cleanup(session.resources["compose_file"])
+        if cleanup_adapter and session.resources.get("container_name"):
+            self._require_lifecycle_ownership(lifecycle_guard)
+            cleanup_adapter.cleanup(session.resources["container_name"])
+        if cleanup_adapter and session.namespace:
+            self._require_lifecycle_ownership(lifecycle_guard)
+            try:
+                if cleanup_timeout &gt; 0:
+                    cleanup_adapter.cleanup(
+                        session.namespace, timeout=cleanup_timeout
+                    )
+                else:
+                    cleanup_adapter.cleanup(session.namespace)
+            except Exception as e:
+                logger.error("Cleanup failed during force-reclaim of session %s namespace %s: %s", session_id, session.namespace, e)
+                if require_cleanup_success or os.environ.get("CLEANUP_VERIFY_RESIDUE", "false").lower() == "true":
+                    reason = (
+                        "force-reclaim cleanup failed — credentials scrubbed — "
+                        f"error: {e}"
+                    )
+                    event = LifecycleEvent(
+                        from_status=session.status,
+                        to_status=SessionStatus.CLEANUP_FAILED,
+                        reason=reason,
+                    )
+                    session = session.model_copy(update={
+                        "status": SessionStatus.CLEANUP_FAILED,
+                        "lifecycle_events": session.lifecycle_events + [event],
+                    })
+                    self._require_lifecycle_ownership(lifecycle_guard)
+                    session = self._scrub_credentials(session)
+                    self._save_session(session)
+                    return session
+        if session.namespace:
+            self._require_lifecycle_ownership(lifecycle_guard)
+            try:
+                # An admin force operation and workshop fallback must obey the
+                # same enabled completion gate as ordinary reclaim. Force is
+                # not permission to mark surviving resources as reclaimed.
+                self._verify_cleanup_completion(
+                    cleanup_adapter, session.namespace, lifecycle_guard
+                )
+&gt;           except LifecycleOwnershipLost:
+                   ^^^^^^^^^^^^^^^^^^^^^^
+E           NameError: name 'LifecycleOwnershipLost' is not defined
+
+backend/app/services/provisioning.py:1461: NameError</failure></testcase><testcase classname="backend.tests.test_staging_access_cleanup_gaps" name="test_force_reclaim_cannot_bypass_enabled_residue_gate[image_puller_role_binding-False]" time="0.003"><failure message="NameError: name 'LifecycleOwnershipLost' is not defined">self = &lt;app.services.provisioning.ProvisioningService object at 0x10733bed0&gt;
+session_id = 'test-session', require_cleanup_success = False
+lifecycle_guard = None, cleanup_timeout = 0
+
+    def force_reclaim_session(
+        self,
+        session_id: str,
+        *,
+        require_cleanup_success: bool = False,
+        lifecycle_guard: Callable[[], bool] | None = None,
+        cleanup_timeout: int = 0,
+    ) -&gt; LabSession:
+        self._require_lifecycle_ownership(lifecycle_guard)
+        session = self._sessions.get(session_id)
+        if not session:
+            raise ValueError(f"Session {session_id} not found")
+        key_revocation_error = None
+        if self.maas_key_broker and (
+            session.maas_api_key
+            or (
+                session.metadata.get("maas_key_id")
+                and not session.metadata.get("maas_key_revocation")
+            )
+        ):
+            self._require_lifecycle_ownership(lifecycle_guard)
+            try:
+                session = self._revoke_maas_key(session)
+            except Exception as exc:
+                key_revocation_error = str(exc)
+        cleanup_adapter = self._get_cleanup(session.cluster_ref)
+        if cleanup_adapter and session.resources.get("compose_file"):
+            self._require_lifecycle_ownership(lifecycle_guard)
+            cleanup_adapter.cleanup(session.resources["compose_file"])
+        if cleanup_adapter and session.resources.get("container_name"):
+            self._require_lifecycle_ownership(lifecycle_guard)
+            cleanup_adapter.cleanup(session.resources["container_name"])
+        if cleanup_adapter and session.namespace:
+            self._require_lifecycle_ownership(lifecycle_guard)
+            try:
+                if cleanup_timeout &gt; 0:
+                    cleanup_adapter.cleanup(
+                        session.namespace, timeout=cleanup_timeout
+                    )
+                else:
+                    cleanup_adapter.cleanup(session.namespace)
+            except Exception as e:
+                logger.error("Cleanup failed during force-reclaim of session %s namespace %s: %s", session_id, session.namespace, e)
+                if require_cleanup_success or os.environ.get("CLEANUP_VERIFY_RESIDUE", "false").lower() == "true":
+                    reason = (
+                        "force-reclaim cleanup failed — credentials scrubbed — "
+                        f"error: {e}"
+                    )
+                    event = LifecycleEvent(
+                        from_status=session.status,
+                        to_status=SessionStatus.CLEANUP_FAILED,
+                        reason=reason,
+                    )
+                    session = session.model_copy(update={
+                        "status": SessionStatus.CLEANUP_FAILED,
+                        "lifecycle_events": session.lifecycle_events + [event],
+                    })
+                    self._require_lifecycle_ownership(lifecycle_guard)
+                    session = self._scrub_credentials(session)
+                    self._save_session(session)
+                    return session
+        if session.namespace:
+            self._require_lifecycle_ownership(lifecycle_guard)
+            try:
+                # An admin force operation and workshop fallback must obey the
+                # same enabled completion gate as ordinary reclaim. Force is
+                # not permission to mark surviving resources as reclaimed.
+&gt;               self._verify_cleanup_completion(
+                    cleanup_adapter, session.namespace, lifecycle_guard
+                )
+
+backend/app/services/provisioning.py:1458: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;app.services.provisioning.ProvisioningService object at 0x10733bed0&gt;
+cleanup = &lt;MagicMock id='4454769424'&gt;, namespace = 'seat-a'
+lifecycle_guard = None
+
+    def _verify_cleanup_completion(self, cleanup, namespace, lifecycle_guard) -&gt; None:
+        """Opt-in durable-worker gate: deletion acknowledgment is not completion."""
+        if os.environ.get("CLEANUP_VERIFY_RESIDUE", "false").lower() != "true":
+            return
+        inspect = getattr(cleanup, "inspect_residue", None)
+        if not callable(inspect):
+            raise ValueError("Cleanup completion inventory is unavailable")
+        required = {
+            "namespace", "showroom_application", "workload_application",
+            "image_puller_role_binding", "persistent_volume",
+        }
+        timeout = int(os.environ.get("CLEANUP_VERIFICATION_TIMEOUT_SECONDS", "600"))
+        if not 0 &lt;= timeout &lt;= 600:
+            raise ValueError("Cleanup verification timeout must be between 0 and 600 seconds")
+        deadline = time.monotonic() + timeout
+        while True:
+            self._require_lifecycle_ownership(lifecycle_guard)
+            observed = inspect(namespace)
+            if not required.issubset(observed):
+                raise ValueError("Cleanup completion inventory is incomplete")
+            if any(type(value) is not int or value &lt; 0 for value in observed.values()):
+                raise ValueError("Cleanup completion inventory contains invalid counts")
+            remaining = {key: value for key, value in observed.items() if value}
+            if not remaining:
+                return
+            if time.monotonic() &gt;= deadline:
+&gt;               raise ValueError(f"Cleanup residue remains: {remaining}")
+E               ValueError: Cleanup residue remains: {'image_puller_role_binding': 1}
+
+backend/app/services/provisioning.py:1286: ValueError
+
+During handling of the above exception, another exception occurred:
+
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x109866250&gt;
+require_success = False, residue = 'image_puller_role_binding'
+
+    @pytest.mark.parametrize("require_success", [False, True])
+    @pytest.mark.parametrize("residue", ["persistent_volume", "image_puller_role_binding"])
+    def test_force_reclaim_cannot_bypass_enabled_residue_gate(monkeypatch, require_success, residue):
+        monkeypatch.setenv("CLEANUP_VERIFY_RESIDUE", "true")
+        monkeypatch.setenv("CLEANUP_VERIFICATION_TIMEOUT_SECONDS", "0")
+        cleanup = MagicMock()
+        cleanup.inspect_residue.return_value = {
+            "namespace": 0, "showroom_application": 0, "workload_application": 0,
+            "image_puller_role_binding": 0, "persistent_volume": 0,
+        }
+        cleanup.inspect_residue.return_value[residue] = 1
+        service = _force_service(cleanup)
+&gt;       result = service.force_reclaim_session("test-session", require_cleanup_success=require_success)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend/tests/test_staging_access_cleanup_gaps.py:69: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;app.services.provisioning.ProvisioningService object at 0x10733bed0&gt;
+session_id = 'test-session', require_cleanup_success = False
+lifecycle_guard = None, cleanup_timeout = 0
+
+    def force_reclaim_session(
+        self,
+        session_id: str,
+        *,
+        require_cleanup_success: bool = False,
+        lifecycle_guard: Callable[[], bool] | None = None,
+        cleanup_timeout: int = 0,
+    ) -&gt; LabSession:
+        self._require_lifecycle_ownership(lifecycle_guard)
+        session = self._sessions.get(session_id)
+        if not session:
+            raise ValueError(f"Session {session_id} not found")
+        key_revocation_error = None
+        if self.maas_key_broker and (
+            session.maas_api_key
+            or (
+                session.metadata.get("maas_key_id")
+                and not session.metadata.get("maas_key_revocation")
+            )
+        ):
+            self._require_lifecycle_ownership(lifecycle_guard)
+            try:
+                session = self._revoke_maas_key(session)
+            except Exception as exc:
+                key_revocation_error = str(exc)
+        cleanup_adapter = self._get_cleanup(session.cluster_ref)
+        if cleanup_adapter and session.resources.get("compose_file"):
+            self._require_lifecycle_ownership(lifecycle_guard)
+            cleanup_adapter.cleanup(session.resources["compose_file"])
+        if cleanup_adapter and session.resources.get("container_name"):
+            self._require_lifecycle_ownership(lifecycle_guard)
+            cleanup_adapter.cleanup(session.resources["container_name"])
+        if cleanup_adapter and session.namespace:
+            self._require_lifecycle_ownership(lifecycle_guard)
+            try:
+                if cleanup_timeout &gt; 0:
+                    cleanup_adapter.cleanup(
+                        session.namespace, timeout=cleanup_timeout
+                    )
+                else:
+                    cleanup_adapter.cleanup(session.namespace)
+            except Exception as e:
+                logger.error("Cleanup failed during force-reclaim of session %s namespace %s: %s", session_id, session.namespace, e)
+                if require_cleanup_success or os.environ.get("CLEANUP_VERIFY_RESIDUE", "false").lower() == "true":
+                    reason = (
+                        "force-reclaim cleanup failed — credentials scrubbed — "
+                        f"error: {e}"
+                    )
+                    event = LifecycleEvent(
+                        from_status=session.status,
+                        to_status=SessionStatus.CLEANUP_FAILED,
+                        reason=reason,
+                    )
+                    session = session.model_copy(update={
+                        "status": SessionStatus.CLEANUP_FAILED,
+                        "lifecycle_events": session.lifecycle_events + [event],
+                    })
+                    self._require_lifecycle_ownership(lifecycle_guard)
+                    session = self._scrub_credentials(session)
+                    self._save_session(session)
+                    return session
+        if session.namespace:
+            self._require_lifecycle_ownership(lifecycle_guard)
+            try:
+                # An admin force operation and workshop fallback must obey the
+                # same enabled completion gate as ordinary reclaim. Force is
+                # not permission to mark surviving resources as reclaimed.
+                self._verify_cleanup_completion(
+                    cleanup_adapter, session.namespace, lifecycle_guard
+                )
+&gt;           except LifecycleOwnershipLost:
+                   ^^^^^^^^^^^^^^^^^^^^^^
+E           NameError: name 'LifecycleOwnershipLost' is not defined
+
+backend/app/services/provisioning.py:1461: NameError</failure></testcase><testcase classname="backend.tests.test_staging_access_cleanup_gaps" name="test_force_reclaim_cannot_bypass_enabled_residue_gate[image_puller_role_binding-True]" time="0.001"><failure message="NameError: name 'LifecycleOwnershipLost' is not defined">self = &lt;app.services.provisioning.ProvisioningService object at 0x109c95fd0&gt;
+session_id = 'test-session', require_cleanup_success = True
+lifecycle_guard = None, cleanup_timeout = 0
+
+    def force_reclaim_session(
+        self,
+        session_id: str,
+        *,
+        require_cleanup_success: bool = False,
+        lifecycle_guard: Callable[[], bool] | None = None,
+        cleanup_timeout: int = 0,
+    ) -&gt; LabSession:
+        self._require_lifecycle_ownership(lifecycle_guard)
+        session = self._sessions.get(session_id)
+        if not session:
+            raise ValueError(f"Session {session_id} not found")
+        key_revocation_error = None
+        if self.maas_key_broker and (
+            session.maas_api_key
+            or (
+                session.metadata.get("maas_key_id")
+                and not session.metadata.get("maas_key_revocation")
+            )
+        ):
+            self._require_lifecycle_ownership(lifecycle_guard)
+            try:
+                session = self._revoke_maas_key(session)
+            except Exception as exc:
+                key_revocation_error = str(exc)
+        cleanup_adapter = self._get_cleanup(session.cluster_ref)
+        if cleanup_adapter and session.resources.get("compose_file"):
+            self._require_lifecycle_ownership(lifecycle_guard)
+            cleanup_adapter.cleanup(session.resources["compose_file"])
+        if cleanup_adapter and session.resources.get("container_name"):
+            self._require_lifecycle_ownership(lifecycle_guard)
+            cleanup_adapter.cleanup(session.resources["container_name"])
+        if cleanup_adapter and session.namespace:
+            self._require_lifecycle_ownership(lifecycle_guard)
+            try:
+                if cleanup_timeout &gt; 0:
+                    cleanup_adapter.cleanup(
+                        session.namespace, timeout=cleanup_timeout
+                    )
+                else:
+                    cleanup_adapter.cleanup(session.namespace)
+            except Exception as e:
+                logger.error("Cleanup failed during force-reclaim of session %s namespace %s: %s", session_id, session.namespace, e)
+                if require_cleanup_success or os.environ.get("CLEANUP_VERIFY_RESIDUE", "false").lower() == "true":
+                    reason = (
+                        "force-reclaim cleanup failed — credentials scrubbed — "
+                        f"error: {e}"
+                    )
+                    event = LifecycleEvent(
+                        from_status=session.status,
+                        to_status=SessionStatus.CLEANUP_FAILED,
+                        reason=reason,
+                    )
+                    session = session.model_copy(update={
+                        "status": SessionStatus.CLEANUP_FAILED,
+                        "lifecycle_events": session.lifecycle_events + [event],
+                    })
+                    self._require_lifecycle_ownership(lifecycle_guard)
+                    session = self._scrub_credentials(session)
+                    self._save_session(session)
+                    return session
+        if session.namespace:
+            self._require_lifecycle_ownership(lifecycle_guard)
+            try:
+                # An admin force operation and workshop fallback must obey the
+                # same enabled completion gate as ordinary reclaim. Force is
+                # not permission to mark surviving resources as reclaimed.
+&gt;               self._verify_cleanup_completion(
+                    cleanup_adapter, session.namespace, lifecycle_guard
+                )
+
+backend/app/services/provisioning.py:1458: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;app.services.provisioning.ProvisioningService object at 0x109c95fd0&gt;
+cleanup = &lt;MagicMock id='4459162512'&gt;, namespace = 'seat-a'
+lifecycle_guard = None
+
+    def _verify_cleanup_completion(self, cleanup, namespace, lifecycle_guard) -&gt; None:
+        """Opt-in durable-worker gate: deletion acknowledgment is not completion."""
+        if os.environ.get("CLEANUP_VERIFY_RESIDUE", "false").lower() != "true":
+            return
+        inspect = getattr(cleanup, "inspect_residue", None)
+        if not callable(inspect):
+            raise ValueError("Cleanup completion inventory is unavailable")
+        required = {
+            "namespace", "showroom_application", "workload_application",
+            "image_puller_role_binding", "persistent_volume",
+        }
+        timeout = int(os.environ.get("CLEANUP_VERIFICATION_TIMEOUT_SECONDS", "600"))
+        if not 0 &lt;= timeout &lt;= 600:
+            raise ValueError("Cleanup verification timeout must be between 0 and 600 seconds")
+        deadline = time.monotonic() + timeout
+        while True:
+            self._require_lifecycle_ownership(lifecycle_guard)
+            observed = inspect(namespace)
+            if not required.issubset(observed):
+                raise ValueError("Cleanup completion inventory is incomplete")
+            if any(type(value) is not int or value &lt; 0 for value in observed.values()):
+                raise ValueError("Cleanup completion inventory contains invalid counts")
+            remaining = {key: value for key, value in observed.items() if value}
+            if not remaining:
+                return
+            if time.monotonic() &gt;= deadline:
+&gt;               raise ValueError(f"Cleanup residue remains: {remaining}")
+E               ValueError: Cleanup residue remains: {'image_puller_role_binding': 1}
+
+backend/app/services/provisioning.py:1286: ValueError
+
+During handling of the above exception, another exception occurred:
+
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x109c96c90&gt;
+require_success = True, residue = 'image_puller_role_binding'
+
+    @pytest.mark.parametrize("require_success", [False, True])
+    @pytest.mark.parametrize("residue", ["persistent_volume", "image_puller_role_binding"])
+    def test_force_reclaim_cannot_bypass_enabled_residue_gate(monkeypatch, require_success, residue):
+        monkeypatch.setenv("CLEANUP_VERIFY_RESIDUE", "true")
+        monkeypatch.setenv("CLEANUP_VERIFICATION_TIMEOUT_SECONDS", "0")
+        cleanup = MagicMock()
+        cleanup.inspect_residue.return_value = {
+            "namespace": 0, "showroom_application": 0, "workload_application": 0,
+            "image_puller_role_binding": 0, "persistent_volume": 0,
+        }
+        cleanup.inspect_residue.return_value[residue] = 1
+        service = _force_service(cleanup)
+&gt;       result = service.force_reclaim_session("test-session", require_cleanup_success=require_success)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend/tests/test_staging_access_cleanup_gaps.py:69: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;app.services.provisioning.ProvisioningService object at 0x109c95fd0&gt;
+session_id = 'test-session', require_cleanup_success = True
+lifecycle_guard = None, cleanup_timeout = 0
+
+    def force_reclaim_session(
+        self,
+        session_id: str,
+        *,
+        require_cleanup_success: bool = False,
+        lifecycle_guard: Callable[[], bool] | None = None,
+        cleanup_timeout: int = 0,
+    ) -&gt; LabSession:
+        self._require_lifecycle_ownership(lifecycle_guard)
+        session = self._sessions.get(session_id)
+        if not session:
+            raise ValueError(f"Session {session_id} not found")
+        key_revocation_error = None
+        if self.maas_key_broker and (
+            session.maas_api_key
+            or (
+                session.metadata.get("maas_key_id")
+                and not session.metadata.get("maas_key_revocation")
+            )
+        ):
+            self._require_lifecycle_ownership(lifecycle_guard)
+            try:
+                session = self._revoke_maas_key(session)
+            except Exception as exc:
+                key_revocation_error = str(exc)
+        cleanup_adapter = self._get_cleanup(session.cluster_ref)
+        if cleanup_adapter and session.resources.get("compose_file"):
+            self._require_lifecycle_ownership(lifecycle_guard)
+            cleanup_adapter.cleanup(session.resources["compose_file"])
+        if cleanup_adapter and session.resources.get("container_name"):
+            self._require_lifecycle_ownership(lifecycle_guard)
+            cleanup_adapter.cleanup(session.resources["container_name"])
+        if cleanup_adapter and session.namespace:
+            self._require_lifecycle_ownership(lifecycle_guard)
+            try:
+                if cleanup_timeout &gt; 0:
+                    cleanup_adapter.cleanup(
+                        session.namespace, timeout=cleanup_timeout
+                    )
+                else:
+                    cleanup_adapter.cleanup(session.namespace)
+            except Exception as e:
+                logger.error("Cleanup failed during force-reclaim of session %s namespace %s: %s", session_id, session.namespace, e)
+                if require_cleanup_success or os.environ.get("CLEANUP_VERIFY_RESIDUE", "false").lower() == "true":
+                    reason = (
+                        "force-reclaim cleanup failed — credentials scrubbed — "
+                        f"error: {e}"
+                    )
+                    event = LifecycleEvent(
+                        from_status=session.status,
+                        to_status=SessionStatus.CLEANUP_FAILED,
+                        reason=reason,
+                    )
+                    session = session.model_copy(update={
+                        "status": SessionStatus.CLEANUP_FAILED,
+                        "lifecycle_events": session.lifecycle_events + [event],
+                    })
+                    self._require_lifecycle_ownership(lifecycle_guard)
+                    session = self._scrub_credentials(session)
+                    self._save_session(session)
+                    return session
+        if session.namespace:
+            self._require_lifecycle_ownership(lifecycle_guard)
+            try:
+                # An admin force operation and workshop fallback must obey the
+                # same enabled completion gate as ordinary reclaim. Force is
+                # not permission to mark surviving resources as reclaimed.
+                self._verify_cleanup_completion(
+                    cleanup_adapter, session.namespace, lifecycle_guard
+                )
+&gt;           except LifecycleOwnershipLost:
+                   ^^^^^^^^^^^^^^^^^^^^^^
+E           NameError: name 'LifecycleOwnershipLost' is not defined
+
+backend/app/services/provisioning.py:1461: NameError</failure></testcase><testcase classname="backend.tests.test_staging_access_cleanup_gaps" name="test_workshop_fallback_does_not_turn_residue_failure_into_success" time="0.001"><failure message="assert 'persistent_volume' in &quot;name 'LifecycleOwnershipLost' is not defined; force-reclaim failed: name 'LifecycleOwnershipLost' is not defined&quot;&#10; +  where &quot;name 'LifecycleOwnershipLost' is not defined; force-reclaim failed: name 'LifecycleOwnershipLost' is not defined&quot; = _reclaim_workshop_session('test-session')&#10; +    where _reclaim_workshop_session = &lt;app.services.provisioning.ProvisioningService object at 0x10982dd10&gt;._reclaim_workshop_session">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x10982c610&gt;
+
+    def test_workshop_fallback_does_not_turn_residue_failure_into_success(monkeypatch):
+        monkeypatch.setenv("CLEANUP_VERIFY_RESIDUE", "true")
+        monkeypatch.setenv("CLEANUP_VERIFICATION_TIMEOUT_SECONDS", "0")
+        cleanup = MagicMock()
+        cleanup.inspect_residue.return_value = {
+            "namespace": 0, "showroom_application": 0, "workload_application": 0,
+            "image_puller_role_binding": 0, "persistent_volume": 1,
+        }
+        service = _force_service(cleanup)
+        service.reclaim_session = MagicMock(return_value=service._sessions["test-session"])
+&gt;       assert "persistent_volume" in service._reclaim_workshop_session("test-session")
+E       assert 'persistent_volume' in "name 'LifecycleOwnershipLost' is not defined; force-reclaim failed: name 'LifecycleOwnershipLost' is not defined"
+E        +  where "name 'LifecycleOwnershipLost' is not defined; force-reclaim failed: name 'LifecycleOwnershipLost' is not defined" = _reclaim_workshop_session('test-session')
+E        +    where _reclaim_workshop_session = &lt;app.services.provisioning.ProvisioningService object at 0x10982dd10&gt;._reclaim_workshop_session
+
+backend/tests/test_staging_access_cleanup_gaps.py:85: AssertionError</failure></testcase><testcase classname="backend.tests.test_staging_access_cleanup_gaps" name="test_force_reclaim_requires_valid_inventory_when_enabled[None]" time="0.001"><failure message="NameError: name 'LifecycleOwnershipLost' is not defined">self = &lt;app.services.provisioning.ProvisioningService object at 0x109ace410&gt;
+session_id = 'test-session', require_cleanup_success = False
+lifecycle_guard = None, cleanup_timeout = 0
+
+    def force_reclaim_session(
+        self,
+        session_id: str,
+        *,
+        require_cleanup_success: bool = False,
+        lifecycle_guard: Callable[[], bool] | None = None,
+        cleanup_timeout: int = 0,
+    ) -&gt; LabSession:
+        self._require_lifecycle_ownership(lifecycle_guard)
+        session = self._sessions.get(session_id)
+        if not session:
+            raise ValueError(f"Session {session_id} not found")
+        key_revocation_error = None
+        if self.maas_key_broker and (
+            session.maas_api_key
+            or (
+                session.metadata.get("maas_key_id")
+                and not session.metadata.get("maas_key_revocation")
+            )
+        ):
+            self._require_lifecycle_ownership(lifecycle_guard)
+            try:
+                session = self._revoke_maas_key(session)
+            except Exception as exc:
+                key_revocation_error = str(exc)
+        cleanup_adapter = self._get_cleanup(session.cluster_ref)
+        if cleanup_adapter and session.resources.get("compose_file"):
+            self._require_lifecycle_ownership(lifecycle_guard)
+            cleanup_adapter.cleanup(session.resources["compose_file"])
+        if cleanup_adapter and session.resources.get("container_name"):
+            self._require_lifecycle_ownership(lifecycle_guard)
+            cleanup_adapter.cleanup(session.resources["container_name"])
+        if cleanup_adapter and session.namespace:
+            self._require_lifecycle_ownership(lifecycle_guard)
+            try:
+                if cleanup_timeout &gt; 0:
+                    cleanup_adapter.cleanup(
+                        session.namespace, timeout=cleanup_timeout
+                    )
+                else:
+                    cleanup_adapter.cleanup(session.namespace)
+            except Exception as e:
+                logger.error("Cleanup failed during force-reclaim of session %s namespace %s: %s", session_id, session.namespace, e)
+                if require_cleanup_success or os.environ.get("CLEANUP_VERIFY_RESIDUE", "false").lower() == "true":
+                    reason = (
+                        "force-reclaim cleanup failed — credentials scrubbed — "
+                        f"error: {e}"
+                    )
+                    event = LifecycleEvent(
+                        from_status=session.status,
+                        to_status=SessionStatus.CLEANUP_FAILED,
+                        reason=reason,
+                    )
+                    session = session.model_copy(update={
+                        "status": SessionStatus.CLEANUP_FAILED,
+                        "lifecycle_events": session.lifecycle_events + [event],
+                    })
+                    self._require_lifecycle_ownership(lifecycle_guard)
+                    session = self._scrub_credentials(session)
+                    self._save_session(session)
+                    return session
+        if session.namespace:
+            self._require_lifecycle_ownership(lifecycle_guard)
+            try:
+                # An admin force operation and workshop fallback must obey the
+                # same enabled completion gate as ordinary reclaim. Force is
+                # not permission to mark surviving resources as reclaimed.
+&gt;               self._verify_cleanup_completion(
+                    cleanup_adapter, session.namespace, lifecycle_guard
+                )
+
+backend/app/services/provisioning.py:1458: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;app.services.provisioning.ProvisioningService object at 0x109ace410&gt;
+cleanup = None, namespace = 'seat-a', lifecycle_guard = None
+
+    def _verify_cleanup_completion(self, cleanup, namespace, lifecycle_guard) -&gt; None:
+        """Opt-in durable-worker gate: deletion acknowledgment is not completion."""
+        if os.environ.get("CLEANUP_VERIFY_RESIDUE", "false").lower() != "true":
+            return
+        inspect = getattr(cleanup, "inspect_residue", None)
+        if not callable(inspect):
+&gt;           raise ValueError("Cleanup completion inventory is unavailable")
+E           ValueError: Cleanup completion inventory is unavailable
+
+backend/app/services/provisioning.py:1266: ValueError
+
+During handling of the above exception, another exception occurred:
+
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x10732e6d0&gt;
+cleanup = None
+
+    @pytest.mark.parametrize("cleanup", [None, MagicMock()])
+    def test_force_reclaim_requires_valid_inventory_when_enabled(monkeypatch, cleanup):
+        monkeypatch.setenv("CLEANUP_VERIFY_RESIDUE", "true")
+        monkeypatch.setenv("CLEANUP_VERIFICATION_TIMEOUT_SECONDS", "0")
+        if cleanup is not None:
+            cleanup.inspect_residue.side_effect = RuntimeError("inventory unavailable")
+        service = _force_service(cleanup)
+&gt;       assert service.force_reclaim_session("test-session").status == SessionStatus.CLEANUP_FAILED
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend/tests/test_staging_access_cleanup_gaps.py:96: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;app.services.provisioning.ProvisioningService object at 0x109ace410&gt;
+session_id = 'test-session', require_cleanup_success = False
+lifecycle_guard = None, cleanup_timeout = 0
+
+    def force_reclaim_session(
+        self,
+        session_id: str,
+        *,
+        require_cleanup_success: bool = False,
+        lifecycle_guard: Callable[[], bool] | None = None,
+        cleanup_timeout: int = 0,
+    ) -&gt; LabSession:
+        self._require_lifecycle_ownership(lifecycle_guard)
+        session = self._sessions.get(session_id)
+        if not session:
+            raise ValueError(f"Session {session_id} not found")
+        key_revocation_error = None
+        if self.maas_key_broker and (
+            session.maas_api_key
+            or (
+                session.metadata.get("maas_key_id")
+                and not session.metadata.get("maas_key_revocation")
+            )
+        ):
+            self._require_lifecycle_ownership(lifecycle_guard)
+            try:
+                session = self._revoke_maas_key(session)
+            except Exception as exc:
+                key_revocation_error = str(exc)
+        cleanup_adapter = self._get_cleanup(session.cluster_ref)
+        if cleanup_adapter and session.resources.get("compose_file"):
+            self._require_lifecycle_ownership(lifecycle_guard)
+            cleanup_adapter.cleanup(session.resources["compose_file"])
+        if cleanup_adapter and session.resources.get("container_name"):
+            self._require_lifecycle_ownership(lifecycle_guard)
+            cleanup_adapter.cleanup(session.resources["container_name"])
+        if cleanup_adapter and session.namespace:
+            self._require_lifecycle_ownership(lifecycle_guard)
+            try:
+                if cleanup_timeout &gt; 0:
+                    cleanup_adapter.cleanup(
+                        session.namespace, timeout=cleanup_timeout
+                    )
+                else:
+                    cleanup_adapter.cleanup(session.namespace)
+            except Exception as e:
+                logger.error("Cleanup failed during force-reclaim of session %s namespace %s: %s", session_id, session.namespace, e)
+                if require_cleanup_success or os.environ.get("CLEANUP_VERIFY_RESIDUE", "false").lower() == "true":
+                    reason = (
+                        "force-reclaim cleanup failed — credentials scrubbed — "
+                        f"error: {e}"
+                    )
+                    event = LifecycleEvent(
+                        from_status=session.status,
+                        to_status=SessionStatus.CLEANUP_FAILED,
+                        reason=reason,
+                    )
+                    session = session.model_copy(update={
+                        "status": SessionStatus.CLEANUP_FAILED,
+                        "lifecycle_events": session.lifecycle_events + [event],
+                    })
+                    self._require_lifecycle_ownership(lifecycle_guard)
+                    session = self._scrub_credentials(session)
+                    self._save_session(session)
+                    return session
+        if session.namespace:
+            self._require_lifecycle_ownership(lifecycle_guard)
+            try:
+                # An admin force operation and workshop fallback must obey the
+                # same enabled completion gate as ordinary reclaim. Force is
+                # not permission to mark surviving resources as reclaimed.
+                self._verify_cleanup_completion(
+                    cleanup_adapter, session.namespace, lifecycle_guard
+                )
+&gt;           except LifecycleOwnershipLost:
+                   ^^^^^^^^^^^^^^^^^^^^^^
+E           NameError: name 'LifecycleOwnershipLost' is not defined
+
+backend/app/services/provisioning.py:1461: NameError</failure></testcase><testcase classname="backend.tests.test_staging_access_cleanup_gaps" name="test_force_reclaim_requires_valid_inventory_when_enabled[cleanup1]" time="0.002"><failure message="NameError: name 'LifecycleOwnershipLost' is not defined">self = &lt;app.services.provisioning.ProvisioningService object at 0x109c94d10&gt;
+session_id = 'test-session', require_cleanup_success = False
+lifecycle_guard = None, cleanup_timeout = 0
+
+    def force_reclaim_session(
+        self,
+        session_id: str,
+        *,
+        require_cleanup_success: bool = False,
+        lifecycle_guard: Callable[[], bool] | None = None,
+        cleanup_timeout: int = 0,
+    ) -&gt; LabSession:
+        self._require_lifecycle_ownership(lifecycle_guard)
+        session = self._sessions.get(session_id)
+        if not session:
+            raise ValueError(f"Session {session_id} not found")
+        key_revocation_error = None
+        if self.maas_key_broker and (
+            session.maas_api_key
+            or (
+                session.metadata.get("maas_key_id")
+                and not session.metadata.get("maas_key_revocation")
+            )
+        ):
+            self._require_lifecycle_ownership(lifecycle_guard)
+            try:
+                session = self._revoke_maas_key(session)
+            except Exception as exc:
+                key_revocation_error = str(exc)
+        cleanup_adapter = self._get_cleanup(session.cluster_ref)
+        if cleanup_adapter and session.resources.get("compose_file"):
+            self._require_lifecycle_ownership(lifecycle_guard)
+            cleanup_adapter.cleanup(session.resources["compose_file"])
+        if cleanup_adapter and session.resources.get("container_name"):
+            self._require_lifecycle_ownership(lifecycle_guard)
+            cleanup_adapter.cleanup(session.resources["container_name"])
+        if cleanup_adapter and session.namespace:
+            self._require_lifecycle_ownership(lifecycle_guard)
+            try:
+                if cleanup_timeout &gt; 0:
+                    cleanup_adapter.cleanup(
+                        session.namespace, timeout=cleanup_timeout
+                    )
+                else:
+                    cleanup_adapter.cleanup(session.namespace)
+            except Exception as e:
+                logger.error("Cleanup failed during force-reclaim of session %s namespace %s: %s", session_id, session.namespace, e)
+                if require_cleanup_success or os.environ.get("CLEANUP_VERIFY_RESIDUE", "false").lower() == "true":
+                    reason = (
+                        "force-reclaim cleanup failed — credentials scrubbed — "
+                        f"error: {e}"
+                    )
+                    event = LifecycleEvent(
+                        from_status=session.status,
+                        to_status=SessionStatus.CLEANUP_FAILED,
+                        reason=reason,
+                    )
+                    session = session.model_copy(update={
+                        "status": SessionStatus.CLEANUP_FAILED,
+                        "lifecycle_events": session.lifecycle_events + [event],
+                    })
+                    self._require_lifecycle_ownership(lifecycle_guard)
+                    session = self._scrub_credentials(session)
+                    self._save_session(session)
+                    return session
+        if session.namespace:
+            self._require_lifecycle_ownership(lifecycle_guard)
+            try:
+                # An admin force operation and workshop fallback must obey the
+                # same enabled completion gate as ordinary reclaim. Force is
+                # not permission to mark surviving resources as reclaimed.
+&gt;               self._verify_cleanup_completion(
+                    cleanup_adapter, session.namespace, lifecycle_guard
+                )
+
+backend/app/services/provisioning.py:1458: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+backend/app/services/provisioning.py:1277: in _verify_cleanup_completion
+    observed = inspect(namespace)
+               ^^^^^^^^^^^^^^^^^^
+../../.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/unittest/mock.py:1124: in __call__
+    return self._mock_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/unittest/mock.py:1128: in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;MagicMock name='mock.inspect_residue' id='4459151952'&gt;
+args = ('seat-a',), kwargs = {}
+
+    def _execute_mock_call(self, /, *args, **kwargs):
+        # separate from _increment_mock_call so that awaited functions are
+        # executed separately from their call, also AsyncMock overrides this method
+    
+        effect = self.side_effect
+        if effect is not None:
+            if _is_exception(effect):
+&gt;               raise effect
+E               RuntimeError: inventory unavailable
+
+../../.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/unittest/mock.py:1183: RuntimeError
+
+During handling of the above exception, another exception occurred:
+
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x109c968d0&gt;
+cleanup = &lt;MagicMock id='4455735568'&gt;
+
+    @pytest.mark.parametrize("cleanup", [None, MagicMock()])
+    def test_force_reclaim_requires_valid_inventory_when_enabled(monkeypatch, cleanup):
+        monkeypatch.setenv("CLEANUP_VERIFY_RESIDUE", "true")
+        monkeypatch.setenv("CLEANUP_VERIFICATION_TIMEOUT_SECONDS", "0")
+        if cleanup is not None:
+            cleanup.inspect_residue.side_effect = RuntimeError("inventory unavailable")
+        service = _force_service(cleanup)
+&gt;       assert service.force_reclaim_session("test-session").status == SessionStatus.CLEANUP_FAILED
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend/tests/test_staging_access_cleanup_gaps.py:96: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;app.services.provisioning.ProvisioningService object at 0x109c94d10&gt;
+session_id = 'test-session', require_cleanup_success = False
+lifecycle_guard = None, cleanup_timeout = 0
+
+    def force_reclaim_session(
+        self,
+        session_id: str,
+        *,
+        require_cleanup_success: bool = False,
+        lifecycle_guard: Callable[[], bool] | None = None,
+        cleanup_timeout: int = 0,
+    ) -&gt; LabSession:
+        self._require_lifecycle_ownership(lifecycle_guard)
+        session = self._sessions.get(session_id)
+        if not session:
+            raise ValueError(f"Session {session_id} not found")
+        key_revocation_error = None
+        if self.maas_key_broker and (
+            session.maas_api_key
+            or (
+                session.metadata.get("maas_key_id")
+                and not session.metadata.get("maas_key_revocation")
+            )
+        ):
+            self._require_lifecycle_ownership(lifecycle_guard)
+            try:
+                session = self._revoke_maas_key(session)
+            except Exception as exc:
+                key_revocation_error = str(exc)
+        cleanup_adapter = self._get_cleanup(session.cluster_ref)
+        if cleanup_adapter and session.resources.get("compose_file"):
+            self._require_lifecycle_ownership(lifecycle_guard)
+            cleanup_adapter.cleanup(session.resources["compose_file"])
+        if cleanup_adapter and session.resources.get("container_name"):
+            self._require_lifecycle_ownership(lifecycle_guard)
+            cleanup_adapter.cleanup(session.resources["container_name"])
+        if cleanup_adapter and session.namespace:
+            self._require_lifecycle_ownership(lifecycle_guard)
+            try:
+                if cleanup_timeout &gt; 0:
+                    cleanup_adapter.cleanup(
+                        session.namespace, timeout=cleanup_timeout
+                    )
+                else:
+                    cleanup_adapter.cleanup(session.namespace)
+            except Exception as e:
+                logger.error("Cleanup failed during force-reclaim of session %s namespace %s: %s", session_id, session.namespace, e)
+                if require_cleanup_success or os.environ.get("CLEANUP_VERIFY_RESIDUE", "false").lower() == "true":
+                    reason = (
+                        "force-reclaim cleanup failed — credentials scrubbed — "
+                        f"error: {e}"
+                    )
+                    event = LifecycleEvent(
+                        from_status=session.status,
+                        to_status=SessionStatus.CLEANUP_FAILED,
+                        reason=reason,
+                    )
+                    session = session.model_copy(update={
+                        "status": SessionStatus.CLEANUP_FAILED,
+                        "lifecycle_events": session.lifecycle_events + [event],
+                    })
+                    self._require_lifecycle_ownership(lifecycle_guard)
+                    session = self._scrub_credentials(session)
+                    self._save_session(session)
+                    return session
+        if session.namespace:
+            self._require_lifecycle_ownership(lifecycle_guard)
+            try:
+                # An admin force operation and workshop fallback must obey the
+                # same enabled completion gate as ordinary reclaim. Force is
+                # not permission to mark surviving resources as reclaimed.
+                self._verify_cleanup_completion(
+                    cleanup_adapter, session.namespace, lifecycle_guard
+                )
+&gt;           except LifecycleOwnershipLost:
+                   ^^^^^^^^^^^^^^^^^^^^^^
+E           NameError: name 'LifecycleOwnershipLost' is not defined
+
+backend/app/services/provisioning.py:1461: NameError</failure></testcase><testcase classname="backend.tests.test_staging_access_cleanup_gaps" name="test_oidc_cannot_inherit_legacy_admin_or_tenant_by_username[groups0]" time="0.001" /><testcase classname="backend.tests.test_staging_access_cleanup_gaps" name="test_oidc_cannot_inherit_legacy_admin_or_tenant_by_username[groups1]" time="0.000" /><testcase classname="backend.tests.test_staging_access_cleanup_gaps" name="test_oidc_cannot_inherit_legacy_admin_or_tenant_by_username[groups2]" time="0.001" /><testcase classname="backend.tests.test_oauth_identity" name="test_kube_admin_is_admin_without_forwarded_groups" time="0.000" /><testcase classname="backend.tests.test_oauth_identity" name="test_regular_oauth_user_is_not_admin_without_forwarded_groups" time="0.000" /><testcase classname="backend.tests.test_oauth_identity" name="test_oauth_user_gets_tenants_from_identity_map" time="0.000" /><testcase classname="backend.tests.test_oauth_identity" name="test_oauth_user_gets_tenants_from_group_claims" time="0.001" /><testcase classname="backend.tests.test_oauth_identity" name="test_forwarded_identity_is_rejected_on_public_api_hostname" time="0.001" /><testcase classname="backend.tests.test_oauth_identity" name="test_oidc_host_requires_a_bearer_token_and_rejects_spoofed_headers" time="0.000" /><testcase classname="backend.tests.test_oauth_identity" name="test_oidc_claims_are_mapped_to_stable_identity_tenant_and_admin" time="0.000" /><testcase classname="backend.tests.test_oauth_identity" name="test_oidc_host_does_not_fall_back_to_legacy_headers_when_token_is_invalid" time="0.000" /><testcase classname="backend.tests.test_oauth_identity" name="test_current_identity_contract_does_not_expose_groups_or_tenants" time="0.000" /><testcase classname="backend.tests.test_cleanup_completion_gate" name="test_enabled_completion_gate_refuses_retained_storage" time="0.000" /><testcase classname="backend.tests.test_cleanup_completion_gate" name="test_enabled_completion_gate_requires_complete_inventory" time="0.000" /><testcase classname="backend.tests.test_cleanup_completion_gate" name="test_enabled_completion_gate_accepts_complete_zero_residue" time="0.000" /><testcase classname="backend.tests.test_cleanup_openshift.TestGatewayNamespaceLock" name="test_gateway_lock_exists" time="0.000" /><testcase classname="backend.tests.test_cleanup_openshift.TestGatewayNamespaceLock" name="test_get_gw_lock_returns_lock" time="0.000" /><testcase classname="backend.tests.test_cleanup_openshift.TestGatewayNamespaceLock" name="test_same_gateway_returns_same_lock" time="0.000" /><testcase classname="backend.tests.test_cleanup_openshift.TestGatewayNamespaceLock" name="test_different_gateways_different_locks" time="0.000" /><testcase classname="backend.tests.test_cleanup_openshift.TestCleanupTimeoutFatal" name="test_cleanup_timeout_error_exists" time="0.000" /><testcase classname="backend.tests.test_cleanup_openshift.TestCleanupTimeoutFatal" name="test_cleanup_timeout_raises" time="3.006" /><testcase classname="backend.tests.test_cleanup_openshift.TestCleanupTimeoutFatal" name="test_default_cleanup_does_not_wait" time="0.001" /><testcase classname="backend.tests.test_cleanup_openshift.TestCleanupTimeoutFatal" name="test_showroom_delete_timeout_is_configurable" time="0.001" /><testcase classname="backend.tests.test_cleanup_openshift.TestCleanupTimeoutFatal" name="test_cleanup_deletes_workload_application_before_namespace" time="0.002" /><testcase classname="backend.tests.test_cleanup_openshift.TestOrphanedRoleBindingCleanup" name="test_cleanup_deletes_role_binding" time="0.001" /><testcase classname="backend.tests.test_cleanup_openshift.TestOrphanedRoleBindingCleanup" name="test_cleanup_residue_inspection_is_read_only_and_counts_every_owner" time="0.001" /><testcase classname="backend.tests.test_cleanup_openshift.TestOrphanedRoleBindingCleanup" name="test_cleanup_ignores_missing_role_binding" time="0.001" /><testcase classname="backend.tests.test_cleanup_openshift.TestOrphanedRoleBindingCleanup" name="test_cleanup_removes_only_reclaimed_namespace_from_shared_binding" time="0.001" /></testsuite></testsuites>

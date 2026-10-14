@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="11" skipped="0" tests="11" time="0.794" timestamp="2026-10-14T13:06:00.322214-05:00" hostname="jkershaw-mac"><testcase classname="backend.tests.test_staging_access_cleanup_gaps" name="test_residue_checks_exact_namespace_image_puller_name" time="0.006"><failure message="assert 0 == 1">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x10de0d250&gt;
+
+    def test_residue_checks_exact_namespace_image_puller_name(monkeypatch):
+        monkeypatch.setenv("OPERATOR_NAMESPACE", "control-plane")
+        adapter = OpenShiftCleanupAdapter.__new__(OpenShiftCleanupAdapter)
+        adapter._core_v1 = MagicMock()
+        adapter._rbac_v1 = MagicMock()
+        adapter._showroom_gitops = MagicMock()
+        adapter._workload_gitops = MagicMock()
+        missing = ApiException(status=404)
+        adapter._core_v1.list_persistent_volume.return_value.items = []
+        adapter._core_v1.read_namespace.side_effect = missing
+        adapter._rbac_v1.read_cluster_role_binding.side_effect = missing
+    
+        def read_binding(name, namespace):
+            if (name, namespace) == ("seat-a-image-puller", "control-plane"):
+                return MagicMock()
+            raise missing
+    
+        adapter._rbac_v1.read_namespaced_role_binding.side_effect = read_binding
+        result = adapter.inspect_residue("seat-a")
+&gt;       assert result["image_puller_role_binding"] == 1
+E       assert 0 == 1
+
+backend/tests/test_staging_access_cleanup_gaps.py:35: AssertionError</failure></testcase><testcase classname="backend.tests.test_staging_access_cleanup_gaps" name="test_force_reclaim_cannot_bypass_enabled_residue_gate[persistent_volume-False]" time="0.002"><failure message="AssertionError: assert &lt;SessionStatu...: 'reclaimed'&gt; == &lt;SessionStatu...eanup_failed'&gt;&#10;  &#10;  - cleanup_failed&#10;  + reclaimed">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x10de0ccd0&gt;
+require_success = False, residue = 'persistent_volume'
+
+    @pytest.mark.parametrize("require_success", [False, True])
+    @pytest.mark.parametrize("residue", ["persistent_volume", "image_puller_role_binding"])
+    def test_force_reclaim_cannot_bypass_enabled_residue_gate(monkeypatch, require_success, residue):
+        monkeypatch.setenv("CLEANUP_VERIFY_RESIDUE", "true")
+        monkeypatch.setenv("CLEANUP_VERIFICATION_TIMEOUT_SECONDS", "0")
+        cleanup = MagicMock()
+        cleanup.inspect_residue.return_value = {
+            "namespace": 0, "showroom_application": 0, "workload_application": 0,
+            "image_puller_role_binding": 0, "persistent_volume": 0,
+        }
+        cleanup.inspect_residue.return_value[residue] = 1
+        service = _force_service(cleanup)
+        result = service.force_reclaim_session("test-session", require_cleanup_success=require_success)
+&gt;       assert result.status == SessionStatus.CLEANUP_FAILED
+E       AssertionError: assert &lt;SessionStatu...: 'reclaimed'&gt; == &lt;SessionStatu...eanup_failed'&gt;
+E         
+E         - cleanup_failed
+E         + reclaimed
+
+backend/tests/test_staging_access_cleanup_gaps.py:70: AssertionError</failure></testcase><testcase classname="backend.tests.test_staging_access_cleanup_gaps" name="test_force_reclaim_cannot_bypass_enabled_residue_gate[persistent_volume-True]" time="0.001"><failure message="AssertionError: assert &lt;SessionStatu...: 'reclaimed'&gt; == &lt;SessionStatu...eanup_failed'&gt;&#10;  &#10;  - cleanup_failed&#10;  + reclaimed">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x10de0d7d0&gt;
+require_success = True, residue = 'persistent_volume'
+
+    @pytest.mark.parametrize("require_success", [False, True])
+    @pytest.mark.parametrize("residue", ["persistent_volume", "image_puller_role_binding"])
+    def test_force_reclaim_cannot_bypass_enabled_residue_gate(monkeypatch, require_success, residue):
+        monkeypatch.setenv("CLEANUP_VERIFY_RESIDUE", "true")
+        monkeypatch.setenv("CLEANUP_VERIFICATION_TIMEOUT_SECONDS", "0")
+        cleanup = MagicMock()
+        cleanup.inspect_residue.return_value = {
+            "namespace": 0, "showroom_application": 0, "workload_application": 0,
+            "image_puller_role_binding": 0, "persistent_volume": 0,
+        }
+        cleanup.inspect_residue.return_value[residue] = 1
+        service = _force_service(cleanup)
+        result = service.force_reclaim_session("test-session", require_cleanup_success=require_success)
+&gt;       assert result.status == SessionStatus.CLEANUP_FAILED
+E       AssertionError: assert &lt;SessionStatu...: 'reclaimed'&gt; == &lt;SessionStatu...eanup_failed'&gt;
+E         
+E         - cleanup_failed
+E         + reclaimed
+
+backend/tests/test_staging_access_cleanup_gaps.py:70: AssertionError</failure></testcase><testcase classname="backend.tests.test_staging_access_cleanup_gaps" name="test_force_reclaim_cannot_bypass_enabled_residue_gate[image_puller_role_binding-False]" time="0.001"><failure message="AssertionError: assert &lt;SessionStatu...: 'reclaimed'&gt; == &lt;SessionStatu...eanup_failed'&gt;&#10;  &#10;  - cleanup_failed&#10;  + reclaimed">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x10decc1d0&gt;
+require_success = False, residue = 'image_puller_role_binding'
+
+    @pytest.mark.parametrize("require_success", [False, True])
+    @pytest.mark.parametrize("residue", ["persistent_volume", "image_puller_role_binding"])
+    def test_force_reclaim_cannot_bypass_enabled_residue_gate(monkeypatch, require_success, residue):
+        monkeypatch.setenv("CLEANUP_VERIFY_RESIDUE", "true")
+        monkeypatch.setenv("CLEANUP_VERIFICATION_TIMEOUT_SECONDS", "0")
+        cleanup = MagicMock()
+        cleanup.inspect_residue.return_value = {
+            "namespace": 0, "showroom_application": 0, "workload_application": 0,
+            "image_puller_role_binding": 0, "persistent_volume": 0,
+        }
+        cleanup.inspect_residue.return_value[residue] = 1
+        service = _force_service(cleanup)
+        result = service.force_reclaim_session("test-session", require_cleanup_success=require_success)
+&gt;       assert result.status == SessionStatus.CLEANUP_FAILED
+E       AssertionError: assert &lt;SessionStatu...: 'reclaimed'&gt; == &lt;SessionStatu...eanup_failed'&gt;
+E         
+E         - cleanup_failed
+E         + reclaimed
+
+backend/tests/test_staging_access_cleanup_gaps.py:70: AssertionError</failure></testcase><testcase classname="backend.tests.test_staging_access_cleanup_gaps" name="test_force_reclaim_cannot_bypass_enabled_residue_gate[image_puller_role_binding-True]" time="0.001"><failure message="AssertionError: assert &lt;SessionStatu...: 'reclaimed'&gt; == &lt;SessionStatu...eanup_failed'&gt;&#10;  &#10;  - cleanup_failed&#10;  + reclaimed">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x10dead350&gt;
+require_success = True, residue = 'image_puller_role_binding'
+
+    @pytest.mark.parametrize("require_success", [False, True])
+    @pytest.mark.parametrize("residue", ["persistent_volume", "image_puller_role_binding"])
+    def test_force_reclaim_cannot_bypass_enabled_residue_gate(monkeypatch, require_success, residue):
+        monkeypatch.setenv("CLEANUP_VERIFY_RESIDUE", "true")
+        monkeypatch.setenv("CLEANUP_VERIFICATION_TIMEOUT_SECONDS", "0")
+        cleanup = MagicMock()
+        cleanup.inspect_residue.return_value = {
+            "namespace": 0, "showroom_application": 0, "workload_application": 0,
+            "image_puller_role_binding": 0, "persistent_volume": 0,
+        }
+        cleanup.inspect_residue.return_value[residue] = 1
+        service = _force_service(cleanup)
+        result = service.force_reclaim_session("test-session", require_cleanup_success=require_success)
+&gt;       assert result.status == SessionStatus.CLEANUP_FAILED
+E       AssertionError: assert &lt;SessionStatu...: 'reclaimed'&gt; == &lt;SessionStatu...eanup_failed'&gt;
+E         
+E         - cleanup_failed
+E         + reclaimed
+
+backend/tests/test_staging_access_cleanup_gaps.py:70: AssertionError</failure></testcase><testcase classname="backend.tests.test_staging_access_cleanup_gaps" name="test_workshop_fallback_does_not_turn_residue_failure_into_success" time="0.001"><failure message="TypeError: argument of type 'NoneType' is not iterable">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x10df1b650&gt;
+
+    def test_workshop_fallback_does_not_turn_residue_failure_into_success(monkeypatch):
+        monkeypatch.setenv("CLEANUP_VERIFY_RESIDUE", "true")
+        monkeypatch.setenv("CLEANUP_VERIFICATION_TIMEOUT_SECONDS", "0")
+        cleanup = MagicMock()
+        cleanup.inspect_residue.return_value = {
+            "namespace": 0, "showroom_application": 0, "workload_application": 0,
+            "image_puller_role_binding": 0, "persistent_volume": 1,
+        }
+        service = _force_service(cleanup)
+        service.reclaim_session = MagicMock(return_value=service._sessions["test-session"])
+&gt;       assert "persistent_volume" in service._reclaim_workshop_session("test-session")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: argument of type 'NoneType' is not iterable
+
+backend/tests/test_staging_access_cleanup_gaps.py:85: TypeError</failure></testcase><testcase classname="backend.tests.test_staging_access_cleanup_gaps" name="test_force_reclaim_requires_valid_inventory_when_enabled[None]" time="0.001"><failure message="AssertionError: assert &lt;SessionStatu...: 'reclaimed'&gt; == &lt;SessionStatu...eanup_failed'&gt;&#10;  &#10;  - cleanup_failed&#10;  + reclaimed">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x10deeab50&gt;
+cleanup = None
+
+    @pytest.mark.parametrize("cleanup", [None, MagicMock()])
+    def test_force_reclaim_requires_valid_inventory_when_enabled(monkeypatch, cleanup):
+        monkeypatch.setenv("CLEANUP_VERIFY_RESIDUE", "true")
+        monkeypatch.setenv("CLEANUP_VERIFICATION_TIMEOUT_SECONDS", "0")
+        if cleanup is not None:
+            cleanup.inspect_residue.side_effect = RuntimeError("inventory unavailable")
+        service = _force_service(cleanup)
+&gt;       assert service.force_reclaim_session("test-session").status == SessionStatus.CLEANUP_FAILED
+E       AssertionError: assert &lt;SessionStatu...: 'reclaimed'&gt; == &lt;SessionStatu...eanup_failed'&gt;
+E         
+E         - cleanup_failed
+E         + reclaimed
+
+backend/tests/test_staging_access_cleanup_gaps.py:96: AssertionError</failure></testcase><testcase classname="backend.tests.test_staging_access_cleanup_gaps" name="test_force_reclaim_requires_valid_inventory_when_enabled[cleanup1]" time="0.001"><failure message="AssertionError: assert &lt;SessionStatu...: 'reclaimed'&gt; == &lt;SessionStatu...eanup_failed'&gt;&#10;  &#10;  - cleanup_failed&#10;  + reclaimed">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x10de4fbd0&gt;
+cleanup = &lt;MagicMock id='4527714832'&gt;
+
+    @pytest.mark.parametrize("cleanup", [None, MagicMock()])
+    def test_force_reclaim_requires_valid_inventory_when_enabled(monkeypatch, cleanup):
+        monkeypatch.setenv("CLEANUP_VERIFY_RESIDUE", "true")
+        monkeypatch.setenv("CLEANUP_VERIFICATION_TIMEOUT_SECONDS", "0")
+        if cleanup is not None:
+            cleanup.inspect_residue.side_effect = RuntimeError("inventory unavailable")
+        service = _force_service(cleanup)
+&gt;       assert service.force_reclaim_session("test-session").status == SessionStatus.CLEANUP_FAILED
+E       AssertionError: assert &lt;SessionStatu...: 'reclaimed'&gt; == &lt;SessionStatu...eanup_failed'&gt;
+E         
+E         - cleanup_failed
+E         + reclaimed
+
+backend/tests/test_staging_access_cleanup_gaps.py:96: AssertionError</failure></testcase><testcase classname="backend.tests.test_staging_access_cleanup_gaps" name="test_oidc_cannot_inherit_legacy_admin_or_tenant_by_username[groups0]" time="0.001"><failure message="AssertionError: assert not True&#10; +  where True = User(username='kubeadmin', subject='independent-oidc-subject', email=None, groups=[], tenant_ids=['legacy-tenant'], is_admin=True, identity_verified=True).is_admin">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x10decc110&gt;
+groups = []
+
+    @pytest.mark.parametrize("groups", [[], ["launchpad-requesters"], ["system:cluster-admins"]])
+    def test_oidc_cannot_inherit_legacy_admin_or_tenant_by_username(monkeypatch, groups):
+        monkeypatch.setattr(oauth, "AUTH_ENABLED", True)
+        monkeypatch.setattr(oauth, "OIDC_JWT_HOSTS", {"requester-auth.example.com"})
+        monkeypatch.setattr(oauth, "ADMIN_USERS", {"kubeadmin"})
+        monkeypatch.setenv("TENANT_USER_MAP", '{"kubeadmin":["legacy-tenant"]}')
+        monkeypatch.setattr(oauth, "verify_oidc_token", lambda _: {
+            "sub": "independent-oidc-subject", "preferred_username": "kubeadmin", "groups": groups,
+        })
+        request = Request({
+            "type": "http", "method": "GET", "path": "/",
+            "headers": [(b"host", b"requester-auth.example.com"),
+                        (b"authorization", b"Bearer test-signed-token")],
+        })
+        user = oauth.get_current_user(request)
+&gt;       assert not user.is_admin
+E       AssertionError: assert not True
+E        +  where True = User(username='kubeadmin', subject='independent-oidc-subject', email=None, groups=[], tenant_ids=['legacy-tenant'], is_admin=True, identity_verified=True).is_admin
+
+backend/tests/test_staging_access_cleanup_gaps.py:115: AssertionError</failure></testcase><testcase classname="backend.tests.test_staging_access_cleanup_gaps" name="test_oidc_cannot_inherit_legacy_admin_or_tenant_by_username[groups1]" time="0.000"><failure message="AssertionError: assert not True&#10; +  where True = User(username='kubeadmin', subject='independent-oidc-subject', email=None, groups=['launchpad-requesters'], tenant_ids=['legacy-tenant'], is_admin=True, identity_verified=True).is_admin">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x10df2b390&gt;
+groups = ['launchpad-requesters']
+
+    @pytest.mark.parametrize("groups", [[], ["launchpad-requesters"], ["system:cluster-admins"]])
+    def test_oidc_cannot_inherit_legacy_admin_or_tenant_by_username(monkeypatch, groups):
+        monkeypatch.setattr(oauth, "AUTH_ENABLED", True)
+        monkeypatch.setattr(oauth, "OIDC_JWT_HOSTS", {"requester-auth.example.com"})
+        monkeypatch.setattr(oauth, "ADMIN_USERS", {"kubeadmin"})
+        monkeypatch.setenv("TENANT_USER_MAP", '{"kubeadmin":["legacy-tenant"]}')
+        monkeypatch.setattr(oauth, "verify_oidc_token", lambda _: {
+            "sub": "independent-oidc-subject", "preferred_username": "kubeadmin", "groups": groups,
+        })
+        request = Request({
+            "type": "http", "method": "GET", "path": "/",
+            "headers": [(b"host", b"requester-auth.example.com"),
+                        (b"authorization", b"Bearer test-signed-token")],
+        })
+        user = oauth.get_current_user(request)
+&gt;       assert not user.is_admin
+E       AssertionError: assert not True
+E        +  where True = User(username='kubeadmin', subject='independent-oidc-subject', email=None, groups=['launchpad-requesters'], tenant_ids=['legacy-tenant'], is_admin=True, identity_verified=True).is_admin
+
+backend/tests/test_staging_access_cleanup_gaps.py:115: AssertionError</failure></testcase><testcase classname="backend.tests.test_staging_access_cleanup_gaps" name="test_oidc_cannot_inherit_legacy_admin_or_tenant_by_username[groups2]" time="0.000"><failure message="AssertionError: assert not True&#10; +  where True = User(username='kubeadmin', subject='independent-oidc-subject', email=None, groups=['system:cluster-admins'], tenant_ids=['legacy-tenant'], is_admin=True, identity_verified=True).is_admin">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x10defb050&gt;
+groups = ['system:cluster-admins']
+
+    @pytest.mark.parametrize("groups", [[], ["launchpad-requesters"], ["system:cluster-admins"]])
+    def test_oidc_cannot_inherit_legacy_admin_or_tenant_by_username(monkeypatch, groups):
+        monkeypatch.setattr(oauth, "AUTH_ENABLED", True)
+        monkeypatch.setattr(oauth, "OIDC_JWT_HOSTS", {"requester-auth.example.com"})
+        monkeypatch.setattr(oauth, "ADMIN_USERS", {"kubeadmin"})
+        monkeypatch.setenv("TENANT_USER_MAP", '{"kubeadmin":["legacy-tenant"]}')
+        monkeypatch.setattr(oauth, "verify_oidc_token", lambda _: {
+            "sub": "independent-oidc-subject", "preferred_username": "kubeadmin", "groups": groups,
+        })
+        request = Request({
+            "type": "http", "method": "GET", "path": "/",
+            "headers": [(b"host", b"requester-auth.example.com"),
+                        (b"authorization", b"Bearer test-signed-token")],
+        })
+        user = oauth.get_current_user(request)
+&gt;       assert not user.is_admin
+E       AssertionError: assert not True
+E        +  where True = User(username='kubeadmin', subject='independent-oidc-subject', email=None, groups=['system:cluster-admins'], tenant_ids=['legacy-tenant'], is_admin=True, identity_verified=True).is_admin
+
+backend/tests/test_staging_access_cleanup_gaps.py:115: AssertionError</failure></testcase></testsuite></testsuites>

@@ -1327,10 +1327,11 @@ class ProvisioningService:
             except Exception as e:
                 cleanup_errors.append(str(e))
 
-        if cleanup_adapter and session.namespace:
+        if session.namespace:
             self._require_lifecycle_ownership(lifecycle_guard)
             try:
-                cleanup_adapter.cleanup(session.namespace)
+                if cleanup_adapter:
+                    cleanup_adapter.cleanup(session.namespace)
                 self._verify_cleanup_completion(
                     cleanup_adapter, session.namespace, lifecycle_guard
                 )
@@ -1431,7 +1432,9 @@ class ProvisioningService:
                     cleanup_adapter.cleanup(session.namespace)
             except Exception as e:
                 logger.error("Cleanup failed during force-reclaim of session %s namespace %s: %s", session_id, session.namespace, e)
-                if require_cleanup_success:
+                if require_cleanup_success or (
+                    os.environ.get("CLEANUP_VERIFY_RESIDUE", "false").lower() == "true"
+                ):
                     reason = (
                         "force-reclaim cleanup failed — credentials scrubbed — "
                         f"error: {e}"
@@ -1449,6 +1452,31 @@ class ProvisioningService:
                     session = self._scrub_credentials(session)
                     self._save_session(session)
                     return session
+        if session.namespace:
+            self._require_lifecycle_ownership(lifecycle_guard)
+            try:
+                # An admin force operation and workshop fallback must obey the
+                # same enabled completion gate as ordinary reclaim. Force is
+                # not permission to mark surviving resources as reclaimed.
+                self._verify_cleanup_completion(
+                    cleanup_adapter, session.namespace, lifecycle_guard
+                )
+            except LifecycleOwnershipLostError:
+                raise
+            except Exception as exc:  # noqa: BLE001 - adapter failures must persist cleanup_failed
+                self._require_lifecycle_ownership(lifecycle_guard)
+                event = LifecycleEvent(
+                    from_status=session.status,
+                    to_status=SessionStatus.CLEANUP_FAILED,
+                    reason=f"force-reclaim completion verification failed: {exc}",
+                )
+                session = session.model_copy(update={
+                    "status": SessionStatus.CLEANUP_FAILED,
+                    "lifecycle_events": session.lifecycle_events + [event],
+                })
+                session = self._scrub_credentials(session)
+                self._save_session(session)
+                return session
         if key_revocation_error:
             self._require_lifecycle_ownership(lifecycle_guard)
             event = LifecycleEvent(

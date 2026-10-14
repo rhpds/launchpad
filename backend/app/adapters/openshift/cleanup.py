@@ -137,9 +137,9 @@ class OpenShiftCleanupAdapter:
             if getattr(getattr(volume.spec, "claim_ref", None), "namespace", None)
             == namespace
         )
-        for binding_name in PIPELINES_SHARED_BINDINGS:
+        for shared_binding_name in PIPELINES_SHARED_BINDINGS:
             try:
-                binding = self._rbac_v1.read_cluster_role_binding(binding_name)
+                binding = self._rbac_v1.read_cluster_role_binding(shared_binding_name)
             except ApiException as exc:
                 if exc.status == 404:
                     continue

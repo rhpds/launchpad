@@ -1,0 +1,68 @@
+schema: launchpad/staging-gap-closeout/v1
+date: '2026-10-14'
+cluster_scope: flightpath
+overall_status: NOT-STAGING-QUALIFIED
+deployment_performed: false
+existing_lab_resources_changed: false
+proof_scope: local component, identity contract, cleanup and lifecycle regressions
+source_fixes:
+  - id: CLEANUP-IMAGE-PULLER-INVENTORY-SHADOW
+    status: GREEN-local
+    change: Preserve the namespace image-puller name while inspecting shared cluster bindings.
+  - id: CLEANUP-FORCE-FALLBACK-VERIFICATION
+    status: GREEN-local
+    change: Force reclaim and workshop fallback obey the enabled residue gate; surviving resources prevent success and capacity release.
+    override_policy: No residue bypass when CLEANUP_VERIFY_RESIDUE is true, including admin force operations.
+    compatibility: Disabled-gate legacy behavior remains unchanged.
+  - id: CLEANUP-MISSING-ADAPTER-VERIFICATION
+    status: GREEN-local
+    change: Both normal and force reclaim fail closed when enabled inventory is unavailable.
+  - id: WORKFORCE-OIDC-LEGACY-PRIVILEGE-COLLISION
+    status: GREEN-local
+    change: Workforce OIDC requires launchpad-admins for admin access and tenant groups for tenant access; legacy username maps and OpenShift admin groups do not grant OIDC privileges.
+    compatibility: Trusted legacy OpenShift proxy and API-key authorization remain unchanged.
+tests:
+  initial_red:
+    path: evidence/runs/staging-access-cleanup-red-20261014.xml
+    sha256: 7fa285c54ac5b12a099b7cf61b39320f5787160a49c1107782d4a91fc1369088
+    intended_failures: 11
+  additional_red:
+    path: evidence/runs/staging-access-cleanup-missing-adapter-red-20261014.xml
+    sha256: 121df63ac0af0d49336cfcb4644e78ce1fabeb3dd866886627119b7eda9a2ba1
+    intended_failures: 1
+  preserved_repair_attempt: evidence/runs/staging-access-cleanup-attempt-r1-20261014.xml
+  focused_green:
+    path: evidence/runs/staging-access-cleanup-green-local-r3-20261014.xml
+    sha256: e3c5b078004d1083bea6294a573a598bfa5921f429c9bcfda43d0de14b5a11fb
+    passing: 75
+  regression_green:
+    path: evidence/runs/staging-access-cleanup-green-regression-20261014.xml
+    sha256: 0959080035caaa28588288292895d6b0aba52d3b6ca0bad5a1d0af97b91bd241
+    passing: 119
+  lint_scope: E/F/import checks pass excluding pre-existing line-length findings; full lint is not claimed green.
+security_triage:
+  image: ghcr.io/jkershawrh/launchpad-backend-flightpath-candidate@sha256:3bedbc0cef3c09c86e440eff8a883043c9dde9687fd686fe7c9fd1e1a24aabd8
+  source_revision: a59d503c38f6063dd487779a62b01b8f488cf461
+  source_run: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/38489410096
+  source_artifact: backend-vulnerability-scan-a59d503c38f6063dd487779a62b01b8f488cf461/vulnerability-report.json
+  source_report_sha256: bdaa0c1acf759af81ea2732fd802f2824f704ac1be6add35a4259f25402cdc28
+  high_matches: 107
+  distinct_high_ids: 26
+  high_rpm_matches: 104
+  high_go_module_matches: 3
+  high_fix_states: {not-fixed: 97, wont-fix: 9, unspecified: 1}
+  critical_matches: 0
+  risk_acceptance: NOT-GRANTED
+  gate: OPEN
+  next: Inventory runtime package necessity, reduce unnecessary runtime dependencies using a separately tested image candidate, rescan, and submit remaining findings for explicit risk review.
+  expired_exception_file: security/backend-cli-vulnerability-exceptions.yaml
+  exception_expiration: '2026-10-08'
+  exception_action: Do not renew or rely on expired exceptions without approval; verify whether any release job actually consumes them.
+remaining_gates:
+  - Publish a signed immutable candidate containing these changes; current deployed image does not contain them.
+  - Live negative proof for retained RoleBinding/storage and force fallback on disposable resources, followed by complete cleanup.
+  - One-seat participant order/use/reclaim regression plus requester/admin API compatibility on the new image.
+  - Resolve Console hostname/callback separation with infrastructure approval; preserve participant access.
+  - Keep workforce Authentik deferred and not public self-service until hostname, MFA, login/logout, roles, and tenant isolation are live-certified.
+  - Close image-security findings by remediation or approved scoped risk disposition; a fixable-only CI pass is insufficient.
+  - Confirm operational owners, restore/rollback evidence, and the staging acceptance decision.
