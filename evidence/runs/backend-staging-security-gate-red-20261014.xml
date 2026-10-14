@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="9" skipped="0" tests="9" time="0.051" timestamp="2026-10-14T13:43:19.935773-05:00" hostname="jkershaw-mac"><testcase classname="scripts.tests.test_backend_staging_security_gate" name="test_high_findings_block_staging_regardless_of_fix_state[not-fixed]" time="0.000"><failure message="FileNotFoundError: [Errno 2] No such file or directory: '/Users/jkershaw/Documents/launchpad/scripts/check_backend_staging_security.py'">state = 'not-fixed'
+
+    @pytest.mark.parametrize("state", ["not-fixed", "wont-fix", "fixed", ""])
+    def test_high_findings_block_staging_regardless_of_fix_state(state):
+&gt;       result = _gate().summarize({"matches": [_match(fix=state)]})
+                 ^^^^^^^
+
+scripts/tests/test_backend_staging_security_gate.py:29: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/tests/test_backend_staging_security_gate.py:16: in _gate
+    spec.loader.exec_module(module)
+&lt;frozen importlib._bootstrap_external&gt;:936: in exec_module
+    ???
+&lt;frozen importlib._bootstrap_external&gt;:1073: in get_code
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;_frozen_importlib_external.SourceFileLoader object at 0x109757ed0&gt;
+path = '/Users/jkershaw/Documents/launchpad/scripts/check_backend_staging_security.py'
+
+&gt;   ???
+E   FileNotFoundError: [Errno 2] No such file or directory: '/Users/jkershaw/Documents/launchpad/scripts/check_backend_staging_security.py'
+
+&lt;frozen importlib._bootstrap_external&gt;:1130: FileNotFoundError</failure></testcase><testcase classname="scripts.tests.test_backend_staging_security_gate" name="test_high_findings_block_staging_regardless_of_fix_state[wont-fix]" time="0.000"><failure message="FileNotFoundError: [Errno 2] No such file or directory: '/Users/jkershaw/Documents/launchpad/scripts/check_backend_staging_security.py'">state = 'wont-fix'
+
+    @pytest.mark.parametrize("state", ["not-fixed", "wont-fix", "fixed", ""])
+    def test_high_findings_block_staging_regardless_of_fix_state(state):
+&gt;       result = _gate().summarize({"matches": [_match(fix=state)]})
+                 ^^^^^^^
+
+scripts/tests/test_backend_staging_security_gate.py:29: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/tests/test_backend_staging_security_gate.py:16: in _gate
+    spec.loader.exec_module(module)
+&lt;frozen importlib._bootstrap_external&gt;:936: in exec_module
+    ???
+&lt;frozen importlib._bootstrap_external&gt;:1073: in get_code
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;_frozen_importlib_external.SourceFileLoader object at 0x109763750&gt;
+path = '/Users/jkershaw/Documents/launchpad/scripts/check_backend_staging_security.py'
+
+&gt;   ???
+E   FileNotFoundError: [Errno 2] No such file or directory: '/Users/jkershaw/Documents/launchpad/scripts/check_backend_staging_security.py'
+
+&lt;frozen importlib._bootstrap_external&gt;:1130: FileNotFoundError</failure></testcase><testcase classname="scripts.tests.test_backend_staging_security_gate" name="test_high_findings_block_staging_regardless_of_fix_state[fixed]" time="0.000"><failure message="FileNotFoundError: [Errno 2] No such file or directory: '/Users/jkershaw/Documents/launchpad/scripts/check_backend_staging_security.py'">state = 'fixed'
+
+    @pytest.mark.parametrize("state", ["not-fixed", "wont-fix", "fixed", ""])
+    def test_high_findings_block_staging_regardless_of_fix_state(state):
+&gt;       result = _gate().summarize({"matches": [_match(fix=state)]})
+                 ^^^^^^^
+
+scripts/tests/test_backend_staging_security_gate.py:29: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/tests/test_backend_staging_security_gate.py:16: in _gate
+    spec.loader.exec_module(module)
+&lt;frozen importlib._bootstrap_external&gt;:936: in exec_module
+    ???
+&lt;frozen importlib._bootstrap_external&gt;:1073: in get_code
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;_frozen_importlib_external.SourceFileLoader object at 0x109740a50&gt;
+path = '/Users/jkershaw/Documents/launchpad/scripts/check_backend_staging_security.py'
+
+&gt;   ???
+E   FileNotFoundError: [Errno 2] No such file or directory: '/Users/jkershaw/Documents/launchpad/scripts/check_backend_staging_security.py'
+
+&lt;frozen importlib._bootstrap_external&gt;:1130: FileNotFoundError</failure></testcase><testcase classname="scripts.tests.test_backend_staging_security_gate" name="test_high_findings_block_staging_regardless_of_fix_state[]" time="0.000"><failure message="FileNotFoundError: [Errno 2] No such file or directory: '/Users/jkershaw/Documents/launchpad/scripts/check_backend_staging_security.py'">state = ''
+
+    @pytest.mark.parametrize("state", ["not-fixed", "wont-fix", "fixed", ""])
+    def test_high_findings_block_staging_regardless_of_fix_state(state):
+&gt;       result = _gate().summarize({"matches": [_match(fix=state)]})
+                 ^^^^^^^
+
+scripts/tests/test_backend_staging_security_gate.py:29: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/tests/test_backend_staging_security_gate.py:16: in _gate
+    spec.loader.exec_module(module)
+&lt;frozen importlib._bootstrap_external&gt;:936: in exec_module
+    ???
+&lt;frozen importlib._bootstrap_external&gt;:1073: in get_code
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;_frozen_importlib_external.SourceFileLoader object at 0x109755990&gt;
+path = '/Users/jkershaw/Documents/launchpad/scripts/check_backend_staging_security.py'
+
+&gt;   ???
+E   FileNotFoundError: [Errno 2] No such file or directory: '/Users/jkershaw/Documents/launchpad/scripts/check_backend_staging_security.py'
+
+&lt;frozen importlib._bootstrap_external&gt;:1130: FileNotFoundError</failure></testcase><testcase classname="scripts.tests.test_backend_staging_security_gate" name="test_critical_blocks_and_duplicates_are_not_distinct_vulnerabilities" time="0.000"><failure message="FileNotFoundError: [Errno 2] No such file or directory: '/Users/jkershaw/Documents/launchpad/scripts/check_backend_staging_security.py'">def test_critical_blocks_and_duplicates_are_not_distinct_vulnerabilities():
+&gt;       result = _gate().summarize({"matches": [_match("Critical"), _match("Critical")]})
+                 ^^^^^^^
+
+scripts/tests/test_backend_staging_security_gate.py:36: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/tests/test_backend_staging_security_gate.py:16: in _gate
+    spec.loader.exec_module(module)
+&lt;frozen importlib._bootstrap_external&gt;:936: in exec_module
+    ???
+&lt;frozen importlib._bootstrap_external&gt;:1073: in get_code
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;_frozen_importlib_external.SourceFileLoader object at 0x109763450&gt;
+path = '/Users/jkershaw/Documents/launchpad/scripts/check_backend_staging_security.py'
+
+&gt;   ???
+E   FileNotFoundError: [Errno 2] No such file or directory: '/Users/jkershaw/Documents/launchpad/scripts/check_backend_staging_security.py'
+
+&lt;frozen importlib._bootstrap_external&gt;:1130: FileNotFoundError</failure></testcase><testcase classname="scripts.tests.test_backend_staging_security_gate" name="test_clean_scan_only_passes_security_scan_not_platform_staging" time="0.000"><failure message="FileNotFoundError: [Errno 2] No such file or directory: '/Users/jkershaw/Documents/launchpad/scripts/check_backend_staging_security.py'">def test_clean_scan_only_passes_security_scan_not_platform_staging():
+&gt;       result = _gate().summarize({"matches": [_match("Medium")]})
+                 ^^^^^^^
+
+scripts/tests/test_backend_staging_security_gate.py:43: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/tests/test_backend_staging_security_gate.py:16: in _gate
+    spec.loader.exec_module(module)
+&lt;frozen importlib._bootstrap_external&gt;:936: in exec_module
+    ???
+&lt;frozen importlib._bootstrap_external&gt;:1073: in get_code
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;_frozen_importlib_external.SourceFileLoader object at 0x109756f50&gt;
+path = '/Users/jkershaw/Documents/launchpad/scripts/check_backend_staging_security.py'
+
+&gt;   ???
+E   FileNotFoundError: [Errno 2] No such file or directory: '/Users/jkershaw/Documents/launchpad/scripts/check_backend_staging_security.py'
+
+&lt;frozen importlib._bootstrap_external&gt;:1130: FileNotFoundError</failure></testcase><testcase classname="scripts.tests.test_backend_staging_security_gate" name="test_malformed_inventory_fails_closed[report0]" time="0.000"><failure message="FileNotFoundError: [Errno 2] No such file or directory: '/Users/jkershaw/Documents/launchpad/scripts/check_backend_staging_security.py'">report = {}
+
+    @pytest.mark.parametrize("report", [{}, {"matches": None}, {"matches": [{}]}])
+    def test_malformed_inventory_fails_closed(report):
+        with pytest.raises(ValueError):
+&gt;           _gate().summarize(report)
+            ^^^^^^^
+
+scripts/tests/test_backend_staging_security_gate.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/tests/test_backend_staging_security_gate.py:16: in _gate
+    spec.loader.exec_module(module)
+&lt;frozen importlib._bootstrap_external&gt;:936: in exec_module
+    ???
+&lt;frozen importlib._bootstrap_external&gt;:1073: in get_code
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;_frozen_importlib_external.SourceFileLoader object at 0x109760990&gt;
+path = '/Users/jkershaw/Documents/launchpad/scripts/check_backend_staging_security.py'
+
+&gt;   ???
+E   FileNotFoundError: [Errno 2] No such file or directory: '/Users/jkershaw/Documents/launchpad/scripts/check_backend_staging_security.py'
+
+&lt;frozen importlib._bootstrap_external&gt;:1130: FileNotFoundError</failure></testcase><testcase classname="scripts.tests.test_backend_staging_security_gate" name="test_malformed_inventory_fails_closed[report1]" time="0.000"><failure message="FileNotFoundError: [Errno 2] No such file or directory: '/Users/jkershaw/Documents/launchpad/scripts/check_backend_staging_security.py'">report = {'matches': None}
+
+    @pytest.mark.parametrize("report", [{}, {"matches": None}, {"matches": [{}]}])
+    def test_malformed_inventory_fails_closed(report):
+        with pytest.raises(ValueError):
+&gt;           _gate().summarize(report)
+            ^^^^^^^
+
+scripts/tests/test_backend_staging_security_gate.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/tests/test_backend_staging_security_gate.py:16: in _gate
+    spec.loader.exec_module(module)
+&lt;frozen importlib._bootstrap_external&gt;:936: in exec_module
+    ???
+&lt;frozen importlib._bootstrap_external&gt;:1073: in get_code
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;_frozen_importlib_external.SourceFileLoader object at 0x10976dbd0&gt;
+path = '/Users/jkershaw/Documents/launchpad/scripts/check_backend_staging_security.py'
+
+&gt;   ???
+E   FileNotFoundError: [Errno 2] No such file or directory: '/Users/jkershaw/Documents/launchpad/scripts/check_backend_staging_security.py'
+
+&lt;frozen importlib._bootstrap_external&gt;:1130: FileNotFoundError</failure></testcase><testcase classname="scripts.tests.test_backend_staging_security_gate" name="test_malformed_inventory_fails_closed[report2]" time="0.000"><failure message="FileNotFoundError: [Errno 2] No such file or directory: '/Users/jkershaw/Documents/launchpad/scripts/check_backend_staging_security.py'">report = {'matches': [{}]}
+
+    @pytest.mark.parametrize("report", [{}, {"matches": None}, {"matches": [{}]}])
+    def test_malformed_inventory_fails_closed(report):
+        with pytest.raises(ValueError):
+&gt;           _gate().summarize(report)
+            ^^^^^^^
+
+scripts/tests/test_backend_staging_security_gate.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/tests/test_backend_staging_security_gate.py:16: in _gate
+    spec.loader.exec_module(module)
+&lt;frozen importlib._bootstrap_external&gt;:936: in exec_module
+    ???
+&lt;frozen importlib._bootstrap_external&gt;:1073: in get_code
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;_frozen_importlib_external.SourceFileLoader object at 0x1097563d0&gt;
+path = '/Users/jkershaw/Documents/launchpad/scripts/check_backend_staging_security.py'
+
+&gt;   ???
+E   FileNotFoundError: [Errno 2] No such file or directory: '/Users/jkershaw/Documents/launchpad/scripts/check_backend_staging_security.py'
+
+&lt;frozen importlib._bootstrap_external&gt;:1130: FileNotFoundError</failure></testcase></testsuite></testsuites>

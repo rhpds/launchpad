@@ -1,0 +1,42 @@
+schema: launchpad/backend-security-suppression-review/v1
+date: '2026-10-14'
+status: BLOCKED-STAGING
+deployed: false
+source_report:
+  release: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/38614555743
+  source_revision: 2580f06568d4f1a005856545beb1ddd5cd58c047
+  sha256: ca09692b0ec65a4824744291738c6db39cc3dec5ebd6fa90a624ce1d14f0119b
+observations:
+  visible_high_matches: 108
+  visible_critical_matches: 0
+  suppressed_high_matches: 157
+  suppressed_critical_matches: 0
+  suppressed_cli_high_matches: 13
+  suppressed_cli_high_fix_state: fixed
+  other_suppressed_high_matches: 144
+  note: Other suppressed matches include scanner built-in header-package rules; these are not asserted to be exploitable runtime vulnerabilities. They require separate applicability review, not automatic acceptance.
+expired_policy:
+  active_file_before_fix: .grype.yaml
+  contract: security/backend-cli-vulnerability-exceptions.yaml
+  expiry: '2026-10-08'
+  retirement_date: '2026-10-14'
+  historical_contract_preserved: true
+  active_repository_ignore_rules_after_fix: 0
+  renewal_or_risk_acceptance: NOT-GRANTED
+local_proof:
+  checker_initial_red: evidence/runs/backend-staging-security-gate-red-20261014.xml
+  exception_retirement_red: evidence/runs/backend-expired-exceptions-red-20261014.xml
+  regression_green: evidence/runs/backend-staging-security-gate-green-regression-20261014.xml
+  passing_checks: 22
+checker:
+  script: scripts/check_backend_staging_security.py
+  refuses_filtered_report: true
+  includes_suppressed_findings: true
+  rejects_unrated_findings: true
+  grants_platform_staging: false
+  ci_promotion_wiring_complete: false
+limits:
+  - Earlier fixable-only pass means zero unsuppressed fixable findings, not zero total fixable findings.
+  - The running 27b6d2b1 reduction release predates scanner-exception retirement and must not be granted staging acceptance from its CI success.
+  - Dependency upgrades require compatibility and runtime proof; no blind replacement of oc build dependencies is approved by this report.
+  - No candidate deployment or lab resource mutation occurred during this review.

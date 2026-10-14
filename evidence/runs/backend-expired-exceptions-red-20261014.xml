@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="2" time="0.075" timestamp="2026-10-14T13:45:28.619484-05:00" hostname="jkershaw-mac"><testcase classname="backend.tests.test_backend_cli_vulnerability_exceptions" name="test_expired_cli_exceptions_are_retired_not_active_scanner_rules" time="0.005"><failure message="AssertionError: assert [{'vulnerabil...in/oc'}}, ...] == []&#10;  &#10;  Left contains 19 more items, first extra item: {'vulnerability': 'GHSA-3p65-76g6-3w7r', 'package': {'location': '/usr/local/bin/oc'}}&#10;  Use -v to get more diff">def test_expired_cli_exceptions_are_retired_not_active_scanner_rules() -&gt; None:
+        grype = yaml.safe_load((ROOT / ".grype.yaml").read_text())
+        contract = yaml.safe_load(
+            (ROOT / "security/backend-cli-vulnerability-exceptions.yaml").read_text()
+        )
+    
+&gt;       assert grype["ignore"] == []
+E       AssertionError: assert [{'vulnerabil...in/oc'}}, ...] == []
+E         
+E         Left contains 19 more items, first extra item: {'vulnerability': 'GHSA-3p65-76g6-3w7r', 'package': {'location': '/usr/local/bin/oc'}}
+E         Use -v to get more diff
+
+backend/tests/test_backend_cli_vulnerability_exceptions.py:25: AssertionError</failure></testcase><testcase classname="backend.tests.test_backend_cli_vulnerability_exceptions" name="test_historical_exception_contract_does_not_claim_current_acceptance" time="0.002"><failure message="KeyError: 'status'">def test_historical_exception_contract_does_not_claim_current_acceptance() -&gt; None:
+        contract = yaml.safe_load(
+            (ROOT / "security/backend-cli-vulnerability-exceptions.yaml").read_text()
+        )
+    
+        assert contract["owner"] == "launchpad-platform"
+        assert contract["approved_scope"] == "backend-release"
+&gt;       assert contract["status"] == "retired-expired"
+               ^^^^^^^^^^^^^^^^^^
+E       KeyError: 'status'
+
+backend/tests/test_backend_cli_vulnerability_exceptions.py:41: KeyError</failure></testcase></testsuite></testsuites>
