@@ -104,6 +104,7 @@ jobs:
           path: |
             client-build-info.txt
             client-symbol-inventory.json
+            ${{ runner.temp }}/launchpad-oc-symbols.txt
 
       - name: Release build cache before security scanning
         shell: bash

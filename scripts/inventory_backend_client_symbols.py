@@ -22,12 +22,15 @@ SURFACES = {
 
 def inventory(text: str) -> dict:
     symbols = []
-    for line in text.splitlines():
+    for line_number, line in enumerate(text.splitlines(), start=1):
         if not line.strip():
             continue
         match = re.fullmatch(r"\s*(?:[0-9a-fA-F]+\s+)?[A-Za-z?]\s+(\S.*)", line)
         if not match:
-            raise ValueError("Unrecognized Go nm output; cannot infer symbol absence")
+            raise ValueError(
+                f"Unrecognized Go nm output at line {line_number}: {line[:160]!r}; "
+                "cannot infer symbol absence"
+            )
         symbols.append(match.group(1).strip())
     if not {"main.main", "runtime.main"}.issubset(symbols):
         raise ValueError("Client entry symbols missing; inventory cannot be trusted")

@@ -1,6 +1,22 @@
 schema: launchpad/backend-client-symbol-evidence/v1
 date: '2026-10-14'
-status: GREEN-local-PENDING-BUILT-INVENTORY
+status: BUILT-SMOKE-PASS-COLLECTOR-INVALID-REVIEW-PENDING
+retry_run: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/38635482999
+retry_attempt: 2
+retry_source_revision: fe916cd85ed345b19ebda590894c48263e36c446
+retry_result:
+  compilation: PASS
+  offline_runtime_smoke: PASS
+  named_symbol_inventory: INVALID
+  reason: Collector rejected an unrecognized nm line; the previous artifact omitted raw input, so the exact format is not yet established.
+  vulnerability_scan: NOT-REACHED
+  published: false
+  deployed: false
+diagnostic_followup:
+  change: Retain complete raw nm input and include the bounded offending line and line number in fail-closed errors.
+  parser_acceptance_relaxed: false
+  red: evidence/runs/backend-symbol-diagnostics-red-20261014.xml
+  green: evidence/runs/backend-symbol-diagnostics-green-20261014.xml
 live_changes: false
 client_dependencies: Restore the last compile-proven set by removing the incompatible archive override.
 collection:

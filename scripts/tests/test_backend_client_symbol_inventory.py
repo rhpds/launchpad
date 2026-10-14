@@ -42,3 +42,20 @@ def test_vulnerable_subsystem_symbols_are_reported_not_waived():
 def test_failed_or_unrecognizable_symbol_inventory_fails_closed(text):
     with pytest.raises(ValueError):
         _module().inventory(text)
+
+
+def test_invalid_symbol_line_reports_bounded_diagnostic_without_inference():
+    with pytest.raises(ValueError, match="line 3") as error:
+        _module().inventory(BASE + "invalid-format " + "x" * 1000)
+    assert "invalid-format" in str(error.value)
+    assert len(str(error.value)) < 300
+
+
+def test_release_retains_raw_symbol_input_for_parser_failure_review():
+    import yaml
+
+    workflow = yaml.safe_load((ROOT / ".github/workflows/backend-release.yml").read_text())
+    steps = workflow["jobs"]["release"]["steps"]
+    retained = next(step for step in steps if step.get("name") == "Retain client symbol evidence")
+    assert "always()" in retained["if"]
+    assert "${{ runner.temp }}/launchpad-oc-symbols.txt" in retained["with"]["path"]

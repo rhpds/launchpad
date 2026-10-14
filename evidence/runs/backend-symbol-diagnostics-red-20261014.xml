@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="7" time="0.118" timestamp="2026-10-14T16:15:22.928141-05:00" hostname="jkershaw-mac"><testcase classname="scripts.tests.test_backend_client_symbol_inventory" name="test_module_presence_does_not_imply_vulnerable_server_symbols" time="0.011" /><testcase classname="scripts.tests.test_backend_client_symbol_inventory" name="test_vulnerable_subsystem_symbols_are_reported_not_waived" time="0.003" /><testcase classname="scripts.tests.test_backend_client_symbol_inventory" name="test_failed_or_unrecognizable_symbol_inventory_fails_closed[]" time="0.001" /><testcase classname="scripts.tests.test_backend_client_symbol_inventory" name="test_failed_or_unrecognizable_symbol_inventory_fails_closed[nm: no symbols]" time="0.001" /><testcase classname="scripts.tests.test_backend_client_symbol_inventory" name="test_failed_or_unrecognizable_symbol_inventory_fails_closed[001 T unknown.package.Function\n]" time="0.001" /><testcase classname="scripts.tests.test_backend_client_symbol_inventory" name="test_invalid_symbol_line_reports_bounded_diagnostic_without_inference" time="0.002"><failure message="AssertionError: Regex pattern did not match.&#10;  Expected regex: 'line 3'&#10;  Actual message: 'Unrecognized Go nm output; cannot infer symbol absence'">def test_invalid_symbol_line_reports_bounded_diagnostic_without_inference():
+&gt;       with pytest.raises(ValueError, match="line 3") as error:
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'line 3'
+E         Actual message: 'Unrecognized Go nm output; cannot infer symbol absence'
+
+scripts/tests/test_backend_client_symbol_inventory.py:48: AssertionError</failure></testcase><testcase classname="scripts.tests.test_backend_client_symbol_inventory" name="test_release_retains_raw_symbol_input_for_parser_failure_review" time="0.027"><failure message="AssertionError: assert '${{ runner.temp }}/launchpad-oc-symbols.txt' in 'client-build-info.txt\nclient-symbol-inventory.json\n'">def test_release_retains_raw_symbol_input_for_parser_failure_review():
+        import yaml
+    
+        workflow = yaml.safe_load((ROOT / ".github/workflows/backend-release.yml").read_text())
+        steps = workflow["jobs"]["release"]["steps"]
+        retained = next(step for step in steps if step.get("name") == "Retain client symbol evidence")
+        assert "always()" in retained["if"]
+&gt;       assert "${{ runner.temp }}/launchpad-oc-symbols.txt" in retained["with"]["path"]
+E       AssertionError: assert '${{ runner.temp }}/launchpad-oc-symbols.txt' in 'client-build-info.txt\nclient-symbol-inventory.json\n'
+
+scripts/tests/test_backend_client_symbol_inventory.py:61: AssertionError</failure></testcase></testsuite></testsuites>
