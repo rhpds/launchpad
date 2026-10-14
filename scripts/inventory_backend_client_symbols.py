@@ -21,6 +21,12 @@ SURFACES = {
         f"github.com/moby/go-archive.{name}"
         for name in ("Unpack", "Untar", "ApplyLayer", "createTarFile")
     ),
+    # oc carries a copied extractor under its own import path. Absence of
+    # upstream extraction symbols cannot establish that extraction is absent.
+    "openshift-copied-archive-extraction": tuple(
+        f"github.com/openshift/oc/pkg/cli/image/archive.{name}"
+        for name in ("ApplyLayer", "unpackLayer", "createTarFile")
+    ),
 }
 
 

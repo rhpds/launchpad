@@ -78,6 +78,21 @@ def test_archive_creation_is_not_mislabeled_as_named_vulnerable_extraction():
     assert extracted["not_affected_declared"] is False
 
 
+def test_copied_openshift_extraction_is_not_hidden_by_upstream_absence():
+    text = BASE + (
+        "003 T github.com/openshift/oc/pkg/cli/image/archive.ApplyLayer\n"
+        "004 T github.com/openshift/oc/pkg/cli/image/archive.unpackLayer\n"
+        "005 T github.com/openshift/oc/pkg/cli/image/archive.createTarFile\n"
+    )
+    result = _module().inventory(text)
+    assert not result["surfaces"]["archive-vulnerable-extraction-call-sites"]["named_symbols_present"]
+    copied = result["surfaces"]["openshift-copied-archive-extraction"]
+    assert copied["named_symbols_present"] is True
+    assert copied["matching_count"] == 3
+    assert result["not_affected_declared"] is False
+    assert result["risk_acceptance"] == "NOT-GRANTED"
+
+
 def test_official_vulnerability_tool_collects_binary_evidence_without_waivers():
     import yaml
 

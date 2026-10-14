@@ -1,0 +1,41 @@
+schema: launchpad/backend-client-advisory-review/v1
+date: '2026-10-14'
+status: REVIEW-INCOMPLETE-SECURITY-BLOCKED
+candidate_source: 2bcaf14275015386952e2ec6ff7e67dd7e11933c
+client_source: d0f23b14fbf35493e5b713e25ecf662ec239e76c
+client_binary_sha256: 5aea1d4aa6d002b0c2ce26aee52998c2eda3b79598d1295c11c044ae943da313
+upstream_observed:
+  source: 758dbfa96d00a3e7a1baef5d05f01a1ef620f661
+  same_flagged_dependency_versions: true
+  conclusion: Switching to current upstream source alone does not resolve these five scan matches.
+archive_review:
+  advisory: https://github.com/moby/go-archive/security/advisories/GHSA-hfg8-hc9c-6c3h
+  advisory_scope: Archive extraction routines can write outside the destination through crafted links.
+  upstream_extraction_named_symbols: 0
+  copied_extraction_source: https://github.com/openshift/oc/blob/d0f23b14fbf35493e5b713e25ecf662ec239e76c/pkg/cli/image/archive/archive.go
+  copied_extraction_present_in_binary: true
+  compiled_functions: [ApplyLayer, unpackLayer, createTarFile]
+  entry_point: pkg/cli/image/extract/extract.go calls the OpenShift-local archive.ApplyLayer.
+  source_observation: Copied routines use lexical path checks and filesystem operations; an exploit regression and confinement review remain necessary.
+  conclusion: Upstream symbol absence is insufficient to dispose of this finding; no non-affected assertion is granted.
+  prior_inventories: Preserved as historical upstream-prefix evidence; incomplete for copied extraction paths.
+buildkit_review:
+  advisories:
+    - https://github.com/moby/buildkit/security/advisories/GHSA-4c29-8rgm-jvjj
+    - https://github.com/moby/buildkit/security/advisories/GHSA-4vrq-3vrq-g6gg
+  direct_source_imports: Dockerfile parser and command packages in pkg/helpers/newapp.
+  observed_execution_surface_named_symbols: 0
+  conclusion: Promising applicability distinction, not yet a source dependency closure or accepted disposition.
+additional_go_database_findings:
+  buildkit_fixed_version_for_new_findings: v0.31.1
+  note: The collected Go database contains newer advisories than the five fixable Grype matches; upgrading only to v0.28.1 would not establish complete remediation.
+proof:
+  red: evidence/runs/backend-copied-archive-inventory-red-20261014.xml
+  green: evidence/runs/backend-copied-archive-inventory-green-local-20261014.xml
+limits:
+  - No production binaries, live workloads, client feature flags or scanner ignores were changed.
+  - No VEX non-affected declaration, waiver or staging qualification was granted.
+next:
+  - Reproduce archive escape in a disposable source test before choosing a compatible fix.
+  - Determine complete BuildKit and registry dependency closure against exact compiled source.
+  - Review OS findings separately against vendor updates and removable runtime dependencies.
