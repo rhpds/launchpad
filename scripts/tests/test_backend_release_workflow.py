@@ -88,3 +88,19 @@ def test_private_releases_require_registry_attestations_without_publicizing_sour
     assert 'cosign verify-attestation --type spdxjson' in text
     assert '--certificate-identity="$identity"' in text
     assert 'provenance-verification.json' in text
+
+
+def test_full_inventory_gate_blocks_publication_and_retains_decision() -> None:
+    _, workflow = _workflow()
+    steps = workflow["jobs"]["release"]["steps"]
+    names = [step.get("name") for step in steps]
+    gate = next(s for s in steps if s.get("name") == "Block unresolved full-inventory security findings")
+    assert "!cancelled()" in gate["if"]
+    assert "steps.runtime_smoke.outcome == 'success'" in gate["if"]
+    assert "continue-on-error" not in gate
+    assert "python3 scripts/check_backend_staging_security.py vulnerability-report.json" in gate["run"]
+    assert "> staging-security-decision.json" in gate["run"]
+    assert names.index(gate["name"]) < names.index("Publish immutable candidate and record digest")
+    retained = next(s for s in steps if s.get("name") == "Retain vulnerability evidence even when the gate blocks")
+    assert "always()" in retained["if"]
+    assert "staging-security-decision.json" in retained["with"]["path"]

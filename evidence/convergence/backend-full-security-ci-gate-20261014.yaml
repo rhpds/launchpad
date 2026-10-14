@@ -1,0 +1,30 @@
+schema: launchpad/security-gate-convergence/v1
+date: '2026-10-14'
+status: GREEN-LOCAL-PENDING-CI
+scope: Private backend release workflow only; no live deployment changes.
+reason: The fixable-only scan cannot satisfy the existing conservative full-inventory security policy.
+behavior:
+  - Full matches and ignoredMatches are evaluated by the existing security checker.
+  - High, Critical and Unknown findings block publication regardless of fix availability.
+  - Missing, malformed or filtered inventories fail closed.
+  - The decision and vulnerability inventories are retained even after a failed gate.
+  - A clean scan alone never qualifies platform staging.
+proof:
+  red: evidence/runs/backend-full-security-ci-gate-red-20261014.xml
+  green_local: evidence/runs/backend-full-security-ci-gate-green-local-20261014.xml
+  local_tests_passed: 41
+candidate_build_in_flight:
+  source: 2bcaf14275015386952e2ec6ff7e67dd7e11933c
+  run: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/38645547359
+  publish: false
+  includes_this_gate_change: false
+  note: Preserve this run for runtime and scan evidence; publication must use the strengthened workflow in a subsequent exact-revision run.
+live_check:
+  application_deployments_at_expected_replicas: true
+  console_available: true
+  console_degraded: false
+  console_progressing: false
+limits:
+  - No security exception or waiver was granted.
+  - The running backend and lifecycle worker remain unchanged.
+  - CI verification and final candidate live order/use/reclaim proof remain required.
