@@ -1,0 +1,34 @@
+schema: launchpad/backend-client-symbol-parser-remediation/v1
+date: '2026-10-14'
+status: GREEN-local-PENDING-CI
+live_changes: false
+source_run: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/38638924962
+source_revision: fbaceb10f745d5d829f4fc9ba7002400b35e419d
+artifact: backend-client-symbols-fbaceb10f745d5d829f4fc9ba7002400b35e419d
+failure:
+  line_number: 58340
+  exact_line: '       0 _ go.go'
+  cause: Parser omitted the valid underscore metadata symbol code.
+remediation:
+  change: Accept underscore symbol codes while preserving main/runtime entry validation and rejection of malformed lines.
+  skipped_raw_lines: false
+  risk_acceptance: NOT-GRANTED
+raw_inventory:
+  sha256: a006dc703e493ce357f9bd7d3e77b6a244dea838978d328dfdf624157ffd8bf2
+  parsed_symbol_count: 155935
+  named_distribution_proxy_symbols: 0
+  named_distribution_redis_cache_symbols: 0
+  named_buildkit_git_solver_gateway_symbols: 0
+  named_archive_package_symbols: 30
+  observed_archive_operations: Tarball creation and related metadata helpers are linked; no named Unpack/Untar/ApplyLayer/createTarFile entries observed.
+  binary_digest: Not available in the failed collector artifact; do not represent this local reparse as a complete binary-bound qualification report.
+proof:
+  metadata_red: evidence/runs/backend-symbol-elf-metadata-red-20261014.xml
+  metadata_green: evidence/runs/backend-symbol-elf-metadata-green-20261014.xml
+  extraction_scope_red: evidence/runs/backend-symbol-extraction-scope-red-20261014.xml
+  combined_green: evidence/runs/backend-symbol-parser-green-r2-20261014.xml
+limits:
+  - Named-symbol absence does not exclude inlined code or by itself establish non-applicability.
+  - Registry/BuildKit findings require exact-source and affected-function review; no scanner exceptions are restored.
+  - Archive creation symbols are not evidence that vulnerable extraction is used; the converse also requires review.
+  - No publication, deployment, security waiver, or staging qualification is granted.

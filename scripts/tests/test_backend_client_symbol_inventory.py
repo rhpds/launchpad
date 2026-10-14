@@ -59,3 +59,20 @@ def test_release_retains_raw_symbol_input_for_parser_failure_review():
     retained = next(step for step in steps if step.get("name") == "Retain client symbol evidence")
     assert "always()" in retained["if"]
     assert "${{ runner.temp }}/launchpad-oc-symbols.txt" in retained["with"]["path"]
+
+
+def test_actual_go_elf_metadata_symbol_is_valid_not_a_parse_failure():
+    # Exact rejected line from run 38638924962, raw nm input line 58340.
+    result = _module().inventory(BASE + "       0 _ go.go\n")
+    assert result["symbols_count"] == 3
+    assert result["risk_acceptance"] == "NOT-GRANTED"
+    assert result["staging_qualified"] is False
+
+
+def test_archive_creation_is_not_mislabeled_as_named_vulnerable_extraction():
+    result = _module().inventory(BASE + "003 T github.com/moby/go-archive.TarWithOptions\n")
+    assert result["surfaces"]["archive-extraction"]["named_symbols_present"] is True
+    assert result["surfaces"]["archive-vulnerable-extraction-call-sites"]["named_symbols_present"] is False
+    extracted = _module().inventory(BASE + "003 T github.com/moby/go-archive.UntarUncompressed\n")
+    assert extracted["surfaces"]["archive-vulnerable-extraction-call-sites"]["named_symbols_present"] is True
+    assert extracted["not_affected_declared"] is False

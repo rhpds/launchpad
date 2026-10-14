@@ -17,6 +17,10 @@ SURFACES = {
     "buildkit-solver": ("github.com/moby/buildkit/solver/",),
     "buildkit-gateway": ("github.com/moby/buildkit/frontend/gateway/",),
     "archive-extraction": ("github.com/moby/go-archive.",),
+    "archive-vulnerable-extraction-call-sites": tuple(
+        f"github.com/moby/go-archive.{name}"
+        for name in ("Unpack", "Untar", "ApplyLayer", "createTarFile")
+    ),
 }
 
 
@@ -25,7 +29,7 @@ def inventory(text: str) -> dict:
     for line_number, line in enumerate(text.splitlines(), start=1):
         if not line.strip():
             continue
-        match = re.fullmatch(r"\s*(?:[0-9a-fA-F]+\s+)?[A-Za-z?]\s+(\S.*)", line)
+        match = re.fullmatch(r"\s*(?:[0-9a-fA-F]+\s+)?[A-Za-z?_]\s+(\S.*)", line)
         if not match:
             raise ValueError(
                 f"Unrecognized Go nm output at line {line_number}: {line[:160]!r}; "
