@@ -1,6 +1,6 @@
 schema: launchpad/backend-runtime-security-experiment/v1
 date: '2026-10-14'
-status: BUILD-RED-HELM-DEPENDENCY-ASSERTION-CORRECTION-PENDING
+status: RUNTIME-GREEN-SECURITY-BLOCKED
 source_revision: 17d9532ab553a31705bf8a801243283a242b1a03
 release_run: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/38644369020
 publish_requested: false
@@ -34,6 +34,35 @@ build_failure:
   vulnerable_symbol_collection: NOT-REACHED
   security_scan: NOT-REACHED
   regression_red: evidence/runs/backend-helm-optional-dependency-red-20261014.xml
+corrected_candidate_result:
+  source: 2bcaf14275015386952e2ec6ff7e67dd7e11933c
+  run: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/38645547359
+  build: PASS
+  runtime_smoke: PASS
+  candidate_interpreter_regressions: PASS
+  candidate_interpreter_tests: 68
+  candidate_interpreter_failures: 0
+  candidate_interpreter_skipped: 0
+  candidate_interpreter_report_sha256: 0a83cd4b89619c23218ba4f4f0ef4a0345be4348f9c29866dedc749f8fbb5867
+  client_symbol_collection: PASS
+  client_vulnerable_symbol_collection: PASS-EVIDENCE-ONLY
+  fixable_high_gate: BLOCKED
+  full_inventory_review: BLOCKED
+  full_inventory_sha256: 3ca932abcc127a050997e6f189f96aa0d006f951e8db90e7e5f1e303353c744a
+  high_matches: 32
+  critical_matches: 0
+  unrated_matches: 2
+  suppressed_high_critical_unrated_matches: 0
+  high_fix_states: {fixed: 5, not-fixed: 26, unspecified: 1}
+  compression_advisory_in_full_scan: ABSENT
+  published: false
+  deployed: false
+  remaining_work:
+    - Review the five fixable High matches in BuildKit, distribution and go-archive without repeating incompatible upgrades.
+    - Review remaining operating-system findings against vendor advisories and runtime dependency requirements.
+    - Reconcile unrated OpenPGP findings in both clients; do not disable signature verification to silence the scanner.
+    - Reconcile additional govulncheck findings against the full inventory; binary analysis is not a source reachability proof.
+  artifact_download_note: Required evidence artifacts downloaded successfully; the unrelated Docker build-summary archive failed extraction and is not used for this result.
 actual_interpreter_regression:
   image: Test-only derivative of the exact loaded runtime image; never published.
   test_dependency: pytest==8.4.2
