@@ -4,10 +4,12 @@ These tests do not change the deployed Console hostname or tunnel settings.
 """
 
 import importlib.util
+import json
 from pathlib import Path
 from urllib.parse import parse_qs, quote, urlsplit
 
 import pytest
+import yaml
 
 ROOT = Path(__file__).resolve().parents[2]
 NATIVE = "console-openshift-console.apps.flightpath.fm2aihpcsed.com"
@@ -72,3 +74,18 @@ def test_labs_root_and_namespace_console_remain_separate_dispatches(router):
     assert router._select_upstream("")[0] == router.GATEWAY_ORIGIN
     assert router._select_upstream("labs/example/showroom/")[0] == router.GATEWAY_ORIGIN
     assert router._select_upstream("k8s/ns/seat-example/core~v1~Pod")[0] == router.CONSOLE_ORIGIN
+
+
+def test_checked_in_flightpath_tunnel_uses_native_operator_console_callback():
+    resources = yaml.safe_load_all((ROOT / "deploy/tunnel-oncluster/flightpath-deployment.yaml").read_text())
+    deployment = next(resource for resource in resources if resource.get("kind") == "Deployment")
+    router = next(container for container in deployment["spec"]["template"]["spec"]["containers"] if container["name"] == "router")
+    env = {entry["name"]: entry.get("value") for entry in router["env"]}
+    assert env["OPENSHIFT_CONSOLE_UPSTREAM_HOST"] == NATIVE
+    assert env["OPENSHIFT_CONSOLE_CALLBACK_URL"] == f"https://{NATIVE}/auth/callback"
+    assert env["KEYCLOAK_PUBLIC_HOST"] == PUBLIC
+
+
+def test_native_route_patch_does_not_replace_unrelated_console_settings():
+    patch = json.loads((ROOT / "deploy/console-embed/flightpath-native-route.patch.json").read_text())
+    assert patch == {"spec": {"route": None}}

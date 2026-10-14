@@ -1,0 +1,86 @@
+schema: launchpad/flightpath-native-console-repair/v1
+date: '2026-10-14'
+status: GREEN-ONE-SEAT-CONSOLE-REPAIR-NOT-FULL-STAGING
+cluster_scope: flightpath
+owner_approved_cutover: true
+preconditions:
+  active_lab_records: 0
+  default_kubeconfig_changed: false
+  api_tls_verified: true
+  deployed_router_matches_tested_source: true
+  deployed_router_sha256: eb379b51f10a694351c4e56c077eeee176383e295aa5553e8a045dbfddc79f0c
+  restricted_rollback_snapshot_captured: true
+  secret_values_exported_to_git: false
+mutations:
+  - Remove only the Console operator custom spec.route override and let the running operator reconcile native routing/callbacks.
+  - Set only the router container Console upstream Host and accepted callback to the native hostname.
+unchanged: [Keycloak issuer, participant hostname, namespace RBAC policy, catalog pins, backend image, worker image, Console operator replicas]
+deployed_result:
+  canonical_console: https://console-openshift-console.apps.flightpath.fm2aihpcsed.com
+  oauth_callback: https://console-openshift-console.apps.flightpath.fm2aihpcsed.com/auth/callback
+  native_route_service: console
+  tunnel_ready: 2/2
+  console_operator: {Available: true, Degraded: false, Progressing: false}
+browser_checks:
+  method: Chrome controlled through CUA; no certificate warning was bypassed.
+  native_provider_selection: PASS
+  native_kubeadmin_login_dashboard: PASS
+  native_logout_returns_provider_selection: PASS
+  participant_email_code_login: PASS
+  showroom_instruction_and_story_rendering: PASS
+  embedded_console_assigned_namespace_pods: PASS
+  embedded_console_after_refresh: PASS
+  participant_logout_requires_login_again: PASS
+  same_email_code_recovers_same_seat: PASS
+  no_new_tab_required_for_participant_console: PASS
+authorization:
+  assigned_namespace_create_deployments: yes
+  platform_namespace_get_pods: no
+  cluster_get_nodes: no
+  after_reclaim_create_deployments: no
+disposable_order:
+  workshop_id: 4c9fbdf3-ba44-46f7-8d52-bd808e3f828b
+  session_id: 89d1220e-e4b7-4b08-9d13-86db802186af
+  seat_id: d49ecf75-33c7-4a6b-9181-5f25dad357e2
+  namespace: launchpad-flightpath-candida-agentic-ai-101-d49ecf
+  catalog: agentic-ai-101
+  seats: 1
+  final_workshop_status: completed
+  one_time_code_persisted_in_evidence: false
+reclamation:
+  method: Normal workshop DELETE; no force deletion or finalizer removal.
+  intermediate_inventory: {namespace: 1, persistent_volume: 1, any_namespace_role_binding_subject: 5}
+  intermediate_explanation: Normal namespace/PVC protection was still finalizing; this was not declared zero residue.
+  final_independent_inventory:
+    namespace: 0
+    image_puller_role_binding: 0
+    showroom_application: 0
+    workload_application: 0
+    shared_cluster_role_binding_subject: 0
+    persistent_volume: 0
+    any_namespace_role_binding_subject: 0
+    any_cluster_role_binding_subject: 0
+    argo_destination_namespace: 0
+  policy_enabled: false
+  entitlement_status: expired
+  participant_identity_disabled: true
+  external_identity_cleanup_recorded: true
+  external_sweep: Existing unsuspended five-minute CronJob succeeded at 2026-10-14T21:50:07Z; disabled identity and recorded external cleanup confirmed at 2026-10-14T21:50:11Z.
+  reclaim_started_at: '2026-10-14T21:44:22.691048Z'
+  cleanup_confirmed_at: '2026-10-14T21:50:11Z'
+  cleanup_within_ten_minutes: true
+proof:
+  manifest_red: evidence/runs/flightpath-native-console-manifest-red-20261014.xml
+  manifest_green: evidence/runs/flightpath-native-console-manifest-green-20261014.xml
+  source_persistence_red: evidence/runs/flightpath-native-console-source-persistence-red-20261014.xml
+  source_persistence_green: evidence/runs/flightpath-native-console-source-persistence-green-20261014.xml
+  scoped_passing_tests: 47
+  excluded_legacy_arena_test: test_arena_overlay_persists_the_named_public_origin_and_strict_oidc_contract
+  participant_screenshot: evidence/runs/flightpath-native-console-participant-20261014.png
+  participant_screenshot_sha256: 4463348eeb7aedbdd95d3ac5042b634fc44f697e8fd8b9791fdb509d5a01ad06
+limits:
+  - This qualifies the repaired access path on the current deployed image, not the undeployed hardened backend candidate.
+  - The Agentic 101 service explicitly uses rehearsal data; no Intel inference or full lab-content recertification is claimed by this Console test.
+  - Success in this Chrome profile does not prove default browser trust on a fresh device.
+  - Global Console-token revocation on participant logout was not independently certified.
+  - Image security, final immutable backend rollout, negative cleanup proof and full-platform staging acceptance remain open.

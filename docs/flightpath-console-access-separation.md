@@ -1,10 +1,43 @@
 # Flightpath Console and participant access separation
 
-Status: Proposed; preparation approved, live cutover not approved or performed.
+Status: Native-route repair approved and deployed; staff and participant browser checks passed. Overall staging qualification remains blocked on separate security and release gates.
 Date: 2026-10-14.
 Decision owners: Launchpad owner and Flightpath/network owner.
 
-## Update: native-route option worth testing before new DNS
+## Current decision and deployed configuration
+
+The owner approved the coordinated native-route restoration on October 14.
+No new DNS was needed. The Console operator now owns the native hostname
+`console-openshift-console.apps.flightpath.fm2aihpcsed.com` and its native
+`/auth/callback`. The participant proxy forwards to that native host and
+translates callbacks back to `labs.smg-helix.ai` for the participant browser.
+The Keycloak issuer, lab links, identities, namespace RBAC and backend image
+were not changed.
+
+Checked-in source is `deploy/tunnel-oncluster/flightpath-deployment.yaml`.
+The narrowly scoped operator merge patch is
+`deploy/console-embed/flightpath-native-route.patch.json`; it removes only the
+custom route override, not unrelated Console settings. It is intentionally not
+automatically applied by a broad platform overlay. Apply it only to a verified
+Flightpath connection in an approved, coordinated window.
+
+Native kubeadmin login/logout and participant email/code login, embedded Pods,
+refresh, logout, same-seat recovery and namespace authorization were checked in
+Chrome. API/header probes are not substituted for that browser evidence.
+Browser success in this profile does not certify default certificate trust on
+a new device; that remains separate from this routing repair.
+
+The disposable one-seat order was reclaimed through the normal workflow.
+Independent namespace, storage, Argo and RBAC inventory reached zero; access
+was revoked and the scheduled external identity cleanup completed within ten
+minutes. Full scoped proof and limitations are recorded in
+`evidence/convergence/flightpath-native-console-repair-20261014.yaml`.
+
+The dedicated-hostname proposal and implementation sequence below are retained
+as historical alternatives, not outstanding DNS prerequisites or instructions
+to replace this deployed native-route configuration.
+
+## Pre-repair assessment: native-route alternative
 
 October 14 local tests confirm the existing tunnel code can translate public
 Console authorization to a native operator-managed callback, rewrite native
@@ -39,7 +72,7 @@ Launchpad's participant email/code form. Participant Console access must remain
 bound to the assigned lab identity and namespace. Do not share administrative
 credentials through a catalog, Showroom, or participant portal.
 
-## Verified current behavior
+## Verified pre-repair behavior (historical)
 
 Read-only checks on October 14 found:
 
@@ -106,7 +139,7 @@ Caiti/zone owner owns DNS, tunnel-host approval, edge policy, and certificate
 delivery. Launchpad owner owns router dispatch, application/callback changes,
 participant integration, evidence, and coordinated rollback.
 
-## Implementation sequence — gated, not executed
+## Historical dedicated-hostname alternative — not executed
 
 1. Capture a restricted rollback snapshot of Console settings, Routes,
    OAuthClient callbacks, tunnel configuration, Keycloak redirects, and

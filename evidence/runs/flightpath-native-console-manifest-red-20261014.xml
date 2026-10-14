@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="5" time="0.267" timestamp="2026-10-14T16:38:03.574398-05:00" hostname="jkershaw-mac"><testcase classname="backend.tests.test_flightpath_native_console_contract" name="test_participant_authorization_can_use_native_operator_callback" time="0.156" /><testcase classname="backend.tests.test_flightpath_native_console_contract" name="test_console_bootstrap_and_namespace_path_remain_on_participant_origin" time="0.006" /><testcase classname="backend.tests.test_flightpath_native_console_contract" name="test_native_console_redirect_stays_public_for_participant_browser" time="0.006" /><testcase classname="backend.tests.test_flightpath_native_console_contract" name="test_labs_root_and_namespace_console_remain_separate_dispatches" time="0.014" /><testcase classname="backend.tests.test_flightpath_native_console_contract" name="test_checked_in_flightpath_tunnel_uses_native_operator_console_callback" time="0.007"><failure message="AssertionError: assert 'labs.smg-helix.ai' == 'console-open...2aihpcsed.com'&#10;  &#10;  - console-openshift-console.apps.flightpath.fm2aihpcsed.com&#10;  + labs.smg-helix.ai">def test_checked_in_flightpath_tunnel_uses_native_operator_console_callback():
+        resources = yaml.safe_load_all((ROOT / "deploy/tunnel-oncluster/flightpath-deployment.yaml").read_text())
+        deployment = next(resource for resource in resources if resource.get("kind") == "Deployment")
+        router = next(container for container in deployment["spec"]["template"]["spec"]["containers"] if container["name"] == "router")
+        env = {entry["name"]: entry.get("value") for entry in router["env"]}
+&gt;       assert env["OPENSHIFT_CONSOLE_UPSTREAM_HOST"] == NATIVE
+E       AssertionError: assert 'labs.smg-helix.ai' == 'console-open...2aihpcsed.com'
+E         
+E         - console-openshift-console.apps.flightpath.fm2aihpcsed.com
+E         + labs.smg-helix.ai
+
+backend/tests/test_flightpath_native_console_contract.py:83: AssertionError</failure></testcase></testsuite></testsuites>

@@ -4,6 +4,10 @@ cluster_scope: flightpath
 overall_status: NOT-STAGING-QUALIFIED
 deployment_performed: false
 existing_lab_resources_changed: false
+subsequent_console_closeout:
+  date: '2026-10-14'
+  evidence: evidence/convergence/flightpath-native-console-repair-20261014.yaml
+  scope: Native staff Console and embedded participant routing repair deployed and browser-verified on the existing image; not a hardened-backend rollout.
 proof_scope: local component, identity contract, cleanup and lifecycle regressions
 source_fixes:
   - id: CLEANUP-IMAGE-PULLER-INVENTORY-SHADOW
@@ -62,7 +66,7 @@ remaining_gates:
   - Publish a signed immutable candidate containing these changes; current deployed image does not contain them.
   - Live negative proof for retained RoleBinding/storage and force fallback on disposable resources, followed by complete cleanup.
   - One-seat participant order/use/reclaim regression plus requester/admin API compatibility on the new image.
-  - Resolve Console hostname/callback separation with infrastructure approval; preserve participant access.
+  - Native Console hostname/callback separation repaired with owner approval and preserved embedded participant access; see subsequent_console_closeout. Fresh-device certificate trust remains separate.
   - Keep workforce Authentik deferred and not public self-service until hostname, MFA, login/logout, roles, and tenant isolation are live-certified.
   - Close image-security findings by remediation or approved scoped risk disposition; a fixable-only CI pass is insufficient.
   - Confirm operational owners, restore/rollback evidence, and the staging acceptance decision.

@@ -77,8 +77,8 @@ spec:
             - {name: KEYCLOAK_ORIGIN, value: http://keycloak.launchpad-stage.svc:8080}
             - {name: KEYCLOAK_INT_ORIGIN, value: http://keycloak.launchpad-stage.svc:8080}
             - {name: OPENSHIFT_CONSOLE_HOST, value: console-openshift-console.apps.flightpath.fm2aihpcsed.com}
-            - {name: OPENSHIFT_CONSOLE_UPSTREAM_HOST, value: labs.smg-helix.ai}
-            - {name: OPENSHIFT_CONSOLE_CALLBACK_URL, value: https://labs.smg-helix.ai/auth/callback}
+            - {name: OPENSHIFT_CONSOLE_UPSTREAM_HOST, value: console-openshift-console.apps.flightpath.fm2aihpcsed.com}
+            - {name: OPENSHIFT_CONSOLE_CALLBACK_URL, value: https://console-openshift-console.apps.flightpath.fm2aihpcsed.com/auth/callback}
             - {name: OPENSHIFT_OAUTH_HOST, value: oauth-openshift.apps.flightpath.fm2aihpcsed.com}
             - {name: KEYCLOAK_PUBLIC_HOST, value: labs.smg-helix.ai}
             - {name: OPENSHIFT_INGRESS_DOMAIN, value: apps.flightpath.fm2aihpcsed.com}

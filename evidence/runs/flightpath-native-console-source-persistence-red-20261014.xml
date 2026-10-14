@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="6" time="0.241" timestamp="2026-10-14T16:45:03.675164-05:00" hostname="jkershaw-mac"><testcase classname="backend.tests.test_flightpath_native_console_contract" name="test_participant_authorization_can_use_native_operator_callback" time="0.143" /><testcase classname="backend.tests.test_flightpath_native_console_contract" name="test_console_bootstrap_and_namespace_path_remain_on_participant_origin" time="0.005" /><testcase classname="backend.tests.test_flightpath_native_console_contract" name="test_native_console_redirect_stays_public_for_participant_browser" time="0.005" /><testcase classname="backend.tests.test_flightpath_native_console_contract" name="test_labs_root_and_namespace_console_remain_separate_dispatches" time="0.004" /><testcase classname="backend.tests.test_flightpath_native_console_contract" name="test_checked_in_flightpath_tunnel_uses_native_operator_console_callback" time="0.006" /><testcase classname="backend.tests.test_flightpath_native_console_contract" name="test_native_route_patch_does_not_replace_unrelated_console_settings" time="0.001"><failure message="FileNotFoundError: [Errno 2] No such file or directory: '/Users/jkershaw/Documents/launchpad/deploy/console-embed/flightpath-native-route.patch.json'">def test_native_route_patch_does_not_replace_unrelated_console_settings():
+&gt;       patch = json.loads((ROOT / "deploy/console-embed/flightpath-native-route.patch.json").read_text())
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend/tests/test_flightpath_native_console_contract.py:90: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/Users/jkershaw/Documents/launchpad/deploy/console-embed/flightpath-native-route.patch.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+&gt;       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/Users/jkershaw/Documents/launchpad/deploy/console-embed/flightpath-native-route.patch.json'
+
+../../.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/pathlib.py:1044: FileNotFoundError</failure></testcase></testsuite></testsuites>
