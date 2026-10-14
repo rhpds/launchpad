@@ -1,6 +1,15 @@
 schema: launchpad/backend-client-patch-experiment/v1
 date: '2026-10-14'
-status: GREEN-local-PENDING-BUILT-COMPATIBILITY
+status: GREEN-BUILD-AND-OFFLINE-SMOKE-SECURITY-GATE-BLOCKED
+source_revision: 377dba4d7dec2832afbef117e8b70690bcc63307
+release_run: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/38629795620
+observed_build_result: PASS
+observed_runtime_smoke: PASS
+observed_target_advisories_remaining: 0
+observed_fixable_high_remaining: 8
+observed_active_high: 53
+observed_critical: 0
+published: false
 cluster_mutations: false
 publish_requested: false
 client_source_revision: d0f23b14fbf35493e5b713e25ecf662ec239e76c
@@ -29,5 +38,5 @@ proof:
   green: evidence/runs/backend-client-git-pins-green-local-20261014.xml
   passing_local_checks: 41
 limits:
-  - No build, advisory-removal, live adapter, or deployment proof is claimed for these new overrides yet.
+  - Build, offline smoke and advisory absence are proved; live adapter compatibility and deployment are not.
   - Other client and OS findings remain release/staging blockers; expected next build must preserve its failed security evidence if those remain.

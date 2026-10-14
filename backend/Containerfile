@@ -7,6 +7,8 @@ ARG GO_JOSE_VERSION=v4.1.4
 ARG SPDYSTREAM_VERSION=v0.5.1
 ARG GO_GIT_VERSION=v5.19.2
 ARG GO_BILLY_VERSION=v5.9.0
+ARG OTEL_VERSION=v1.41.0
+ARG FULCIO_VERSION=v1.8.6
 ENV GOTOOLCHAIN=go1.26.9
 ARG HELM_VERSION=4.3.0
 ARG HELM_SOURCE_COMMIT=bec5b06ed841fe5269972d864d5177944fd5970f
@@ -21,6 +23,9 @@ RUN git clone https://github.com/openshift/oc.git . \
       -replace=github.com/moby/spdystream=github.com/moby/spdystream@${SPDYSTREAM_VERSION} \
       -replace=github.com/go-git/go-git/v5=github.com/go-git/go-git/v5@${GO_GIT_VERSION} \
       -replace=github.com/go-git/go-billy/v5=github.com/go-git/go-billy/v5@${GO_BILLY_VERSION} \
+      -replace=go.opentelemetry.io/otel=go.opentelemetry.io/otel@${OTEL_VERSION} \
+      -replace=go.opentelemetry.io/otel/trace=go.opentelemetry.io/otel/trace@${OTEL_VERSION} \
+      -replace=github.com/sigstore/fulcio=github.com/sigstore/fulcio@${FULCIO_VERSION} \
     && CGO_ENABLED=0 go build -mod=mod \
       -tags "include_gcs include_oss containers_image_openpgp" \
       -trimpath -o /tmp/oc-bin ./cmd/oc \
@@ -38,7 +43,13 @@ RUN git clone https://github.com/openshift/oc.git . \
     | grep -F "${GO_GIT_VERSION}" \
     && go version -m /tmp/oc-bin \
     | grep -F "github.com/go-git/go-billy/v5" \
-    | grep -F "${GO_BILLY_VERSION}"
+    | grep -F "${GO_BILLY_VERSION}" \
+    && go version -m /tmp/oc-bin \
+    | grep -F "go.opentelemetry.io/otel" \
+    | grep -F "${OTEL_VERSION}" \
+    && go version -m /tmp/oc-bin \
+    | grep -F "github.com/sigstore/fulcio" \
+    | grep -F "${FULCIO_VERSION}"
 
 WORKDIR /tmp/helm
 RUN git clone https://github.com/helm/helm.git . \

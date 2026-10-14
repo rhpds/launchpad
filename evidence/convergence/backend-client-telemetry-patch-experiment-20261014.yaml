@@ -1,0 +1,34 @@
+schema: launchpad/backend-client-patch-experiment/v1
+date: '2026-10-14'
+status: GREEN-local-PENDING-BUILT-COMPATIBILITY
+cluster_mutations: false
+publish_requested: false
+client_source_revision: d0f23b14fbf35493e5b713e25ecf662ec239e76c
+patches:
+  - module: go.opentelemetry.io/otel
+    from: v1.36.0
+    to: v1.41.0
+    trace_module_aligned: true
+    advisory: https://github.com/advisories/GHSA-mh2q-q3fh-2475
+    primary_advisory_review: Bounds amplification from extracting multi-value HTTP baggage headers.
+  - module: github.com/sigstore/fulcio
+    from: v1.6.6
+    to: v1.8.6
+    advisories:
+      - https://github.com/advisories/GHSA-f5mr-q85p-6hh6
+      - https://github.com/advisories/GHSA-f83f-xpx7-ffpw
+    primary_advisory_review: Corrects OIDC discovery redirects and service-account token transport boundaries, and bounds excessive token parsing allocation.
+controls:
+  same_major_versions: true
+  compiled_version_checks: required
+  offline_built_runtime_smoke: required
+  scanner_exceptions_active: false
+  risk_acceptance: NOT-GRANTED
+proof:
+  red: evidence/runs/backend-client-telemetry-pins-red-20261014.xml
+  green: evidence/runs/backend-client-telemetry-pins-green-local-20261014.xml
+  passing_local_checks: 42
+limits:
+  - Advisory applicability is not waived merely because Fulcio server or baggage extraction is not directly invoked by the backend.
+  - The new overrides require compiled and scanned proof before target advisory removal can be claimed.
+  - No live platform or lab changes; other client and OS findings remain open.

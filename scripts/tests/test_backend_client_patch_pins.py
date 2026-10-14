@@ -31,3 +31,14 @@ def test_git_and_billy_fixes_stay_on_supported_v5_major():
     assert 'grep -F "${GO_GIT_VERSION}"' in text
     assert 'grep -F "${GO_BILLY_VERSION}"' in text
     assert "github.com/go-git/go-git/v6" not in text
+
+
+def test_telemetry_and_fulcio_pins_are_verified_and_same_major():
+    text = (ROOT / "backend/Containerfile").read_text()
+    assert "ARG OTEL_VERSION=v1.41.0" in text
+    assert "ARG FULCIO_VERSION=v1.8.6" in text
+    assert "-replace=go.opentelemetry.io/otel=go.opentelemetry.io/otel@${OTEL_VERSION}" in text
+    assert "-replace=go.opentelemetry.io/otel/trace=go.opentelemetry.io/otel/trace@${OTEL_VERSION}" in text
+    assert "-replace=github.com/sigstore/fulcio=github.com/sigstore/fulcio@${FULCIO_VERSION}" in text
+    assert 'grep -F "${OTEL_VERSION}"' in text
+    assert 'grep -F "${FULCIO_VERSION}"' in text
