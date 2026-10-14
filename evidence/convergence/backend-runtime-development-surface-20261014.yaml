@@ -1,6 +1,16 @@
 schema: launchpad/backend-runtime-surface-experiment/v1
 date: '2026-10-14'
-status: GREEN-local-PENDING-BUILT-PROOF
+status: GREEN-BUILT-SMOKE-SECURITY-GATE-BLOCKED
+source_revision: ca1d6c489e68b29e47f014f061719033a50ac875
+release_run: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/38639606891
+built_proof:
+  compilation: PASS
+  offline_runtime_smoke: PASS
+  optional_package_absence: PASS
+  symbol_collector: Failed on the known valid underscore metadata symbol; corrected in 3e5de564e34fe585f578965ade57b967cb3156f0, pending rebuilt CI result.
+  vulnerability_inventory: RETAINED
+  fixable_high_gate: BLOCKED
+  full_staging_gate: BLOCKED
 cluster_scope: flightpath
 live_changes: false
 published: false
@@ -26,6 +36,14 @@ scan_context:
   suppressed_high_kernel_header_matches: 144
   interpretation: Installed header-package matches are not evidence of a running kernel vulnerability; removal must be verified against the actual image.
   remaining_five_fixable_client_findings: OPEN
+  current_visible_high_matches: 36
+  previous_visible_high_matches: 50
+  current_suppressed_high_matches: 0
+  current_critical_matches: 0
+  current_unrated_matches: 3
+  distinct_high_critical_ids: 21
+  full_report_sha256: 9881ee0b28be0c73ff930303e2246586626ad1b8229d537866d67f949f40d9d9
+  fixable_report_sha256: 199a409fbc96e3e6a3965fed0be73575b95c760bd5b6668125c09d6e69ee1d12
   security_acceptance: NOT-GRANTED
 evidence_collection:
   change: Run both vulnerability inventories after successful build/runtime smoke even if independent symbol parsing fails.

@@ -1,0 +1,46 @@
+schema: launchpad/staging-readonly-preflight/v1
+date: '2026-10-14'
+cluster_scope: flightpath
+status: READONLY-PREFLIGHT-PASS-NOT-STAGING-QUALIFIED
+connection:
+  isolated_login_refreshed: true
+  default_kubeconfig_changed: false
+  api_tls_verified_after_bootstrap: true
+  credentials_in_evidence: false
+deployed_image:
+  backend_and_worker: ghcr.io/jkershawrh/launchpad-backend-flightpath-candidate@sha256:3bedbc0cef3c09c86e440eff8a883043c9dde9687fd686fe7c9fd1e1a24aabd8
+  hardening_candidate_deployed: false
+readiness:
+  backend: 1/1
+  lifecycle_worker: 2/2
+  cloudflare_tunnel: 2/2
+  public_access_gateway: 2/2
+  admin: 1/1
+  requester: 1/1
+  postgres: 1/1
+  maas: 1/1
+database_inventory:
+  method: Read-only transaction, aggregate counts only, no email or secret fields.
+  sessions: {reclaimed: 1623}
+  workshops: {completed: 500, completed_with_errors: 2}
+  active_records_observed: 0
+labeled_resource_inventory:
+  selector: launchpad.redhat.com/session-id
+  namespaces: 0
+  argo_applications_all_namespaces: 0
+  persistent_volumes: 0
+  limitation: This is not a complete unlabelled-orphan audit or new-image reclamation proof.
+console:
+  canonical_hostname: labs.smg-helix.ai
+  oauth_callback: https://labs.smg-helix.ai/auth/callback
+  native_route_backend: console-redirect
+  custom_route_backend: console
+  tunnel_upstream_host: labs.smg-helix.ai
+  ingress_component_routes: absent
+  conclusion: Canonical Console still collides with the participant hostname.
+  mutation_performed: false
+  cutover: Await explicitly approved coordinated window and rollback capture.
+limits:
+  - Replica readiness is not participant-facing certification.
+  - No deployment, DNS edit, Console change, lab reclaim or cluster restart was performed.
+  - Security disposition, final candidate deployment and complete browser/lifecycle proof remain open.
