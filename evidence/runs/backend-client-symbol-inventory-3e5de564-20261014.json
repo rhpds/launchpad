@@ -1,0 +1,63 @@
+{
+  "schema": "launchpad/backend-client-symbol-inventory/v1",
+  "symbols_count": 155935,
+  "surfaces": {
+    "distribution-proxy": {
+      "named_symbols_present": false,
+      "matching_count": 0,
+      "examples": []
+    },
+    "distribution-redis-cache": {
+      "named_symbols_present": false,
+      "matching_count": 0,
+      "examples": []
+    },
+    "buildkit-git-source": {
+      "named_symbols_present": false,
+      "matching_count": 0,
+      "examples": []
+    },
+    "buildkit-solver": {
+      "named_symbols_present": false,
+      "matching_count": 0,
+      "examples": []
+    },
+    "buildkit-gateway": {
+      "named_symbols_present": false,
+      "matching_count": 0,
+      "examples": []
+    },
+    "archive-extraction": {
+      "named_symbols_present": true,
+      "matching_count": 30,
+      "examples": [
+        "github.com/moby/go-archive.(*Tarballer).Do",
+        "github.com/moby/go-archive.(*Tarballer).Do.func1",
+        "github.com/moby/go-archive.(*Tarballer).Do.func2",
+        "github.com/moby/go-archive.(*overlayWhiteoutConverter).ConvertRead",
+        "github.com/moby/go-archive.(*overlayWhiteoutConverter).ConvertWrite",
+        "github.com/moby/go-archive.(*tarAppender).addTarFile",
+        "github.com/moby/go-archive..inittask",
+        "github.com/moby/go-archive..typeAssert.6",
+        "github.com/moby/go-archive.ErrCannotCopyDir",
+        "github.com/moby/go-archive.ErrDirNotExists"
+      ]
+    },
+    "archive-vulnerable-extraction-call-sites": {
+      "named_symbols_present": false,
+      "matching_count": 0,
+      "examples": []
+    }
+  },
+  "not_affected_declared": false,
+  "staging_qualified": false,
+  "risk_acceptance": "NOT-GRANTED",
+  "limitations": [
+    "Named-symbol absence alone does not exclude inlined code or prove unreachability.",
+    "Package-prefix presence does not prove the vulnerable function is invoked.",
+    "Review exact source, advisory call sites, inputs, and runtime before any disposition."
+  ],
+  "symbols_sha256": "a006dc703e493ce357f9bd7d3e77b6a244dea838978d328dfdf624157ffd8bf2",
+  "binary_sha256": "8abf52ea17ada6b07247fce06a6d31885913db8521fa37ee6c8874c9ae8e6712",
+  "source_revision": "3e5de564e34fe585f578965ade57b967cb3156f0"
+}

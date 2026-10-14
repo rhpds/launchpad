@@ -1,6 +1,23 @@
 schema: launchpad/backend-client-symbol-parser-remediation/v1
 date: '2026-10-14'
-status: GREEN-local-PENDING-CI
+status: GREEN-CI-SECURITY-GATE-BLOCKED
+verified_ci:
+  release_run: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/38640408504
+  source_revision: 3e5de564e34fe585f578965ade57b967cb3156f0
+  compile: PASS
+  offline_runtime_smoke: PASS
+  symbol_inventory: PASS
+  binary_sha256: 8abf52ea17ada6b07247fce06a6d31885913db8521fa37ee6c8874c9ae8e6712
+  retained_inventory: evidence/runs/backend-client-symbol-inventory-3e5de564-20261014.json
+  retained_inventory_sha256: 445e05ecc8d42d1df7d637c74dd1f9bbd86b6dbebab39ada4b6b049c4e97f8dc
+  scan_high_matches: 36
+  scan_critical_matches: 0
+  scan_suppressed_high_matches: 0
+  scan_unrated_matches: 3
+  scan_full_report_sha256: 670876b9331b62bc8540d4105dc4fbd71312aa834f1f4e8ef0276de1cbbd7312
+  fixable_high_gate: BLOCKED
+  published: false
+  deployed: false
 live_changes: false
 source_run: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/38638924962
 source_revision: fbaceb10f745d5d829f4fc9ba7002400b35e419d
