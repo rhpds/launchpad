@@ -1,0 +1,54 @@
+schema: launchpad/staging-hardening-release/v1
+source_revision: 2580f06568d4f1a005856545beb1ddd5cd58c047
+branch: codex/flightpath-migration-20260922
+repository: jkershawrh/intel-ai-launchpad
+repository_private_verified: true
+release_run: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/38614555743
+last_observed_release_stage: Completed signing, registry attestation verification, and digest retention
+last_observed_release_status: success
+observed_date: '2026-10-14'
+image_package: ghcr.io/jkershawrh/launchpad-backend-flightpath-candidate
+digest: sha256:61ddc08cf4a9bbb3b2d4b4b46b8b31f98b01759b1033714c421b6a165f58dc68
+signature_verified: true
+signature_verification_scope: Release workflow verified registry signature against the exact workflow identity and GitHub OIDC issuer; local review matched receipt digest and source provenance. No separate local cosign verification was performed.
+attestation_checks:
+  source_revision_matches: true
+  linux_amd64: true
+  registry_sbom_verified_in_release: true
+  registry_provenance_verified_in_release: true
+  artifact_name: backend-release-digest-2580f06568d4f1a005856545beb1ddd5cd58c047
+  signature_receipt_sha256: 555b1b910eefc365b3bf6f1ed8c904c1adff9e9a6285bfbca294ae6a9e130675
+  sbom_receipt_sha256: 2ad24e0a25416071ec8eace78c60ea636224cd6d724087bbc3135cc20e26b328
+  provenance_receipt_sha256: 5928a3521acc67f612bc62de87d0bd93ae8bae0ba242035082b39997e6853bc0
+deployed: false
+staging_qualified: false
+deployment_hold_reason: Full security disposition remains open; no acceptance of unresolved High findings has been granted.
+security:
+  artifact_name: backend-vulnerability-scan-2580f06568d4f1a005856545beb1ddd5cd58c047
+  high_matches: 108
+  distinct_high_ids: 28
+  critical_matches: 0
+  fixable_high_or_critical_matches: 0
+  high_fix_states: {not-fixed: 98, wont-fix: 9, unspecified: 1}
+  full_report_sha256: ca09692b0ec65a4824744291738c6db39cc3dec5ebd6fa90a624ce1d14f0119b
+  fixable_report_sha256: 4818c54d87cadd25483c3a4a25af06478234f0f2ac08af381f56a8a31ad22c90
+  risk_acceptance: NOT-GRANTED
+  gate: OPEN
+connection:
+  existing_isolated_flightpath_credential: expired
+  refresh_before_live_preflight: required
+checks:
+  staged_gitleaks: PASS
+  commit_secret_hook: PASS
+  clean_committed_source_regressions: {result: PASS, passing: 119}
+  release_and_pull_contracts: {result: PASS, passing: 8}
+  unrelated_catalog_changes_included: false
+proof_record: evidence/convergence/staging-access-cleanup-closeout-20261014.yaml
+next_gates:
+  - Reduce unnecessary runtime packages in a separately tested candidate and disposition remaining security findings without relying on expired exceptions.
+  - Inventory Flightpath active labs and lifecycle jobs before a guarded control-plane rollout.
+  - Run disposable retained-residue negative tests and a normal one-seat participant/reclaim journey.
+  - Resolve Console routing through the approved infrastructure change; do not grant staging from this backend release alone.
+limits:
+  - Build publication is not security risk acceptance or permission to expose unfinished workforce authentication.
+  - The last-observed build status is a snapshot, not a live status feed.
