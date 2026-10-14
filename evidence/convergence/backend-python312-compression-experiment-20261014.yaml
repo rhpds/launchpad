@@ -1,6 +1,9 @@
 schema: launchpad/backend-runtime-security-experiment/v1
 date: '2026-10-14'
 status: GREEN-local-PENDING-BUILT-PROOF
+source_revision: 17d9532ab553a31705bf8a801243283a242b1a03
+release_run: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/38644369020
+publish_requested: false
 cluster_changes: false
 published: false
 deployed: false
