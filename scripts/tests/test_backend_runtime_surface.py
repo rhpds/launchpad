@@ -68,3 +68,25 @@ def test_scans_still_collect_after_symbol_failure_but_publication_stays_gated():
         assert step.get("continue-on-error", False) is False
     publish = next(step for step in steps if step.get("name") == "Publish immutable candidate and record digest")
     assert publish["if"] == "${{ inputs.publish }}"
+
+
+def test_runtime_moves_to_supported_python_312_with_explicit_smoke_assertion():
+    text = (ROOT / "backend/Containerfile").read_text()
+    smoke = (ROOT / "backend/scripts/runtime_smoke.py").read_text()
+    assert "FROM registry.access.redhat.com/ubi9/python-312:latest" in text
+    assert "python3.12-devel" in text
+    assert "sys.version_info[:2] != (3, 12)" in smoke
+
+
+def test_candidate_interpreter_runs_regressions_without_shipping_test_tools():
+    workflow = yaml.safe_load((ROOT / ".github/workflows/backend-release.yml").read_text())
+    steps = workflow["jobs"]["release"]["steps"]
+    test = next(step for step in steps if step.get("name") == "Verify regressions under the candidate interpreter")
+    assert "backend/Containerfile.test" in test["run"]
+    assert "--network none" in test["run"]
+    assert "--read-only" in test["run"]
+    assert "test_staging_access_cleanup_gaps.py" in test["run"]
+    assert "$GITHUB_WORKSPACE/backend/tests:/workspace/backend/tests:ro" in test["run"]
+    assert "$GITHUB_WORKSPACE:/workspace" not in test["run"]
+    assert "pytest" not in (ROOT / "backend/Containerfile").read_text()
+    assert "pytest==8.4.2" in (ROOT / "backend/Containerfile.test").read_text()

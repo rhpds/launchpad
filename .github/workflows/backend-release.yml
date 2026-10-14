@@ -81,6 +81,39 @@ jobs:
             "${IMAGE_REPOSITORY}:git-${{ inputs.expected_sha }}" \
             scripts/runtime_smoke.py
 
+      - name: Verify regressions under the candidate interpreter
+        shell: bash
+        run: |
+          set -euo pipefail
+          image="${IMAGE_REPOSITORY}:git-${{ inputs.expected_sha }}"
+          docker build --file backend/Containerfile.test \
+            --build-arg "RUNTIME_IMAGE=$image" --tag "$image-tests" backend
+          mkdir -p "$RUNNER_TEMP/backend-runtime-proof"
+          chmod 0777 "$RUNNER_TEMP/backend-runtime-proof"
+          docker run --rm --network none --read-only --user 1001 \
+            --tmpfs /tmp:rw,nosuid,nodev,mode=1777 \
+            --env PYTHONDONTWRITEBYTECODE=1 --env HOME=/tmp \
+            --env PYTHONPATH=/opt/app-root/src --env LAUNCHPAD_MODE=mock \
+            --volume "$GITHUB_WORKSPACE/backend/tests:/workspace/backend/tests:ro" \
+            --volume "$GITHUB_WORKSPACE/deploy:/workspace/deploy:ro" \
+            --volume "$RUNNER_TEMP/backend-runtime-proof:/proof" \
+            --entrypoint python3 "$image-tests" -m pytest -p no:cacheprovider -q \
+            tests/test_staging_access_cleanup_gaps.py \
+            tests/test_cleanup_completion_gate.py \
+            tests/test_cleanup_openshift.py \
+            tests/test_cleanup_hardening.py \
+            tests/test_retained_volume_residue.py \
+            tests/test_oauth_identity.py \
+            tests/test_flightpath_native_console_contract.py \
+            --junitxml=/proof/candidate-interpreter.xml
+
+      - name: Retain candidate interpreter evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: backend-runtime-regression-${{ inputs.expected_sha }}
+          path: ${{ runner.temp }}/backend-runtime-proof/candidate-interpreter.xml
+
       - name: Inventory named client security surfaces
         shell: bash
         run: |
@@ -89,6 +122,7 @@ jobs:
           container_id="$(docker create "$image")"
           trap 'docker rm "$container_id" >/dev/null' EXIT
           docker cp "$container_id:/usr/local/bin/oc" "$RUNNER_TEMP/launchpad-oc"
+          docker cp "$container_id:/usr/local/bin/helm" "$RUNNER_TEMP/launchpad-helm"
           go version -m "$RUNNER_TEMP/launchpad-oc" > client-build-info.txt
           go tool nm "$RUNNER_TEMP/launchpad-oc" > "$RUNNER_TEMP/launchpad-oc-symbols.txt"
           python3 scripts/inventory_backend_client_symbols.py \
@@ -106,6 +140,38 @@ jobs:
             client-build-info.txt
             client-symbol-inventory.json
             ${{ runner.temp }}/launchpad-oc-symbols.txt
+
+      - name: Collect client vulnerable-symbol evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/launchpad-vuln-tools"
+          GOBIN="$RUNNER_TEMP/launchpad-vuln-tools" timeout 180 \
+            go install golang.org/x/vuln/cmd/govulncheck@v1.9.0
+          sha256sum "$RUNNER_TEMP/launchpad-oc" "$RUNNER_TEMP/launchpad-helm" \
+            > client-vulnerability-binary-digests.txt
+          printf '%s\n' "${{ inputs.expected_sha }}" > client-vulnerability-source.txt
+          timeout 180 "$RUNNER_TEMP/launchpad-vuln-tools/govulncheck" \
+            -mode binary -format json "$RUNNER_TEMP/launchpad-oc" \
+            > govulncheck-oc.json 2> govulncheck-oc.stderr.txt
+          timeout 180 "$RUNNER_TEMP/launchpad-vuln-tools/govulncheck" \
+            -mode binary -format json "$RUNNER_TEMP/launchpad-helm" \
+            > govulncheck-helm.json 2> govulncheck-helm.stderr.txt
+          # JSON mode exits zero even when findings exist. These are retained
+          # review inputs, not a waiver or replacement for the Grype gates.
+
+      - name: Retain client vulnerable-symbol evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: backend-client-vulnerable-symbols-${{ inputs.expected_sha }}
+          path: |
+            govulncheck-oc.json
+            govulncheck-helm.json
+            govulncheck-oc.stderr.txt
+            govulncheck-helm.stderr.txt
+            client-vulnerability-binary-digests.txt
+            client-vulnerability-source.txt
 
       - name: Release build cache before security scanning
         if: ${{ !cancelled() && steps.runtime_smoke.outcome == 'success' }}

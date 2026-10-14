@@ -76,3 +76,21 @@ def test_archive_creation_is_not_mislabeled_as_named_vulnerable_extraction():
     extracted = _module().inventory(BASE + "003 T github.com/moby/go-archive.UntarUncompressed\n")
     assert extracted["surfaces"]["archive-vulnerable-extraction-call-sites"]["named_symbols_present"] is True
     assert extracted["not_affected_declared"] is False
+
+
+def test_official_vulnerability_tool_collects_binary_evidence_without_waivers():
+    import yaml
+
+    workflow = yaml.safe_load((ROOT / ".github/workflows/backend-release.yml").read_text())
+    steps = workflow["jobs"]["release"]["steps"]
+    step = next(step for step in steps if step.get("name") == "Collect client vulnerable-symbol evidence")
+    assert "golang.org/x/vuln/cmd/govulncheck@v1.9.0" in step["run"]
+    assert "-mode binary -format json" in step["run"]
+    assert "launchpad-oc" in step["run"]
+    assert "launchpad-helm" in step["run"]
+    assert "GOSUMDB=off" not in step["run"]
+    assert step.get("continue-on-error", False) is False
+    retained = next(step for step in steps if step.get("name") == "Retain client vulnerable-symbol evidence")
+    assert "always()" in retained["if"]
+    assert "govulncheck-oc.json" in retained["with"]["path"]
+    assert "client-vulnerability-binary-digests.txt" in retained["with"]["path"]

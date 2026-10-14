@@ -8,11 +8,14 @@ import shutil
 import sqlite3
 import ssl
 import subprocess
+import sys
 import tempfile
 from pathlib import Path
 
 
 def main() -> None:
+    if sys.version_info[:2] != (3, 12):
+        raise RuntimeError("Candidate must use the expected Python 3.12 runtime")
     modules = (
         "fastapi", "uvicorn", "httpx", "websockets", "multipart",
         "sqlalchemy", "psycopg2", "kubernetes", "requests", "celery",
@@ -48,7 +51,7 @@ def main() -> None:
     forbidden = {
         "httpd", "httpd-core", "httpd-devel", "httpd-filesystem", "httpd-tools",
         "mod_ldap", "mod_lua", "mod_session", "mod_ssl", "gd", "gd-devel",
-        "kernel-headers", "python3.11-devel", "expat-devel", "libblkid-devel",
+        "kernel-headers", "python3.11-devel", "python3.12-devel", "expat-devel", "libblkid-devel",
         "libmount-devel", "go-srpm-macros", "qt5-srpm-macros",
         "emacs-filesystem", "vim-filesystem", "vim-minimal", "libX11-devel",
     }
@@ -60,6 +63,7 @@ def main() -> None:
             raise RuntimeError(f"Missing platform content: {directory}")
     print(json.dumps({
         "status": "PASS", "network": "not-used", "modules": len(modules),
+        "python_version": sys.version.split()[0],
         "tools": [command[0] for command in commands], "unused_packages": 0,
     }))
 

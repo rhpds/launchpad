@@ -1,0 +1,54 @@
+schema: launchpad/backend-runtime-security-experiment/v1
+date: '2026-10-14'
+status: GREEN-local-PENDING-BUILT-PROOF
+cluster_changes: false
+published: false
+deployed: false
+runtime:
+  previous: registry.access.redhat.com/ubi9/python-311:latest
+  candidate: registry.access.redhat.com/ubi9/python-312:latest
+  operating_system_major_changed: false
+  supported_image_manifest_observed: sha256:b1ed2928e5c7de1a4308e68386f1372f8503d1c0506305fde3a35c252ae53a64
+  reason: Red Hat identifies python3.11 as Will not fix for CVE-2026-11940 and records a fixed RHEL9 python3.12 package.
+  primary_source: https://access.redhat.com/hydra/rest/securitydata/cve/CVE-2026-11940.json
+  fixed_package_reference: python3.12-0:3.12.14-1.el9_8
+  minimum_interpreter_smoke: Require Python 3.12 plus all existing runtime imports, CLI checks, TLS trust, SQLite, filesystem and optional-package absence checks.
+compression:
+  module: github.com/klauspost/compress
+  previous_observed: v1.18.5
+  candidate: v1.18.7
+  advisory: GO-2026-5841
+  primary_source: https://vuln.go.dev/ID/GO-2026-5841.json
+  affected_function: github.com/klauspost/compress/s2.NewDict
+  compiled_version_verification: Both oc and Helm, exact v1.18.7 replacement.
+actual_interpreter_regression:
+  image: Test-only derivative of the exact loaded runtime image; never published.
+  test_dependency: pytest==8.4.2
+  network_during_tests: none
+  filesystem: Read-only runtime and selected source directories, temporary output only.
+  mounted_source: [backend/tests, deploy]
+  github_credentials_or_git_directory_mounted: false
+  suite: Existing cleanup, residue, identity and native Console regression tests.
+  runtime_test_tools_shipped: false
+client_applicability_evidence:
+  tool: golang.org/x/vuln/cmd/govulncheck@v1.9.0
+  mode: binary
+  format: json
+  binaries: [oc, Helm]
+  exact_source_and_binary_hashes_retained: true
+  primary_documentation: https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck
+  caveats:
+    - JSON mode exits successfully even when findings exist; success is not a clean security verdict.
+    - Binary analysis lacks source call stacks and can report linked but unreachable code.
+    - Missing symbol metadata may fall back to module-level findings; never infer absence from that fallback.
+    - Databases may differ or omit advisories; reconcile against the complete Grype inventory.
+proof:
+  runtime_and_compression_red: evidence/runs/backend-python312-compress-red-20261014.xml
+  actual_interpreter_contract_red: evidence/runs/backend-candidate-interpreter-contract-red-20261014.xml
+  vulnerable_symbol_contract_red: evidence/runs/backend-client-vulnerable-symbol-contract-red-20261014.xml
+  local_green: evidence/runs/backend-python312-compress-green-local-r3-20261014.xml
+limits:
+  - Source contracts on the Mac still use Python 3.11; only the new CI test container will prove actual Python 3.12 compatibility.
+  - The experiment does not guarantee remediation of all OS, Go-module or unrated findings.
+  - No OpenPGP security feature is silently removed to satisfy a scan.
+  - No scanner ignores, VEX non-affected declaration, risk waiver or staging acceptance is introduced.

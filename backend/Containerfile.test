@@ -1,0 +1,9 @@
+ARG RUNTIME_IMAGE
+FROM ${RUNTIME_IMAGE}
+
+# CI-only derivative of the exact candidate. Never publish this image or add
+# pytest to the runtime image to obtain interpreter compatibility evidence.
+USER 0
+RUN python3 -m pip install --no-cache-dir pytest==8.4.2
+USER 1001
+WORKDIR /workspace/backend

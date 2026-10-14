@@ -9,6 +9,7 @@ ARG GO_GIT_VERSION=v5.19.2
 ARG GO_BILLY_VERSION=v5.9.0
 ARG OTEL_VERSION=v1.41.0
 ARG FULCIO_VERSION=v1.8.6
+ARG GO_COMPRESS_VERSION=v1.18.7
 ENV GOTOOLCHAIN=go1.26.9
 ARG HELM_VERSION=4.3.0
 ARG HELM_SOURCE_COMMIT=bec5b06ed841fe5269972d864d5177944fd5970f
@@ -26,6 +27,7 @@ RUN git clone https://github.com/openshift/oc.git . \
       -replace=go.opentelemetry.io/otel=go.opentelemetry.io/otel@${OTEL_VERSION} \
       -replace=go.opentelemetry.io/otel/trace=go.opentelemetry.io/otel/trace@${OTEL_VERSION} \
       -replace=github.com/sigstore/fulcio=github.com/sigstore/fulcio@${FULCIO_VERSION} \
+      -replace=github.com/klauspost/compress=github.com/klauspost/compress@${GO_COMPRESS_VERSION} \
     && CGO_ENABLED=0 go build -mod=mod \
       -tags "include_gcs include_oss containers_image_openpgp" \
       -trimpath -o /tmp/oc-bin ./cmd/oc \
@@ -49,18 +51,26 @@ RUN git clone https://github.com/openshift/oc.git . \
     | grep -F "${OTEL_VERSION}" \
     && go version -m /tmp/oc-bin \
     | grep -F "github.com/sigstore/fulcio" \
-    | grep -F "${FULCIO_VERSION}"
+    | grep -F "${FULCIO_VERSION}" \
+    && go version -m /tmp/oc-bin \
+    | grep -F "github.com/klauspost/compress" \
+    | grep -F "${GO_COMPRESS_VERSION}"
 
 WORKDIR /tmp/helm
 RUN git clone https://github.com/helm/helm.git . \
     && git checkout --detach "${HELM_SOURCE_COMMIT}" \
-    && go mod edit -replace=golang.org/x/net=golang.org/x/net@${GO_X_NET_VERSION} \
+    && go mod edit \
+      -replace=golang.org/x/net=golang.org/x/net@${GO_X_NET_VERSION} \
+      -replace=github.com/klauspost/compress=github.com/klauspost/compress@${GO_COMPRESS_VERSION} \
     && CGO_ENABLED=0 go build -mod=mod -trimpath \
       -ldflags="-s -w -X helm.sh/helm/v4/internal/version.version=v${HELM_VERSION} -X helm.sh/helm/v4/internal/version.gitCommit=${HELM_SOURCE_COMMIT}" \
       -o /tmp/helm-bin ./cmd/helm \
-    && /tmp/helm-bin version --short | grep -F "v${HELM_VERSION}"
+    && /tmp/helm-bin version --short | grep -F "v${HELM_VERSION}" \
+    && go version -m /tmp/helm-bin \
+    | grep -F "github.com/klauspost/compress" \
+    | grep -F "${GO_COMPRESS_VERSION}"
 
-FROM registry.access.redhat.com/ubi9/python-311:latest
+FROM registry.access.redhat.com/ubi9/python-312:latest
 
 LABEL name="partner-ai-launchpad-backend" \
       version="0.1.0" \
@@ -76,7 +86,7 @@ RUN dnf -y upgrade \
     && dnf -y remove --setopt=clean_requirements_on_remove=False \
       httpd httpd-core httpd-devel httpd-filesystem httpd-tools \
       mod_ldap mod_lua mod_session mod_ssl gd gd-devel \
-      kernel-headers python3.11-devel expat-devel libblkid-devel libmount-devel \
+      kernel-headers python3.11-devel python3.12-devel expat-devel libblkid-devel libmount-devel \
       go-srpm-macros qt5-srpm-macros emacs-filesystem vim-filesystem vim-minimal \
       libX11-devel \
     && dnf clean all
