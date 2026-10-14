@@ -1,0 +1,47 @@
+schema: launchpad/backend-client-advisory-review/v1
+date: '2026-10-14'
+status: OPEN-NOT-ACCEPTED
+live_changes: false
+current_experiment: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/38632135891
+current_experiment_result_at_review: pending
+advisories:
+  - id: GHSA-hfg8-hc9c-6c3h
+    source: https://github.com/advisories/GHSA-hfg8-hc9c-6c3h
+    module: github.com/moby/go-archive
+    recorded_version: v0.1.0
+    patched_version: v0.3.0
+    trigger: Crafted tar archive escapes extraction destination through filesystem link resolution.
+    proof_needed: Determine whether affected extraction functions are linked and invoked by approved backend CLI paths; otherwise compile and smoke a bounded version upgrade before accepting it.
+  - id: GHSA-3p65-76g6-3w7r
+    source: https://github.com/advisories/GHSA-3p65-76g6-3w7r
+    module: github.com/distribution/distribution/v3
+    patched_version: v3.1.0
+    trigger: Pull-through registry cache trusts a bearer realm from an upstream registry and sends configured upstream credentials to it.
+    proof_needed: Establish whether registry proxy/server auth paths exist in the compiled client and runtime; do not equate a module-level scanner match with executing a registry server.
+  - id: GHSA-f2g3-hh2r-cwgc
+    source: https://github.com/advisories/GHSA-f2g3-hh2r-cwgc
+    module: github.com/distribution/distribution/v3
+    patched_version: v3.1.0
+    trigger: Registry server with Redis blob-descriptor caching and deletion enabled retains stale repository membership after deletion.
+    proof_needed: Verify affected server/cache symbols and required configuration against the actual executable and runtime; absence is a hypothesis until independently evidenced.
+  - id: GHSA-4c29-8rgm-jvjj
+    source: https://github.com/advisories/GHSA-4c29-8rgm-jvjj
+    module: github.com/moby/buildkit
+    recorded_version: v0.12.5
+    patched_version: v0.28.1
+    trigger: An untrusted BuildKit frontend crafts an API message escaping the execution-context storage directory.
+    proof_needed: Verify whether the vulnerable builder/frontend execution path is part of Launchpad runtime behavior; alternatively test a larger compatibility upgrade separately.
+  - id: GHSA-4vrq-3vrq-g6gg
+    source: https://github.com/advisories/GHSA-4vrq-3vrq-g6gg
+    module: github.com/moby/buildkit
+    recorded_version: v0.12.5
+    patched_version: v0.28.1
+    trigger: A Git build-context URL with an attacker-controlled subdirectory component accesses files outside its checkout.
+    proof_needed: Prove the exact builder-context path and inputs, not merely that no direct backend build command was found.
+decision_boundaries:
+  scanner_exceptions_restored: false
+  non_applicability_declared: false
+  risk_acceptance: NOT-GRANTED
+  larger_dependency_upgrade_performed: false
+  client_command_source_rewrite_performed: false
+  next: Finish telemetry/identity compatibility proof, then choose an evidence-backed upgrade or applicability-review path for this group.

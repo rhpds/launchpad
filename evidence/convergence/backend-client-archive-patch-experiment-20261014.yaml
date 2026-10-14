@@ -1,0 +1,26 @@
+schema: launchpad/backend-client-patch-experiment/v1
+date: '2026-10-14'
+status: PENDING-BUILT-COMPATIBILITY
+cluster_mutations: false
+publish_requested: false
+client_source_revision: d0f23b14fbf35493e5b713e25ecf662ec239e76c
+patch:
+  module: github.com/moby/go-archive
+  from: v0.1.0
+  to: v0.3.0
+  advisory: https://github.com/advisories/GHSA-hfg8-hc9c-6c3h
+  issue: Crafted archive can escape its extraction destination.
+  compatibility_guaranteed: false
+controls:
+  compiled_version_check: required
+  offline_built_runtime_smoke: required
+  client_command_implementation_rewrites: NOT-PERFORMED
+  compilation_failure_action: Preserve failure evidence and stop this experiment; do not rewrite client commands to force compatibility.
+  risk_acceptance: NOT-GRANTED
+proof:
+  red: evidence/runs/backend-client-archive-pins-red-20261014.xml
+  green: evidence/runs/backend-client-archive-pins-green-local-20261014.xml
+limits:
+  - A v0 version bump does not guarantee API or behavioral compatibility.
+  - Four other fixable client findings and the residual OS/nonfixable inventory remain open even if this target is removed.
+  - No publication, deployment, or security waiver is authorized by this record.

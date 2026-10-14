@@ -1,6 +1,15 @@
 schema: launchpad/backend-client-patch-experiment/v1
 date: '2026-10-14'
-status: GREEN-local-PENDING-BUILT-COMPATIBILITY
+status: GREEN-BUILD-AND-OFFLINE-SMOKE-SECURITY-GATE-BLOCKED
+source_revision: d63fdfade11467aee1e43a74a006f21609641245
+release_run: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/38632135891
+observed_build_result: PASS
+observed_runtime_smoke: PASS
+observed_target_advisories_remaining: 0
+observed_fixable_high_remaining: 5
+observed_active_high: 50
+observed_critical: 0
+published: false
 cluster_mutations: false
 publish_requested: false
 client_source_revision: d0f23b14fbf35493e5b713e25ecf662ec239e76c
@@ -30,5 +39,5 @@ proof:
   passing_local_checks: 42
 limits:
   - Advisory applicability is not waived merely because Fulcio server or baggage extraction is not directly invoked by the backend.
-  - The new overrides require compiled and scanned proof before target advisory removal can be claimed.
+  - Compiled versions, offline smoke and absence of the three targeted advisory IDs are proved; authenticated live compatibility remains open.
   - No live platform or lab changes; other client and OS findings remain open.
