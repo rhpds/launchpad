@@ -39,7 +39,7 @@ metadata:
   solution_family: virtualization_ai
   showroom: true
   showroom_content_repo_url: https://github.com/jkershawrh/virtualization-ai-501.git
-  showroom_content_ref: 6e65858f773e2a28a4874a2a59785e8c8ab52b07
+  showroom_content_ref: 78442e22eeed56b54d1e910ad8c2b847e3cd241a
   showroom_content_playbook: default-site.yml
   showroom_content_start_path: showroom/content
   operator_workshop: true
@@ -92,7 +92,7 @@ metadata:
   workshop_node_headroom_pods: 0
   workshop_node_required_labels: {}
   workload_repo: https://github.com/jkershawrh/virtualization-ai-501.git
-  workload_revision: 6e65858f773e2a28a4874a2a59785e8c8ab52b07
+  workload_revision: 78442e22eeed56b54d1e910ad8c2b847e3cd241a
   workload_deploy_type: helm
   workload_deployment_scope: seat
   workload_deploy_path: charts/virtualization-ai-501
@@ -100,8 +100,8 @@ metadata:
   workload_gitops_ready: true
   workload_release_name: virtualization-ai-501
   workload_helm_values:
-    workload_image: ghcr.io/jkershawrh/virtualization-ai-501-qualification-adapter@sha256:e14a5dc17dfb1a63321a99d4e76ad904dd271e5fb57b359c62c263891b8173bf
-    presentation_image: ghcr.io/jkershawrh/virtualization-ai-501-presentation@sha256:06e5e51b88f561bd401dd634acdcc07e3c6112caf4316fb46c989ac8baf3f762
+    workload_image: ghcr.io/jkershawrh/virtualization-ai-501-qualification-adapter@sha256:256400deedfe2103fd887f7665f9813039e1d613252d1e230683b8b82d4512b1
+    presentation_image: ghcr.io/jkershawrh/virtualization-ai-501-presentation@sha256:825fa99269c1bed2af4d1a3190203a29488ab032983e1e255d9b730963819acf
     presentation_enabled: true
     storage_class: ocs-storagecluster-ceph-rbd
     qualificationAdapter:
@@ -116,7 +116,7 @@ metadata:
     ui: virtualization-ai-501
   workload_readiness: []
   source_content_repo: https://github.com/jkershawrh/virtualization-ai-501.git
-  source_content_revision: 6e65858f773e2a28a4874a2a59785e8c8ab52b07
+  source_content_revision: 78442e22eeed56b54d1e910ad8c2b847e3cd241a
   source_references:
-    release_workflow: https://github.com/jkershawrh/virtualization-ai-501/actions/runs/36771381538
-    certification_evidence: evidence/runs/flightpath-live-20261002-virtualization-ai-501-public-1seat-r1.json
+    release_workflow: https://github.com/jkershawrh/virtualization-ai-501/actions/runs/38480918274
+    certification_evidence: evidence/runs/virtualization-ai-501-formal-current-pin-r2-20261013.json

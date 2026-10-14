@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 from pathlib import Path
 
 import yaml
@@ -20,6 +21,22 @@ REQUIRED_SECTIONS = {
 }
 COMPATIBILITY_ALIASES = {"cpu-inference-serving", "rag-on-xeon"}
 PLATFORM_VALIDATION = {"smoke-test"}
+
+
+def _assert_fresh_virt_one_seat_proof(catalog_id: str, run: str) -> None:
+    path = ROOT / f"evidence/runs/{catalog_id}-formal-{run}-20261013.json"
+    checksum = path.with_name(path.name + ".sha256").read_text().split()
+    assert checksum == [hashlib.sha256(path.read_bytes()).hexdigest(), path.name]
+    proof = json.loads(path.read_text())
+    assert proof['catalog_item_id'] == catalog_id
+    assert proof['result'] == 'GREEN-live'
+    assert proof['plan']['seats'] == 1
+    assert proof['plan']['cluster_ref'] == 'flightpath'
+    assert proof['rubric']['score'] == 100 and proof['rubric']['passed'] is True
+    assert proof['cleanup']['status'] == 'completed'
+    assert all(count == 0 for count in proof['cleanup']['resource_counts'].values())
+    if catalog_id == "virtualization-ai-301":
+        assert all(seat["probe"]["result"]["provenance"]["source_revision"] == "e5888aeac1042cbcf909b540eee1281fdc3c4dac" for seat in proof["seat_results"])
 
 
 def _portfolio_catalog_ids() -> set[str]:
@@ -199,7 +216,7 @@ def test_sovereign_201_exact_release_is_one_seat_live_certified() -> None:
 
 
 def test_virtualization_301_pins_public_root_playbook_and_exact_internal_certification() -> None:
-    exact_revision = "30f51e19223faf64c689a07e254870fbc43fd0c6"
+    exact_revision = "e5888aeac1042cbcf909b540eee1281fdc3c4dac"
     review = yaml.safe_load(REVIEW.read_text(encoding="utf-8"))["labs"][
         "virtualization-ai-301"
     ]
@@ -233,7 +250,9 @@ def test_virtualization_301_pins_public_root_playbook_and_exact_internal_certifi
     assert metadata["activation_blockers"] == intake["certification"][
         "activation_blockers"
     ]
-    assert review["source_state"]["catalog_pinned_revision"] == exact_revision
+    # The September baseline is historical evidence, not proof for the new pin.
+    assert review["source_state"]["catalog_pinned_revision"] == "30f51e19223faf64c689a07e254870fbc43fd0c6"
+    _assert_fresh_virt_one_seat_proof("virtualization-ai-301", "current-pin-r4")
     assert review["source_state"]["runtime_image_source_revision"] == (
         "eaca0d12a224c6edebeae6c0a4f80c9fd92bfdf1"
     )
@@ -301,14 +320,14 @@ def test_advanced_and_virtualization_labs_pin_their_exact_releases() -> None:
             "workload": "sha256:b95d3779c254a352028cdfb13aecffb229113ef78d2dba332aef19596ca0d732",
         },
         "virtualization-ai-501": {
-            "revision": "6e65858f773e2a28a4874a2a59785e8c8ab52b07",
-            "presentation": "sha256:06e5e51b88f561bd401dd634acdcc07e3c6112caf4316fb46c989ac8baf3f762",
-            "workload": "sha256:e14a5dc17dfb1a63321a99d4e76ad904dd271e5fb57b359c62c263891b8173bf",
+            "revision": "78442e22eeed56b54d1e910ad8c2b847e3cd241a",
+            "presentation": "sha256:825fa99269c1bed2af4d1a3190203a29488ab032983e1e255d9b730963819acf",
+            "workload": "sha256:256400deedfe2103fd887f7665f9813039e1d613252d1e230683b8b82d4512b1",
         },
         "virtualization-ai-401": {
-            "revision": "f00b4bc075acf37f014b8ee55d5810625639b6b3",
-            "presentation": "sha256:7115b9332335e9ceb77f68b9dc04828b36e1f0c874deee56272556fa3001bf25",
-            "workload": "sha256:864ad89cb5f4bae6f2b403c31604d78692e30afe9275c0d753a9eafaeae9d8ca",
+            "revision": "aee89597b325da490fa837b5639e6e71892c0ca1",
+            "presentation": "sha256:23d13240db7100facdc9edf10c95636526816d7fca11f32bf6408112b018cde4",
+            "workload": "sha256:b18c5a36cf18a2a3b45bc652600fc652c150227463c69cb50f0a039a55318431",
         },
     }
 
@@ -343,6 +362,8 @@ def test_advanced_and_virtualization_labs_pin_their_exact_releases() -> None:
             "agentic-ai-601": "one-seat-live-certified-active",
         }[catalog_id]
         assert review["labs"][catalog_id]["overall_status"] == expected_overall
+        if catalog_id.startswith("virtualization-ai-"):
+            _assert_fresh_virt_one_seat_proof(catalog_id, "current-pin-r2")
 
     virtualization_401 = review["labs"]["virtualization-ai-401"]["source_state"]
     assert virtualization_401["published_revision"] == (
@@ -614,7 +635,8 @@ def test_virtualization_foundations_records_exact_one_seat_proof_before_activati
     assert intake["certification"]["certified_seats"] == 1
     assert catalog["metadata"]["showroom_content_ref"] == intake["sources"][
         "showroom"
-    ]["revision"] == "3f622615f544c75db87a37833fc209b3d1b60731"
+    ]["revision"] == "e881ece208528720974f4e7bc659a0c8ad0627fb"
+    _assert_fresh_virt_one_seat_proof("virtualization-ai-foundations-101", "current-pin-r9")
     assert catalog["metadata"]["showroom_content_image"] == intake["sources"][
         "showroom"
     ]["content_image"]

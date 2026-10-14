@@ -1,7 +1,7 @@
 schema: launchpad/green-convergence-progress/v1
 cluster: flightpath
 seat_limit: 1
-result: IN_PROGRESS_NOT_ALL_GREEN
+result: ONE-SEAT-LAB-GATES-PASSED-BACKEND-ROLLOUT-BLOCKED
 rule: Signed builds and local regression passes do not replace fresh participant or zero-residue proof.
 passed_local:
   - Cleanup completion gate rejects retained or missing residue inventory.
@@ -14,8 +14,8 @@ qualified_source_releases:
     revision: e881ece208528720974f4e7bc659a0c8ad0627fb
     run: https://github.com/jkershawrh/virtualization-ai-foundations/actions/runs/38480888501
   virtualization-ai-201:
-    revision: 78bf0c80787aaee71890a979128d4b303ad53ebd
-    run: https://github.com/jkershawrh/virtualization-ai-201/actions/runs/38480893837
+    revision: f5cbcad3865390d7d5844d94087b59eb94c8f276
+    run: https://github.com/jkershawrh/virtualization-ai-201/actions/runs/38492958880
   virtualization-ai-301:
     revision: e5888aeac1042cbcf909b540eee1281fdc3c4dac
     run: https://github.com/jkershawrh/virtualization-ai-301/actions/runs/38480906690
@@ -25,14 +25,61 @@ qualified_source_releases:
   virtualization-ai-501:
     revision: 78442e22eeed56b54d1e910ad8c2b847e3cd241a
     run: https://github.com/jkershawrh/virtualization-ai-501/actions/runs/38480918274
-pending_release_gates:
+qualified_backend_release:
   backend:
-    revision_prefix: 02e22ae8
-    run: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/38481201342
+    revision: a59d503c38f6063dd487779a62b01b8f488cf461
+    run: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/38489410096
+    image: ghcr.io/jkershawrh/launchpad-backend-flightpath-candidate@sha256:3bedbc0cef3c09c86e440eff8a883043c9dde9687fd686fe7c9fd1e1a24aabd8
+    workflow_and_registry_attestations: GREEN
+    destination_cold_pull: RED
+    cold_pull_evidence: evidence/runs/virt-backend-cold-pull-red-20261013.yaml
+    deployed: false
+    cleanup_verifier_enabled_live: false
+    fixable_high: 0
+    critical: 0
+    full_scan_high_matches: 107
+    full_security_gate_green: false
+    risk_acceptance_granted: false
+formal_one_seat_proofs:
+  virtualization-ai-foundations-101: evidence/runs/virtualization-ai-foundations-101-formal-current-pin-r9-20261013.json
+  virtualization-ai-201: evidence/runs/virtualization-ai-201-formal-current-pin-r4-20261013.json
+  virtualization-ai-301: evidence/runs/virtualization-ai-301-formal-current-pin-r4-20261013.json
+  virtualization-ai-401: evidence/runs/virtualization-ai-401-formal-current-pin-r2-20261013.json
+  virtualization-ai-501: evidence/runs/virtualization-ai-501-formal-current-pin-r2-20261013.json
+formal_results:
+  every_result: GREEN-live
+  every_rubric_score: 100
+  seats_each: 1
+  every_cleanup_status: completed
+  every_recorded_resource_count: 0
+normal_orderability:
+  evidence: evidence/runs/virt-family-normal-one-seat-orderability-final-20261013.json
+  result: GREEN-orderability
+  passed_checks: 10
+  exposures: [internal, public_code]
+  certification_override: false
+  catalog_activation: Five earned current candidates, active with a maximum of one seat each.
+  deployed_backend_image_changed: false
+  limitation: Admission contracts do not independently prove every requester-form browser flow.
+public_participant_proofs:
+  virtualization-ai-foundations-101:
+    functional_and_cleanup: evidence/runs/virtualization-ai-foundations-101-participant-final-access-r6-20261013.json
+    cached_session_denial: HTTP 403
+    limitation: Prior failed observer and blank Console runs are preserved, not rewritten.
+  virtualization-ai-201: evidence/runs/virtualization-ai-201-participant-complete-guide-r4-20261013.json
+  virtualization-ai-301: evidence/runs/virtualization-ai-301-participant-final-controls-r2-20261013.json
+  virtualization-ai-401: evidence/runs/virtualization-ai-401-participant-final-controls-r2-20261013.json
+  virtualization-ai-501: evidence/runs/virtualization-ai-501-participant-final-controls-r2-20261013.json
+scope_limits:
+  - 201 authoring automation uses the reference-assisted fixture and chart-derived wiring; it does not prove a learner-authored client was deployed.
+  - Broker revocation receipts are checked by session key ID; response redaction alone is not evidence that a key was revoked.
+  - Cached gateway denial does not independently prove external Keycloak account deletion.
+  - Rehearsal-mode 301/401/501 controls are labeled rehearsal, not claimed as live model execution or actual infrastructure remediation.
+  - These are one-seat lab gates, not production or multi-seat certification.
 observed_red:
   - Refreshed 101 instructions returned HTTP 404; the failed browser report remains intact.
   - Backend scan attempts 1 and 2 ran out of runner disk and produced no valid vulnerability report.
-  - After build-cache cleanup the scanner produced a valid report and blocked fixable high/critical Go standard-library and x/net findings in oc and Helm. Patched pinned-source tool rebuilds are pending; the security gate was not weakened.
+  - After build-cache cleanup the scanner blocked fixable high/critical Go findings in oc and Helm. Pinned-source rebuilds subsequently passed the unchanged fixable gate; unfixed full-scan High findings remain.
   - Historical review tests reject new 301/401/501 pins as previously certified revisions; no historical proof was rewritten.
 deployed_safety:
   - Restored the prior earned 101 catalog pin after the exploratory regression.
@@ -41,7 +88,7 @@ deployed_safety:
   - PV inspection grant adds only get/list; PV delete remains forbidden.
   - Latest synthetic 101 order 4bd83e88-ac0a-4cd6-9a75-0942b3e8bacc reclaimed automatically; independent namespace/PV/Application/external-RoleBinding counts were all zero.
   - Final-control 101 staging was deferred twice because the lifecycle inventory reported running work; no busy-worker rollout was forced.
-latest_partial_live_proof:
+historical_partial_live_proof:
   evidence: evidence/runs/virtualization-ai-foundations-101-participant-root-skin-r3-20261013.json
   source_revision_prefix: 67ae61d
   passed: [public_login, embedded_story, embedded_terminal, embedded_namespace_console, story_live_xeon_condition, story_unavailable_condition, rendered_instructions, loaded_partnership_logos, automatic_reclaim]
@@ -49,11 +96,6 @@ latest_partial_live_proof:
   limitation: The browser harness stopped on a hidden-until-hover control. Duplicate controls were separately reproduced and fixed in the component test; neither the harness repair nor the component pass proves live ttyd delivery.
   formal_certified: false
 next_required:
-  - Qualify the patched backend image release.
-  - Prove existing pull credentials can retrieve the private backend candidate.
-  - Deploy the cleanup verifier behind its Flightpath-only feature flag while idle.
-  - Execute fresh one-seat journeys for all five exact candidate revisions.
-  - Complete the 201 learner-authored artifacts before running its proof steps.
-  - Verify real Execute delivery, readable loaded logos, all Story conditions, embedded namespace Console, and all rendered commands.
-  - Independently prove automatic cleanup including zero PV residue, revoked model keys, and participant access denial.
-  - Update certification and activation records only after those live checks pass.
+  - Obtain a dedicated backend-only read-only package credential; never copy it to learner namespaces or replace the shared lab secret.
+  - Repeat private-image cold pull before rolling out the cleanup verifier, then prove the feature live.
+  - Remediate or formally evaluate remaining unfixed security findings without marking the full security gate green or accepting risk implicitly.

@@ -23,13 +23,13 @@ learning:
 sources:
   showroom:
     repo_url: https://github.com/jkershawrh/virtualization-ai-401.git
-    revision: f00b4bc075acf37f014b8ee55d5810625639b6b3
+    revision: aee89597b325da490fa837b5639e6e71892c0ca1
     playbook: showroom/default-site.yml
     start_path: showroom/content
     gitops_repo_url: https://github.com/jkershawrh/virtualization-ai-401.git
   workload:
     repo_url: https://github.com/jkershawrh/virtualization-ai-401.git
-    revision: f00b4bc075acf37f014b8ee55d5810625639b6b3
+    revision: aee89597b325da490fa837b5639e6e71892c0ca1
     deploy_path: charts/virtualization-ai-401
     gitops_repo_url: https://github.com/jkershawrh/virtualization-ai-401.git
 runtime:
@@ -84,14 +84,14 @@ runtime:
           storageClassName: ocs-storagecluster-ceph-rbd
         image:
           repository: ghcr.io/jkershawrh/virtualization-ai-401-operations-adapter
-          digest: sha256:864ad89cb5f4bae6f2b403c31604d78692e30afe9275c0d753a9eafaeae9d8ca
+          digest: sha256:b18c5a36cf18a2a3b45bc652600fc652c150227463c69cb50f0a039a55318431
           pullPolicy: IfNotPresent
       presentation:
         enabled: true
         ingressDomain: apps.flightpath.fm2aihpcsed.com
         image:
           repository: ghcr.io/jkershawrh/virtualization-ai-401-presentation
-          digest: sha256:7115b9332335e9ceb77f68b9dc04828b36e1f0c874deee56272556fa3001bf25
+          digest: sha256:23d13240db7100facdc9edf10c95636526816d7fca11f32bf6408112b018cde4
           pullPolicy: IfNotPresent
     runtime_secret_name: ''
     runtime_secret_value_path: ''

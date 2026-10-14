@@ -43,10 +43,10 @@ metadata:
   certification_transfer: none
   showroom: true
   showroom_content_repo_url: https://github.com/jkershawrh/virtualization-ai-201.git
-  showroom_content_ref: 3c94600ca8808a55693e94d5a1f169efbadbedd1
-  showroom_content_playbook: showroom/default-site.yml
+  showroom_content_ref: f5cbcad3865390d7d5844d94087b59eb94c8f276
+  showroom_content_playbook: default-site.yml
   showroom_content_start_path: showroom/content
-  showroom_content_image: ghcr.io/jkershawrh/virtualization-ai-201-showroom-content@sha256:56991a08cba6849d42caa54ae45b4c7d2714b086d0df247f53cd2d4700b090ca
+  showroom_content_image: ghcr.io/jkershawrh/virtualization-ai-201-showroom-content@sha256:dc4f902c9892824e1eb9f1ddabc9bc4b56f7a4090da5a61a429116b857c30168
   operator_workshop: true
   content_only: false
   onboarding_managed: true
@@ -92,7 +92,7 @@ metadata:
   workshop_node_headroom_pods: 0
   workshop_node_required_labels: {}
   workload_repo: https://github.com/jkershawrh/virtualization-ai-201.git
-  workload_revision: 3c94600ca8808a55693e94d5a1f169efbadbedd1
+  workload_revision: f5cbcad3865390d7d5844d94087b59eb94c8f276
   workload_deploy_type: helm
   workload_deployment_scope: seat
   workload_deploy_path: charts/virtualization-ai-201
@@ -101,8 +101,8 @@ metadata:
   workload_release_name: virtualization-ai-201
   workload_helm_values:
     values_overlay: charts/virtualization-ai-201/values.published.yaml
-    workload_image: ghcr.io/jkershawrh/virtualization-ai-201-adapter@sha256:99f1ac6f65386013cb20d81e3dbc6099ffbb63cebfdc6fb1f1cdd50d96153a39
-    presentation_image: ghcr.io/jkershawrh/virtualization-ai-201-presentation@sha256:2749e4ad44f3902f7507adaaaa8fadd509d1e625b33619530852bd9a01255069
+    workload_image: ghcr.io/jkershawrh/virtualization-ai-201-adapter@sha256:177af37c53b08b09c73b39b50bbaa92c47f2737c7072c2c14a3eed1e04bc9c99
+    presentation_image: ghcr.io/jkershawrh/virtualization-ai-201-presentation@sha256:84a9b5ae29903ffedfc9b84753b362f5715167f23057628e99df5a94e1683a06
     presentation_enabled: true
     adapter:
       mode: live
@@ -135,6 +135,7 @@ metadata:
     ui: lab
   workload_readiness: []
   source_content_repo: https://github.com/jkershawrh/virtualization-ai-201.git
-  source_content_revision: 3c94600ca8808a55693e94d5a1f169efbadbedd1
+  source_content_revision: f5cbcad3865390d7d5844d94087b59eb94c8f276
   source_references:
-    release_workflow: https://github.com/jkershawrh/virtualization-ai-201/actions/runs/36878975266
+    release_workflow: https://github.com/jkershawrh/virtualization-ai-201/actions/runs/38492958880
+    certification_evidence: evidence/runs/virtualization-ai-201-formal-current-pin-r4-20261013.json

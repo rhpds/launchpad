@@ -1,0 +1,798 @@
+{
+  "schema": "launchpad/public-browser-exploration/v1",
+  "catalog": "virtualization-ai-401",
+  "cluster": "flightpath",
+  "started_at": "2026-10-14T00:38:25.539Z",
+  "checks": [
+    {
+      "id": "order_created",
+      "passed": true,
+      "detail": {
+        "order_id": "14cbd7e6-e0bf-494b-b8fe-7a8a9a2c3ae7",
+        "public_url": "https://labs.smg-helix.ai/labs/virtualization-ai-401-14cbd7e6"
+      }
+    },
+    {
+      "id": "one_seat_ready",
+      "passed": true,
+      "detail": [
+        {
+          "seat_id": "257a281b-f2f9-4b04-9fd9-a412f828a657",
+          "session_id": "1e10f098-50f4-42d8-b1a3-156c35781b7d"
+        }
+      ]
+    },
+    {
+      "id": "participant_landing",
+      "passed": true,
+      "detail": {
+        "url": "https://labs.smg-helix.ai/labs/virtualization-ai-401-14cbd7e6",
+        "text": "×\n|\nPartner AI Launchpad\nPARTICIPANT\nCurrent lab\nMy Lab Access\nLog out of lab\nPARTICIPANT WORKSPACE\nYour lab is ready\n\nSeat 257a281b-f2f9-4b04-9fd9-a412f828a657\n\nOpen Lab\nMy Lab Access\nLog out of lab\nLogging out preserves your seat. Access ends at 2026-10-14T02:38:29.216626."
+      }
+    },
+    {
+      "id": "showroom_shell",
+      "passed": true,
+      "detail": {
+        "url": "https://labs.smg-helix.ai/labs/virtualization-ai-401-14cbd7e6/showroom/",
+        "frames": [
+          "https://labs.smg-helix.ai/labs/virtualization-ai-401-14cbd7e6/showroom/",
+          "https://labs.smg-helix.ai/labs/virtualization-ai-401-14cbd7e6/showroom/www/virtualization-ai-401/index.html",
+          "https://labs.smg-helix.ai/labs/virtualization-ai-401-14cbd7e6/proxy/tool/story/",
+          "https://labs.smg-helix.ai/labs/virtualization-ai-401-14cbd7e6/showroom/terminal",
+          "https://labs.smg-helix.ai/k8s/ns/launchpad-flightpath-candida-virtualization-ai-257a28/core~v1~Pod"
+        ],
+        "text": "Story\nTerminal\nOpenShift Console"
+      }
+    },
+    {
+      "id": "active_tab_story",
+      "passed": true,
+      "detail": {
+        "url": "https://labs.smg-helix.ai/labs/virtualization-ai-401-14cbd7e6/proxy/tool/story/",
+        "text": "×\nOperate Hybrid VM and AI Workloads\n\nA governed day-two path for migration, recovery, dependency failure, and durable evidence\n\nCLICK OR PRESS SPACE TO BEGIN",
+        "canvas": 0,
+        "popups": []
+      }
+    },
+    {
+      "id": "active_tab_terminal",
+      "passed": true,
+      "detail": {
+        "url": "https://labs.smg-helix.ai/labs/virtualization-ai-401-14cbd7e6/showroom/terminal",
+        "text": "",
+        "canvas": 3,
+        "popups": []
+      }
+    },
+    {
+      "id": "active_tab_openshift_console",
+      "passed": true,
+      "detail": {
+        "url": "https://labs.smg-helix.ai/k8s/ns/launchpad-flightpath-candida-virtualization-ai-257a28/core~v1~Pod?page=1&perPage=50",
+        "text": "Skip to content\nCore platform\nHome\nFavorites\nEcosystem\nWorkloads\nVirtualization\nMigration\nServerless\nNetworking\nStorage\nBuilds\nObserve\nUser Management\nAdministration\nProject: launchpad-flightpath-candida-virtualization-ai-257a28\nPods\nCreate Pod\n1 - 4 of 4 items\nName\n\t\nStatus\n\t\nReady\n\t\nRestarts\n\t\nOwner\n\t\nMemory\n\t\nCPU\n\t\nCreated\n\t\nActions\n\n\nPod\nP\nshowroom-7745d446db-d7q7c\n\t\nRunning\n\t4/4\t0\t\nReplicaSet\nRS\nshowroom-7745d446db\n\t115.8 MiB\t0.027 cores\t\n1 minute ago\n\t\n\n\nPod\nP\nvirt-launcher-operations-client-t7b67\n\t\nRunning\n\t3/3\t0\t\nVirtualMachineInstance\nVMI\noperations-client\n\t633.0 MiB\t0.066 cores\t\n1 minute ago\n\t\n\n\nPod\nP\nvirtualization-ai-401-operations-adapter-5d75b87c74-lphg6\n\t\nRunning\n\t1/1\t0\t\nReplicaSet\nRS\nvirtualization-ai-401-operations-adapter-5d75b87c74\n\t21.2 MiB\t0.000 cores\t\n1 minute ago\n\t\n\n\nPod\nP\nvirtualization-ai-401-presentation-56786b6775-9qndw\n\t\nRunning\n\t1/1\t0\t\nReplicaSet\nRS\nvirtualization-ai-401-presentation-56786b6775\n\t12.1 MiB\t0.000 cores\t\n1 minute ago\n\t\nWelcome to the new OpenShift experience!\n\nIntroducing a fresh modern look to the console! With this update, we made changes to the user interface to enhance usability and streamline your workflow. This includes improved navigation and visual refinement to help manage your applications and infrastructure more easily.\n\nWhat do you want to do next?\nLaunch tour\nSkip tour",
+        "canvas": 0,
+        "popups": []
+      }
+    },
+    {
+      "id": "story_navigation",
+      "passed": true,
+      "detail": {
+        "steps": [
+          {
+            "step": 0,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-401-14cbd7e6/proxy/tool/story/?act=0&scene=0",
+            "text": "×\n←\n→\nP\n⛶\nOBSERVE\nInfrastructure health is not service health\n×\nInfrastructure health is not service health\nA PLANNED MIGRATION CAN COMPLETE WHILE THE APPLICATION OR ITS AI DEPENDENCY STILL FAILS.\n01 · 1/1"
+          },
+          {
+            "step": 1,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-401-14cbd7e6/proxy/tool/story/?act=1&scene=0",
+            "text": "×\n←\n→\nP\n⛶\nPREFLIGHT\nQualify the operation before proposing it\n\nEach answer is observed evidence, never an assumption.\n\n1\nIdentity\n2\nCompatibility\n3\nEvidence\n4\nAuthority\nAUDIENCE QUESTION\nIs this the declared VM?\nReveal technical boundary\nactive request and evidence path\ndeployment or trust boundary\noptional integration\nAUTHORITY\nHuman operator\nrequests and explicitly approves an operation\nGOVERNED OPERATIONS BOUNDARY\nnamespaced candidate; no cluster mutation authority\nsnapshot\n→\nEVIDENCE\nObserved state\ncurrent identity, compatibility, and health\nevaluate\n→\nPOLICY\nDeterministic policy\nALLOW_REVIEW · REFUSE · ABSTAIN\nrecord\n→\nDEPLOYMENT\nOperations adapter\nrecords evidence; never remediates\nPOST /api/v1/operations\nauthorize review\n→\nAUTHORITY\nApproval gate\nhuman · digest · expiry\nobserved result\n→\nEXTERNAL\nExternal operation\nmigration or recovery remains outside adapter authority\nhealth\n→\nSERVICE\nApplication + AI path\nvalidated separately from infrastructure\nlearn\n→\nDATA\nDurable evidence "
+          },
+          {
+            "step": 2,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-401-14cbd7e6/proxy/tool/story/?act=2&scene=0",
+            "text": "×\n←\n→\nP\n⛶\nPROPOSE\nA passing preflight is a proposal, not permission\nThe checks passed\n→\nALLOW_REVIEW · HUMAN_APPROVAL_REQUIRED\n\nThe operation digest freezes exactly what the reviewer is asked to approve.\n\n03 · 1/1"
+          },
+          {
+            "step": 3,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-401-14cbd7e6/proxy/tool/story/?act=3&scene=0",
+            "text": "×\n←\n→\nP\n⛶\nAPPROVE\nAuthority stays with the operator\nMAY APPROVE THE EXACT OPERATION DIGEST\nHuman authority\nnamed reviewer\nexpiry\naccept or reject\nMAY EVALUATE AND RECORD ONLY\nAdapter authority\ndeterministic policy\ndurable evidence\nno remediation\nNONE\nModel authority\noptional explanation\nno decision override\nno infrastructure action\n04 · 1/1"
+          },
+          {
+            "step": 4,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-401-14cbd7e6/proxy/tool/story/?act=4&scene=0",
+            "text": "×\n←\n→\nP\n⛶\n1\nPlanned migration validates\n2\nAI dependency is unavailable\n3\nInfrastructure succeeds, application fails\nGOVERNED REHEARSAL\nStart with one approved operation\nPreserve the exact digest, observed result, source state, and human authority.\nINPUT\nGoverned operation request\nOne typed contract separates the platform operation, application health, AI dependency, and correlated evidence.\nInspect technical topology\nRun governed operation conditions\nAUTHORITY\nExecution remains human-owned\n\nThe adapter records an external operation result. It never migrates, restores, or remediates a workload.\n\nALLOW_REVIEW permits inspection; it never authorizes certification or promotion.\n05 · 1/1"
+          },
+          {
+            "condition_result": "×\n←\n→\nP\n⛶\n1\nPlanned migration validates\n2\nAI dependency is unavailable\n3\nInfrastructure succeeds, application fails\nCONDITION 1 OF 3\nPlanned migration validates\nInfrastructure, application, AI dependency, and correlation all pass.\nREHEARSAL\nDECISION\nALLOW_REVIEW\nREASON\nVALIDATION_COMPLETE\nSOURCE\nREHEARSAL\n\nLive endpoint returned HTTP 405 Showing clearly labeled fallback evidence.\n\nInspect technical topology\nNext governed condition →\nAUTHORITY\nExecution remains human-owned\n\nThe adapter records an external operation result. It never migrates, restores, or remediates a workload.\n\nALLOW_REVIEW permits inspection; it never authorizes certification or promotion.\n05 · 1/1"
+          },
+          {
+            "step": 5,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-401-14cbd7e6/proxy/tool/story/?act=5&scene=0",
+            "text": "×\n←\n→\nP\n⛶\nVALIDATE\nValidate the service, not just the operation\nHEALTHY MIGRATION\nALLOW_REVIEW\n\nInfrastructure PASS · application PASS · AI path PASS\n\nDEPENDENCY OUTAGE\nABSTAIN\n\nInfrastructure PASS · application PASS · AI path FAIL\n\nSPLIT FAILURE\nREFUSE\n\nInfrastructure PASS · application FAIL\n\n06 · 1/1"
+          },
+          {
+            "step": 6,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-401-14cbd7e6/proxy/tool/story/?act=6&scene=0",
+            "text": "×\n←\n→\nP\n⛶\nLEARN\nThe durable record preserves what happened—and what did not\nREHEARSAL\n1 proof condition completed\nDECISION\nALLOW_REVIEW\nREASON\nVALIDATION_COMPLETE\nSOURCE\nREHEARSAL\nOBSERVE → PREFLIGHT → PROPOSE → APPROVE → EXECUTE → VALIDATE → LEARN remains correlated.\nLaunchpad still owns target execution, measurement, cleanup verification, certification, and promotion.\nContinue in the separate 90–120 minute Showroom lab →\n07 · 1/1"
+          },
+          {
+            "step": 7,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-401-14cbd7e6/proxy/tool/story/?act=6&scene=0&finale=1",
+            "text": "×\n←\n→\nP\n⛶\nSTORY COMPLETE\nDecide whether the operation and its service outcome are safe to review.\nOPTIONAL NEXT STEP · 90–120 MINUTES\nOperate Hybrid VM and AI Workloads lab\nUse the separate Showroom lab; begin in REHEARSAL and stop before certification.\nClose presentation\nRestart\nRed Hat × Intel"
+          },
+          {
+            "step": 8,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-401-14cbd7e6/proxy/tool/story/?act=6&scene=0&finale=1",
+            "text": "×\n←\n→\nP\n⛶\nSTORY COMPLETE\nDecide whether the operation and its service outcome are safe to review.\nOPTIONAL NEXT STEP · 90–120 MINUTES\nOperate Hybrid VM and AI Workloads lab\nUse the separate Showroom lab; begin in REHEARSAL and stop before certification.\nClose presentation\nRestart\nRed Hat × Intel"
+          },
+          {
+            "step": 9,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-401-14cbd7e6/proxy/tool/story/?act=6&scene=0&finale=1",
+            "text": "×\n←\n→\nP\n⛶\nSTORY COMPLETE\nDecide whether the operation and its service outcome are safe to review.\nOPTIONAL NEXT STEP · 90–120 MINUTES\nOperate Hybrid VM and AI Workloads lab\nUse the separate Showroom lab; begin in REHEARSAL and stop before certification.\nClose presentation\nRestart\nRed Hat × Intel"
+          },
+          {
+            "step": 10,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-401-14cbd7e6/proxy/tool/story/?act=6&scene=0&finale=1",
+            "text": "×\n←\n→\nP\n⛶\nSTORY COMPLETE\nDecide whether the operation and its service outcome are safe to review.\nOPTIONAL NEXT STEP · 90–120 MINUTES\nOperate Hybrid VM and AI Workloads lab\nUse the separate Showroom lab; begin in REHEARSAL and stop before certification.\nClose presentation\nRestart\nRed Hat × Intel"
+          },
+          {
+            "step": 11,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-401-14cbd7e6/proxy/tool/story/?act=6&scene=0&finale=1",
+            "text": "×\n←\n→\nP\n⛶\nSTORY COMPLETE\nDecide whether the operation and its service outcome are safe to review.\nOPTIONAL NEXT STEP · 90–120 MINUTES\nOperate Hybrid VM and AI Workloads lab\nUse the separate Showroom lab; begin in REHEARSAL and stop before certification.\nClose presentation\nRestart\nRed Hat × Intel"
+          }
+        ]
+      }
+    },
+    {
+      "id": "content_welcome",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Operate Hybrid VM and AI Workloads"
+      }
+    },
+    {
+      "id": "showroom_branding",
+      "passed": true,
+      "detail": {
+        "logos": [
+          {
+            "alt": "Red Hat",
+            "src": "../_/img/redhat-logo.svg",
+            "loaded": true,
+            "width": 41.703125,
+            "height": 31.671875
+          },
+          {
+            "alt": "Intel",
+            "src": "../_/img/intel-logo.svg",
+            "loaded": true,
+            "width": 65.765625,
+            "height": 25.515625
+          }
+        ]
+      }
+    },
+    {
+      "id": "code_controls_welcome",
+      "passed": true,
+      "detail": {
+        "buttons": [
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "nav-toggle"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          }
+        ],
+        "executable_blocks": 2
+      }
+    },
+    {
+      "id": "execute_button_interaction",
+      "passed": true,
+      "detail": {
+        "stage": "welcome",
+        "button_label": "Run in terminal",
+        "terminal_output_marker": "namespace=launchpad-",
+        "actual_terminal_output_observed": true
+      }
+    },
+    {
+      "id": "content_observe",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "OBSERVE"
+      }
+    },
+    {
+      "id": "code_controls_observe",
+      "passed": true,
+      "detail": {
+        "buttons": [
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "nav-toggle"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          }
+        ],
+        "executable_blocks": 2
+      }
+    },
+    {
+      "id": "content_preflight",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "PREFLIGHT"
+      }
+    },
+    {
+      "id": "code_controls_preflight",
+      "passed": true,
+      "detail": {
+        "buttons": [
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "nav-toggle"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          }
+        ],
+        "executable_blocks": 2
+      }
+    },
+    {
+      "id": "content_propose",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "PROPOSE"
+      }
+    },
+    {
+      "id": "code_controls_propose",
+      "passed": true,
+      "detail": {
+        "buttons": [
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "nav-toggle"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          }
+        ],
+        "executable_blocks": 2
+      }
+    },
+    {
+      "id": "content_approve",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "APPROVE"
+      }
+    },
+    {
+      "id": "code_controls_approve",
+      "passed": true,
+      "detail": {
+        "buttons": [
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "nav-toggle"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          }
+        ],
+        "executable_blocks": 2
+      }
+    },
+    {
+      "id": "content_execute",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "EXECUTE the rehearsal"
+      }
+    },
+    {
+      "id": "code_controls_execute",
+      "passed": true,
+      "detail": {
+        "buttons": [
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "nav-toggle"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          }
+        ],
+        "executable_blocks": 2
+      }
+    },
+    {
+      "id": "content_validate",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "VALIDATE"
+      }
+    },
+    {
+      "id": "code_controls_validate",
+      "passed": true,
+      "detail": {
+        "buttons": [
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "nav-toggle"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          }
+        ],
+        "executable_blocks": 2
+      }
+    },
+    {
+      "id": "content_learn",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "LEARN and hand off"
+      }
+    },
+    {
+      "id": "code_controls_learn",
+      "passed": true,
+      "detail": {
+        "buttons": [
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "nav-toggle"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          }
+        ],
+        "executable_blocks": 3
+      }
+    },
+    {
+      "id": "content_conclusion",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Conclusion"
+      }
+    },
+    {
+      "id": "rendered_code_inventory",
+      "passed": true,
+      "detail": {
+        "blocks": [
+          {
+            "stage": "welcome",
+            "first_line": "export LAB_NAMESPACE=\"$(oc project -q)\""
+          },
+          {
+            "stage": "welcome",
+            "first_line": "curl -fsS \"$OPS_URL/healthz\" | jq '{status,mode,authority}'"
+          },
+          {
+            "stage": "observe",
+            "first_line": "oc get virtualmachines,virtualmachineinstances -n \"$LAB_NAMESPACE\" -o wide"
+          },
+          {
+            "stage": "observe",
+            "first_line": "oc get deployment,service,persistentvolumeclaims -n \"$LAB_NAMESPACE\" \\"
+          },
+          {
+            "stage": "preflight",
+            "first_line": "curl -fsS \"$PRESENTATION_URL/fixtures/healthy-migration.json\" -o /tmp/op-healthy.json"
+          },
+          {
+            "stage": "preflight",
+            "first_line": "jq -e '.source_state == \"REHEARSAL\" and .authority.automated_action_performed == false' /tmp/op-healthy.json"
+          },
+          {
+            "stage": "propose",
+            "first_line": "curl -fsS \"$PRESENTATION_URL/fixtures/approved-migration-request.json\" -o /tmp/op-request.json"
+          },
+          {
+            "stage": "propose",
+            "first_line": "jq -e '.target.virtual_machine != \"\" and (.approval.operation_digest | startswith(\"sha256:\"))' /tmp/op-request.json"
+          },
+          {
+            "stage": "approve",
+            "first_line": "jq '{approved_by:.approval.approved_by,expires_at:.approval.expires_at,digest:.approval.operation_digest}' /tmp/op-request.json"
+          },
+          {
+            "stage": "approve",
+            "first_line": "test \"$(jq -r '.authority.human_review_required' /tmp/op-healthy.json)\" = true"
+          },
+          {
+            "stage": "execute",
+            "first_line": "curl -fsS -H 'Content-Type: application/json' --data-binary @/tmp/op-request.json \\"
+          },
+          {
+            "stage": "execute",
+            "first_line": "jq -e '.source_state == \"REHEARSAL\" and .ai_participated == false and .authority.automated_action_performed == false' /tmp/op-result.json"
+          },
+          {
+            "stage": "validate",
+            "first_line": "for scenario in dependency-outage application-failure; do"
+          },
+          {
+            "stage": "validate",
+            "first_line": "test \"$(jq -r .decision /tmp/dependency-outage-result.json)\" = ABSTAIN"
+          },
+          {
+            "stage": "learn",
+            "first_line": "REQUEST_ID=\"$(jq -r .request_id /tmp/op-result.json)\""
+          },
+          {
+            "stage": "learn",
+            "first_line": "curl -fsS \"$OPS_URL/metrics\" | grep '^virtualization_ai_401_'"
+          },
+          {
+            "stage": "learn",
+            "first_line": "jq -e '.evidence | length == 7' /tmp/op-ledger.json"
+          }
+        ]
+      }
+    },
+    {
+      "id": "learner_tool_dependencies",
+      "passed": true,
+      "detail": {
+        "tools": [
+          "/usr/local/bin/oc",
+          "/usr/bin/curl",
+          "/usr/bin/jq",
+          "/usr/local/bin/virtctl",
+          "/usr/bin/ssh",
+          "/usr/bin/uuidgen",
+          "/usr/bin/base64",
+          "/usr/bin/install",
+          "/usr/bin/chmod",
+          "/usr/bin/tee",
+          "/usr/bin/grep"
+        ]
+      }
+    },
+    {
+      "id": "complete_rendered_command_journey",
+      "passed": true,
+      "detail": {
+        "blocks": 17,
+        "completed_blocks": [
+          "JOURNEY_PASS_0_welcome",
+          "JOURNEY_PASS_1_welcome",
+          "JOURNEY_PASS_2_observe",
+          "JOURNEY_PASS_3_observe",
+          "JOURNEY_PASS_4_preflight",
+          "JOURNEY_PASS_5_preflight",
+          "JOURNEY_PASS_6_propose",
+          "JOURNEY_PASS_7_propose",
+          "JOURNEY_PASS_8_approve",
+          "JOURNEY_PASS_9_approve",
+          "JOURNEY_PASS_10_execute",
+          "JOURNEY_PASS_11_execute",
+          "JOURNEY_PASS_12_validate",
+          "JOURNEY_PASS_13_validate",
+          "JOURNEY_PASS_14_learn",
+          "JOURNEY_PASS_15_learn",
+          "JOURNEY_PASS_16_learn"
+        ],
+        "live_vm_inference": false,
+        "output_tail": "ove\nJOURNEY_PASS_9_approve\nJOURNEY_BLOCK_10_execute\n{\n  \"request_id\": \"op-401-migration-healthy\",\n  \"decision\": \"ALLOW_REVIEW\",\n  \"source_state\": \"REHEARSAL\",\n  \"ai_participated\": false,\n  \"authority\": {\n    \"human_review_required\": true,\n    \"automated_action_performed\": false,\n    \"llm_authority\": \"NONE\"\n  },\n  \"states\": [\n    \"OBSERVE\",\n    \"PREFLIGHT\",\n    \"PROPOSE\",\n    \"APPROVE\",\n    \"EXECUTE\",\n    \"VALIDATE\",\n    \"LEARN\"\n  ]\n}\nJOURNEY_PASS_10_execute\nJOURNEY_BLOCK_11_execute\ntrue\nJOURNEY_PASS_11_execute\nJOURNEY_BLOCK_12_validate\n{\n  \"request_id\": \"op-401-ai-dependency-outage\",\n  \"decision\": \"ABSTAIN\",\n  \"reason_codes\": [\n    \"AI_DEPENDENCY_UNAVAILABLE\"\n  ],\n  \"validation\": {\n    \"status\": \"INCOMPLETE\",\n    \"infrastructure\": \"PASS\",\n    \"application\": \"PASS\",\n    \"ai_dependency\": \"FAIL\",\n    \"correlation\": \"PASS\"\n  }\n}\n{\n  \"request_id\": \"op-401-application-failure\",\n  \"decision\": \"REFUSE\",\n  \"reason_codes\": [\n    \"APPLICATION_FAILED_AFTER_INFRA_SUCCESS\"\n  ],\n  \"validation\": {\n    \"status\": \"FAIL\",\n    \"infrastructure\": \"PASS\",\n    \"application\": \"FAIL\",\n    \"ai_dependency\": \"PASS\",\n    \"correlation\": \"PASS\"\n  }\n}\nJOURNEY_PASS_12_validate\nJOURNEY_BLOCK_13_validate\nJOURNEY_PASS_13_validate\nJOURNEY_BLOCK_14_learn\n{\n  \"request_id\": \"op-401-migration-healthy\",\n  \"states\": [\n    \"OBSERVE\",\n    \"PREFLIGHT\",\n    \"PROPOSE\",\n    \"APPROVE\",\n    \"EXECUTE\",\n    \"VALIDATE\",\n    \"LEARN\"\n  ],\n  \"records\": 7\n}\nJOURNEY_PASS_14_learn\nJOURNEY_BLOCK_15_learn\nvirtualization_ai_401_decisions_total{decision=\"ALLOW_REVIEW\"} 1\nvirtualization_ai_401_decisions_total{decision=\"REFUSE\"} 1\nvirtualization_ai_401_decisions_total{decision=\"ABSTAIN\"} 1\nvirtualization_ai_401_ledger_records_total 21\nJOURNEY_PASS_15_learn\nJOURNEY_BLOCK_16_learn\ntrue\nJOURNEY_PASS_16_learn\nFULL_LEARNER_JOURNEY_COMPLETE\n"
+      }
+    },
+    {
+      "id": "my_labs_contains_seat",
+      "passed": true,
+      "detail": {
+        "text": "×\n|\nPartner AI Launchpad\nPARTICIPANT\nCurrent lab\nMy Lab Access\nLog out of lab\nPARTICIPANT WORKSPACE\nMy Lab Access\n\nResume any active environment associated with your participant identity.\n\nvirtualization-ai-401\n\nAvailable until 2026-10-14T02:38:29.216626\n\nResume lab\nAdd another lab\n\nEnter the instructor code for another active lab.\n\nAdd lab"
+      }
+    },
+    {
+      "id": "reclaim_completed",
+      "passed": true,
+      "detail": {
+        "status": "completed",
+        "remaining_labeled_namespaces": 0
+      }
+    },
+    {
+      "id": "independent_zero_residue",
+      "passed": true,
+      "detail": {
+        "namespace": "launchpad-flightpath-candida-virtualization-ai-257a28",
+        "inventory": {
+          "namespace": 0,
+          "persistent_volume": 0,
+          "application": 0,
+          "external_role_binding": 0
+        }
+      }
+    },
+    {
+      "id": "model_key_revoked",
+      "passed": true,
+      "detail": {
+        "key_present": false,
+        "revocation": {
+          "key_id": "9bbc8f660501a278e34d01afc9e277e43d58654babcbc7d316fc0ca79cc086ff",
+          "provider": "litellm",
+          "confirmed_at": "2026-10-14T00:41:02.218805Z",
+          "confirmation_id": "http-success"
+        }
+      }
+    },
+    {
+      "id": "public_policy_and_claims_disabled",
+      "passed": true,
+      "detail": {
+        "enabled": false,
+        "claim_count": 0
+      }
+    },
+    {
+      "id": "cached_participant_session_denied",
+      "passed": true,
+      "detail": {
+        "http_status": 403,
+        "location": ""
+      }
+    }
+  ],
+  "certified": false,
+  "run": "final-controls-r2",
+  "order_id": "14cbd7e6-e0bf-494b-b8fe-7a8a9a2c3ae7",
+  "public_url": "https://labs.smg-helix.ai/labs/virtualization-ai-401-14cbd7e6",
+  "seats": [
+    {
+      "seat_id": "257a281b-f2f9-4b04-9fd9-a412f828a657",
+      "session_id": "1e10f098-50f4-42d8-b1a3-156c35781b7d"
+    }
+  ],
+  "landing_links": [
+    {
+      "text": "Current lab",
+      "href": "/"
+    },
+    {
+      "text": "My Lab Access",
+      "href": "/my-labs"
+    },
+    {
+      "text": "Log out of lab",
+      "href": "/oauth2/sign_out?rd=%2Frealms%2Flaunchpad-public%2Fprotocol%2Fopenid-connect%2Flogout"
+    },
+    {
+      "text": "Open Lab",
+      "href": "/labs/virtualization-ai-401-14cbd7e6/showroom/"
+    },
+    {
+      "text": "My Lab Access",
+      "href": "/my-labs"
+    },
+    {
+      "text": "Log out of lab",
+      "href": "/oauth2/sign_out?rd=%2Frealms%2Flaunchpad-public%2Fprotocol%2Fopenid-connect%2Flogout"
+    }
+  ],
+  "namespace": "launchpad-flightpath-candida-virtualization-ai-257a28",
+  "cleanup_status": "completed",
+  "remaining_labeled_namespaces": 0,
+  "finished_at": "2026-10-14T00:42:29.465Z"
+}

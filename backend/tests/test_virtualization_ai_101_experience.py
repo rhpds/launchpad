@@ -28,7 +28,7 @@ def test_101_records_certification_without_claiming_browser_console_sso() -> Non
         "public_code",
     ]
     assert metadata["showroom_journey"] == "virtualization-ai-101"
-    assert metadata["workload_revision"] == "3f622615f544c75db87a37833fc209b3d1b60731"
+    assert metadata["workload_revision"] == "e881ece208528720974f4e7bc659a0c8ad0627fb"
     assert metadata["recommended_next_items"] == ["virtualization-ai-201"]
     assert intake["learning"]["recommended_next_items"] == ["virtualization-ai-201"]
     assert metadata["showroom_tabs"] == intake["runtime"]["tabs"]

@@ -39,7 +39,7 @@ metadata:
   solution_family: virtualization_ai
   showroom: true
   showroom_content_repo_url: https://github.com/jkershawrh/virtualization-ai-401.git
-  showroom_content_ref: f00b4bc075acf37f014b8ee55d5810625639b6b3
+  showroom_content_ref: aee89597b325da490fa837b5639e6e71892c0ca1
   showroom_content_playbook: showroom/default-site.yml
   showroom_content_start_path: showroom/content
   operator_workshop: true
@@ -91,7 +91,7 @@ metadata:
   workshop_node_headroom_pods: 0
   workshop_node_required_labels: {}
   workload_repo: https://github.com/jkershawrh/virtualization-ai-401.git
-  workload_revision: f00b4bc075acf37f014b8ee55d5810625639b6b3
+  workload_revision: aee89597b325da490fa837b5639e6e71892c0ca1
   workload_deploy_type: helm
   workload_deployment_scope: seat
   workload_deploy_path: charts/virtualization-ai-401
@@ -105,14 +105,14 @@ metadata:
         storageClassName: ocs-storagecluster-ceph-rbd
       image:
         repository: ghcr.io/jkershawrh/virtualization-ai-401-operations-adapter
-        digest: sha256:864ad89cb5f4bae6f2b403c31604d78692e30afe9275c0d753a9eafaeae9d8ca
+        digest: sha256:b18c5a36cf18a2a3b45bc652600fc652c150227463c69cb50f0a039a55318431
         pullPolicy: IfNotPresent
     presentation:
       enabled: true
       ingressDomain: apps.flightpath.fm2aihpcsed.com
       image:
         repository: ghcr.io/jkershawrh/virtualization-ai-401-presentation
-        digest: sha256:7115b9332335e9ceb77f68b9dc04828b36e1f0c874deee56272556fa3001bf25
+        digest: sha256:23d13240db7100facdc9edf10c95636526816d7fca11f32bf6408112b018cde4
         pullPolicy: IfNotPresent
   workload_ignore_differences: []
   workload_runtime_secret_name: ''
@@ -123,7 +123,7 @@ metadata:
     ui: virtualization-ai-401
   workload_readiness: []
   source_content_repo: https://github.com/jkershawrh/virtualization-ai-401.git
-  source_content_revision: f00b4bc075acf37f014b8ee55d5810625639b6b3
+  source_content_revision: aee89597b325da490fa837b5639e6e71892c0ca1
   source_references:
-    release_workflow: https://github.com/jkershawrh/virtualization-ai-401/actions/runs/36761503526
-    certification_evidence: evidence/runs/flightpath-live-20261002-virtualization-ai-401-public-1seat-r1.json
+    release_workflow: https://github.com/jkershawrh/virtualization-ai-401/actions/runs/38480912766
+    certification_evidence: evidence/runs/virtualization-ai-401-formal-current-pin-r2-20261013.json

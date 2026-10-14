@@ -1,0 +1,834 @@
+{
+  "schema": "launchpad/public-browser-exploration/v1",
+  "catalog": "virtualization-ai-301",
+  "cluster": "flightpath",
+  "started_at": "2026-10-14T00:30:55.349Z",
+  "checks": [
+    {
+      "id": "order_created",
+      "passed": true,
+      "detail": {
+        "order_id": "67141888-b318-4189-b8f2-a1c79f859bb0",
+        "public_url": "https://labs.smg-helix.ai/labs/virtualization-ai-301-67141888"
+      }
+    },
+    {
+      "id": "one_seat_ready",
+      "passed": true,
+      "detail": [
+        {
+          "seat_id": "b7ad6398-b630-4803-b2f9-652a1e761809",
+          "session_id": "0e09e171-1d6a-4831-b6d4-398c5aca260b"
+        }
+      ]
+    },
+    {
+      "id": "participant_landing",
+      "passed": true,
+      "detail": {
+        "url": "https://labs.smg-helix.ai/labs/virtualization-ai-301-67141888",
+        "text": "×\n|\nPartner AI Launchpad\nPARTICIPANT\nCurrent lab\nMy Lab Access\nLog out of lab\nPARTICIPANT WORKSPACE\nYour lab is ready\n\nSeat b7ad6398-b630-4803-b2f9-652a1e761809\n\nOpen Lab\nMy Lab Access\nLog out of lab\nLogging out preserves your seat. Access ends at 2026-10-14T02:30:59.102863."
+      }
+    },
+    {
+      "id": "showroom_shell",
+      "passed": true,
+      "detail": {
+        "url": "https://labs.smg-helix.ai/labs/virtualization-ai-301-67141888/showroom/",
+        "frames": [
+          "https://labs.smg-helix.ai/labs/virtualization-ai-301-67141888/showroom/",
+          "https://labs.smg-helix.ai/labs/virtualization-ai-301-67141888/showroom/www/virtualization-ai-301/main/index.html",
+          "https://labs.smg-helix.ai/labs/virtualization-ai-301-67141888/proxy/tool/story/",
+          "https://labs.smg-helix.ai/labs/virtualization-ai-301-67141888/showroom/terminal",
+          "https://labs.smg-helix.ai/k8s/ns/launchpad-flightpath-candida-virtualization-ai-b7ad63/core~v1~Pod"
+        ],
+        "text": "Story\nTerminal\nOpenShift Console"
+      }
+    },
+    {
+      "id": "active_tab_story",
+      "passed": true,
+      "detail": {
+        "url": "https://labs.smg-helix.ai/labs/virtualization-ai-301-67141888/proxy/tool/story/",
+        "text": "×\nModernize VMs with Governed AI\n\nIdentity, network, placement, and evidence across Red Hat OpenShift Virtualization and Intel\n\nCLICK OR PRESS SPACE TO BEGIN",
+        "canvas": 0,
+        "popups": []
+      }
+    },
+    {
+      "id": "active_tab_terminal",
+      "passed": true,
+      "detail": {
+        "url": "https://labs.smg-helix.ai/labs/virtualization-ai-301-67141888/showroom/terminal",
+        "text": "",
+        "canvas": 3,
+        "popups": []
+      }
+    },
+    {
+      "id": "active_tab_openshift_console",
+      "passed": true,
+      "detail": {
+        "url": "https://labs.smg-helix.ai/k8s/ns/launchpad-flightpath-candida-virtualization-ai-b7ad63/core~v1~Pod?page=1&perPage=50",
+        "text": "Skip to content\nCore platform\nHome\nFavorites\nEcosystem\nWorkloads\nVirtualization\nMigration\nServerless\nNetworking\nStorage\nBuilds\nObserve\nUser Management\nAdministration\nProject: launchpad-flightpath-candida-virtualization-ai-b7ad63\nPods\nCreate Pod\n1 - 4 of 4 items\nName\n\t\nStatus\n\t\nReady\n\t\nRestarts\n\t\nOwner\n\t\nMemory\n\t\nCPU\n\t\nCreated\n\t\nActions\n\n\nPod\nP\nshowroom-6465df5d8c-lt42r\n\t\nRunning\n\t4/4\t0\t\nReplicaSet\nRS\nshowroom-6465df5d8c\n\t101.3 MiB\t-\t\n1 minute ago\n\t\n\n\nPod\nP\nvirt-launcher-modernization-client-bvjtm\n\t\nRunning\n\t3/3\t0\t\nVirtualMachineInstance\nVMI\nmodernization-client\n\t411.4 MiB\t0.044 cores\t\n1 minute ago\n\t\n\n\nPod\nP\nvirtualization-ai-301-adapter-54b4f6bddc-8x5k7\n\t\nRunning\n\t1/1\t0\t\nReplicaSet\nRS\nvirtualization-ai-301-adapter-54b4f6bddc\n\t21.1 MiB\t0.000 cores\t\n1 minute ago\n\t\n\n\nPod\nP\nvirtualization-ai-301-presentation-6c986b666f-qz95m\n\t\nRunning\n\t1/1\t0\t\nReplicaSet\nRS\nvirtualization-ai-301-presentation-6c986b666f\n\t195.1 MiB\t0.003 cores\t\n1 minute ago\n\t\nWelcome to the new OpenShift experience!\n\nIntroducing a fresh modern look to the console! With this update, we made changes to the user interface to enhance usability and streamline your workflow. This includes improved navigation and visual refinement to help manage your applications and infrastructure more easily.\n\nWhat do you want to do next?\nLaunch tour\nSkip tour",
+        "canvas": 0,
+        "popups": []
+      }
+    },
+    {
+      "id": "story_navigation",
+      "passed": true,
+      "detail": {
+        "steps": [
+          {
+            "step": 0,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-301-67141888/proxy/tool/story/?act=0&scene=0",
+            "text": "×\n←\n→\nP\n⛶\nA working contract is only the beginning\n×\nA working contract is only the beginning\nLEVEL 201 CONNECTED A VM TO AI. LEVEL 301 GOVERNS WHETHER ITS EVIDENCE MAY BE REVIEWED.\n00 · 1/2"
+          },
+          {
+            "step": 1,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-301-67141888/proxy/tool/story/?act=0&scene=1",
+            "text": "×\n←\n→\nP\n⛶\nTHE OPERATIONAL GAP\nReachable does not mean governed\nThe request returned\n→\nThe caller, path, placement, and record agree\n\nA mismatch must REFUSE. Missing evidence must ABSTAIN. ALLOW_REVIEW still requires a human.\n\n00 · 2/2"
+          },
+          {
+            "step": 2,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-301-67141888/proxy/tool/story/?act=1&scene=0",
+            "text": "×\n←\n→\nP\n⛶\nDECLARE BEFORE OBSERVE\nReveal one control boundary at a time\n\nEvery question compares declared intent with an independent observation.\n\n1\nIdentity\n2\nNetwork\n3\nPlacement\n4\nObservability\n5\nHuman authority\nAUDIENCE QUESTION\nWhich workload is asking?\nReveal technical boundary\nactive request and evidence path\ndeployment or trust boundary\noptional integration\nVIRTUAL-MACHINE\nVM client\ndeclared identity + correlation ID\nOPENSHIFT NAMESPACE\nnamespaced development candidate\nHTTP JSON\n→\nSERVICE\nGoverned adapter Service\ndeclared destination only\n:8080\nadmit / refuse\n→\nPOLICY\nNetworkPolicy\ndefault deny + labeled exception\nevaluate\n→\nDEPLOYMENT\nDecision adapter\nordered deterministic checks\nPOST /api/v1/modernize\ncompare\n→\nEVIDENCE\nIdentity observations\nnamespace · VM · VMI UID · service account\ncompare\n→\nEVIDENCE\nPlacement observations\nnode · architecture · required labels\nexport\n→\nDATA\nCorrelated record\nchecks · reasons · state · timestamp\naccept / reject\n→\nAUTHORITY\nHuman reviewer\nonly "
+          },
+          {
+            "step": 3,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-301-67141888/proxy/tool/story/?act=2&scene=0",
+            "text": "×\n←\n→\nP\n⛶\n1\nComplete representative evidence\n2\nIdentity mismatch\n3\nPlacement observation missing\nGOVERNED REHEARSAL\nStart with the declared request\nCompare declared intent with identity, path, placement, and correlation evidence.\nINPUT\nGovernance evidence request\nOne typed request exercises complete, mismatched, and unknown evidence without changing a workload.\nInspect technical topology\nRun governed conditions\nAUTHORITY\nOutcome remains human-owned\n\nEach condition retains its source state and ordered reason. A later result never erases an earlier refusal.\n\nALLOW_REVIEW permits inspection; it never deploys, migrates, promotes, or certifies.\n02 · 1/2"
+          },
+          {
+            "condition_result": "×\n←\n→\nP\n⛶\n1\nComplete representative evidence\n2\nIdentity mismatch\n3\nPlacement observation missing\nCONDITION 1 OF 3\nComplete representative evidence\nEvery deterministic check passes; fixture output permits review but claims no live AI.\nREHEARSAL\nOUTCOME\nALLOW_REVIEW\nREASON\nCONTROLS_COMPLETE\nAUTHORITY\nHUMAN_REVIEW_REQUIRED\n\nLive endpoint returned HTTP 404 Showing clearly labeled fallback evidence.\n\nInspect technical topology\nNext governed condition →\nAUTHORITY\nOutcome remains human-owned\n\nEach condition retains its source state and ordered reason. A later result never erases an earlier refusal.\n\nALLOW_REVIEW permits inspection; it never deploys, migrates, promotes, or certifies.\n02 · 1/2"
+          },
+          {
+            "step": 4,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-301-67141888/proxy/tool/story/?act=2&scene=1",
+            "text": "×\n←\n→\nP\n⛶\nThe outcome follows evidence quality\nCOMPLETE\nALLOW_REVIEW\n\nEvidence may be reviewed; no operational action is authorized.\n\nMISMATCH\nREFUSE\n\nKnown unsafe identity, network, or placement disagreement.\n\nUNKNOWN\nABSTAIN\n\nMissing correlation, placement, or model evidence.\n\n02 · 2/2"
+          },
+          {
+            "step": 5,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-301-67141888/proxy/tool/story/?act=3&scene=0",
+            "text": "×\n←\n→\nP\n⛶\nMECHANISMS\nPolicy is observable and ordered\n\nThese controls make the result repeatable without granting automation authority.\n\n01\nRefusal precedence\nIdentity and network decide before model use.\nUnsafe callers and paths never become prompts.\n02\nOne evidence key\nEvery check retains one correlation identifier.\nA missing join becomes an abstention, not a guessed record.\n03\nObserved placement\nRequired labels must be present in evidence.\nREHEARSAL labels exercise logic; only target receipts support hardware claims.\n03 · 1/1"
+          },
+          {
+            "step": 6,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-301-67141888/proxy/tool/story/?act=4&scene=0",
+            "text": "×\n←\n→\nP\n⛶\nWHAT THIS SESSION ESTABLISHED\nA decision record with an honest limit\nREHEARSAL\n1 proof condition completed\nLATEST OUTCOME\nALLOW_REVIEW\nORDERED REASON\nCONTROLS_COMPLETE\nAUTHORITY\nHUMAN_REVIEW_REQUIRED\nThe same contract allowed review, refused a mismatch, and abstained on absence.\nLaunchpad still owns live execution, measurement, cleanup, certification, and promotion.\nClose the story and build the controls in the separate Showroom lab →\n04 · 1/1"
+          },
+          {
+            "step": 7,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-301-67141888/proxy/tool/story/?act=4&scene=0&finale=1",
+            "text": "×\n←\n→\nP\n⛶\nSTORY COMPLETE\nDecide whether the governed construction lab earns review.\nOPTIONAL NEXT STEP · 90–120 MINUTES\nGoverned construction lab\nOpen the separate Showroom and produce a human-reviewed evidence bundle.\nClose presentation\nRestart\nRed Hat × Intel"
+          },
+          {
+            "step": 8,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-301-67141888/proxy/tool/story/?act=4&scene=0&finale=1",
+            "text": "×\n←\n→\nP\n⛶\nSTORY COMPLETE\nDecide whether the governed construction lab earns review.\nOPTIONAL NEXT STEP · 90–120 MINUTES\nGoverned construction lab\nOpen the separate Showroom and produce a human-reviewed evidence bundle.\nClose presentation\nRestart\nRed Hat × Intel"
+          },
+          {
+            "step": 9,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-301-67141888/proxy/tool/story/?act=4&scene=0&finale=1",
+            "text": "×\n←\n→\nP\n⛶\nSTORY COMPLETE\nDecide whether the governed construction lab earns review.\nOPTIONAL NEXT STEP · 90–120 MINUTES\nGoverned construction lab\nOpen the separate Showroom and produce a human-reviewed evidence bundle.\nClose presentation\nRestart\nRed Hat × Intel"
+          },
+          {
+            "step": 10,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-301-67141888/proxy/tool/story/?act=4&scene=0&finale=1",
+            "text": "×\n←\n→\nP\n⛶\nSTORY COMPLETE\nDecide whether the governed construction lab earns review.\nOPTIONAL NEXT STEP · 90–120 MINUTES\nGoverned construction lab\nOpen the separate Showroom and produce a human-reviewed evidence bundle.\nClose presentation\nRestart\nRed Hat × Intel"
+          },
+          {
+            "step": 11,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-301-67141888/proxy/tool/story/?act=4&scene=0&finale=1",
+            "text": "×\n←\n→\nP\n⛶\nSTORY COMPLETE\nDecide whether the governed construction lab earns review.\nOPTIONAL NEXT STEP · 90–120 MINUTES\nGoverned construction lab\nOpen the separate Showroom and produce a human-reviewed evidence bundle.\nClose presentation\nRestart\nRed Hat × Intel"
+          }
+        ]
+      }
+    },
+    {
+      "id": "content_welcome",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Govern a VM-to-AI modernization decision"
+      }
+    },
+    {
+      "id": "showroom_branding",
+      "passed": true,
+      "detail": {
+        "logos": [
+          {
+            "alt": "Red Hat",
+            "src": "../../_/img/redhat-logo.svg",
+            "loaded": true,
+            "width": 41.703125,
+            "height": 31.671875
+          },
+          {
+            "alt": "Intel",
+            "src": "../../_/img/intel-logo.svg",
+            "loaded": true,
+            "width": 65.765625,
+            "height": 25.515625
+          }
+        ]
+      }
+    },
+    {
+      "id": "content_prerequisites",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Show the governed path"
+      }
+    },
+    {
+      "id": "code_controls_prerequisites",
+      "passed": true,
+      "detail": {
+        "buttons": [
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "nav-toggle"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          }
+        ],
+        "executable_blocks": 3
+      }
+    },
+    {
+      "id": "execute_button_interaction",
+      "passed": true,
+      "detail": {
+        "stage": "prerequisites",
+        "button_label": "Run in terminal",
+        "terminal_output_marker": "\"authority\"",
+        "actual_terminal_output_observed": true
+      }
+    },
+    {
+      "id": "content_declare",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Learn the policy, then declare intent"
+      }
+    },
+    {
+      "id": "code_controls_declare",
+      "passed": true,
+      "detail": {
+        "buttons": [
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "nav-toggle"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          }
+        ],
+        "executable_blocks": 3
+      }
+    },
+    {
+      "id": "content_observe",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Observe with two independent views"
+      }
+    },
+    {
+      "id": "code_controls_observe",
+      "passed": true,
+      "detail": {
+        "buttons": [
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "nav-toggle"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          }
+        ],
+        "executable_blocks": 2
+      }
+    },
+    {
+      "id": "content_compare",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Submit the governed review"
+      }
+    },
+    {
+      "id": "code_controls_compare",
+      "passed": true,
+      "detail": {
+        "buttons": [
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "nav-toggle"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          }
+        ],
+        "executable_blocks": 3
+      }
+    },
+    {
+      "id": "content_refuse",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Make the system refuse and abstain"
+      }
+    },
+    {
+      "id": "code_controls_refuse",
+      "passed": true,
+      "detail": {
+        "buttons": [
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "nav-toggle"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          }
+        ],
+        "executable_blocks": 3
+      }
+    },
+    {
+      "id": "content_review",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Keep the human decision explicit"
+      }
+    },
+    {
+      "id": "code_controls_review",
+      "passed": true,
+      "detail": {
+        "buttons": [
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "nav-toggle"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          }
+        ],
+        "executable_blocks": 3
+      }
+    },
+    {
+      "id": "content_cleanup",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Clean up and prove your boundary"
+      }
+    },
+    {
+      "id": "code_controls_cleanup",
+      "passed": true,
+      "detail": {
+        "buttons": [
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "nav-toggle"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          }
+        ],
+        "executable_blocks": 3
+      }
+    },
+    {
+      "id": "content_conclusion",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Conclusion"
+      }
+    },
+    {
+      "id": "rendered_code_inventory",
+      "passed": true,
+      "detail": {
+        "blocks": [
+          {
+            "stage": "prerequisites",
+            "first_line": "export LAB_NS=\"$(oc project -q)\""
+          },
+          {
+            "stage": "prerequisites",
+            "first_line": "jq -e '"
+          },
+          {
+            "stage": "prerequisites",
+            "first_line": "oc get vm,vmi,deploy,svc,endpointslice,networkpolicy \\"
+          },
+          {
+            "stage": "declare",
+            "first_line": "oc exec deployment/virtualization-ai-301-adapter -- \\"
+          },
+          {
+            "stage": "declare",
+            "first_line": "export VM_NAME=\"modernization-client\""
+          },
+          {
+            "stage": "declare",
+            "first_line": "! jq -e '.. | objects | keys[]? | ascii_downcase"
+          },
+          {
+            "stage": "observe",
+            "first_line": "{"
+          },
+          {
+            "stage": "observe",
+            "first_line": "grep -q \"modernization-client\" \"$LAB_DIR/runtime-inventory.txt\""
+          },
+          {
+            "stage": "compare",
+            "first_line": "curl -fsS -X POST \"$ADAPTER_URL/api/v1/modernize\" \\"
+          },
+          {
+            "stage": "compare",
+            "first_line": "jq -e '"
+          },
+          {
+            "stage": "compare",
+            "first_line": "jq -e --arg id \"$EVIDENCE_ID\" --arg correlation \"$CORRELATION_ID\" '"
+          },
+          {
+            "stage": "refuse",
+            "first_line": "jq '.observed.identity.service_account = \"unexpected-caller\"' \\"
+          },
+          {
+            "stage": "refuse",
+            "first_line": "jq '.observed.observability.events_available = false' \\"
+          },
+          {
+            "stage": "refuse",
+            "first_line": "curl -fsS -X POST \"$ADAPTER_URL/api/v1/modernize?condition=model-unavailable\" \\"
+          },
+          {
+            "stage": "review",
+            "first_line": "curl -fsS \"$ADAPTER_URL/metrics\" | tee \"$LAB_DIR/metrics.txt\""
+          },
+          {
+            "stage": "review",
+            "first_line": "export REVIEWER=\"${REVIEWER:-lab-participant}\""
+          },
+          {
+            "stage": "review",
+            "first_line": "jq -e --arg evidence_id \"$EVIDENCE_ID\" '"
+          },
+          {
+            "stage": "cleanup",
+            "first_line": "oc get vm,vmi,deploy,svc,networkpolicy \\"
+          },
+          {
+            "stage": "cleanup",
+            "first_line": "if test -f \"$LAB_DIR/port-forward.pid\"; then"
+          },
+          {
+            "stage": "cleanup",
+            "first_line": "test ! -e \"$LAB_DIR\""
+          }
+        ]
+      }
+    },
+    {
+      "id": "learner_tool_dependencies",
+      "passed": true,
+      "detail": {
+        "tools": [
+          "/usr/local/bin/oc",
+          "/usr/bin/curl",
+          "/usr/bin/jq",
+          "/usr/local/bin/virtctl",
+          "/usr/bin/ssh",
+          "/usr/bin/uuidgen",
+          "/usr/bin/base64",
+          "/usr/bin/install",
+          "/usr/bin/chmod",
+          "/usr/bin/tee",
+          "/usr/bin/grep"
+        ]
+      }
+    },
+    {
+      "id": "complete_rendered_command_journey",
+      "passed": true,
+      "detail": {
+        "blocks": 20,
+        "completed_blocks": [
+          "JOURNEY_PASS_0_prerequisites",
+          "JOURNEY_PASS_1_prerequisites",
+          "JOURNEY_PASS_2_prerequisites",
+          "JOURNEY_PASS_3_declare",
+          "JOURNEY_PASS_4_declare",
+          "JOURNEY_PASS_5_declare",
+          "JOURNEY_PASS_6_observe",
+          "JOURNEY_PASS_7_observe",
+          "JOURNEY_PASS_8_compare",
+          "JOURNEY_PASS_9_compare",
+          "JOURNEY_PASS_10_compare",
+          "JOURNEY_PASS_11_refuse",
+          "JOURNEY_PASS_12_refuse",
+          "JOURNEY_PASS_13_refuse",
+          "JOURNEY_PASS_14_review",
+          "JOURNEY_PASS_15_review",
+          "JOURNEY_PASS_16_review",
+          "JOURNEY_PASS_17_cleanup",
+          "JOURNEY_PASS_18_cleanup",
+          "JOURNEY_PASS_19_cleanup"
+        ],
+        "live_vm_inference": false,
+        "output_tail": "ue\nJOURNEY_PASS_13_refuse\nJOURNEY_BLOCK_14_review\n# HELP virtualization_ai_301_decisions_total In-process governed decision counts.\n# TYPE virtualization_ai_301_decisions_total counter\nvirtualization_ai_301_decisions_total{outcome=\"ALLOW_REVIEW\"} 1\nvirtualization_ai_301_decisions_total{outcome=\"REFUSE\"} 1\nvirtualization_ai_301_decisions_total{outcome=\"ABSTAIN\"} 2\n# HELP virtualization_ai_301_decisions_total In-process governed decision counts.\n# TYPE virtualization_ai_301_decisions_total counter\nvirtualization_ai_301_decisions_total{outcome=\"ALLOW_REVIEW\"} 1\nvirtualization_ai_301_decisions_total{outcome=\"REFUSE\"} 1\nvirtualization_ai_301_decisions_total{outcome=\"ABSTAIN\"} 2\nJOURNEY_PASS_14_review\nJOURNEY_BLOCK_15_review\n{\n  \"reviewer\": \"lab-participant\",\n  \"decision\": \"ACCEPT_FOR_FURTHER_VALIDATION\",\n  \"evidence_id\": \"d8adcdfa-c9df-4685-93d5-560307b942c5\",\n  \"source_state\": \"REHEARSAL\",\n  \"recorded_at\": \"2026-10-14T00:33:27Z\",\n  \"limits\": [\n    \"not Launchpad certification\",\n    \"not production approval\",\n    \"not performance or capacity proof\",\n    \"not authority to mutate the VM or cluster\"\n  ]\n}\nJOURNEY_PASS_15_review\nJOURNEY_BLOCK_16_review\ntrue\nJOURNEY_PASS_16_review\nJOURNEY_BLOCK_17_cleanup\nvirtualmachine.kubevirt.io/modernization-client\ndeployment.apps/virtualization-ai-301-adapter\ndeployment.apps/virtualization-ai-301-presentation\nservice/virtualization-ai-301-adapter\nservice/virtualization-ai-301-presentation\nnetworkpolicy.networking.k8s.io/adapter-default-deny\nnetworkpolicy.networking.k8s.io/allow-declared-adapter-path\nJOURNEY_PASS_17_cleanup\nJOURNEY_BLOCK_18_cleanup\nJOURNEY_PASS_18_cleanup\nJOURNEY_BLOCK_19_cleanup\nvirtualmachine.kubevirt.io/modernization-client\ndeployment.apps/virtualization-ai-301-adapter\nJOURNEY_PASS_19_cleanup\nFULL_LEARNER_JOURNEY_COMPLETE\n"
+      }
+    },
+    {
+      "id": "my_labs_contains_seat",
+      "passed": true,
+      "detail": {
+        "text": "×\n|\nPartner AI Launchpad\nPARTICIPANT\nCurrent lab\nMy Lab Access\nLog out of lab\nPARTICIPANT WORKSPACE\nMy Lab Access\n\nResume any active environment associated with your participant identity.\n\nvirtualization-ai-301\n\nAvailable until 2026-10-14T02:30:59.102863\n\nResume lab\nAdd another lab\n\nEnter the instructor code for another active lab.\n\nAdd lab"
+      }
+    },
+    {
+      "id": "reclaim_completed",
+      "passed": true,
+      "detail": {
+        "status": "completed",
+        "remaining_labeled_namespaces": 0
+      }
+    },
+    {
+      "id": "independent_zero_residue",
+      "passed": true,
+      "detail": {
+        "namespace": "launchpad-flightpath-candida-virtualization-ai-b7ad63",
+        "inventory": {
+          "namespace": 0,
+          "persistent_volume": 0,
+          "application": 0,
+          "external_role_binding": 0
+        }
+      }
+    },
+    {
+      "id": "model_key_revoked",
+      "passed": true,
+      "detail": {
+        "key_present": false,
+        "revocation": {
+          "key_id": "e3b8d2cf4472b6d0b195829bcd8c80be366622a527c081176dd604324d49d786",
+          "provider": "litellm",
+          "confirmed_at": "2026-10-14T00:33:33.671939Z",
+          "confirmation_id": "http-success"
+        }
+      }
+    },
+    {
+      "id": "public_policy_and_claims_disabled",
+      "passed": true,
+      "detail": {
+        "enabled": false,
+        "claim_count": 0
+      }
+    },
+    {
+      "id": "cached_participant_session_denied",
+      "passed": true,
+      "detail": {
+        "http_status": 403,
+        "location": ""
+      }
+    }
+  ],
+  "certified": false,
+  "run": "final-controls-r2",
+  "order_id": "67141888-b318-4189-b8f2-a1c79f859bb0",
+  "public_url": "https://labs.smg-helix.ai/labs/virtualization-ai-301-67141888",
+  "seats": [
+    {
+      "seat_id": "b7ad6398-b630-4803-b2f9-652a1e761809",
+      "session_id": "0e09e171-1d6a-4831-b6d4-398c5aca260b"
+    }
+  ],
+  "landing_links": [
+    {
+      "text": "Current lab",
+      "href": "/"
+    },
+    {
+      "text": "My Lab Access",
+      "href": "/my-labs"
+    },
+    {
+      "text": "Log out of lab",
+      "href": "/oauth2/sign_out?rd=%2Frealms%2Flaunchpad-public%2Fprotocol%2Fopenid-connect%2Flogout"
+    },
+    {
+      "text": "Open Lab",
+      "href": "/labs/virtualization-ai-301-67141888/showroom/"
+    },
+    {
+      "text": "My Lab Access",
+      "href": "/my-labs"
+    },
+    {
+      "text": "Log out of lab",
+      "href": "/oauth2/sign_out?rd=%2Frealms%2Flaunchpad-public%2Fprotocol%2Fopenid-connect%2Flogout"
+    }
+  ],
+  "namespace": "launchpad-flightpath-candida-virtualization-ai-b7ad63",
+  "cleanup_status": "completed",
+  "remaining_labeled_namespaces": 0,
+  "finished_at": "2026-10-14T00:35:05.902Z"
+}

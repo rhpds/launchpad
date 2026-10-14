@@ -44,19 +44,19 @@ oc --kubeconfig "$KUBECONFIG" create rolebinding "$probe_binding" --clusterrole=
 case "$catalog_id" in
   virtualization-ai-foundations-101)
     vm_names=(operations-vm); service=ai-analysis; route=lab; endpoint=/api/v1/analyze
-    source_revision="3f622615f544c75db87a37833fc209b3d1b60731"
-    expected_presentation_image="ghcr.io/jkershawrh/virtualization-ai-foundations-presentation@sha256:205fb61bf069e59ce84817d5b69abbfc9f9bf3dd224206d29287b811af98368b"
-    expected_adapter_image="ghcr.io/jkershawrh/virtualization-ai-foundations-adapter@sha256:8046e653246f5cf6d35bbc841cf10a405c76a79d6d94b4c9ac47ca6781b57cf7" ;;
+    source_revision="e881ece208528720974f4e7bc659a0c8ad0627fb"
+    expected_presentation_image="ghcr.io/jkershawrh/virtualization-ai-foundations-presentation@sha256:723b28c736cac152e7872a8b5ec146f877ab1baf78b2e4375ce31a53e346c378"
+    expected_adapter_image="ghcr.io/jkershawrh/virtualization-ai-foundations-adapter@sha256:775377060ec11006604f458c887357e1fc32c71c3cdf89411719cd4e3eef3586" ;;
   virtualization-ai-201)
     vm_names=(contract-author-vm); service=virtualization-ai-201-adapter; route=lab; endpoint=/api/v1/qualify
-    source_revision="3c94600ca8808a55693e94d5a1f169efbadbedd1"
-    expected_presentation_image="ghcr.io/jkershawrh/virtualization-ai-201-presentation@sha256:2749e4ad44f3902f7507adaaaa8fadd509d1e625b33619530852bd9a01255069"
-    expected_adapter_image="ghcr.io/jkershawrh/virtualization-ai-201-adapter@sha256:99f1ac6f65386013cb20d81e3dbc6099ffbb63cebfdc6fb1f1cdd50d96153a39" ;;
+    source_revision="f5cbcad3865390d7d5844d94087b59eb94c8f276"
+    expected_presentation_image="ghcr.io/jkershawrh/virtualization-ai-201-presentation@sha256:84a9b5ae29903ffedfc9b84753b362f5715167f23057628e99df5a94e1683a06"
+    expected_adapter_image="ghcr.io/jkershawrh/virtualization-ai-201-adapter@sha256:177af37c53b08b09c73b39b50bbaa92c47f2737c7072c2c14a3eed1e04bc9c99" ;;
   virtualization-ai-301)
     vm_names=(modernization-client); service=virtualization-ai-301-adapter; route=virt301; endpoint=/api/v1/modernize
-    source_revision="30f51e19223faf64c689a07e254870fbc43fd0c6"
-    expected_presentation_image="ghcr.io/jkershawrh/virtualization-ai-301-presentation@sha256:853ea3bdfea8998652bb51a3930bfeaeb4785ce4c058fe5d733f2e5d2d835185"
-    expected_adapter_image="ghcr.io/jkershawrh/virtualization-ai-301-adapter@sha256:9be46b02185933877854dae6e4f91e7e11a3ab028b5f33f896ae40e56b1b07ee" ;;
+    source_revision="e5888aeac1042cbcf909b540eee1281fdc3c4dac"
+    expected_presentation_image="ghcr.io/jkershawrh/virtualization-ai-301-presentation@sha256:4d05e095b0815009bc9949ed4863bfcf85c066a46c4404ce5c070f03a2baf32c"
+    expected_adapter_image="ghcr.io/jkershawrh/virtualization-ai-301-adapter@sha256:93188a7f8e70847c34edb6fb96a3c2cb34ecd4493fc13f5101f3127540e4bbef" ;;
   virtualization-ai-401)
     vm_names=(operations-client); service=virtualization-ai-401-operations-adapter; route=virtualization-ai-401; endpoint=/api/v1/operations ;;
   virtualization-ai-501)

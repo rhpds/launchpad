@@ -25,19 +25,19 @@ learning:
 sources:
   showroom:
     repo_url: https://github.com/jkershawrh/virtualization-ai-301.git
-    revision: 30f51e19223faf64c689a07e254870fbc43fd0c6
+    revision: e5888aeac1042cbcf909b540eee1281fdc3c4dac
     playbook: default-site.yml
     start_path: showroom/content
     gitops_repo_url: https://github.com/jkershawrh/virtualization-ai-301.git
   workload:
     repo_url: https://github.com/jkershawrh/virtualization-ai-301.git
-    revision: 30f51e19223faf64c689a07e254870fbc43fd0c6
+    revision: e5888aeac1042cbcf909b540eee1281fdc3c4dac
     deploy_path: charts/virtualization-ai-301
     gitops_repo_url: https://github.com/jkershawrh/virtualization-ai-301.git
 references:
   release_workflow:
     repo_url: https://github.com/jkershawrh/virtualization-ai-301.git
-    revision: 30f51e19223faf64c689a07e254870fbc43fd0c6
+    revision: e5888aeac1042cbcf909b540eee1281fdc3c4dac
     path: .github/workflows/release-images.yml
 runtime:
   namespace_slug: virtualization-ai-301
@@ -85,8 +85,8 @@ runtime:
     release_name: virtualization-ai-301
     helm_values:
       values_overlay: charts/virtualization-ai-301/values.published.yaml
-      adapter_image: ghcr.io/jkershawrh/virtualization-ai-301-adapter@sha256:9be46b02185933877854dae6e4f91e7e11a3ab028b5f33f896ae40e56b1b07ee
-      presentation_image: ghcr.io/jkershawrh/virtualization-ai-301-presentation@sha256:853ea3bdfea8998652bb51a3930bfeaeb4785ce4c058fe5d733f2e5d2d835185
+      adapter_image: ghcr.io/jkershawrh/virtualization-ai-301-adapter@sha256:93188a7f8e70847c34edb6fb96a3c2cb34ecd4493fc13f5101f3127540e4bbef
+      presentation_image: ghcr.io/jkershawrh/virtualization-ai-301-presentation@sha256:4d05e095b0815009bc9949ed4863bfcf85c066a46c4404ce5c070f03a2baf32c
       presentation_enabled: true
       default_source_state: REHEARSAL
       adapter:
@@ -94,13 +94,13 @@ runtime:
         image:
           repository: ghcr.io/jkershawrh/virtualization-ai-301-adapter
           tag: ''
-          digest: sha256:9be46b02185933877854dae6e4f91e7e11a3ab028b5f33f896ae40e56b1b07ee
+          digest: sha256:93188a7f8e70847c34edb6fb96a3c2cb34ecd4493fc13f5101f3127540e4bbef
           pullPolicy: IfNotPresent
       presentation:
         image:
           repository: ghcr.io/jkershawrh/virtualization-ai-301-presentation
           tag: ''
-          digest: sha256:853ea3bdfea8998652bb51a3930bfeaeb4785ce4c058fe5d733f2e5d2d835185
+          digest: sha256:4d05e095b0815009bc9949ed4863bfcf85c066a46c4404ce5c070f03a2baf32c
           pullPolicy: IfNotPresent
     runtime_secret_name: ''
     runtime_secret_value_path: ''

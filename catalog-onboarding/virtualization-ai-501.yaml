@@ -23,13 +23,13 @@ learning:
 sources:
   showroom:
     repo_url: https://github.com/jkershawrh/virtualization-ai-501.git
-    revision: 6e65858f773e2a28a4874a2a59785e8c8ab52b07
+    revision: 78442e22eeed56b54d1e910ad8c2b847e3cd241a
     playbook: default-site.yml
     start_path: showroom/content
     gitops_repo_url: https://github.com/jkershawrh/virtualization-ai-501.git
   workload:
     repo_url: https://github.com/jkershawrh/virtualization-ai-501.git
-    revision: 6e65858f773e2a28a4874a2a59785e8c8ab52b07
+    revision: 78442e22eeed56b54d1e910ad8c2b847e3cd241a
     deploy_path: charts/virtualization-ai-501
     gitops_repo_url: https://github.com/jkershawrh/virtualization-ai-501.git
 runtime:
@@ -78,8 +78,8 @@ runtime:
     gitops_ready: true
     release_name: virtualization-ai-501
     helm_values:
-      workload_image: ghcr.io/jkershawrh/virtualization-ai-501-qualification-adapter@sha256:e14a5dc17dfb1a63321a99d4e76ad904dd271e5fb57b359c62c263891b8173bf
-      presentation_image: ghcr.io/jkershawrh/virtualization-ai-501-presentation@sha256:06e5e51b88f561bd401dd634acdcc07e3c6112caf4316fb46c989ac8baf3f762
+      workload_image: ghcr.io/jkershawrh/virtualization-ai-501-qualification-adapter@sha256:256400deedfe2103fd887f7665f9813039e1d613252d1e230683b8b82d4512b1
+      presentation_image: ghcr.io/jkershawrh/virtualization-ai-501-presentation@sha256:825fa99269c1bed2af4d1a3190203a29488ab032983e1e255d9b730963819acf
       presentation_enabled: true
       storage_class: ocs-storagecluster-ceph-rbd
       qualificationAdapter:

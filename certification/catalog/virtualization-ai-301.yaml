@@ -24,6 +24,7 @@ spec:
     result_format: json
     json_assertions:
       - {path: result, equals: GREEN-live-internal-seat}
+      - {path: provenance.source_revision, equals: e5888aeac1042cbcf909b540eee1281fdc3c4dac}
       - {path: cluster_ref, equals: flightpath}
       - {path: readiness.vms_running, equals: 1}
       - {path: readiness.vmis_ready, equals: 1}

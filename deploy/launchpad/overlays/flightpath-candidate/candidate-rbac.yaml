@@ -12,6 +12,11 @@ rules:
   - apiGroups: [""]
     resources: [nodes]
     verbs: [get, list]
+  # Retain-policy PVs outlive namespaces. Completion verification needs
+  # read-only storage inventory, never cluster-wide volume mutation.
+  - apiGroups: [""]
+    resources: [persistentvolumes]
+    verbs: [get, list]
   - apiGroups: [""]
     resources: [pods, services, configmaps, persistentvolumeclaims, serviceaccounts]
     verbs: [get, list, create, update, patch, delete, watch]

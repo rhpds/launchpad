@@ -2,7 +2,31 @@ schema: launchpad/participant-experience-review/v1
 cluster: flightpath
 seat_limit: 1
 scope: Fresh single-seat public participant walkthroughs, plus normal internal/public capacity previews.
-overall_result: ORDERABILITY-PROVEN-PARTICIPANT-JOURNEYS-NOT-ALL-GREEN
+overall_result: ONE-SEAT-PARTICIPANT-JOURNEYS-GREEN
+record_policy: Findings below retain original observations; final convergence evidence supersedes their historical pending states without rewriting failed runs.
+final_convergence:
+  summary: evidence/runs/virt-ai-green-convergence-progress-20261013.yaml
+  formal_one_seat: All five current immutable candidates passed GREEN-live, 100/100, automatic cleanup and zero recorded residue.
+  public_complete:
+    virtualization-ai-201: evidence/runs/virtualization-ai-201-participant-complete-guide-r4-20261013.json
+    virtualization-ai-301: evidence/runs/virtualization-ai-301-participant-final-controls-r2-20261013.json
+    virtualization-ai-401: evidence/runs/virtualization-ai-401-participant-final-controls-r2-20261013.json
+    virtualization-ai-501: evidence/runs/virtualization-ai-501-participant-final-controls-r2-20261013.json
+  public_101_latest:
+    evidence: evidence/runs/virtualization-ai-foundations-101-participant-final-access-r6-20261013.json
+    passed: All 36 checks, including embedded Console, commands, live VM-origin Xeon inference, branding, Execute, cleanup, revocation and cached-session denial.
+    prior_failure: r5's blank Console observation remains intact; the final harness resolves the current iframe after authentication navigations.
+  limits:
+    - Reference-assisted 201 authoring is not proof of deploying the learner-authored VM client.
+    - Rehearsal controls remain rehearsal; no production or multi-seat claim.
+    - Backend cleanup-verifier rollout remains blocked by private registry pull authentication.
+  provenance_correction:
+    catalog: virtualization-ai-301
+    historical_report: evidence/runs/virtualization-ai-301-formal-current-pin-r2-20261013.json
+    finding: Recorded runtime digests matched the current candidate, but the probe's printed source label was stale.
+    admission_red: evidence/runs/virtualization-ai-301-formal-current-pin-r3-20261013.json
+    corrected_exact_revision_proof: evidence/runs/virtualization-ai-301-formal-current-pin-r4-20261013.json
+    result: GREEN-live, 100/100, automatic reclaim and zero recorded residue.
 activation:
   catalog_item_id: virtualization-ai-foundations-101
   evidence: evidence/runs/virt101-refreshed-one-seat-20261013-r7.json
@@ -22,6 +46,24 @@ observed_successes:
   - Story scene navigation worked on all five; not all interactive scenario conditions were exercised.
   - All 19 rendered 101 command blocks passed, including actual VM-origin live Granite inference, failure containment, evidence export, and local artifact cleanup.
 findings:
+  - id: VIRT-UX-201-QUALIFIER-DEPENDENCY
+    priority: high
+    catalog_items: [virtualization-ai-201]
+    observed: The fresh root-attribute-corrected journey reaches the qualifier but the terminal raises ModuleNotFoundError for yaml.
+    required_fix: Install pinned PyYAML 6.0.3 into an owned learner virtual environment before qualification, not the shared terminal image.
+    local_status: GREEN-local
+    live_status: PENDING-FRESH-PASS
+    evidence: evidence/runs/virtualization-ai-201-participant-root-attributes-r3-20261013.json
+  - id: VIRT-UX-201-WIRING-SECRET
+    priority: high
+    catalog_items: [virtualization-ai-201]
+    observed: The guide's exact rehearsal Helm command renders zero documents containing secretKeyRef because adapter.model.secretName defaults to empty.
+    required_fix: Render the declared virtualization-ai-model-runtime Secret name explicitly without rendering credential values.
+    red_secret_reference_documents: 0
+    green_local_secret_reference_documents: 1
+    corrected_source_revision: f5cbcad3865390d7d5844d94087b59eb94c8f276
+    local_status: GREEN-local
+    live_status: PENDING-FRESH-PASS
   - id: VIRT-UX-EXECUTE-DUPLICATE
     priority: medium
     catalog_items: [virtualization-ai-foundations-101, virtualization-ai-201, virtualization-ai-301, virtualization-ai-401, virtualization-ai-501]
@@ -96,7 +138,7 @@ cleanup:
   model_key_receipts: Confirmed Litellm revocation for all five test sessions.
   limitation: Keycloak account disablement, cached-session denial, and OpenShift token deletion were not independently checked by this observer.
 ordering:
-  evidence: evidence/runs/virt-family-normal-one-seat-orderability-post-activation-20261013.json
+  evidence: evidence/runs/virt-family-normal-one-seat-orderability-final-20261013.json
   certification_override: false
   expected_checks: 10
   limitation: Capacity previews prove normal admission eligibility, not a full requester-form browser submission.
@@ -104,4 +146,4 @@ local_regression:
   passed: 54
   activation_red: evidence/runs/virt101-one-seat-activation-red-20261013.json
   scope: Eight scoped Virt101/probe tests, six Virtualization experience-review tests, and forty certification/promotion tests.
-next_action: Fix and re-test the identified participant blockers without raising seat limits or calling the entire family staging-qualified.
+next_action: Keep the earned one-seat ordering limits; obtain a backend-only read-only pull credential before cleanup-verifier rollout, and resolve the separate security gate before claiming staging or production qualification.
