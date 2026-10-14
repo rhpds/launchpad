@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="3" time="0.085" timestamp="2026-10-14T13:40:22.675023-05:00" hostname="jkershaw-mac"><testcase classname="scripts.tests.test_backend_runtime_surface" name="test_runtime_removes_unused_web_server_without_autoremoving_dependencies" time="0.001"><failure message="assert 'clean_requirements_on_remove=False' in 'FROM registry.access.redhat.com/ubi9/go-toolset:1.26 AS oc-builder\n\nARG OPENSHIFT_CLIENT_COMMIT=d0f23b14fbf35493e5b...http://localhost:8000/health\')&quot; || exit 1\n\nCMD [&quot;uvicorn&quot;, &quot;app.main:app&quot;, &quot;--host&quot;, &quot;0.0.0.0&quot;, &quot;--port&quot;, &quot;8000&quot;]\n'">def test_runtime_removes_unused_web_server_without_autoremoving_dependencies():
+        text = (ROOT / "backend/Containerfile").read_text()
+&gt;       assert "clean_requirements_on_remove=False" in text
+E       assert 'clean_requirements_on_remove=False' in 'FROM registry.access.redhat.com/ubi9/go-toolset:1.26 AS oc-builder\n\nARG OPENSHIFT_CLIENT_COMMIT=d0f23b14fbf35493e5b...http://localhost:8000/health\')" || exit 1\n\nCMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]\n'
+
+scripts/tests/test_backend_runtime_surface.py:12: AssertionError</failure></testcase><testcase classname="scripts.tests.test_backend_runtime_surface" name="test_release_smokes_built_image_before_scan_and_publication" time="0.007"><failure message="StopIteration">def test_release_smokes_built_image_before_scan_and_publication():
+        workflow = yaml.safe_load((ROOT / ".github/workflows/backend-release.yml").read_text())
+        steps = workflow["jobs"]["release"]["steps"]
+        names = [step.get("name") for step in steps]
+&gt;       smoke = next(step for step in steps if step.get("name") == "Verify backend runtime surface")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       StopIteration
+
+scripts/tests/test_backend_runtime_surface.py:23: StopIteration</failure></testcase><testcase classname="scripts.tests.test_backend_runtime_surface" name="test_smoke_preserves_platform_dependencies_and_cli_tools" time="0.001"><failure message="FileNotFoundError: [Errno 2] No such file or directory: '/Users/jkershaw/Documents/launchpad/backend/scripts/runtime_smoke.py'">def test_smoke_preserves_platform_dependencies_and_cli_tools():
+&gt;       text = (ROOT / "backend/scripts/runtime_smoke.py").read_text()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+scripts/tests/test_backend_runtime_surface.py:33: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/Users/jkershaw/Documents/launchpad/backend/scripts/runtime_smoke.py')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+&gt;       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/Users/jkershaw/Documents/launchpad/backend/scripts/runtime_smoke.py'
+
+../../.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/pathlib.py:1044: FileNotFoundError</failure></testcase></testsuite></testsuites>

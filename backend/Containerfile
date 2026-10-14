@@ -37,9 +37,14 @@ LABEL name="partner-ai-launchpad-backend" \
 
 WORKDIR /opt/app-root/src
 
+# The UBI S2I base includes Apache and graphics build packages that our uvicorn
+# runtime does not use. Disable dependency autoremove for this bounded removal.
 USER 0
 RUN dnf -y upgrade \
     && (dnf -y remove npm 'nodejs*' || true) \
+    && dnf -y remove --setopt=clean_requirements_on_remove=False \
+      httpd httpd-core httpd-devel httpd-filesystem httpd-tools \
+      mod_ldap mod_lua mod_session mod_ssl gd gd-devel \
     && dnf clean all
 
 COPY --from=oc-builder /tmp/oc-bin /usr/local/bin/oc

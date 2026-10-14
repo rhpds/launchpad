@@ -68,6 +68,18 @@ jobs:
             org.opencontainers.image.revision=${{ inputs.expected_sha }}
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
 
+      - name: Verify backend runtime surface
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker run --rm --network none --read-only --user 1001 \
+            --tmpfs /tmp:rw,nosuid,nodev,mode=1777 \
+            --env PYTHONDONTWRITEBYTECODE=1 \
+            --env HOME=/tmp --env PYTHONPATH=/opt/app-root/src \
+            --entrypoint python3 \
+            "${IMAGE_REPOSITORY}:git-${{ inputs.expected_sha }}" \
+            scripts/runtime_smoke.py
+
       - name: Release build cache before security scanning
         shell: bash
         run: |
