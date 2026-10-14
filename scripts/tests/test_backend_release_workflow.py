@@ -76,3 +76,15 @@ def test_backend_release_reclaims_only_build_cache_before_scan() -> None:
     )
     assert "docker builder prune --all --force" in text
     assert "docker image prune" not in text
+
+
+def test_private_releases_require_registry_attestations_without_publicizing_source() -> None:
+    text, workflow = _workflow()
+    github_step = next(s for s in workflow['jobs']['release']['steps'] if s.get('name') == 'Attest build provenance')
+    assert '!github.event.repository.private' in github_step['if']
+    assert 'cosign attest --yes --type spdxjson' in text
+    assert 'cosign attest --yes --type custom' in text
+    assert 'cosign verify-attestation --type custom' in text
+    assert 'cosign verify-attestation --type spdxjson' in text
+    assert '--certificate-identity="$identity"' in text
+    assert 'provenance-verification.json' in text

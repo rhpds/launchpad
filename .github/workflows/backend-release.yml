@@ -156,8 +156,30 @@ jobs:
           DIGEST_REF: ${{ steps.publish.outputs.digest_ref }}
         run: cosign sign --yes "$DIGEST_REF"
 
-      - name: Attest build provenance
+      - name: Attest and verify registry provenance and SBOM
         if: ${{ inputs.publish }}
+        env:
+          DIGEST_REF: ${{ steps.publish.outputs.digest_ref }}
+          SOURCE_REPOSITORY: ${{ github.server_url }}/${{ github.repository }}
+          SOURCE_REVISION: ${{ inputs.expected_sha }}
+          WORKFLOW_RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          WORKFLOW_IDENTITY: ${{ github.server_url }}/${{ github.repository }}/.github/workflows/backend-release.yml@${{ github.ref }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -n --arg repository "$SOURCE_REPOSITORY" --arg revision "$SOURCE_REVISION" \
+            --arg image "$DIGEST_REF" --arg workflow "$WORKFLOW_RUN" \
+            '{source_repository:$repository,source_revision:$revision,subject_image:$image,workflow_run:$workflow,build_platform:"linux/amd64"}' > provenance.json
+          cosign attest --yes --type spdxjson --predicate sbom.spdx.json "$DIGEST_REF"
+          cosign attest --yes --type custom --predicate provenance.json "$DIGEST_REF"
+          identity="$WORKFLOW_IDENTITY"
+          issuer="https://token.actions.githubusercontent.com"
+          cosign verify --certificate-identity="$identity" --certificate-oidc-issuer="$issuer" "$DIGEST_REF" > signature-verification.json
+          cosign verify-attestation --type spdxjson --certificate-identity="$identity" --certificate-oidc-issuer="$issuer" "$DIGEST_REF" > sbom-verification.json
+          cosign verify-attestation --type custom --certificate-identity="$identity" --certificate-oidc-issuer="$issuer" "$DIGEST_REF" > provenance-verification.json
+
+      - name: Attest build provenance
+        if: ${{ inputs.publish && !github.event.repository.private }}
         uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be
         with:
           subject-name: ${{ env.IMAGE_REPOSITORY }}
@@ -168,4 +190,9 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: backend-release-digest-${{ inputs.expected_sha }}
-          path: image-digest.txt
+          path: |
+            image-digest.txt
+            provenance.json
+            signature-verification.json
+            sbom-verification.json
+            provenance-verification.json
