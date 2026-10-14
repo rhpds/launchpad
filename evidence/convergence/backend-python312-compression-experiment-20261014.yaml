@@ -1,6 +1,6 @@
 schema: launchpad/backend-runtime-security-experiment/v1
 date: '2026-10-14'
-status: GREEN-local-PENDING-BUILT-PROOF
+status: BUILD-RED-HELM-DEPENDENCY-ASSERTION-CORRECTION-PENDING
 source_revision: 17d9532ab553a31705bf8a801243283a242b1a03
 release_run: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/38644369020
 publish_requested: false
@@ -23,7 +23,17 @@ compression:
   advisory: GO-2026-5841
   primary_source: https://vuln.go.dev/ID/GO-2026-5841.json
   affected_function: github.com/klauspost/compress/s2.NewDict
-  compiled_version_verification: Both oc and Helm, exact v1.18.7 replacement.
+  compiled_version_verification: oc requires exact v1.18.7; Helm requires that version if linked and always prints its complete build metadata.
+  observed_scan_location: /usr/local/bin/oc
+build_failure:
+  run: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/38644369020
+  observation: Helm compiled and reported v4.3.0+gbec5b06; mandatory compression-module metadata grep then failed.
+  correction: Preserve the pin and verify the version if linked; do not require an unused dependency to be linked into Helm.
+  runtime_smoke: NOT-REACHED
+  candidate_interpreter_tests: NOT-REACHED
+  vulnerable_symbol_collection: NOT-REACHED
+  security_scan: NOT-REACHED
+  regression_red: evidence/runs/backend-helm-optional-dependency-red-20261014.xml
 actual_interpreter_regression:
   image: Test-only derivative of the exact loaded runtime image; never published.
   test_dependency: pytest==8.4.2

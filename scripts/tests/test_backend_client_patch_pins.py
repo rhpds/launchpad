@@ -51,9 +51,14 @@ def test_incompatible_archive_override_is_not_left_in_candidate():
     assert "OPENSHIFT_CLIENT_COMMIT=d0f23b14fbf35493e5b713e25ecf662ec239e76c" in text
 
 
-def test_compression_fix_is_pinned_and_compiled_into_both_clients():
+def test_compression_fix_is_verified_when_linked_not_required_in_helm():
     text = (ROOT / "backend/Containerfile").read_text()
     assert "ARG GO_COMPRESS_VERSION=v1.18.7" in text
     pin = "-replace=github.com/klauspost/compress=github.com/klauspost/compress@${GO_COMPRESS_VERSION}"
     assert text.count(pin) == 2
     assert text.count('grep -F "${GO_COMPRESS_VERSION}"') == 2
+    # The prior scan locates this dependency in oc only. Helm may omit it;
+    # retain its metadata and reject an old version if it becomes linked.
+    assert 'go version -m /tmp/helm-bin > /tmp/helm-build-info.txt' in text
+    assert 'if grep -F "github.com/klauspost/compress" /tmp/helm-build-info.txt; then' in text
+    assert 'cat /tmp/helm-build-info.txt' in text
