@@ -1,6 +1,6 @@
 schema: launchpad/certification-origin-trust/v1
 date: '2026-10-15'
-status: GREEN-LOCAL-PENDING-STRICT-LIVE-RUN
+status: GREEN-LIVE-INTERNAL-501
 runtime_deployment_changed: false
 correction:
   - Pass the explicit certification CA bundle to curl and Python probe clients without mutating the runner environment.
@@ -30,7 +30,24 @@ ca_artifact:
   source: Existing Flightpath launchpad-cluster-ca-bundle ConfigMap; no certificate or DNS mutation.
   sha256: 2e2a673e0d82153873127b159e85d4772d6a54214a6ca7014656b6e98c828ef6
   contents_committed: false
+strict_live_run:
+  runner_source: 330487e0
+  catalog_id: virtualization-ai-501
+  exposure_policy: internal
+  seats: 1
+  report: evidence/runs/virtualization-ai-501-strict-origin-r1-20261015.json
+  result: GREEN-live
+  rubric_score: 100
+  source_revision: 78442e22eeed56b54d1e910ad8c2b847e3cd241a
+  presentation_http_status: 200
+  vms_running: 3
+  vmis_ready: 3
+  model_participated: false
+  cleanup_seconds: 99.791
+  independent_residue_counts: all-zero
+  model_keys_revoked: true
+  trust_scope: Verification against the explicitly supplied existing origin CA bundle, not fresh-device public browser trust.
 limits:
   - No public participant browser journey is certified by an internal run.
-  - Fresh live proof is required for the stricter shell-origin trust path.
+  - Strict shell-origin trust is proven for the fresh internal 501 run only; the earlier 401 run retains its documented trust limit.
   - The archive vulnerability and other platform staging gates remain unresolved.
