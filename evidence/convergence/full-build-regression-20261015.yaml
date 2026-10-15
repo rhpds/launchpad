@@ -79,6 +79,34 @@ targeted_corrections:
   limits:
     - Targeted correction results do not replace a new exact-commit full-suite run.
     - Do not change certification versions or source pins merely to match stale assertions; reconcile authoritative proof first.
+post_correction_full_run:
+  source: a4b8806c6be894b54d59807c4cb53e070d937fd5
+  selection: Same clean-clone offline selection as isolated_git_rerun.
+  passed: 2855
+  failed: 11
+  skipped: 27
+  deselected: 13
+  duration_seconds: 62.85
+  report: evidence/runs/backend-full-a4b8806c-20261015.xml
+  report_sha256: dbbe03408824df90d2a5ed2d4f5f97afbcbc6837243eae0ad5b56745c8fd94b3
+  additional_contract_reconciliation:
+    report: evidence/runs/qualification-registry-contracts-green-20261015.xml
+    passed: 23
+    changes:
+      - Agentic 501 now asserts its existing destination/offline proof, matching source revision and zero namespace residue; it explicitly rejects live-inference and production-capacity claims.
+      - Multi-agent Flightpath registry-grant expectation now requires immutable external workload and support images; legacy integrated-registry targets retain grants.
+    not_a_new_full_suite_result: true
+  unresolved_from_full_run:
+    - Sovereign 201 exposure/certification agreement
+    - Virtualization 201 source revision agreement
+    - Virtualization 301 catalog/intake agreement
+    - Virtualization 401 source revision agreement
+    - Virtualization 501 source revision agreement
+    - Virtualization foundations 301 source revision agreement
+    - Arena canary catalog version agreement
+    - Flightpath candidate backend image agreement
+    - Flightpath rollback image agreement
+  next_full_run_required: true
 archive:
   test_fixture: backend/security-tests/oc_archive_confinement_test.go
   fixture_sha256: db6d6aeb3ed459610dcad4422a8c4c04b537b1e3acf1187702a5ee2db1574c9f

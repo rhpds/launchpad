@@ -62,7 +62,9 @@ def test_deployed_cluster_images_and_pilot_catalog_preserve_grant_boundary(
         requested_mode=item.category,
     )
 
-    flightpath_grant = catalog_id == "multi-agent-quickstart"
+    # Flightpath's certified workload and Showroom support images are now
+    # external immutable Quay references, unlike the legacy Arena/Brutus ones.
+    flightpath_grant = False
     for cluster_id, expected_grant in (
         ("arena", True),
         ("brutus", True),
@@ -77,6 +79,16 @@ def test_deployed_cluster_images_and_pilot_catalog_preserve_grant_boundary(
         adapter._select_workshop_node_name = MagicMock(return_value="")
 
         plan = adapter.create_plan(request, item)
+
+        if cluster_id == "flightpath" and catalog_id == "multi-agent-quickstart":
+            supports = plan.required_resources["showroom_support_images"]
+            assert all(
+                supports[name].startswith("quay.io/") and "@sha256:" in supports[name]
+                for name in ("showroom_terminal", "showroom_git_cloner")
+            )
+            image = plan.required_resources["workload_helm_values"]["image"]
+            assert image["repository"].startswith("quay.io/")
+            assert image["digest"].startswith("sha256:")
 
         assert adapter._requires_image_pull_grant(plan.required_resources) is expected_grant
 

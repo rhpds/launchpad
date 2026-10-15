@@ -1,4 +1,5 @@
 from pathlib import Path
+import json
 
 import pytest
 import yaml
@@ -139,7 +140,16 @@ def test_scale_blueprint_extends_401_as_a_separate_gated_catalog_item():
     assert scale["metadata"]["prerequisites"] == ["operate-agentic-blueprint"]
     assert scale["metadata"]["shared_blueprint"] == operate["metadata"]["shared_blueprint"]
     assert scale["metadata"]["solution_family"] == "agentic_ai"
-    assert scale["metadata"]["certification_stage"] == "pending"
+    assert scale["metadata"]["certification_stage"] == "one-seat-destination-qualified"
+    proof_path = scale["metadata"]["source_references"]["certification_evidence"]
+    proof = json.loads((ROOT / proof_path).read_text())
+    assert proof["result"] == "GREEN-destination-participant-seat"
+    assert proof["cluster_ref"] == "flightpath"
+    assert proof["source_revision"] == scale["metadata"]["source_content_revision"]
+    assert proof["truth_boundaries"]["live_inference_claim"] is False
+    assert proof["truth_boundaries"]["production_capacity_claim"] is False
+    assert proof["truth_boundaries"]["participant_execution_source"] == "offline"
+    assert proof["cleanup"]["namespace_exists"] is False
     assert scale["metadata"]["activation_blockers"] == []
     assert scale["metadata"]["production_blockers"]
 
