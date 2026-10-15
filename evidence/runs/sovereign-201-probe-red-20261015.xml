@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="3" time="0.034" timestamp="2026-10-15T11:41:33.834085-05:00" hostname="jkershaw-mac"><testcase classname="scripts.tests.test_sovereign_201_probe_evidence" name="test_sovereign_201_probe_verifies_tls" time="0.001"><failure message="assert '-sSk' not in &quot;#!/usr/bin/...:false\n}'\n&quot;&#10;  &#10;  '-sSk' is contained here:&#10;     -a args=(-sSk --max-time 75 -o &quot;$work_dir/body&quot; -w '%{http_code}' -X &quot;$method&quot;)&#10;  ?           ++++&#10;      if [[ -n &quot;$body&quot; ]]; then&#10;        args+=(-H 'Content-Type: application/json' --data-binary &quot;$body&quot;)&#10;      fi...&#10;  &#10;  ...Full output truncated (74 lines hidden), use '-vv' to show">def test_sovereign_201_probe_verifies_tls():
+        source = PROBE.read_text()
+&gt;       assert "-sSk" not in source
+E       assert '-sSk' not in "#!/usr/bin/...:false\n}'\n"
+E         
+E         '-sSk' is contained here:
+E            -a args=(-sSk --max-time 75 -o "$work_dir/body" -w '%{http_code}' -X "$method")
+E         ?           ++++
+E             if [[ -n "$body" ]]; then
+E               args+=(-H 'Content-Type: application/json' --data-binary "$body")
+E             fi...
+E         
+E         ...Full output truncated (74 lines hidden), use '-vv' to show
+
+scripts/tests/test_sovereign_201_probe_evidence.py:9: AssertionError</failure></testcase><testcase classname="scripts.tests.test_sovereign_201_probe_evidence" name="test_sovereign_201_probe_binds_evidence_to_deployed_source_and_images" time="0.000"><failure message="assert 'get applications.argoproj.io -A -o json' in '#!/usr/bin/env bash\nset -euo pipefail\n\nnamespace=&quot;${1:?usage: certify-sovereign-ai-201-seat.sh &lt;namespace&gt; &lt;cluste...d:true,human_authority:true},\n  terminal_scope:($terminal_scope|split(&quot;\\n&quot;)), contains_sensitive_values:false\n}\'\n'">def test_sovereign_201_probe_binds_evidence_to_deployed_source_and_images():
+        source = PROBE.read_text()
+&gt;       assert "get applications.argoproj.io -A -o json" in source
+E       assert 'get applications.argoproj.io -A -o json' in '#!/usr/bin/env bash\nset -euo pipefail\n\nnamespace="${1:?usage: certify-sovereign-ai-201-seat.sh &lt;namespace&gt; &lt;cluste...d:true,human_authority:true},\n  terminal_scope:($terminal_scope|split("\\n")), contains_sensitive_values:false\n}\'\n'
+
+scripts/tests/test_sovereign_201_probe_evidence.py:15: AssertionError</failure></testcase><testcase classname="scripts.tests.test_sovereign_201_probe_evidence" name="test_sovereign_201_request_helper_fails_closed_inside_conditionals" time="0.000"><failure message="assert 'status=&quot;$(curl &quot;${args[@]}&quot; &quot;$url&quot;)&quot; || return 1' in '#!/usr/bin/env bash\nset -euo pipefail\n\nnamespace=&quot;${1:?usage: certify-sovereign-ai-201-seat.sh &lt;namespace&gt; &lt;cluste...d:true,human_authority:true},\n  terminal_scope:($terminal_scope|split(&quot;\\n&quot;)), contains_sensitive_values:false\n}\'\n'">def test_sovereign_201_request_helper_fails_closed_inside_conditionals():
+        source = PROBE.read_text()
+&gt;       assert 'status="$(curl "${args[@]}" "$url")" || return 1' in source
+E       assert 'status="$(curl "${args[@]}" "$url")" || return 1' in '#!/usr/bin/env bash\nset -euo pipefail\n\nnamespace="${1:?usage: certify-sovereign-ai-201-seat.sh &lt;namespace&gt; &lt;cluste...d:true,human_authority:true},\n  terminal_scope:($terminal_scope|split("\\n")), contains_sensitive_values:false\n}\'\n'
+
+scripts/tests/test_sovereign_201_probe_evidence.py:26: AssertionError</failure></testcase></testsuite></testsuites>

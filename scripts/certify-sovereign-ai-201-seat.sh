@@ -17,16 +17,33 @@ trap cleanup EXIT
 
 request_json() {
   local expected_status="$1" method="$2" url="$3" body="${4:-}"
-  local -a args=(-sSk --max-time 75 -o "$work_dir/body" -w '%{http_code}' -X "$method")
+  local -a args=(-sS --max-time 75 -o "$work_dir/body" -w '%{http_code}' -X "$method")
   if [[ -n "$body" ]]; then
     args+=(-H 'Content-Type: application/json' --data-binary "$body")
   fi
   local status
-  status="$(curl "${args[@]}" "$url")"
-  [[ "$status" == "$expected_status" ]]
-  jq -e . "$work_dir/body" >/dev/null
+  status="$(curl "${args[@]}" "$url")" || return 1
+  [[ "$status" == "$expected_status" ]] || return 1
+  jq -e . "$work_dir/body" >/dev/null || return 1
   cat "$work_dir/body"
 }
+
+stage="release-identity"
+source_revision="29e45a00e89f36a7b5180bb5884c541a9694cc0c"
+expected_presentation_image="ghcr.io/jkershawrh/sovereign-ai-201-presentation@sha256:1348ec0131a9efcfdc1fe537a3c5127f2470d86e3178aae7f7d07bc6370cab5d"
+expected_adapter_image="ghcr.io/jkershawrh/sovereign-ai-201-adapter@sha256:a5b903e1287279087d1b442639ec864911638ff873712bdbf88ebea70cea2f4b"
+oc --kubeconfig "$KUBECONFIG" get applications.argoproj.io -A -o json >"$work_dir/applications.json"
+# Bind the receipt to a synced workload Application targeting this exact seat.
+jq -e --arg namespace "$namespace" --arg revision "$source_revision" '
+  [.items[] | select(.spec.destination.namespace == $namespace)
+   | select(.spec.source.repoURL == "https://github.com/jkershawrh/sovereign-ai-201.git")
+   | select(.spec.source.path == "charts/sovereign-ai-201")
+   | select(.spec.source.targetRevision == $revision and .status.sync.revision == $revision)
+   | select(.status.sync.status == "Synced")] | length == 1
+' "$work_dir/applications.json" >/dev/null
+oc --kubeconfig "$KUBECONFIG" get deployments -n "$namespace" -o json >"$work_dir/deployments.json"
+presentation_image="$(jq -er --arg image "$expected_presentation_image" '[.items[].spec.template.spec.containers[].image | select(. == $image)] | unique | if length == 1 then .[0] else error("presentation image mismatch") end' "$work_dir/deployments.json")"
+adapter_image="$(jq -er --arg image "$expected_adapter_image" '[.items[].spec.template.spec.containers[].image | select(. == $image)] | unique | if length == 1 then .[0] else error("adapter image mismatch") end' "$work_dir/deployments.json")"
 
 stage="route-discovery"
 app_host="$(oc --kubeconfig "$KUBECONFIG" get route lab -n "$namespace" -o jsonpath='{.spec.host}')"
@@ -34,7 +51,7 @@ app_host="$(oc --kubeconfig "$KUBECONFIG" get route lab -n "$namespace" -o jsonp
 base_url="https://${app_host}"
 
 stage="presentation"
-presentation_status="$(curl -sSkL --max-time 30 -o /dev/null -w '%{http_code}' "$base_url/")"
+presentation_status="$(curl -fsSL --max-time 30 -o /dev/null -w '%{http_code}' "$base_url/")"
 [[ "$presentation_status" == "200" ]]
 
 stage="adapter-forward"
@@ -89,8 +106,9 @@ grep -qx 'own_edit=yes' <<<"$terminal_scope"
 grep -qx 'cross_namespace=DENIED' <<<"$terminal_scope"
 grep -qx 'node_list=DENIED' <<<"$terminal_scope"
 
-jq -cn --arg namespace "$namespace" --arg cluster_ref "$expected_cluster" --arg evidence_id "$evidence_id" --arg terminal_scope "$terminal_scope" '{
+jq -cn --arg namespace "$namespace" --arg cluster_ref "$expected_cluster" --arg evidence_id "$evidence_id" --arg terminal_scope "$terminal_scope" --arg source_revision "$source_revision" --arg presentation_image "$presentation_image" --arg adapter_image "$adapter_image" '{
   result:"GREEN-live-internal-seat", namespace:$namespace, cluster_ref:$cluster_ref,
+  source_revision:$source_revision,presentation_image:$presentation_image,adapter_image:$adapter_image,
   readiness:{health:true,presentation_http_status:200},
   journey:{mode:"LIVE",live_qualified:true,model_identity_configured:true,model_participated:true,model:"granite-3.2-8b-tools",allow_path:"ALLOWED",deny_path:"POLICY_DENIED",injection_path:"INJECTION_BLOCKED",evidence_id:$evidence_id,evidence_redacted:true,human_authority:true},
   terminal_scope:($terminal_scope|split("\n")), contains_sensitive_values:false

@@ -4,7 +4,7 @@ description: Construct and qualify a fail-closed inference boundary across resid
   trust, schemas, Secret references, Service, NetworkPolicy, model routing, typed
   outcomes, redacted evidence, human authority, and reclaim.
 category: guided_build
-version: 0.1.1-flightpath.1
+version: 0.1.2-flightpath.1
 status: active
 required_capabilities:
 - openshift
@@ -40,7 +40,7 @@ metadata:
   solution_family: sovereign_ai
   showroom: true
   showroom_content_repo_url: https://github.com/jkershawrh/sovereign-ai-201.git
-  showroom_content_ref: 0fdcfba6c2db35190a768e561ac6b0665c76484b
+  showroom_content_ref: 29e45a00e89f36a7b5180bb5884c541a9694cc0c
   showroom_content_playbook: showroom/default-site.yml
   showroom_content_start_path: showroom/content
   showroom_content_image: ghcr.io/jkershawrh/sovereign-ai-201-showroom-content@sha256:56fbc6071efb353f0d43f0f7ef6aec3547f60d3764f3205bfd24b2ad0caf9528
@@ -56,7 +56,6 @@ metadata:
   certification_proof_contract: certification/catalog/sovereign-ai-201.yaml
   allowed_exposure_policies:
   - internal
-  - public_code
   showroom_journey: sovereign-ai-201
   showroom_title: 'Sovereign AI 201: Build the Governed Inference Boundary'
   namespace_slug: sovereign-ai-201
@@ -88,7 +87,7 @@ metadata:
   workshop_node_headroom_pods: 0
   workshop_node_required_labels: {}
   workload_repo: https://github.com/jkershawrh/sovereign-ai-201.git
-  workload_revision: 0fdcfba6c2db35190a768e561ac6b0665c76484b
+  workload_revision: 29e45a00e89f36a7b5180bb5884c541a9694cc0c
   workload_deploy_type: helm
   workload_deployment_scope: seat
   workload_deploy_path: charts/sovereign-ai-201
@@ -137,5 +136,5 @@ metadata:
     ui: lab
   workload_readiness: []
   source_content_repo: https://github.com/jkershawrh/sovereign-ai-201.git
-  source_content_revision: 0fdcfba6c2db35190a768e561ac6b0665c76484b
+  source_content_revision: 29e45a00e89f36a7b5180bb5884c541a9694cc0c
   source_references: {}

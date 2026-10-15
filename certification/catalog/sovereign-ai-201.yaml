@@ -12,9 +12,15 @@ spec:
   showroom:
     pages:
       - {id: welcome, path: /www/sovereign-ai-201/main/index.html, marker: "Build the Governed Inference Boundary"}
+      - {id: prerequisite, path: /www/sovereign-ai-201/main/01-prerequisite.html, marker: "Establish the governed session"}
+      - {id: boundaries, path: /www/sovereign-ai-201/main/02-map-boundaries.html, marker: "Map the Northstar boundary"}
+      - {id: contract, path: /www/sovereign-ai-201/main/03-author-contract.html, marker: "Author the governed request"}
       - {id: controls, path: /www/sovereign-ai-201/main/04-wire-controls.html, marker: "Wire policy and platform controls"}
       - {id: qualify, path: /www/sovereign-ai-201/main/05-qualify-paths.html, marker: "Qualify allowed and denied paths"}
+      - {id: fail-closed, path: /www/sovereign-ai-201/main/06-break-fail-closed.html, marker: "Break the boundary safely"}
       - {id: authority, path: /www/sovereign-ai-201/main/07-evidence-authority.html, marker: "Verify evidence and retain human authority"}
+      - {id: reclaim, path: /www/sovereign-ai-201/main/08-reclaim.html, marker: "Export, clean up, and prove the boundary"}
+      - {id: conclusion, path: /www/sovereign-ai-201/main/99-conclusion.html, marker: "Conclusion"}
   seat_probe:
     argv: [bash, scripts/certify-sovereign-ai-201-seat.sh, "{namespace}", "{cluster_ref}"]
     timeout_seconds: 600

@@ -6,7 +6,7 @@ catalog:
     trust, schemas, Secret references, Service, NetworkPolicy, model routing, typed
     outcomes, redacted evidence, human authority, and reclaim.
   category: guided_build
-  version: 0.1.1-flightpath.1
+  version: 0.1.2-flightpath.1
   status: active
 learning:
   learning_level: '201'
@@ -24,14 +24,14 @@ learning:
 sources:
   showroom:
     repo_url: https://github.com/jkershawrh/sovereign-ai-201.git
-    revision: 0fdcfba6c2db35190a768e561ac6b0665c76484b
+    revision: 29e45a00e89f36a7b5180bb5884c541a9694cc0c
     playbook: showroom/default-site.yml
     start_path: showroom/content
     gitops_repo_url: https://github.com/jkershawrh/sovereign-ai-201.git
     content_image: ghcr.io/jkershawrh/sovereign-ai-201-showroom-content@sha256:56fbc6071efb353f0d43f0f7ef6aec3547f60d3764f3205bfd24b2ad0caf9528
   workload:
     repo_url: https://github.com/jkershawrh/sovereign-ai-201.git
-    revision: 0fdcfba6c2db35190a768e561ac6b0665c76484b
+    revision: 29e45a00e89f36a7b5180bb5884c541a9694cc0c
     deploy_path: charts/sovereign-ai-201
     gitops_repo_url: https://github.com/jkershawrh/sovereign-ai-201.git
 runtime:
@@ -70,7 +70,6 @@ runtime:
     source: cluster.console_url
   allowed_exposure_policies:
   - internal
-  - public_code
   workload:
     source_kind: chart
     gitops_ready: true
