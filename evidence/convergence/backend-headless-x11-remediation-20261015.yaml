@@ -1,0 +1,25 @@
+schema: launchpad/backend-headless-x11-remediation/v1
+date: '2026-10-15'
+status: GREEN-LOCAL-PENDING-EXACT-IMAGE-SCAN
+packages_removed: [libX11, libX11-common, libX11-xcb, libXrender]
+reason: Headless API/worker/gateway runtime does not use X11 clients; the preceding complete image scan records four High matches across these packages.
+scope:
+  - Bounded explicit DNF removal; dependency autoremove remains disabled.
+  - Runtime smoke gate now rejects any of these packages being present.
+  - Existing Python modules, CA trust, SQLite and oc/helm/git/curl/openssl checks remain required.
+proof:
+  red: evidence/runs/backend-headless-x11-red-20261015.xml
+  red_failed: 1
+  green: evidence/runs/backend-headless-x11-green-20261015.xml
+  green_passed: 39
+  isolated_linux_base: evidence/runs/backend-headless-x11-linux-base-proof-20261015.txt
+  base_platform: linux/amd64
+  base_image_id: ffe0b8de75d387a4b4010a69415c1cd8af6d5eaa0565ef5c7adeb6d3bc6a4b18
+  base_image_digest: sha256:8b1b36418501692d863a68f7f31ae47f1f169b83f7cdcc84831ac002304af693
+  host_engine_platform: linux/arm64
+  execution: Emulated disposable container, network disabled, no host mounts, removed automatically on exit.
+  base_checks_passed: [python-3.12, ca-trust, sqlite, git, curl, openssl, x11-packages-absent]
+limits:
+  - Base-image test is not a complete Launchpad candidate runtime test.
+  - Do not claim a reduced vulnerability count until a fresh exact-image scan completes.
+  - No image publication, cluster mutation, library applicability exception or release-gate weakening.

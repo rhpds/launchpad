@@ -1,10 +1,22 @@
 """Release contracts for reducing runtime surface without losing platform tools."""
 
 from pathlib import Path
+import re
 
 import yaml
 
 ROOT = Path(__file__).resolve().parents[2]
+
+
+def test_headless_runtime_removes_exact_x11_packages_and_verifies_their_absence():
+    text = (ROOT / "backend/Containerfile").read_text()
+    smoke = (ROOT / "backend/scripts/runtime_smoke.py").read_text()
+    for package in ("libX11", "libX11-common", "libX11-xcb", "libXrender"):
+        assert re.search(rf"(?<![\w-]){re.escape(package)}(?![\w-])", text)
+        assert f'"{package}"' in smoke
+    assert "clean_requirements_on_remove=False" in text
+    for tool in ("oc", "helm", "git", "curl", "openssl"):
+        assert f'"{tool}"' in smoke
 
 
 def test_runtime_removes_unused_web_server_without_autoremoving_dependencies():

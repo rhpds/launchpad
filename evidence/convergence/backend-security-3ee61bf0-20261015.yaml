@@ -1,0 +1,38 @@
+schema: launchpad/backend-security-image-validation/v1
+date: '2026-10-15'
+status: SECURITY-BLOCKED
+source: 3ee61bf0a46741473c05680146d6850eb3b778b8
+run: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/38755237674
+build: PASS
+runtime_smoke: PASS
+candidate_interpreter:
+  report: evidence/runs/backend-candidate-interpreter-3ee61bf0-20261015.xml
+  sha256: 2cbd228fbb3cf70d651ae65814584bf2a1212342e323ac8c0499327aecb0e1f0
+  passed: 68
+  failed: 0
+  skipped: 0
+binaries:
+  oc_sha256: 6ad5cbf3bd3627038a6f426eeca59540f26be494e8463941c50167f7c8fe7957
+  helm_sha256: 6262abca20d6347e88a490b276b74b226bec9670007b93edbb151502808ee6ff
+full_scan:
+  report_sha256: 09e615e17e162bace68acee49a928b6c8ffdc2d2e89a536bb9840f54f0ac3a84
+  retained_in_ci_artifact: backend-vulnerability-scan-3ee61bf0a46741473c05680146d6850eb3b778b8
+  high: 29
+  critical: 0
+  unrated: 2
+  suppressed_high_critical_unrated: 0
+  high_critical_fix_states: {fixed: 2, not-fixed: 26, unspecified: 1}
+  preceding_high: 32
+  preceding_unrated: 2
+  buildkit_matches: 0
+  archive_matches: 0
+  limit: Absence of a scanner match for the local archive replacement is not an accepted applicability disposition; source provenance and functional confinement evidence remain necessary.
+remaining_groups:
+  - Distribution registry dependency: two fixable High matches.
+  - Docker dependency: three High matches.
+  - OpenPGP cryptography dependency: two unrated matches.
+  - OS/runtime packages: twenty-four High matches.
+publication_requested: false
+image_published: false
+live_rollout_performed: false
+security_waiver_granted: false

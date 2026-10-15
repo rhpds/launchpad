@@ -54,6 +54,7 @@ def main() -> None:
         "kernel-headers", "python3.11-devel", "python3.12-devel", "expat-devel", "libblkid-devel",
         "libmount-devel", "go-srpm-macros", "qt5-srpm-macros",
         "emacs-filesystem", "vim-filesystem", "vim-minimal", "libX11-devel",
+        "libX11", "libX11-common", "libX11-xcb", "libXrender",
     }
     remaining = forbidden.intersection(installed.stdout.splitlines())
     if remaining:
