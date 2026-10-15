@@ -1,0 +1,39 @@
+schema: launchpad/staging-regression-checkpoint/v1
+date: '2026-10-15'
+status: NOT-QUALIFIED
+source: 330487e0
+full_regression:
+  report: evidence/runs/backend-full-330487e0-20261015.xml
+  sha256: 7bb14531188f9b82e0a569aba5db047db6b76bec354db376a5e34c4b1975a92f
+  passed: 2867
+  failed: 8
+  skipped: 27
+  deselected: 13
+  duration_seconds: 64.32
+  scope: Clean exact-source clone; mock mode; external telemetry disabled; existing CI legacy recursive-test exclusion retained.
+follow_up:
+  private_pull_boundary:
+    status: GREEN-local
+    report: evidence/runs/private-pull-boundary-green-20261015.xml
+    sha256: 7a20c6b506b7c4745c9f3da827aea2513a4267265e9c802015da4cd6cbb627ef
+    passed: 2
+    correction: Render the complete overlay and require the private pull reference for all five backend-image consumers, while rejecting it on other Deployments and CronJobs.
+  remaining_regressions:
+    - Sovereign 201 exposure and certification agreement.
+    - Virtualization 201 source revision and evidence alignment.
+    - Virtualization 301 intake/catalog evidence-reference drift and source revision.
+    - Virtualization 401 current revision versus historical public evidence.
+    - Virtualization 501 current revision versus historical public evidence.
+    - Arena canary catalog-version expectation.
+    - Virtualization foundations 301 revision expectation.
+security_gate:
+  unresolved_high: 32
+  unresolved_unrated: 2
+  archive_escape_reproduced: true
+  waiver_granted: false
+  qualified_image_published: false
+live_platform_rollout_performed: false
+limits:
+  - Follow-up focused tests do not turn the preceding full regression run green.
+  - Internal automated lab certification does not prove the external participant browser journey.
+  - Unrelated in-progress Sovereign changes are preserved and excluded from this checkpoint.
