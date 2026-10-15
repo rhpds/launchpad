@@ -2,14 +2,14 @@ schema: launchpad/staging-regression-checkpoint/v1
 date: '2026-10-15'
 status: NOT-QUALIFIED
 latest_full_regression:
-  source: 70ab789b
-  report: evidence/runs/backend-full-70ab789b-20261015.xml
-  sha256: d3edb99bb99852842fedc1a3db5ae5531258ea9936f10fa6d3429afc85022485
-  passed: 2875
+  source: 95fec905
+  report: evidence/runs/backend-full-95fec905-20261015.xml
+  sha256: feb019960b5cc5b2de1451748b573eb6d9e4f12fb5527d5777c94afe89063abb
+  passed: 2876
   failed: 3
   skipped: 27
   deselected: 13
-  duration_seconds: 71.15
+  duration_seconds: 61.40
   remaining:
     - Sovereign 201 exposure and exact release agreement; separate uncommitted work is not included.
     - Virtualization 401 current release versus historical public certification evidence.
@@ -19,9 +19,18 @@ exact_image_validation:
   source: 3ee61bf0a46741473c05680146d6850eb3b778b8
   run: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/38755237674
   requested_publication: false
-  result_at_checkpoint: BUILD-IN-PROGRESS-NOT-QUALIFIED
+  result_at_checkpoint: BUILD-PASS-SECURITY-BLOCKED
+  candidate_interpreter_tests_passed: 68
+  scan_evidence: evidence/convergence/backend-security-3ee61bf0-20261015.yaml
   source_remediation: evidence/convergence/backend-archive-root-remediation-20261015.yaml
-  vulnerability_count_reduction_claimed: false
+  observed_high_reduction: 3
+next_image_validation:
+  source: 95fec905f1c2a3b6581de5e290f711af2ede37c1
+  run: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/38758481803
+  change: Bounded removal of unused X11 libraries with preserved runtime smoke requirements.
+  requested_publication: false
+  status: PENDING
+  scan_count_reduction_claimed: false
 sovereign_201_review_limit:
   receipt: evidence/runs/flightpath-live-20260930-sovereign-ai-201-1seat-r14.json
   historical_review_pin: 0fdcfba6c2db35190a768e561ac6b0665c76484b
@@ -48,16 +57,20 @@ follow_up:
     correction: Render the complete overlay and require the private pull reference for all five backend-image consumers, while rejecting it on other Deployments and CronJobs.
   remaining_regressions:
     - Sovereign 201 exposure and certification agreement.
-    - Virtualization 201 source revision and evidence alignment.
-    - Virtualization 301 intake/catalog evidence-reference drift and source revision.
     - Virtualization 401 current revision versus historical public evidence.
     - Virtualization 501 current revision versus historical public evidence.
+  resolved_regressions:
+    - Virtualization 201 source revision bound to hashed current internal proof.
+    - Virtualization 301 intake/catalog evidence-reference drift and source revision.
     - Arena canary catalog-version expectation.
     - Virtualization foundations 301 revision expectation.
 security_gate:
-  unresolved_high: 32
+  scan_source: 3ee61bf0a46741473c05680146d6850eb3b778b8
+  preceding_high: 32
+  unresolved_high: 29
   unresolved_unrated: 2
-  archive_escape_reproduced: true
+  legacy_archive_escape_reproduced: true
+  root_confinement_remediation: GREEN-SOURCE-AND-IMAGE-BUILD
   waiver_granted: false
   qualified_image_published: false
 live_platform_rollout_performed: false
