@@ -45,6 +45,25 @@ archive:
     preexisting_symlink_escape: FAIL
   conclusion: A lexical prefix fix is insufficient; robust filesystem confinement is required before accepting remediation.
   safety: Attempted escapes remain within test-owned temporary roots; no real resources targeted.
+client_package_review:
+  status: EVIDENCE-COLLECTED-NOT-A-DISPOSITION
+  report: evidence/runs/backend-oc-linux-candidate-package-closure-20261015.txt
+  sha256: 80d763e583e9462d4888fd84c39c1267a3d869625671521e7b3366983a42dddd
+  target: linux/amd64
+  compiler: go1.26.9
+  cgo: false
+  tags: [include_gcs, include_oss, containers_image_openpgp]
+  replacements: Same ten replacements as candidate Containerfile.
+  source_modification: Disposable incomplete archive patch changes no imports; not a bit-identical final binary proof.
+  included:
+    - OpenShift copied image/archive extractor
+    - BuildKit Dockerfile parser, command, shell and stack helper packages
+    - Distribution registry client, auth, API, memory cache and transport packages
+  not_in_package_closure:
+    - Distribution registry proxy
+    - Distribution registry Redis cache
+    - BuildKit git source, solver and frontend gateway execution packages
+  limit: Package absence supports advisory-specific review, but grants no waiver or staging acceptance.
 release:
   staging_qualified: false
   deployed: false
