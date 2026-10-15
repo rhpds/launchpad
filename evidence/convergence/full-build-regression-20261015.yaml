@@ -1,6 +1,6 @@
 schema: launchpad/full-build-regression/v1
 date: '2026-10-15'
-status: IN-PROGRESS-SECURITY-BLOCKED
+status: FULL-REGRESSION-RED-REMEDIATION-IN-PROGRESS
 source: fe0ab39ee3bb8565a2d0c6c6a0602ef8caf79ffb
 source_isolation: Clean git archive; unrelated uncommitted catalog edits excluded.
 live_changes: false
@@ -21,7 +21,7 @@ admin:
   report: evidence/runs/admin-full-regression-fe0ab39e-20261015.json
   sha256: b0b119e8d964bb798912ad9464c38ea82f847fb9d9379e3393c1e803e31cafe7
 backend_and_scripts:
-  status: RUNNING
+  status: COMPLETED-RED
   observed_runner_issue: Historical test_demo_migration.py launches a nested complete backend run with a 120-second timeout; nested failure retained by the outer run.
   python: '3.12.13'
   pytest: '8.4.2'
@@ -29,7 +29,56 @@ backend_and_scripts:
   kubeconfig: Explicit nonexistent disposable path; no live cluster credential supplied.
   selection: backend/tests scripts/tests, excluding tests marked local.
   report: evidence/runs/backend-full-source-regression-fe0ab39e-20261015.xml
+  report_sha256: e3a113e504e450c52b0fc2672220f0722b140365f286aac66ab72d46f8a013d0
+  passed: 2846
+  failed: 45
+  skipped: 27
+  deselected: 13
+  duration_seconds: 1181.61
   scope_limit: This is a source regression run, not the exact Linux container or live certification.
+isolated_git_rerun:
+  source: fe0ab39ee3bb8565a2d0c6c6a0602ef8caf79ffb
+  source_isolation: Clean local clone with historical commits; no credential configuration copied.
+  telemetry_endpoints: Explicitly empty; mock run must not contact production brokers or webhooks.
+  selection: backend/tests scripts/tests, excluding local markers and historical nested-suite test_demo_migration.py, as in existing CI.
+  passed: 2840
+  failed: 24
+  skipped: 27
+  deselected: 13
+  duration_seconds: 61.63
+  report: evidence/runs/backend-full-git-isolated-fe0ab39e-20261015.xml
+  report_sha256: 548de65359b9c4155af14900caa560990db2b193a47b34d33d12a513d7923c66
+  not_a_green_result: true
+targeted_corrections:
+  test_harness:
+    behavior: Clear inherited Kafka and webhook destinations before application imports; runtime configuration unchanged.
+    red: evidence/runs/backend-offline-harness-red-20261015.xml
+    green: evidence/runs/backend-offline-harness-green-20261015.xml
+    passed: 94
+    unchanged_timing_cases: evidence/runs/backend-timing-isolation-fe0ab39e-20261015.xml
+  arena_manifest:
+    behavior: Remove obsolete index-based NetworkPolicy patch; retain base 8080 portal-only and 8443 router/tunnel restrictions.
+    red: evidence/runs/arena-gateway-render-red-20261015.xml
+    initial_correction_report: evidence/runs/arena-gateway-render-green-20261015.xml
+    initial_correction_failures: 2
+    green: evidence/runs/arena-gateway-render-green-r2-20261015.xml
+    passed: 72
+    deselected: 1
+    excluded_case: test_canary_overlay_binds_effective_flightpath_catalogs remains blocked by unrelated catalog-version drift.
+    deployed: false
+  execute_contract:
+    behavior: Assert the current stable terminal path and tab role; reject obsolete shell CSS selectors.
+    green: evidence/runs/showroom-execute-contract-green-20261015.xml
+    passed: 49
+  identifier_audit:
+    behavior: Exclude only git-at-github-colon transport syntax; actual mailboxes remain detected.
+    red: evidence/runs/git-transport-sanitization-red-20261015.xml
+    initial_correction_report: evidence/runs/git-transport-sanitization-green-20261015.xml
+    initial_correction_failures: 1
+    green: evidence/runs/git-transport-sanitization-green-r2-20261015.xml
+  limits:
+    - Targeted correction results do not replace a new exact-commit full-suite run.
+    - Do not change certification versions or source pins merely to match stale assertions; reconcile authoritative proof first.
 archive:
   test_fixture: backend/security-tests/oc_archive_confinement_test.go
   fixture_sha256: db6d6aeb3ed459610dcad4422a8c4c04b537b1e3acf1187702a5ee2db1574c9f

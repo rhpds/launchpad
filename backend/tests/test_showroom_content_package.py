@@ -77,7 +77,9 @@ def test_shared_showroom_ui_uses_canonical_terminal_execute_controls():
     assert not (supplemental / "js/execute.js").exists()
     assert '{{uiRootPath}}/css/site-extra.css' in head
     assert "pasteToTerminal" in script
-    assert ".tabcontent.active .main-content" in script
+    assert 'iframe[src*="/terminal"]' in script
+    assert 'getAttribute("role")' in script
+    assert ".tabcontent.active .main-content" not in script
     assert "xterm-helper-textarea" in script
     assert "Run in terminal" in script
     assert "writeToClipboard" in script

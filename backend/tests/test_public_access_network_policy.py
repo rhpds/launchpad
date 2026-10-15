@@ -24,12 +24,27 @@ def test_public_gateway_accepts_the_managed_cloudflare_tunnel():
         if item["metadata"]["name"] == "public-access-gateway-ingress"
     )
 
-    sources = policy["spec"]["ingress"][0]["from"]
+    tunnel_rule = next(
+        rule for rule in policy["spec"]["ingress"]
+        if any(port["port"] == 8443 for port in rule["ports"])
+    )
+    sources = tunnel_rule["from"]
     assert {
         "podSelector": {
-            "matchLabels": {"app.kubernetes.io/name": "cloudflare-tunnel"}
+            "matchLabels": {
+                "app.kubernetes.io/name": "cloudflare-tunnel",
+                "app.kubernetes.io/managed-by": "kustomize",
+            }
         }
     } in sources
+    participant_rule = next(
+        rule for rule in policy["spec"]["ingress"]
+        if any(port["port"] == 8080 for port in rule["ports"])
+    )
+    assert participant_rule["from"] == [{"podSelector": {"matchLabels": {
+        "app.kubernetes.io/name": "partner-portal",
+        "app.kubernetes.io/managed-by": "kustomize",
+    }}}]
 
 
 def test_arena_public_gateway_validates_the_stable_keycloak_issuer():

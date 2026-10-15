@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="0.049" timestamp="2026-10-15T08:39:41.884248-05:00" hostname="jkershaw-mac"><testcase classname="scripts.tests.test_repository_sanitization" name="test_scp_git_transport_is_not_a_personal_email_but_real_mailboxes_remain" time="0.000"><failure message="AssertionError: assert 1 == 0&#10; +  where 1 = &lt;function non_fixture_email_count at 0x106ac1260&gt;('git@github.com:example/repository.git')&#10; +    where &lt;function non_fixture_email_count at 0x106ac1260&gt; = module.non_fixture_email_count">scripts/tests/test_repository_sanitization.py:65: in test_scp_git_transport_is_not_a_personal_email_but_real_mailboxes_remain
+    assert module.non_fixture_email_count("git@github.com:example/repository.git") == 0
+E   AssertionError: assert 1 == 0
+E    +  where 1 = &lt;function non_fixture_email_count at 0x106ac1260&gt;('git@github.com:example/repository.git')
+E    +    where &lt;function non_fixture_email_count at 0x106ac1260&gt; = module.non_fixture_email_count</failure></testcase></testsuite></testsuites>

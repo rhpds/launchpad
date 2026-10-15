@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="0.214" timestamp="2026-10-15T08:37:11.032741-05:00" hostname="jkershaw-mac"><testcase classname="scripts.tests.test_offline_backend_test_harness" name="test_backend_harness_clears_external_telemetry_before_application_import" time="0.175"><failure message="AssertionError: Traceback (most recent call last):&#10;    File &quot;&lt;string&gt;&quot;, line 1, in &lt;module&gt;&#10;  AssertionError&#10;  &#10;assert 1 == 0&#10; +  where 1 = CompletedProcess(args=['/private/tmp/launchpad-full-regression.PCfV4q/test-env/bin/python', '-c', &quot;import runpy; runpy...de=1, stdout='', stderr='Traceback (most recent call last):\n  File &quot;&lt;string&gt;&quot;, line 1, in &lt;module&gt;\nAssertionError\n').returncode">scripts/tests/test_offline_backend_test_harness.py:29: in test_backend_harness_clears_external_telemetry_before_application_import
+    assert result.returncode == 0, result.stderr
+E   AssertionError: Traceback (most recent call last):
+E       File "&lt;string&gt;", line 1, in &lt;module&gt;
+E     AssertionError
+E     
+E   assert 1 == 0
+E    +  where 1 = CompletedProcess(args=['/private/tmp/launchpad-full-regression.PCfV4q/test-env/bin/python', '-c', "import runpy; runpy...de=1, stdout='', stderr='Traceback (most recent call last):\n  File "&lt;string&gt;", line 1, in &lt;module&gt;\nAssertionError\n').returncode</failure></testcase></testsuite></testsuites>

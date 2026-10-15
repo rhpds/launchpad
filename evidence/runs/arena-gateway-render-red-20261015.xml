@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="3" time="0.418" timestamp="2026-10-15T08:37:50.143658-05:00" hostname="jkershaw-mac"><testcase classname="backend.tests.test_public_access_network_policy" name="test_public_gateway_accepts_the_managed_cloudflare_tunnel" time="0.107"><failure message="subprocess.CalledProcessError: Command '['oc', 'kustomize', '/Users/jkershaw/Documents/launchpad/deploy/launchpad/overlays/arena']' returned non-zero exit status 1.">backend/tests/test_public_access_network_policy.py:14: in test_public_gateway_accepts_the_managed_cloudflare_tunnel
+    rendered = subprocess.run(
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/subprocess.py:571: in run
+    raise CalledProcessError(retcode, process.args,
+E   subprocess.CalledProcessError: Command '['oc', 'kustomize', '/Users/jkershaw/Documents/launchpad/deploy/launchpad/overlays/arena']' returned non-zero exit status 1.</failure></testcase><testcase classname="backend.tests.test_public_access_network_policy" name="test_arena_public_gateway_validates_the_stable_keycloak_issuer" time="0.104"><failure message="subprocess.CalledProcessError: Command '['oc', 'kustomize', '/Users/jkershaw/Documents/launchpad/deploy/launchpad/overlays/arena']' returned non-zero exit status 1.">backend/tests/test_public_access_network_policy.py:47: in test_arena_public_gateway_validates_the_stable_keycloak_issuer
+    rendered = subprocess.run(
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/subprocess.py:571: in run
+    raise CalledProcessError(retcode, process.args,
+E   subprocess.CalledProcessError: Command '['oc', 'kustomize', '/Users/jkershaw/Documents/launchpad/deploy/launchpad/overlays/arena']' returned non-zero exit status 1.</failure></testcase><testcase classname="backend.tests.test_public_access_network_policy" name="test_arena_gateway_verifies_internal_ingress_with_the_cluster_ca_bundle" time="0.101"><failure message="subprocess.CalledProcessError: Command '['oc', 'kustomize', '/Users/jkershaw/Documents/launchpad/deploy/launchpad/overlays/arena']' returned non-zero exit status 1.">backend/tests/test_public_access_network_policy.py:74: in test_arena_gateway_verifies_internal_ingress_with_the_cluster_ca_bundle
+    rendered = subprocess.run(
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/subprocess.py:571: in run
+    raise CalledProcessError(retcode, process.args,
+E   subprocess.CalledProcessError: Command '['oc', 'kustomize', '/Users/jkershaw/Documents/launchpad/deploy/launchpad/overlays/arena']' returned non-zero exit status 1.</failure></testcase></testsuite></testsuites>

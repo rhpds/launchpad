@@ -61,6 +61,16 @@ def test_email_inventory_ignores_fixtures_role_mailboxes_and_url_userinfo() -> N
     assert "fm2aihpcsed.com" in module.OPERATIONAL_ROLE_EMAIL_DOMAINS
 
 
+def test_scp_git_transport_is_not_a_personal_email_but_real_mailboxes_remain():
+    assert module.non_fixture_email_count("git@github.com:example/repository.git") == 0
+    assert module.non_fixture_email_count('startswith("git@github.com:")') == 0
+    assert module.non_fixture_email_count("person@github.com") == 1
+    assert module.non_fixture_email_count("git@github.com") == 1
+    assert module.non_fixture_email_count(
+        "git@github.com:example/repository.git person@company.invalid"
+    ) == 1
+
+
 def test_inventory_has_no_personal_identifier_candidates() -> None:
     assert not any(
         "personal-identifier" in record["categories"]

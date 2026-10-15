@@ -4,6 +4,13 @@ import pytest
 os.environ.setdefault("AUTH_ENABLED", "false")
 os.environ.setdefault("INTEGRATION_API_KEY", "test-integration-key")
 
+# Unit/mock journeys must not inherit live telemetry destinations. Individual
+# integration-adapter tests can explicitly monkeypatch their local fake URLs.
+for telemetry_endpoint in (
+    "KAFKA_BOOTSTRAP_SERVERS", "STARGATE_API_URL", "DASHBOARD_AUDIT_URL",
+):
+    os.environ[telemetry_endpoint] = ""
+
 from app.domain.enums import (
     CatalogCategory,
     CatalogStatus,
