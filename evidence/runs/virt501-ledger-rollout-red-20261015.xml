@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="0.123" timestamp="2026-10-15T11:57:33.765196-05:00" hostname="jkershaw-mac"><testcase classname="tests.test_ledger_rollout.LedgerRolloutTests" name="test_single_writer_ledger_uses_non_overlapping_rollout" time="0.093"><failure message="AssertionError: None != {'type': 'Recreate'}">self = &lt;test_ledger_rollout.LedgerRolloutTests testMethod=test_single_writer_ledger_uses_non_overlapping_rollout&gt;
+
+    def test_single_writer_ledger_uses_non_overlapping_rollout(self):
+        chart = Path(__file__).resolve().parents[1] / "charts/virtualization-ai-501"
+        result = subprocess.run(["helm", "template", "cert", str(chart)],
+                                capture_output=True, text=True, check=True)
+        resources = list(yaml.safe_load_all(result.stdout))
+        adapter = next(item for item in resources if item and item.get("kind") == "Deployment"
+                       and item["metadata"]["name"] == "virtualization-ai-501-qualification-adapter")
+        self.assertEqual(adapter["spec"]["replicas"], 1)
+&gt;       self.assertEqual(adapter["spec"].get("strategy"), {"type": "Recreate"})
+E       AssertionError: None != {'type': 'Recreate'}
+
+tests/test_ledger_rollout.py:17: AssertionError</failure></testcase></testsuite></testsuites>

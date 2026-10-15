@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="0.278" timestamp="2026-10-15T11:57:45.300850-05:00" hostname="jkershaw-mac"><testcase classname="tests.test_ledger_rollout.LedgerRolloutTests" name="test_single_writer_ledger_uses_non_overlapping_rollout" time="0.231"><failure message="AssertionError: None != {'type': 'Recreate'}">tests/test_ledger_rollout.py:18: in test_single_writer_ledger_uses_non_overlapping_rollout
+    self.assertEqual(adapter["spec"].get("strategy"), {"type": "Recreate"})
+E   AssertionError: None != {'type': 'Recreate'}</failure></testcase></testsuite></testsuites>

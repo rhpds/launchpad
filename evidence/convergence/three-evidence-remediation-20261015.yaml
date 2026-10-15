@@ -48,6 +48,16 @@ items:
         secrets: 0
     cause: Default rolling update starts a replacement pod while the previous pod holds the ReadWriteOnce evidence PVC; replacement reported Multi-Attach and rollout timed out.
     required_followup: Review a source-chart Recreate strategy for the single-replica ledger adapter, pin the new source, and repeat restart, public recovery, and cleanup proof. Do not modify the deployed chart merely to make the probe pass.
+    prepared_chart_fix:
+      source_commit: 69e57566be66e87da4d9889c9057158fd171dc73
+      local_checkout: /private/tmp/launchpad-virt-rollout.RErXY8/virt401
+      branch: codex/single-writer-ledger-rollout-20261015
+      change: Explicit Recreate strategy for the single-replica evidence adapter.
+      source_tests_passed: 39
+      red_evidence: evidence/runs/virt401-ledger-rollout-red-r2-20261015.xml
+      green_evidence: evidence/runs/virt401-source-regression-20261015.xml
+      staged_secret_scan: passed
+      publication: published-to-approved-source-branch
   virtualization-ai-501:
     status: current-public-evidence-still-required
     source_revision: 78442e22eeed56b54d1e910ad8c2b847e3cd241a
@@ -56,4 +66,20 @@ items:
     source_review: Adapter also uses a ReadWriteOnce ledger PVC with the default Deployment rolling-update strategy.
     runtime_restart_failure_reproduced: false
     required_followup: Review the same single-replica ledger restart constraint and obtain current-revision public-browser evidence before replacing the historical public receipt.
+    prepared_chart_fix:
+      source_commit: 6e5212e685d28781dcded0208ffece07aa07f6c2
+      local_checkout: /private/tmp/launchpad-virt-rollout.RErXY8/virt501
+      branch: codex/single-writer-ledger-rollout-20261015
+      change: Explicit Recreate strategy for the single-replica evidence adapter.
+      source_tests_passed: 37
+      red_evidence: evidence/runs/virt501-ledger-rollout-red-20261015.xml
+      green_evidence: evidence/runs/virt501-source-regression-20261015.xml
+      staged_secret_scan: passed
+      publication: published-to-approved-source-branch
+next_live_run:
+  status: blocked-by-flightpath-api-timeout
+  live_catalog_mutated: false
+  platform_services_restarted: false
+  probe_improvement: Require the synced Application revision, Recreate strategy, replacement readiness, reconnected port-forward, and byte-identical nonempty evidence ledger after restart for both 401 and 501.
+  required_next_step: Restore Flightpath connectivity, load the two new source pins with a no-active-labs guard and rollback, run one-seat internal/public certification, reclaim, and verify zero residue before closing either remaining evidence failure.
 release_gate: not-cleared; two original evidence failures remain open

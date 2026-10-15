@@ -19,6 +19,7 @@ expected_adapter_image=""
 placement_node=""
 placement_architecture=""
 placement_vmx=false
+restart_evidence_preserved=false
 
 cleanup() {
   [[ -z "$forward_pid" ]] || kill "$forward_pid" >/dev/null 2>&1 || true
@@ -59,12 +60,12 @@ case "$catalog_id" in
     expected_adapter_image="ghcr.io/jkershawrh/virtualization-ai-301-adapter@sha256:93188a7f8e70847c34edb6fb96a3c2cb34ecd4493fc13f5101f3127540e4bbef" ;;
   virtualization-ai-401)
     vm_names=(operations-client); service=virtualization-ai-401-operations-adapter; route=virtualization-ai-401; endpoint=/api/v1/operations
-    source_revision="aee89597b325da490fa837b5639e6e71892c0ca1"
+    source_revision="69e57566be66e87da4d9889c9057158fd171dc73"
     expected_presentation_image="ghcr.io/jkershawrh/virtualization-ai-401-presentation@sha256:23d13240db7100facdc9edf10c95636526816d7fca11f32bf6408112b018cde4"
     expected_adapter_image="ghcr.io/jkershawrh/virtualization-ai-401-operations-adapter@sha256:b18c5a36cf18a2a3b45bc652600fc652c150227463c69cb50f0a039a55318431" ;;
   virtualization-ai-501)
     vm_names=(inference-client-a inference-client-b inference-client-c); service=virtualization-ai-501-qualification-adapter; route=virtualization-ai-501; endpoint=/api/v1/qualifications
-    source_revision="78442e22eeed56b54d1e910ad8c2b847e3cd241a"
+    source_revision="6e5212e685d28781dcded0208ffece07aa07f6c2"
     expected_presentation_image="ghcr.io/jkershawrh/virtualization-ai-501-presentation@sha256:825fa99269c1bed2af4d1a3190203a29488ab032983e1e255d9b730963819acf"
     expected_adapter_image="ghcr.io/jkershawrh/virtualization-ai-501-qualification-adapter@sha256:256400deedfe2103fd887f7665f9813039e1d613252d1e230683b8b82d4512b1" ;;
   *) printf 'unsupported catalog: %s\n' "$catalog_id" >&2; exit 2 ;;
@@ -93,6 +94,14 @@ fi
 
 stage=runtime-images
 [[ "$source_revision" =~ ^[0-9a-f]{40}$ ]] || { printf 'missing exact source revision\n' >&2; exit 1; }
+if [[ "$catalog_id" == virtualization-ai-401 || "$catalog_id" == virtualization-ai-501 ]]; then
+  oc --kubeconfig "$KUBECONFIG" get applications.argoproj.io -A -o json >"$work_dir/applications.json"
+  jq -e --arg namespace "$namespace" --arg revision "$source_revision" --arg repo "https://github.com/jkershawrh/${catalog_id}.git" \
+    '[.items[] | select(.spec.destination.namespace == $namespace and .spec.source.repoURL == $repo)
+      | select(.spec.source.path == ("charts/" + ($repo | split("/")[-1] | rtrimstr(".git"))))
+      | select(.spec.source.targetRevision == $revision and .status.sync.revision == $revision and .status.sync.status == "Synced")]
+      | length == 1' "$work_dir/applications.json" >/dev/null
+fi
 [[ "$expected_presentation_image" == *@sha256:* && "$expected_adapter_image" == *@sha256:* ]] || { printf 'missing immutable image identities\n' >&2; exit 1; }
 oc --kubeconfig "$KUBECONFIG" get deployments -n "$namespace" -o json >"$work_dir/deployments.json"
 # All supported levels must record matched immutable Deployment references.
@@ -118,6 +127,30 @@ for _ in {1..30}; do curl -fsS --max-time 2 "http://127.0.0.1:${forward_port}/he
 jq -e . "$work_dir/health.json" >/dev/null
 
 post() { curl -fsS --max-time 30 -H 'Content-Type: application/json' --data-binary "$2" "http://127.0.0.1:${forward_port}$1"; }
+restart_and_verify_ledger() {
+  local deployment="$1" evidence_path="$2" strategy ledger_before ledger_after
+  stage=ledger-restart-precondition
+  strategy="$(oc --kubeconfig "$KUBECONFIG" get deployment "$deployment" -n "$namespace" -o jsonpath='{.spec.strategy.type}')"
+  [[ "$strategy" == Recreate ]] || exit 1
+  ledger_before="$(curl -fsS --max-time 30 "http://127.0.0.1:${forward_port}${evidence_path}" | jq -ce '.evidence | select(type == "array" and length > 0)')"
+  stage=ledger-restart
+  oc --kubeconfig "$KUBECONFIG" rollout restart -n "$namespace" "deployment/$deployment" >/dev/null
+  oc --kubeconfig "$KUBECONFIG" rollout status -n "$namespace" "deployment/$deployment" --timeout=180s >/dev/null
+  # A port-forward is bound to the old pod, not the replacement selected by
+  # the Service. Establish a new connection before checking durable evidence.
+  kill "$forward_pid" >/dev/null 2>&1 || true
+  wait "$forward_pid" >/dev/null 2>&1 || true
+  oc --kubeconfig "$KUBECONFIG" port-forward -n "$namespace" "service/$service" "${forward_port}:8080" >"$work_dir/port-forward.log" 2>&1 &
+  forward_pid=$!
+  for _ in {1..30}; do
+    curl -fsS --max-time 2 "http://127.0.0.1:${forward_port}/healthz" >"$work_dir/restart-health.json" && break
+    sleep 1
+  done
+  stage=ledger-restart-continuity
+  ledger_after="$(curl -fsS --max-time 30 "http://127.0.0.1:${forward_port}${evidence_path}" | jq -ce '.evidence | select(type == "array" and length > 0)')"
+  [[ "$ledger_after" == "$ledger_before" ]] || exit 1
+  restart_evidence_preserved=true
+}
 normalize_remote_json() {
   # virtctl may emit connection text or terminal control bytes around the
   # remote program's stdout. Decode every possible object boundary and retain
@@ -254,8 +287,7 @@ case "$catalog_id" in
     request='{"schema_version":"demo-story.redhat-intel.com/virtualization-ai-401/operation-request/v1","request_id":"op-401-cert","operation":"LIVE_MIGRATE","target":{"namespace":"cert","virtual_machine":"operations-client"},"requested_by":"certifier","evidence_snapshot":[{"schema_version":"demo-story.redhat-intel.com/virtualization-ai-401/evidence/v1","evidence_id":"ev","request_id":"op-401-cert","state":"OBSERVE","kind":"KUBEVIRT","source":"certification","source_state":"REHEARSAL","observed_at":"2026-09-29T12:00:00Z","freshness":"FRESH","digest":"sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","payload":{}}],"preflight":{"identity_match":true,"network_compatible":true,"storage_compatible":true,"evidence_fresh":true,"correlation_complete":true},"approval":null,"observed_result":null}'
     response="$(post "$endpoint" "$request")"
     jq -e '.decision == "ALLOW_REVIEW" and .reason_codes == ["HUMAN_APPROVAL_REQUIRED"] and .authority.automated_action_performed == false' <<<"$response" >/dev/null
-    oc --kubeconfig "$KUBECONFIG" rollout restart -n "$namespace" deployment/virtualization-ai-401-operations-adapter >/dev/null
-    oc --kubeconfig "$KUBECONFIG" rollout status -n "$namespace" deployment/virtualization-ai-401-operations-adapter --timeout=180s >/dev/null
+    restart_and_verify_ledger "$service" "$endpoint/op-401-cert"
     [[ "$(oc --kubeconfig "$KUBECONFIG" get pvc virtualization-ai-401-evidence -n "$namespace" -o jsonpath='{.status.phase}')" == Bound ]] || exit 1
     outcome=ALLOW_REVIEW ;;
   virtualization-ai-501)
@@ -263,6 +295,7 @@ case "$catalog_id" in
     request="$(jq -cn --arg ns "$namespace" --argjson trials "$trials" '{schema_version:"demo-story.redhat-intel.com/virtualization-ai-501/qualification-request/v1",request_id:"qualification-cert-001",requested_by:"certifier",fleet:{namespace:$ns,inference_service:"cpu-inference",virtual_machines:[{name:"inference-client-a",node:"worker-a",architecture:"amd64",cpu_vendor:"GenuineIntel"},{name:"inference-client-b",node:"worker-b",architecture:"amd64",cpu_vendor:"GenuineIntel"},{name:"inference-client-c",node:"worker-c",architecture:"amd64",cpu_vendor:"GenuineIntel"}]},envelope:{max_p95_ms:800,min_success_rate:0.98,max_concurrency:12,max_cpu_saturation_pct:90},trials:$trials,evidence_snapshot:[{schema_version:"demo-story.redhat-intel.com/virtualization-ai-501/evidence/v1",evidence_id:"ev",request_id:"qualification-cert-001",state:"DISCOVER",kind:"OPENSHIFT",source:"certification",source_state:"REHEARSAL",observed_at:"2026-09-29T12:00:00Z",freshness:"FRESH",digest:"sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",payload:{}}]}')"
     response="$(post "$endpoint" "$request")"
     jq -e '.decision == "ALLOW_REVIEW" and .qualification.status == "PASS" and .qualification.fleet_size == 3 and .authority.promotion_performed == false' <<<"$response" >/dev/null
+    restart_and_verify_ledger "$service" "$endpoint/qualification-cert-001"
     [[ "$(oc --kubeconfig "$KUBECONFIG" get pvc virtualization-ai-501-evidence -n "$namespace" -o jsonpath='{.status.phase}')" == Bound ]] || exit 1
     outcome=ALLOW_REVIEW ;;
 esac
@@ -288,4 +321,5 @@ jq -cn --arg namespace "$namespace" --arg cluster_ref "$expected_cluster" --arg 
   --arg placement_node "$placement_node" --arg placement_architecture "$placement_architecture" --argjson placement_vmx "$placement_vmx" \
   --arg terminal_scope "$terminal_scope" --argjson vm_count "$vm_count" --argjson vmi_count "$vmi_count" \
   --arg source_revision "$source_revision" --arg presentation_image "${presentation_image:-}" --arg adapter_image "${adapter_image:-}" --arg console_url "$console_url" \
-  '{result:"GREEN-live-internal-seat",namespace:$namespace,cluster_ref:$cluster_ref,catalog_item_id:$catalog_id,provenance:{source_revision:$source_revision},runtime_images:{presentation:$presentation_image,adapter:$adapter_image},readiness:{vms_running:$vm_count,vmis_ready:$vmi_count,presentation_http_status:200,adapter_health:true},journey:{source_state:$source_state,outcome:$outcome,model_participated:(if $catalog_id == "virtualization-ai-301" then false else $model_participated end),model:$model,hardware:$hardware,intel_placement_verified:(if $catalog_id == "virtualization-ai-301" then $placement_vmx else null end),human_authority_preserved:true,request_origin:$request_origin},placement_receipt:(if $catalog_id == "virtualization-ai-301" then {node_name:$placement_node,architecture:$placement_architecture,kubevirt_vmx:$placement_vmx,source:"platform-node-and-vmi-status"} else null end),operator_journey:{console_url_present:($console_url|startswith("https://")),console_url:$console_url},terminal_scope:($terminal_scope|split("\n")),contains_sensitive_values:false}'
+  --argjson restart_evidence_preserved "$restart_evidence_preserved" \
+'{result:"GREEN-live-internal-seat",namespace:$namespace,cluster_ref:$cluster_ref,catalog_item_id:$catalog_id,provenance:{source_revision:$source_revision},runtime_images:{presentation:$presentation_image,adapter:$adapter_image},readiness:{vms_running:$vm_count,vmis_ready:$vmi_count,presentation_http_status:200,adapter_health:true},journey:{source_state:$source_state,outcome:$outcome,model_participated:(if $catalog_id == "virtualization-ai-301" then false else $model_participated end),model:$model,hardware:$hardware,intel_placement_verified:(if $catalog_id == "virtualization-ai-301" then $placement_vmx else null end),human_authority_preserved:true,request_origin:$request_origin},placement_receipt:(if $catalog_id == "virtualization-ai-301" then {node_name:$placement_node,architecture:$placement_architecture,kubevirt_vmx:$placement_vmx,source:"platform-node-and-vmi-status"} else null end),operator_journey:{console_url_present:($console_url|startswith("https://")),console_url:$console_url},terminal_scope:($terminal_scope|split("\n")),contains_sensitive_values:false} + {restart_evidence_preserved:$restart_evidence_preserved}'
