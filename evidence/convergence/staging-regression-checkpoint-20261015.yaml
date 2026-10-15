@@ -2,19 +2,33 @@ schema: launchpad/staging-regression-checkpoint/v1
 date: '2026-10-15'
 status: NOT-QUALIFIED
 latest_full_regression:
-  source: 0f39b664
-  report: evidence/runs/backend-full-0f39b664-20261015.xml
-  sha256: 3df6796e58a2134dd9fc4a104362698622f608471184df9940c3a0fab5e92b02
-  passed: 2872
+  source: 70ab789b
+  report: evidence/runs/backend-full-70ab789b-20261015.xml
+  sha256: d3edb99bb99852842fedc1a3db5ae5531258ea9936f10fa6d3429afc85022485
+  passed: 2875
   failed: 3
   skipped: 27
   deselected: 13
-  duration_seconds: 263.91
+  duration_seconds: 71.15
   remaining:
     - Sovereign 201 exposure and exact release agreement; separate uncommitted work is not included.
     - Virtualization 401 current release versus historical public certification evidence.
     - Virtualization 501 current release versus historical public certification evidence.
   limits: No failed check is waived; the focused internal 401/501 passes do not satisfy current public browser proof.
+exact_image_validation:
+  source: 3ee61bf0a46741473c05680146d6850eb3b778b8
+  run: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/38755237674
+  requested_publication: false
+  result_at_checkpoint: BUILD-IN-PROGRESS-NOT-QUALIFIED
+  source_remediation: evidence/convergence/backend-archive-root-remediation-20261015.yaml
+  vulnerability_count_reduction_claimed: false
+sovereign_201_review_limit:
+  receipt: evidence/runs/flightpath-live-20260930-sovereign-ai-201-1seat-r14.json
+  historical_review_pin: 0fdcfba6c2db35190a768e561ac6b0665c76484b
+  pending_worktree_pin: 29e45a00e89f36a7b5180bb5884c541a9694cc0c
+  receipt_contract_git_commit: 4b341ad1f7b9ee833a5b664b5f52a4a8f488cf461
+  contract_commit_intake_pin: c4c5a20792f361c360d64a3d997e8ec19c0f7781
+  conclusion: The old receipt lacks direct runtime-source provenance and is insufficient to close the exact-release discrepancy by changing a literal assertion. Require fresh source-bound proof; pending changes remain untouched.
 source: 330487e0
 full_regression:
   report: evidence/runs/backend-full-330487e0-20261015.xml
