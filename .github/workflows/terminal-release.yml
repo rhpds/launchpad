@@ -1,0 +1,189 @@
+name: Launchpad Terminal Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      expected_sha:
+        description: Exact 40-character source revision to build
+        required: true
+        type: string
+      publish:
+        description: Publish, sign, and attest the image after all gates pass
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+  attestations: write
+
+env:
+  IMAGE_REPOSITORY: ghcr.io/${{ github.repository_owner }}/launchpad-showroom-terminal
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the requested revision
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ inputs.expected_sha }}
+
+      - name: Fail closed on revision drift
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "${{ inputs.expected_sha }}"
+          test -z "$(git status --porcelain)"
+          [[ "${{ inputs.expected_sha }}" =~ ^[0-9a-f]{40}$ ]]
+
+      - name: Verify terminal source contracts
+        run: |
+          set -euo pipefail
+          python -m pip install ".[dev]"
+          python -m pytest backend/tests/test_showroom_gitops.py backend/tests/test_terminal_release_workflow.py -q
+          bash -n workshop-images/showroom-terminal/launchpad-runttyd
+
+      - name: Set up emulation
+        uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f
+
+      - name: Build the exact linux/amd64 candidate
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8
+        with:
+          context: workshop-images/showroom-terminal
+          file: workshop-images/showroom-terminal/Containerfile
+          platforms: linux/amd64
+          load: true
+          push: false
+          tags: ${{ env.IMAGE_REPOSITORY }}:git-${{ inputs.expected_sha }}
+          labels: |
+            org.opencontainers.image.revision=${{ inputs.expected_sha }}
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+
+      - name: Verify isolated persistent shell runtime
+        run: |
+          set -euo pipefail
+          docker run --rm --interactive --read-only --network none --user 1001 \
+            --tmpfs /tmp:rw,nosuid,nodev,mode=1777 --env HOME=/tmp \
+            --entrypoint /usr/bin/bash \
+            "${IMAGE_REPOSITORY}:git-${{ inputs.expected_sha }}" -se <<'SCRIPT'
+          test -x /usr/bin/tmux
+          bash -n /usr/local/bin/launchpad-runttyd
+          tmux -L certification -f /dev/null new-session -d -s lab
+          trap 'tmux -L certification kill-server' EXIT
+          shell_pid="$(tmux -L certification display-message -p -t lab '#{pane_pid}')"
+          tmux -L certification send-keys -t lab 'export LP_TEST_VALUE=LAUNCHPAD_RECONNECT_OK' Enter
+          tmux -L certification send-keys -t lab 'printf "%s\\n" "$LP_TEST_VALUE"' Enter
+          found=false
+          for attempt in $(seq 1 50); do
+            if tmux -L certification capture-pane -p -t lab | grep -qx LAUNCHPAD_RECONNECT_OK; then
+              found=true
+              break
+            fi
+            sleep .1
+          done
+          test "$found" = true
+          test "$(tmux -L certification display-message -p -t lab '#{pane_pid}')" = "$shell_pid"
+          SCRIPT
+
+      - name: Inventory all candidate vulnerabilities
+        uses: anchore/scan-action@1638637db639e0ade3258b51db49a9a137574c3e
+        with:
+          image: ${{ env.IMAGE_REPOSITORY }}:git-${{ inputs.expected_sha }}
+          fail-build: false
+          severity-cutoff: high
+          output-format: json
+          output-file: vulnerability-report.json
+
+      - name: Block fixable high and critical vulnerabilities
+        uses: anchore/scan-action@1638637db639e0ade3258b51db49a9a137574c3e
+        with:
+          image: ${{ env.IMAGE_REPOSITORY }}:git-${{ inputs.expected_sha }}
+          fail-build: true
+          severity-cutoff: high
+          only-fixed: true
+          output-format: json
+          output-file: vulnerability-report-fixable.json
+
+      - name: Generate the SBOM
+        uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610
+        with:
+          image: ${{ env.IMAGE_REPOSITORY }}:git-${{ inputs.expected_sha }}
+          format: spdx-json
+          output-file: sbom.spdx.json
+          upload-artifact: false
+
+      - name: Retain pre-publication evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: terminal-release-evidence-${{ inputs.expected_sha }}
+          path: |
+            vulnerability-report.json
+            vulnerability-report-fixable.json
+            sbom.spdx.json
+
+      - name: Log in to GHCR
+        if: ${{ inputs.publish }}
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish immutable candidate and record digest
+        if: ${{ inputs.publish }}
+        id: publish
+        shell: bash
+        run: |
+          set -euo pipefail
+          image="${IMAGE_REPOSITORY}:git-${{ inputs.expected_sha }}"
+          docker push "$image"
+          digest_ref="$(docker inspect --format='{{index .RepoDigests 0}}' "$image")"
+          test -n "$digest_ref"
+          digest="${digest_ref##*@}"
+          [[ "$digest" =~ ^sha256:[0-9a-f]{64}$ ]]
+          printf 'digest_ref=%s\n' "$digest_ref" >> "$GITHUB_OUTPUT"
+          printf 'digest=%s\n' "$digest" >> "$GITHUB_OUTPUT"
+          jq -n \
+            --arg source_revision "${{ inputs.expected_sha }}" \
+            --arg image "$digest_ref" \
+            '{schema_version:"launchpad.redhat.com/terminal-release/v1",source_revision:$source_revision,image:$image,platform:"linux/amd64",published:true}' \
+            > terminal-release.json
+
+      - name: Install Cosign
+        if: ${{ inputs.publish }}
+        uses: sigstore/cosign-installer@398d4b0eeef1380460a10c8013a76f728fb906ac
+
+      - name: Sign the published digest with GitHub OIDC
+        if: ${{ inputs.publish }}
+        env:
+          DIGEST_REF: ${{ steps.publish.outputs.digest_ref }}
+        run: cosign sign --yes "$DIGEST_REF"
+
+      - name: Verify published signature
+        if: ${{ inputs.publish }}
+        env:
+          DIGEST_REF: ${{ steps.publish.outputs.digest_ref }}
+        run: |
+          cosign verify --certificate-identity="${{ github.server_url }}/${{ github.workflow_ref }}" \
+            --certificate-oidc-issuer="https://token.actions.githubusercontent.com" "$DIGEST_REF"
+
+      - name: Attest build provenance
+        if: ${{ inputs.publish }}
+        uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be
+        with:
+          subject-name: ${{ env.IMAGE_REPOSITORY }}
+          subject-digest: ${{ steps.publish.outputs.digest }}
+
+      - name: Retain the immutable release receipt
+        if: ${{ inputs.publish }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: terminal-release-${{ inputs.expected_sha }}
+          path: terminal-release.json
