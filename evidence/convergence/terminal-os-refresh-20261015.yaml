@@ -1,0 +1,43 @@
+schema: launchpad.redhat.com/terminal-os-refresh/v1
+observed_date: '2026-10-15'
+status: BUILD-AND-RUNTIME-GREEN-SECURITY-BLOCKED
+source_revision: f992a26b1787c1c01430005cc81a7cbfc5effd7f
+run: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/38799414454
+publication_requested: false
+live_deployment_performed: false
+image_published: false
+image_build: passed
+isolated_runtime_and_learner_tool_checks: passed
+security_gate: failed-closed
+scan:
+  full_report_sha256: e7be47fd3f0b95e8fe831b411c02556461d0381dc38ba5ea436dbc9262b085f1
+  retained_artifact: terminal-release-evidence-f992a26b1787c1c01430005cc81a7cbfc5effd7f
+  comparison_unit: unique fixable HIGH-or-CRITICAL package/type/version/severity/fix rows; not a unique CVE count
+  preceding_rows: 288
+  current_rows: 257
+  current_fixable_os_package_rows: 0
+  current_go_module_rows: 257
+  remaining_binaries: [skopeo, helm, kn, kubectl, odo, opc, roxctl, tkn, tkn-pac]
+  limit: Zero fixable OS rows does not imply zero total OS vulnerabilities or a passing complete-inventory staging gate.
+next_step: Refresh embedded CLIs individually with immutable source or vendor artifacts, then prove command compatibility and rescan the complete candidate. No tool stripping or waiver.
+change:
+  - Refresh supported OS packages inside the existing immutable pinned terminal base.
+  - Preserve all learner CLIs; no tool removal or binary replacement.
+  - Extend isolated runtime checks for oc, kubectl, helm, jq, curl, python3, git and tmux.
+red: evidence/runs/terminal-os-refresh-red-20261015.xml
+red_failed: 1
+green: evidence/runs/terminal-os-refresh-green-20261015.xml
+green_passed: 23
+full_working_tree_regression:
+  report: evidence/runs/full-regression-terminal-os-refresh-20261015.xml
+  passed: 2905
+  failed: 0
+  skipped: 27
+  deselected: 13
+  duration_seconds: 76.04
+  skipped_checks_count_as_green: false
+  exact_clean_commit_image_or_live_proof: false
+limits:
+  - A recipe contract pass does not prove the image builds or the vulnerability count falls.
+  - Embedded standalone tools may remain vulnerable after OS package updates.
+  - No exception, suppression or security-gate bypass is introduced.
