@@ -1,0 +1,45 @@
+schema: launchpad/backend-archive-root-remediation/v1
+date: '2026-10-15'
+status: GREEN-LOCAL-SOURCE-PENDING-EXACT-IMAGE-SCAN
+client_source: d0f23b14fbf35493e5b713e25ecf662ec239e76c
+correction:
+  - Replace OpenShift's copied filesystem extractor with upstream go-archive v0.3.0 root-confined UnpackLayer.
+  - Preserve header selection, rebasing, permission alterations, ownership choices, compressed input, whiteouts, and ordinary links.
+  - Use BuildKit v0.31.1 and its tested Dockerfile AST adaptation.
+  - Restore only the deprecated Compression type alias required by Docker 28; no upstream extraction implementation is changed.
+  - Build-time regression tests, the upstream Go module checksum, binary dependency versions, and patch checksums are checked or retained by the Containerfile.
+source_assets:
+  oc_patch: backend/security-patches/oc-client.patch
+  oc_patch_sha256: b03717b640b19c61f3fe9c2fd85be89d6301e6b038f43ac6e171a8fc54bc0031
+  compatibility_alias: backend/security-patches/archive_compat.go
+  compatibility_alias_sha256: a5287d99a764bba961c93d6bb7de262159c62c7bc8f652c9a2bc5be0648adf3c
+  upstream_module: github.com/moby/go-archive@v0.3.0
+  upstream_module_sum: h1:nos4BtzzUIqB406BgQnWGMI4qib9BZ8XUHU+ucv/n1c=
+  upstream_source_commit: 1c23372e409716c3691a540871806083644f348a
+  local_replacement: Explicit copy of the verified upstream module plus the compatibility alias; the shared module cache is not modified.
+  source_difference_check: Recursive comparison found only the added launchpad_compat.go file.
+proof:
+  red: evidence/runs/backend-archive-root-confinement-red-20261015.jsonl
+  red_failures: [TestLaunchpadArchiveRejectsSiblingPrefixEscape, TestLaunchpadArchiveRejectsPreexistingSymlinkEscape]
+  red_scope: Original pinned extractor selected through a Go source overlay; all attempted writes remain inside each test's disposable directory.
+  expanded_review: evidence/runs/backend-archive-link-assumption-review-20261015.jsonl
+  expanded_review_limit: A test initially demanded rejection of a hardlink to an escaping symlink. Creating a link object is not itself an outside write. The final regression instead attempts a subsequent write through that link and requires rejection with no outside file.
+  helper_green: evidence/runs/backend-archive-root-helper-green-summary-20261015.json
+  helper_tests_passed: 125
+  helper_tests_failed: 0
+  helper_report_scope: Structured test outcomes; raw full output remains outside Git in the disposable experiment directory.
+  race_green: evidence/runs/backend-archive-root-race-green-20261015.jsonl
+  race_tests_passed: 8
+  recipe_red: evidence/runs/backend-archive-recipe-red-20261015.xml
+  recipe_green: evidence/runs/backend-archive-recipe-green-20261015.xml
+  recipe_tests_passed: 32
+  linux_amd64_compile_exit: 0
+  binary_sha256: 1d494126ec44d580d05f9cc98fd069c28de36c04854bb76888b0a6f94659c304
+  toolchain: go1.26.9
+  build_tags: [include_gcs, include_oss, containers_image_openpgp]
+limits:
+  - Cross-compilation is not Linux runtime execution or exact container-image certification.
+  - The local replacement is visible in Go build metadata; scan/provenance review must account for it, not treat an absent scanner match as a disposition.
+  - No scanner ignores, VEX declarations, security waivers, or CLI feature removals.
+  - No image publication or live rollout has occurred at this checkpoint.
+  - The remaining registry, Docker, cryptography, and OS findings remain unresolved until reviewed against a fresh exact-image scan.

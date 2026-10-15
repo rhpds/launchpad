@@ -10,13 +10,19 @@ ARG GO_BILLY_VERSION=v5.9.0
 ARG OTEL_VERSION=v1.41.0
 ARG FULCIO_VERSION=v1.8.6
 ARG GO_COMPRESS_VERSION=v1.18.7
+ARG GO_BUILDKIT_VERSION=v0.31.1
+ARG GO_ARCHIVE_VERSION=v0.3.0
 ENV GOTOOLCHAIN=go1.26.9
 ARG HELM_VERSION=4.3.0
 ARG HELM_SOURCE_COMMIT=bec5b06ed841fe5269972d864d5177944fd5970f
 
 WORKDIR /tmp/oc
+COPY backend/security-patches/ /opt/launchpad-security-patches/
+COPY backend/security-tests/ /opt/launchpad-security-tests/
 RUN git clone https://github.com/openshift/oc.git . \
     && git checkout --detach "${OPENSHIFT_CLIENT_COMMIT}" \
+    && git apply --check /opt/launchpad-security-patches/oc-client.patch \
+    && git apply /opt/launchpad-security-patches/oc-client.patch \
     && go mod edit \
       -replace=golang.org/x/text=golang.org/x/text@${GO_X_TEXT_VERSION} \
       -replace=golang.org/x/net=golang.org/x/net@${GO_X_NET_VERSION} \
@@ -28,9 +34,25 @@ RUN git clone https://github.com/openshift/oc.git . \
       -replace=go.opentelemetry.io/otel/trace=go.opentelemetry.io/otel/trace@${OTEL_VERSION} \
       -replace=github.com/sigstore/fulcio=github.com/sigstore/fulcio@${FULCIO_VERSION} \
       -replace=github.com/klauspost/compress=github.com/klauspost/compress@${GO_COMPRESS_VERSION} \
+      -replace=github.com/moby/buildkit=github.com/moby/buildkit@${GO_BUILDKIT_VERSION} \
+      -require=github.com/moby/go-archive@${GO_ARCHIVE_VERSION} \
+    && go mod download -json github.com/moby/go-archive@${GO_ARCHIVE_VERSION} > /tmp/archive-upstream.json \
+    && grep -F '"Sum": "h1:nos4BtzzUIqB406BgQnWGMI4qib9BZ8XUHU+ucv/n1c="' /tmp/archive-upstream.json \
+    && cp -a "$(go env GOMODCACHE)/github.com/moby/go-archive@${GO_ARCHIVE_VERSION}" /tmp/launchpad-go-archive \
+    && chmod u+w /tmp/launchpad-go-archive \
+    && cp /opt/launchpad-security-patches/archive_compat.go /tmp/launchpad-go-archive/launchpad_compat.go \
+    && go mod edit -replace=github.com/moby/go-archive=/tmp/launchpad-go-archive \
+    && cp /opt/launchpad-security-tests/oc_archive_confinement_test.go ./pkg/cli/image/archive/launchpad_confinement_test.go \
+    && cp /opt/launchpad-security-tests/oc_archive_compatibility_test.go ./pkg/cli/image/archive/launchpad_compatibility_test.go \
+    && CGO_ENABLED=0 go test -mod=mod ./pkg/cli/image/archive ./pkg/cli/image/extract \
+      ./pkg/helpers/newapp/docker/dockerfile \
     && CGO_ENABLED=0 go build -mod=mod \
       -tags "include_gcs include_oss containers_image_openpgp" \
       -trimpath -o /tmp/oc-bin ./cmd/oc \
+    && go version -m /tmp/oc-bin > /tmp/oc-build-info.txt \
+    && grep -F "github.com/moby/buildkit" /tmp/oc-build-info.txt | grep -F "${GO_BUILDKIT_VERSION}" \
+    && grep -F "github.com/moby/go-archive" /tmp/oc-build-info.txt | grep -F "${GO_ARCHIVE_VERSION}" \
+    && sha256sum /opt/launchpad-security-patches/oc-client.patch /opt/launchpad-security-patches/archive_compat.go > /tmp/oc-source-patch-sha256.txt \
     && go version -m /tmp/oc-bin \
     | grep -F "golang.org/x/text" \
     | grep -F "v0.41.0" \
@@ -96,6 +118,9 @@ RUN dnf -y upgrade \
 
 COPY --from=oc-builder /tmp/oc-bin /usr/local/bin/oc
 COPY --from=oc-builder /tmp/helm-bin /usr/local/bin/helm
+COPY --from=oc-builder /tmp/oc-build-info.txt /opt/launchpad-client-proof/oc-build-info.txt
+COPY --from=oc-builder /tmp/oc-source-patch-sha256.txt /opt/launchpad-client-proof/oc-source-patch-sha256.txt
+COPY --from=oc-builder /tmp/archive-upstream.json /opt/launchpad-client-proof/archive-upstream.json
 
 RUN pip install --no-cache-dir --upgrade setuptools \
     && pip install --no-cache-dir pydantic pyyaml fastapi uvicorn httpx websockets python-multipart sqlalchemy psycopg2-binary kubernetes requests "celery[redis]" kafka-python-ng argon2-cffi cryptography

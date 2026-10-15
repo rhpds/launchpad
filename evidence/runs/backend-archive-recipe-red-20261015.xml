@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="3" time="0.110" timestamp="2026-10-15T09:48:16.412192-05:00" hostname="jkershaw-mac"><testcase classname="backend.tests.test_backend_archive_remediation" name="test_backend_builds_fixed_archive_and_compatible_parser_with_regressions" time="0.001"><failure message="assert 'ARG GO_BUILDKIT_VERSION=v0.31.1' in 'FROM registry.access.redhat.com/ubi9/go-toolset:1.26 AS oc-builder\n\nARG OPENSHIFT_CLIENT_COMMIT=d0f23b14fbf35493e5b...http://localhost:8000/health\')&quot; || exit 1\n\nCMD [&quot;uvicorn&quot;, &quot;app.main:app&quot;, &quot;--host&quot;, &quot;0.0.0.0&quot;, &quot;--port&quot;, &quot;8000&quot;]\n'">backend/tests/test_backend_archive_remediation.py:10: in test_backend_builds_fixed_archive_and_compatible_parser_with_regressions
+    assert "ARG GO_BUILDKIT_VERSION=v0.31.1" in recipe
+E   assert 'ARG GO_BUILDKIT_VERSION=v0.31.1' in 'FROM registry.access.redhat.com/ubi9/go-toolset:1.26 AS oc-builder\n\nARG OPENSHIFT_CLIENT_COMMIT=d0f23b14fbf35493e5b...http://localhost:8000/health\')" || exit 1\n\nCMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]\n'</failure></testcase><testcase classname="backend.tests.test_backend_archive_remediation" name="test_compatibility_alias_cannot_replace_the_upstream_extractor" time="0.000"><failure message="FileNotFoundError: [Errno 2] No such file or directory: '/Users/jkershaw/Documents/launchpad/backend/security-patches/archive_compat.go'">backend/tests/test_backend_archive_remediation.py:23: in test_compatibility_alias_cannot_replace_the_upstream_extractor
+    compatibility = (ROOT / "backend/security-patches/archive_compat.go").read_text()
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/pathlib.py:1013: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '/Users/jkershaw/Documents/launchpad/backend/security-patches/archive_compat.go'</failure></testcase><testcase classname="backend.tests.test_backend_archive_remediation" name="test_oc_patch_delegates_writes_and_preserves_header_alterations" time="0.001"><failure message="FileNotFoundError: [Errno 2] No such file or directory: '/Users/jkershaw/Documents/launchpad/backend/security-patches/oc-client.patch'">backend/tests/test_backend_archive_remediation.py:31: in test_oc_patch_delegates_writes_and_preserves_header_alterations
+    patch = (ROOT / "backend/security-patches/oc-client.patch").read_text()
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/pathlib.py:1013: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '/Users/jkershaw/Documents/launchpad/backend/security-patches/oc-client.patch'</failure></testcase></testsuite></testsuites>

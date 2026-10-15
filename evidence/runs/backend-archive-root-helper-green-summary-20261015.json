@@ -1,0 +1,672 @@
+{
+  "passed_tests": [
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/app",
+      "Test": "TestWithType",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/app",
+      "Test": "TestBuildConfigNoOutput",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/app",
+      "Test": "TestBuildConfigWithSecrets",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/app",
+      "Test": "TestBuildConfigWithConfigMaps",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/app",
+      "Test": "TestBuildConfigBinaryWithImageSource",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/app",
+      "Test": "TestBuildConfigWithImageSource",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/app",
+      "Test": "TestSourceRefBuildSourceURI",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/app",
+      "Test": "TestGenerateSimpleDockerApp",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/app",
+      "Test": "TestImageStream",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/app",
+      "Test": "TestNameSuggestions_SuggestName",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/app",
+      "Test": "TestIsParameterizableValue",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/app",
+      "Test": "TestNameFromGitURL",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/app",
+      "Test": "TestContainerPortsFromString",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/app",
+      "Test": "TestLabelsFromSpec",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/app",
+      "Test": "TestIsBuilderImage",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/app",
+      "Test": "TestIsBuilderStreamTag",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/app",
+      "Test": "TestIsBuilderMatch",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/app",
+      "Test": "TestIsGeneratorJobImage",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/app",
+      "Test": "TestIsGeneratorJobImageStreamTag",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/app",
+      "Test": "TestParseGenerateTokenAs",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/app",
+      "Test": "TestIsComponentReference",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/app",
+      "Test": "TestWeightedResolvers",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/app",
+      "Test": "TestDockerImageLookup",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/app",
+      "Test": "TestBuildConfigOutput",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/app",
+      "Test": "TestSuggestName",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/app",
+      "Test": "TestImageStreamRefNaming",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/app",
+      "Test": "TestSimpleDeploymentConfig",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/app",
+      "Test": "TestImageRefDeployableContainerPorts",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/app",
+      "Test": "TestFromName",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/app",
+      "Test": "TestFromStream",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/app",
+      "Test": "TestFromNameAndPorts",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/app",
+      "Test": "TestFromDockerfile",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/app",
+      "Test": "TestImageStreamByAnnotationSearcherAndResolver",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/app",
+      "Test": "TestImageStreamSearcher",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/app",
+      "Test": "TestMatchSupportsAnnotation",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/app",
+      "Test": "TestAnnotationMatches",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/app",
+      "Test": "TestInputImageFromMatch",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/app",
+      "Test": "TestAcceptUnique",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/cmd",
+      "Test": "TestValidate",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/cmd",
+      "Test": "TestBuildTemplates",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/app",
+      "Test": "TestAddServices",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/cmd",
+      "Test": "TestEnsureHasSource",
+      "Elapsed": 0.11
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/cmd",
+      "Test": "TestBuildPipelinesWithUnresolvedImage",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/cmd",
+      "Test": "TestBuildPipelinesWithSSHGitURL",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/cmd",
+      "Test": "TestBuildOutputCycleResilience",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/cmd",
+      "Test": "TestBuildOutputCycleWithCircularTag",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/cmd",
+      "Test": "TestResolveJenkinsfileAndDockerfile",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/cmd",
+      "Test": "TestResolveJenkinsfileAndSource",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/cmd",
+      "Test": "TestResolveDockerfileAndSource",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/cmd",
+      "Test": "TestBinaryContentFlagGeneratesDummySource",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/cmd",
+      "Test": "TestTransformTemplate",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/app",
+      "Test": "TestAddBuildSecrets",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/app",
+      "Test": "TestAddBuildConfigMaps",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/app",
+      "Test": "TestTemplateSearcher",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/app",
+      "Test": "TestUniqueNameGeneratorNameRequired",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/app",
+      "Test": "TestUniqueNameGeneratorEnsureValidName",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/docker",
+      "Test": "TestNewHelper",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile",
+      "Test": "TestFindAll",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile",
+      "Test": "TestFindAllNilNode",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile",
+      "Test": "TestInsertInstructions",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile",
+      "Test": "TestInsertInstructionsNilNode",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile",
+      "Test": "TestInsertInstructionsPosOutOfRange",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile",
+      "Test": "TestInsertInstructionsUnparseable",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile",
+      "Test": "TestLastBaseImage",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile",
+      "Test": "TestLastBaseImageNilNode",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile",
+      "Test": "TestBaseImages",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile",
+      "Test": "TestBaseImagesNilNode",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile",
+      "Test": "TestLastExposedPorts",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile",
+      "Test": "TestLastExposedPortsNilNode",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile",
+      "Test": "TestExposedPorts",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile",
+      "Test": "TestLastExposedPortsVarAndRange",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile",
+      "Test": "TestExposedPortsNilNode",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile",
+      "Test": "TestNextValues",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile",
+      "Test": "TestNextValuesOnbuild",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile",
+      "Test": "TestNextValuesNilNode",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile",
+      "Test": "TestKeyValueInstructions",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile",
+      "Test": "TestFrom",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/dockerfile",
+      "Test": "TestFind",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/dockerfile",
+      "Test": "TestFindError",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/newapptest",
+      "Test": "TestNewAppAddArguments",
+      "Elapsed": 0.98
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/newapptest",
+      "Test": "TestNewAppResolve",
+      "Elapsed": 0.41
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/newapptest",
+      "Test": "TestNewAppDetectSource",
+      "Elapsed": 1.07
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/newapptest",
+      "Test": "TestNewAppRunAll/successful_ruby_app_generation",
+      "Elapsed": 0.95
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/newapptest",
+      "Test": "TestNewAppRunAll/successful_ruby_app_generation_-_deployment_config",
+      "Elapsed": 1
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/newapptest",
+      "Test": "TestNewAppRunAll/successful_ruby_app_generation_with_labels",
+      "Elapsed": 0.97
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/newapptest",
+      "Test": "TestNewAppRunAll/successful_docker_app_generation",
+      "Elapsed": 1.09
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/newapptest",
+      "Test": "TestNewAppRunAll/app_generation_using_context_dir",
+      "Elapsed": 1.88
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/newapptest",
+      "Test": "TestNewAppRunAll/failed_app_generation_using_missing_context_dir",
+      "Elapsed": 1.48
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/newapptest",
+      "Test": "TestNewAppRunAll/insecure_registry_generation",
+      "Elapsed": 0.87
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/newapptest",
+      "Test": "TestNewAppRunAll/Docker_build",
+      "Elapsed": 0.8
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/newapptest",
+      "Test": "TestNewAppRunAll/Docker_build_with_no_registry_image",
+      "Elapsed": 0.88
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/newapptest",
+      "Test": "TestNewAppRunAll/custom_name",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/newapptest",
+      "Test": "TestNewAppRunAll/partial_matches",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/newapptest",
+      "Test": "TestNewAppRunAll",
+      "Elapsed": 9.94
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/newapptest",
+      "Test": "TestNewAppRunBuilds/successful_build_from_dockerfile",
+      "Elapsed": 0.93
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/newapptest",
+      "Test": "TestNewAppRunBuilds/successful_build_with_no_output",
+      "Elapsed": 1.7
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/newapptest",
+      "Test": "TestNewAppRunBuilds/successful_build_from_dockerfile_with_custom_name",
+      "Elapsed": 0.38
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/newapptest",
+      "Test": "TestNewAppRunBuilds/successful_build_from_dockerfile_with_--to",
+      "Elapsed": 0.41
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/newapptest",
+      "Test": "TestNewAppRunBuilds/successful_build_from_dockerfile_with_--to_and_--to-docker=true",
+      "Elapsed": 0.38
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/newapptest",
+      "Test": "TestNewAppRunBuilds/unsuccessful_build_from_dockerfile_due_to_strategy_conflict",
+      "Elapsed": 0.01
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/newapptest",
+      "Test": "TestNewAppRunBuilds/unsuccessful_build_from_dockerfile_due_to_missing_FROM_instruction",
+      "Elapsed": 0.01
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/newapptest",
+      "Test": "TestNewAppRunBuilds/unsuccessful_generation_of_BC_with_multiple_repos_and_Dockerfile",
+      "Elapsed": 0.01
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/newapptest",
+      "Test": "TestNewAppRunBuilds/successful_build_from_source_with_autodetected_jenkinsfile",
+      "Elapsed": 1.19
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/newapptest",
+      "Test": "TestNewAppRunBuilds/successful_build_from_source_with_jenkinsfile_with_pipeline_strategy",
+      "Elapsed": 1.12
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/newapptest",
+      "Test": "TestNewAppRunBuilds/failed_build_from_source_with_jenkinsfile_with_docker_strategy",
+      "Elapsed": 1.11
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/newapptest",
+      "Test": "TestNewAppRunBuilds/failed_build_from_source_without_jenkinsfile_with_pipeline_strategy",
+      "Elapsed": 1.15
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/newapptest",
+      "Test": "TestNewAppRunBuilds",
+      "Elapsed": 8.38
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/newapptest",
+      "Test": "TestNewAppBuildOutputCycleDetection/successful_build_from_dockerfile_with_identical_input_and_output_image_references_with_warning(1)",
+      "Elapsed": 1.71
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/newapptest",
+      "Test": "TestNewAppBuildOutputCycleDetection/unsuccessful_build_from_dockerfile_due_to_identical_input_and_output_image_references(1)",
+      "Elapsed": 1.68
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/newapptest",
+      "Test": "TestNewAppBuildOutputCycleDetection/successful_build_with_warning_that_output_image_may_trigger_input_ImageStream_change",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/newapptest",
+      "Test": "TestNewAppBuildOutputCycleDetection/successful_build_with_warning_that_output_image_may_trigger_input_ImageStream_change;_latest_variation",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/newapptest",
+      "Test": "TestNewAppBuildOutputCycleDetection",
+      "Elapsed": 3.4
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/newapptest",
+      "Test": "TestNewAppSourceAuthRequired",
+      "Elapsed": 20.63
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/newapptest",
+      "Test": "TestNewAppListAndSearch",
+      "Elapsed": 0.01
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/portutils",
+      "Test": "TestSplitPortAndProtocol",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/portutils",
+      "Test": "TestFilterPortAndProtocolArray",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/portutils",
+      "Test": "TestSplitPortAndProtocolArray",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/cli/image/archive",
+      "Test": "TestLaunchpadAlterHeadersPreservesSelectionAndRebase",
+      "Elapsed": 0.01
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/cli/image/archive",
+      "Test": "TestLaunchpadAlterHeaderErrorsPropagate",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/cli/image/archive",
+      "Test": "TestLaunchpadRebasedEscapeIsRejected",
+      "Elapsed": 0.01
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/cli/image/archive",
+      "Test": "TestLaunchpadPreservesLinksWhiteoutsAndCompressedInput",
+      "Elapsed": 0.01
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/cli/image/archive",
+      "Test": "TestLaunchpadRejectsHardlinkWriteThroughPreexistingEscape",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/cli/image/archive",
+      "Test": "TestLaunchpadArchiveRejectsSiblingPrefixEscape",
+      "Elapsed": 0.04
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/cli/image/archive",
+      "Test": "TestLaunchpadArchiveRejectsPreexistingSymlinkEscape",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/cli/image/archive",
+      "Test": "TestLaunchpadArchivePreservesOrdinaryExtraction",
+      "Elapsed": 0
+    }
+  ],
+  "failed": [],
+  "package_results": [
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/cmd",
+      "Action": "pass",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/docker",
+      "Action": "pass",
+      "Elapsed": 0
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile",
+      "Action": "pass",
+      "Elapsed": 0.001
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/app",
+      "Action": "pass",
+      "Elapsed": 0.001
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/dockerfile",
+      "Action": "pass",
+      "Elapsed": 0.001
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/newapptest",
+      "Action": "pass",
+      "Elapsed": 0.001
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/helpers/newapp/portutils",
+      "Action": "pass",
+      "Elapsed": 0.001
+    },
+    {
+      "Package": "github.com/openshift/oc/pkg/cli/image/archive",
+      "Action": "pass",
+      "Elapsed": 0.007
+    }
+  ]
+}
