@@ -4,7 +4,7 @@ catalog:
   display_name: "Virtualization + AI 401 \u2014 Operate Hybrid VM and AI Workloads"
   description: Certified one-seat governed hybrid VM and AI day-two operations experience.
   category: guided_build
-  version: 0.1.1
+  version: 0.1.2
   status: active
 learning:
   learning_level: '401'
@@ -23,13 +23,13 @@ learning:
 sources:
   showroom:
     repo_url: https://github.com/jkershawrh/virtualization-ai-401.git
-    revision: aee89597b325da490fa837b5639e6e71892c0ca1
+    revision: 69e57566be66e87da4d9889c9057158fd171dc73
     playbook: showroom/default-site.yml
     start_path: showroom/content
     gitops_repo_url: https://github.com/jkershawrh/virtualization-ai-401.git
   workload:
     repo_url: https://github.com/jkershawrh/virtualization-ai-401.git
-    revision: aee89597b325da490fa837b5639e6e71892c0ca1
+    revision: 69e57566be66e87da4d9889c9057158fd171dc73
     deploy_path: charts/virtualization-ai-401
     gitops_repo_url: https://github.com/jkershawrh/virtualization-ai-401.git
 runtime:

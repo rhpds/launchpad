@@ -5,7 +5,7 @@ catalog:
   description: Guided one-seat experience for qualifying a governed virtual-machine
     inference fleet with evidence-backed human review.
   category: guided_build
-  version: 0.1.1
+  version: 0.1.2
   status: active
 learning:
   learning_level: '501'
@@ -23,13 +23,13 @@ learning:
 sources:
   showroom:
     repo_url: https://github.com/jkershawrh/virtualization-ai-501.git
-    revision: 78442e22eeed56b54d1e910ad8c2b847e3cd241a
+    revision: 6e5212e685d28781dcded0208ffece07aa07f6c2
     playbook: default-site.yml
     start_path: showroom/content
     gitops_repo_url: https://github.com/jkershawrh/virtualization-ai-501.git
   workload:
     repo_url: https://github.com/jkershawrh/virtualization-ai-501.git
-    revision: 78442e22eeed56b54d1e910ad8c2b847e3cd241a
+    revision: 6e5212e685d28781dcded0208ffece07aa07f6c2
     deploy_path: charts/virtualization-ai-501
     gitops_repo_url: https://github.com/jkershawrh/virtualization-ai-501.git
 runtime:

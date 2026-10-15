@@ -2,7 +2,7 @@ catalog_item_id: virtualization-ai-401
 display_name: "Virtualization + AI 401 \u2014 Operate Hybrid VM and AI Workloads"
 description: Certified one-seat governed hybrid VM and AI day-two operations experience.
 category: guided_build
-version: 0.1.1
+version: 0.1.2
 status: active
 required_capabilities:
 - openshift
@@ -39,7 +39,7 @@ metadata:
   solution_family: virtualization_ai
   showroom: true
   showroom_content_repo_url: https://github.com/jkershawrh/virtualization-ai-401.git
-  showroom_content_ref: aee89597b325da490fa837b5639e6e71892c0ca1
+  showroom_content_ref: 69e57566be66e87da4d9889c9057158fd171dc73
   showroom_content_playbook: showroom/default-site.yml
   showroom_content_start_path: showroom/content
   operator_workshop: true
@@ -91,7 +91,7 @@ metadata:
   workshop_node_headroom_pods: 0
   workshop_node_required_labels: {}
   workload_repo: https://github.com/jkershawrh/virtualization-ai-401.git
-  workload_revision: aee89597b325da490fa837b5639e6e71892c0ca1
+  workload_revision: 69e57566be66e87da4d9889c9057158fd171dc73
   workload_deploy_type: helm
   workload_deployment_scope: seat
   workload_deploy_path: charts/virtualization-ai-401
@@ -123,7 +123,7 @@ metadata:
     ui: virtualization-ai-401
   workload_readiness: []
   source_content_repo: https://github.com/jkershawrh/virtualization-ai-401.git
-  source_content_revision: aee89597b325da490fa837b5639e6e71892c0ca1
+  source_content_revision: 69e57566be66e87da4d9889c9057158fd171dc73
   source_references:
     release_workflow: https://github.com/jkershawrh/virtualization-ai-401/actions/runs/38480912766
     certification_evidence: evidence/runs/virtualization-ai-401-formal-current-pin-r2-20261013.json

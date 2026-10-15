@@ -3,7 +3,7 @@ display_name: "Virtualization + AI 501 \u2014 Qualify a Governed VM Inference Fl
 description: Guided one-seat experience for qualifying a governed virtual-machine
   inference fleet with evidence-backed human review.
 category: guided_build
-version: 0.1.1
+version: 0.1.2
 status: active
 required_capabilities:
 - openshift
@@ -39,7 +39,7 @@ metadata:
   solution_family: virtualization_ai
   showroom: true
   showroom_content_repo_url: https://github.com/jkershawrh/virtualization-ai-501.git
-  showroom_content_ref: 78442e22eeed56b54d1e910ad8c2b847e3cd241a
+  showroom_content_ref: 6e5212e685d28781dcded0208ffece07aa07f6c2
   showroom_content_playbook: default-site.yml
   showroom_content_start_path: showroom/content
   operator_workshop: true
@@ -92,7 +92,7 @@ metadata:
   workshop_node_headroom_pods: 0
   workshop_node_required_labels: {}
   workload_repo: https://github.com/jkershawrh/virtualization-ai-501.git
-  workload_revision: 78442e22eeed56b54d1e910ad8c2b847e3cd241a
+  workload_revision: 6e5212e685d28781dcded0208ffece07aa07f6c2
   workload_deploy_type: helm
   workload_deployment_scope: seat
   workload_deploy_path: charts/virtualization-ai-501
@@ -116,7 +116,7 @@ metadata:
     ui: virtualization-ai-501
   workload_readiness: []
   source_content_repo: https://github.com/jkershawrh/virtualization-ai-501.git
-  source_content_revision: 78442e22eeed56b54d1e910ad8c2b847e3cd241a
+  source_content_revision: 6e5212e685d28781dcded0208ffece07aa07f6c2
   source_references:
     release_workflow: https://github.com/jkershawrh/virtualization-ai-501/actions/runs/38480918274
     certification_evidence: evidence/runs/virtualization-ai-501-formal-current-pin-r2-20261013.json
