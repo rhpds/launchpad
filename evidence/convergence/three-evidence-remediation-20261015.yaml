@@ -35,6 +35,17 @@ items:
       full_logout_code_reauthentication: not-proven
     participant_rbac: own-namespace-edit-yes; control-namespace-read-no; node-read-no
     runtime_probe: failed-at-adapter-contract-restart
+    cleanup:
+      status: completed
+      seconds: 98.583
+      resource_counts:
+        namespaces: 0
+        applications.argoproj.io: 0
+        rolebindings.rbac.authorization.k8s.io: 0
+        persistentvolumeclaims: 0
+        persistentvolumes: 0
+        routes.route.openshift.io: 0
+        secrets: 0
     cause: Default rolling update starts a replacement pod while the previous pod holds the ReadWriteOnce evidence PVC; replacement reported Multi-Attach and rollout timed out.
     required_followup: Review a source-chart Recreate strategy for the single-replica ledger adapter, pin the new source, and repeat restart, public recovery, and cleanup proof. Do not modify the deployed chart merely to make the probe pass.
   virtualization-ai-501:
