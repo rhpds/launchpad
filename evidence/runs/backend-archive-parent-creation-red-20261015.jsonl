@@ -1,0 +1,9 @@
+{"Time":"2026-10-15T09:55:47.147051-05:00","Action":"start","Package":"github.com/openshift/oc/pkg/cli/image/archive"}
+{"Time":"2026-10-15T09:55:47.797942-05:00","Action":"run","Package":"github.com/openshift/oc/pkg/cli/image/archive","Test":"TestLaunchpadRejectsParentCreationOutsideRootBeforeMutation"}
+{"Time":"2026-10-15T09:55:47.798198-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/cli/image/archive","Test":"TestLaunchpadRejectsParentCreationOutsideRootBeforeMutation","Output":"=== RUN   TestLaunchpadRejectsParentCreationOutsideRootBeforeMutation\n"}
+{"Time":"2026-10-15T09:55:47.799805-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/cli/image/archive","Test":"TestLaunchpadRejectsParentCreationOutsideRootBeforeMutation","Output":"    launchpad_compatibility_test.go:159: archive created parent directories outside extraction root before rejecting the entry\n"}
+{"Time":"2026-10-15T09:55:47.800253-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/cli/image/archive","Test":"TestLaunchpadRejectsParentCreationOutsideRootBeforeMutation","Output":"--- FAIL: TestLaunchpadRejectsParentCreationOutsideRootBeforeMutation (0.00s)\n"}
+{"Time":"2026-10-15T09:55:47.800302-05:00","Action":"fail","Package":"github.com/openshift/oc/pkg/cli/image/archive","Test":"TestLaunchpadRejectsParentCreationOutsideRootBeforeMutation","Elapsed":0}
+{"Time":"2026-10-15T09:55:47.800382-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/cli/image/archive","Output":"FAIL\n"}
+{"Time":"2026-10-15T09:55:47.800947-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/cli/image/archive","Output":"FAIL\tgithub.com/openshift/oc/pkg/cli/image/archive\t0.653s\n"}
+{"Time":"2026-10-15T09:55:47.800966-05:00","Action":"fail","Package":"github.com/openshift/oc/pkg/cli/image/archive","Elapsed":0.654}

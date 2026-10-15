@@ -44,10 +44,19 @@ def test_telemetry_and_fulcio_pins_are_verified_and_same_major():
     assert 'grep -F "${FULCIO_VERSION}"' in text
 
 
-def test_incompatible_archive_override_is_not_left_in_candidate():
+def test_archive_upgrade_requires_the_reviewed_compatibility_and_confinement_fix():
     text = (ROOT / "backend/Containerfile").read_text()
-    assert "GO_ARCHIVE_VERSION" not in text
-    assert "-replace=github.com/moby/go-archive" not in text
+    # The original bare v0.3 override did not compile against Docker 28.
+    # Permit it only with the tested compatibility copy, confined extraction
+    # patch, exact upstream checksum and build-time behavioral regressions.
+    assert "ARG GO_ARCHIVE_VERSION=v0.3.0" in text
+    assert "-require=github.com/moby/go-archive@${GO_ARCHIVE_VERSION}" in text
+    assert "-replace=github.com/moby/go-archive=/tmp/launchpad-go-archive" in text
+    assert "h1:nos4BtzzUIqB406BgQnWGMI4qib9BZ8XUHU+ucv/n1c=" in text
+    assert "archive_compat.go /tmp/launchpad-go-archive/launchpad_compat.go" in text
+    assert "git apply --check /opt/launchpad-security-patches/oc-client.patch" in text
+    assert "./pkg/cli/image/archive ./pkg/cli/image/extract" in text
+    assert "./pkg/helpers/newapp/docker/dockerfile" in text
     assert "OPENSHIFT_CLIENT_COMMIT=d0f23b14fbf35493e5b713e25ecf662ec239e76c" in text
 
 

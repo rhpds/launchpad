@@ -43,3 +43,25 @@ limits:
   - No scanner ignores, VEX declarations, security waivers, or CLI feature removals.
   - No image publication or live rollout has occurred at this checkpoint.
   - The remaining registry, Docker, cryptography, and OS findings remain unresolved until reviewed against a fresh exact-image scan.
+follow_up:
+  exact_candidate_source: 3ee61bf0a46741473c05680146d6850eb3b778b8
+  ci_run: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/38755237674
+  publication_requested: false
+  full_regression:
+    report: evidence/runs/backend-full-3ee61bf0-20261015.xml
+    sha256: 72a6ab1ebb852807a110f33d46cabcf94f3da4d26b6178f81abe4c5c40dd99ed
+    passed: 2874
+    failed: 4
+    skipped: 27
+    deselected: 13
+    failure_review: The three previous release-evidence gaps plus the old blanket prohibition on the archive override. That prohibition is replaced with explicit checksum, patch, alias and behavioral-test requirements.
+  reviewed_guard:
+    report: evidence/runs/backend-archive-recipe-green-r3-20261015.xml
+    sha256: 8be8b13e3b17acc680a74f291ee8ebb4ccbf937df91586d070dfe156e9b75e2a
+    passed: 38
+  additional_parent_creation_check:
+    red: evidence/runs/backend-archive-parent-creation-red-20261015.jsonl
+    green: evidence/runs/backend-archive-parent-expanded-race-green-20261015.jsonl
+    race_tests_passed: 9
+    finding: Original code creates parent directories outside the extraction root before returning an error; the replacement rejects before that mutation.
+    scope: Additional local regression against the same extraction implementation; the in-progress CI source contains the preceding eight archive tests, not this ninth test.

@@ -142,3 +142,20 @@ func TestLaunchpadRejectsHardlinkWriteThroughPreexistingEscape(t *testing.T) {
 		t.Fatal("archive wrote outside extraction root through a hardlink")
 	}
 }
+
+func TestLaunchpadRejectsParentCreationOutsideRootBeforeMutation(t *testing.T) {
+	root := t.TempDir()
+	dest := filepath.Join(root, "dest")
+	if err := os.Mkdir(dest, 0700); err != nil {
+		t.Fatal(err)
+	}
+	data := launchpadTar(t, &tar.Header{
+		Name: "../outside/new-parent/proof", Typeflag: tar.TypeReg, Mode: 0600, Size: 1,
+	})
+	if _, err := ApplyLayer(dest, bytes.NewReader(data), &TarOptions{Chown: false}); err == nil {
+		t.Fatal("traversing entry accepted")
+	}
+	if _, err := os.Stat(filepath.Join(root, "outside")); !os.IsNotExist(err) {
+		t.Fatal("archive created parent directories outside extraction root before rejecting the entry")
+	}
+}
