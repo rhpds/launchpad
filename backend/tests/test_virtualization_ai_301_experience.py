@@ -1,4 +1,6 @@
 from pathlib import Path
+import hashlib
+import json
 
 import yaml
 
@@ -25,13 +27,32 @@ def test_virtualization_ai_301_is_an_exact_one_seat_certified_rehearsal_candidat
     assert intake["certification"]["certified_seats"] == 1
     assert catalog["validation_refs"] == ["pod-ready", "route-accessible"]
     assert metadata["showroom_content_ref"] == (
-        "30f51e19223faf64c689a07e254870fbc43fd0c6"
+        "e5888aeac1042cbcf909b540eee1281fdc3c4dac"
     )
     assert metadata["source_content_revision"] == metadata["showroom_content_ref"]
     assert metadata["workload_revision"] == metadata["showroom_content_ref"]
     assert metadata["workload_helm_values"]["default_source_state"] == "REHEARSAL"
     assert metadata["activation_blockers"] == []
     assert metadata["allowed_exposure_policies"] == ["internal", "public_code"]
+    # Current internal evidence must bind the release; historical public evidence
+    # is not silently transferred by this regression check.
+    receipt = ROOT / metadata["source_references"]["certification_evidence"]
+    assert hashlib.sha256(receipt.read_bytes()).hexdigest() == (
+        receipt.with_suffix(".json.sha256").read_text().split()[0]
+    )
+    evidence = json.loads(receipt.read_text())
+    probe = evidence["seat_results"][0]["probe"]["result"]
+    assert evidence["result"] == "GREEN-live"
+    assert probe["provenance"]["source_revision"] == metadata["workload_revision"]
+    assert probe["journey"]["source_state"] == "REHEARSAL"
+    assert probe["journey"]["model_participated"] is False
+    assert probe["placement_receipt"]["kubevirt_vmx"] is True
+    values = metadata["workload_helm_values"]
+    for component in ("adapter", "presentation"):
+        image = values[component]["image"]
+        assert probe["runtime_images"][component] == f"{image['repository']}@{image['digest']}"
+    assert evidence["cleanup"]["status"] == "completed"
+    assert all(value == 0 for value in evidence["cleanup"]["resource_counts"].values())
 
 
 def test_virtualization_ai_301_certification_preserves_rehearsal_model_truth_and_platform_placement_proof() -> None:

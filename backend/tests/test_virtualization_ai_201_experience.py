@@ -1,4 +1,6 @@
 from pathlib import Path
+import hashlib
+import json
 
 import yaml
 
@@ -7,18 +9,18 @@ ROOT = Path(__file__).resolve().parents[2]
 CATALOG = ROOT / "catalog/virtualization-ai-201/catalog-item.yaml"
 INTAKE = ROOT / "catalog-onboarding/virtualization-ai-201.yaml"
 CERTIFICATION = ROOT / "certification/catalog/virtualization-ai-201.yaml"
-SOURCE_REVISION = "3c94600ca8808a55693e94d5a1f169efbadbedd1"
+SOURCE_REVISION = "f5cbcad3865390d7d5844d94087b59eb94c8f276"
 PRESENTATION_IMAGE = (
     "ghcr.io/jkershawrh/virtualization-ai-201-presentation@sha256:"
-    "2749e4ad44f3902f7507adaaaa8fadd509d1e625b33619530852bd9a01255069"
+    "84a9b5ae29903ffedfc9b84753b362f5715167f23057628e99df5a94e1683a06"
 )
 ADAPTER_IMAGE = (
     "ghcr.io/jkershawrh/virtualization-ai-201-adapter@sha256:"
-    "99f1ac6f65386013cb20d81e3dbc6099ffbb63cebfdc6fb1f1cdd50d96153a39"
+    "177af37c53b08b09c73b39b50bbaa92c47f2737c7072c2c14a3eed1e04bc9c99"
 )
 SHOWROOM_IMAGE = (
     "ghcr.io/jkershawrh/virtualization-ai-201-showroom-content@sha256:"
-    "56991a08cba6849d42caa54ae45b4c7d2714b086d0df247f53cd2d4700b090ca"
+    "dc4f902c9892824e1eb9f1ddabc9bc4b56f7a4090da5a61a429116b857c30168"
 )
 
 
@@ -55,12 +57,28 @@ def test_201_requires_vm_origin_and_truthful_live_inference_before_certification
         assert source["gitops_repo_url"].startswith("https://github.com/")
         assert source["revision"] == SOURCE_REVISION
     assert metadata["showroom_content_ref"] == SOURCE_REVISION
-    assert metadata["showroom_content_playbook"] == "showroom/default-site.yml"
-    assert intake["sources"]["showroom"]["playbook"] == "showroom/default-site.yml"
+    assert metadata["showroom_content_playbook"] == "default-site.yml"
+    assert intake["sources"]["showroom"]["playbook"] == "default-site.yml"
     assert metadata["workload_revision"] == SOURCE_REVISION
     assert metadata["showroom_content_image"] == SHOWROOM_IMAGE
     assert metadata["workload_helm_values"]["presentation_image"] == PRESENTATION_IMAGE
     assert metadata["workload_helm_values"]["workload_image"] == ADAPTER_IMAGE
+    # This receipt proves the current internal workload, not current public SSO.
+    receipt = ROOT / metadata["source_references"]["certification_evidence"]
+    assert hashlib.sha256(receipt.read_bytes()).hexdigest() == (
+        receipt.with_suffix(".json.sha256").read_text().split()[0]
+    )
+    evidence = json.loads(receipt.read_text())
+    probe = evidence["seat_results"][0]["probe"]["result"]
+    assert evidence["result"] == "GREEN-live"
+    assert probe["provenance"]["source_revision"] == SOURCE_REVISION
+    assert probe["runtime_images"] == {
+        "adapter": ADAPTER_IMAGE, "presentation": PRESENTATION_IMAGE
+    }
+    assert probe["journey"]["model_participated"] is True
+    assert probe["journey"]["request_origin"] == "contract-author-vm"
+    assert evidence["cleanup"]["status"] == "completed"
+    assert all(value == 0 for value in evidence["cleanup"]["resource_counts"].values())
 
     expected_private = {
         "source": "generated_ssh_keypair",

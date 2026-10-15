@@ -35,6 +35,7 @@ sources:
     deploy_path: charts/virtualization-ai-301
     gitops_repo_url: https://github.com/jkershawrh/virtualization-ai-301.git
 references:
+  certification_evidence: evidence/runs/virtualization-ai-301-formal-current-pin-r4-20261013.json
   release_workflow:
     repo_url: https://github.com/jkershawrh/virtualization-ai-301.git
     revision: e5888aeac1042cbcf909b540eee1281fdc3c4dac

@@ -52,9 +52,9 @@ def test_canary_overlay_binds_effective_flightpath_catalogs() -> None:
     backend = _one(items, "Deployment", "backend")
     worker = _one(items, "Deployment", "lifecycle-worker")
     expected = {
-        "intel-llm-cpu-serving": "1.0.12-flightpath.1",
-        "intel-xeon6-agent-201": "1.0.8-flightpath.1",
-        "multi-agent-quickstart": "0.2.15-flightpath.1",
+        "intel-llm-cpu-serving": "1.0.13-flightpath.1",
+        "intel-xeon6-agent-201": "1.0.10-flightpath.1",
+        "multi-agent-quickstart": "0.2.16-flightpath.1",
     }
     for catalog_id, version in expected.items():
         source = (

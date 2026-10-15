@@ -1,0 +1,18 @@
+schema: launchpad/current-virtualization-regression-alignment/v1
+date: '2026-10-15'
+status: GREEN-LOCAL-FOCUSED
+red_baseline: evidence/runs/backend-full-330487e0-20261015.xml
+green:
+  report: evidence/runs/current-virt-regression-green-20261015.xml
+  sha256: 606c56ee6bb76e53d952c6fbfbb17e1e695d003613cbcefbe0e58924f67831ac
+  passed: 10
+corrections:
+  - Bind Virtualization 201 assertions to its current exact source and image references, hashed internal live evidence, VM-origin inference, and zero-residue cleanup.
+  - Restore the Virtualization 301 intake certification evidence reference already present in its generated catalog.
+  - Bind Virtualization 301 assertions to its current source, hashed internal evidence, image references, rehearsal truth, placement receipt, and zero-residue cleanup.
+  - Align the canary version expectations with the existing three Flightpath catalog revisions; no catalog version changed.
+limits:
+  - No runtime deployment, catalog activation, exposure-policy change, or live lab mutation.
+  - Internal receipts do not establish current public browser certification.
+  - The 401 and 501 historical-public-evidence mismatches remain unresolved rather than being waived.
+  - The independent Sovereign worktree changes remain untouched.
