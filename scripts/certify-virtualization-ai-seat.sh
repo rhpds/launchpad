@@ -58,9 +58,15 @@ case "$catalog_id" in
     expected_presentation_image="ghcr.io/jkershawrh/virtualization-ai-301-presentation@sha256:4d05e095b0815009bc9949ed4863bfcf85c066a46c4404ce5c070f03a2baf32c"
     expected_adapter_image="ghcr.io/jkershawrh/virtualization-ai-301-adapter@sha256:93188a7f8e70847c34edb6fb96a3c2cb34ecd4493fc13f5101f3127540e4bbef" ;;
   virtualization-ai-401)
-    vm_names=(operations-client); service=virtualization-ai-401-operations-adapter; route=virtualization-ai-401; endpoint=/api/v1/operations ;;
+    vm_names=(operations-client); service=virtualization-ai-401-operations-adapter; route=virtualization-ai-401; endpoint=/api/v1/operations
+    source_revision="aee89597b325da490fa837b5639e6e71892c0ca1"
+    expected_presentation_image="ghcr.io/jkershawrh/virtualization-ai-401-presentation@sha256:23d13240db7100facdc9edf10c95636526816d7fca11f32bf6408112b018cde4"
+    expected_adapter_image="ghcr.io/jkershawrh/virtualization-ai-401-operations-adapter@sha256:b18c5a36cf18a2a3b45bc652600fc652c150227463c69cb50f0a039a55318431" ;;
   virtualization-ai-501)
-    vm_names=(inference-client-a inference-client-b inference-client-c); service=virtualization-ai-501-qualification-adapter; route=virtualization-ai-501; endpoint=/api/v1/qualifications ;;
+    vm_names=(inference-client-a inference-client-b inference-client-c); service=virtualization-ai-501-qualification-adapter; route=virtualization-ai-501; endpoint=/api/v1/qualifications
+    source_revision="78442e22eeed56b54d1e910ad8c2b847e3cd241a"
+    expected_presentation_image="ghcr.io/jkershawrh/virtualization-ai-501-presentation@sha256:825fa99269c1bed2af4d1a3190203a29488ab032983e1e255d9b730963819acf"
+    expected_adapter_image="ghcr.io/jkershawrh/virtualization-ai-501-qualification-adapter@sha256:256400deedfe2103fd887f7665f9813039e1d613252d1e230683b8b82d4512b1" ;;
   *) printf 'unsupported catalog: %s\n' "$catalog_id" >&2; exit 2 ;;
 esac
 
@@ -73,35 +79,30 @@ for vm in "${vm_names[@]}"; do
 done
 vm_count="$(oc --kubeconfig "$KUBECONFIG" get vm -n "$namespace" -o json | jq '[.items[] | select(.status.printableStatus == "Running")] | length')"
 vmi_count="$(oc --kubeconfig "$KUBECONFIG" get vmi -n "$namespace" -o json | jq '[.items[] | select(any(.status.conditions[]?; .type == "Ready" and .status == "True"))] | length')"
-[[ "$vm_count" -eq "${#vm_names[@]}" && "$vmi_count" -eq "${#vm_names[@]}" ]]
+[[ "$vm_count" -eq "${#vm_names[@]}" && "$vmi_count" -eq "${#vm_names[@]}" ]] || exit 1
 
 if [[ "$catalog_id" == virtualization-ai-301 ]]; then
   stage=platform-placement
   placement_node="$(oc --kubeconfig "$KUBECONFIG" get vmi modernization-client -n "$namespace" -o jsonpath='{.status.nodeName}')"
-  [[ -n "$placement_node" ]]
+  [[ -n "$placement_node" ]] || exit 1
   placement_architecture="$(oc --kubeconfig "$KUBECONFIG" get node "$placement_node" -o jsonpath='{.metadata.labels.kubernetes\.io/arch}')"
   placement_vmx="$(oc --kubeconfig "$KUBECONFIG" get node "$placement_node" -o jsonpath='{.metadata.labels.cpu-feature\.node\.kubevirt\.io/vmx}')"
-  [[ "$placement_architecture" == amd64 ]]
-  [[ "$placement_vmx" == true ]]
+  [[ "$placement_architecture" == amd64 ]] || exit 1
+  [[ "$placement_vmx" == true ]] || exit 1
 fi
 
 stage=runtime-images
-if [[ "$catalog_id" == virtualization-ai-foundations-101 || "$catalog_id" == virtualization-ai-201 || "$catalog_id" == virtualization-ai-301 ]]; then
-  if [[ "$catalog_id" == virtualization-ai-foundations-101 ]]; then
-    presentation_deployment=virtualization-ai-presentation
-    adapter_deployment=ai-analysis-adapter
-  elif [[ "$catalog_id" == virtualization-ai-201 ]]; then
-    presentation_deployment=virtualization-ai-201-presentation
-    adapter_deployment=virtualization-ai-201-adapter
-  else
-    presentation_deployment=virtualization-ai-301-presentation
-    adapter_deployment=virtualization-ai-301-adapter
-  fi
-  presentation_image="$(oc --kubeconfig "$KUBECONFIG" get deployment "$presentation_deployment" -n "$namespace" -o jsonpath='{.spec.template.spec.containers[0].image}')"
-  adapter_image="$(oc --kubeconfig "$KUBECONFIG" get deployment "$adapter_deployment" -n "$namespace" -o jsonpath='{.spec.template.spec.containers[0].image}')"
-  [[ "$presentation_image" == "$expected_presentation_image" ]]
-  [[ "$adapter_image" == "$expected_adapter_image" ]]
-fi
+[[ "$source_revision" =~ ^[0-9a-f]{40}$ ]] || { printf 'missing exact source revision\n' >&2; exit 1; }
+[[ "$expected_presentation_image" == *@sha256:* && "$expected_adapter_image" == *@sha256:* ]] || { printf 'missing immutable image identities\n' >&2; exit 1; }
+oc --kubeconfig "$KUBECONFIG" get deployments -n "$namespace" -o json >"$work_dir/deployments.json"
+# All supported levels must record matched immutable Deployment references.
+# This is not a claim of independently verified node image IDs or provenance.
+presentation_image="$(jq -er --arg expected "$expected_presentation_image" \
+  '[.items[].spec.template.spec.containers[].image | select(. == $expected)] | unique | if length == 1 then .[0] else error("presentation image mismatch") end' "$work_dir/deployments.json")"
+adapter_image="$(jq -er --arg expected "$expected_adapter_image" \
+  '[.items[].spec.template.spec.containers[].image | select(. == $expected)] | unique | if length == 1 then .[0] else error("adapter image mismatch") end' "$work_dir/deployments.json")"
+[[ "$presentation_image" == "$expected_presentation_image" ]] || { printf 'presentation image mismatch\n' >&2; exit 1; }
+[[ "$adapter_image" == "$expected_adapter_image" ]] || { printf 'adapter image mismatch\n' >&2; exit 1; }
 
 stage=presentation
 app_host="$(oc --kubeconfig "$KUBECONFIG" get route "$route" -n "$namespace" -o jsonpath='{.spec.host}')"
@@ -110,7 +111,7 @@ app_host="$(oc --kubeconfig "$KUBECONFIG" get route "$route" -n "$namespace" -o 
 # trusted Launchpad gateway; this probe intentionally verifies the internal
 # origin route while certificate replacement is tracked separately.
 presentation_status="$(curl -ksSL --retry 3 --retry-all-errors --max-time 90 -o /dev/null -w '%{http_code}' "https://${app_host}/")"
-[[ "$presentation_status" == 200 ]]
+[[ "$presentation_status" == 200 ]] || exit 1
 
 stage=adapter-forward
 oc --kubeconfig "$KUBECONFIG" port-forward -n "$namespace" "service/$service" "${forward_port}:8080" >"$work_dir/port-forward.log" 2>&1 &
@@ -257,14 +258,14 @@ case "$catalog_id" in
     jq -e '.decision == "ALLOW_REVIEW" and .reason_codes == ["HUMAN_APPROVAL_REQUIRED"] and .authority.automated_action_performed == false' <<<"$response" >/dev/null
     oc --kubeconfig "$KUBECONFIG" rollout restart -n "$namespace" deployment/virtualization-ai-401-operations-adapter >/dev/null
     oc --kubeconfig "$KUBECONFIG" rollout status -n "$namespace" deployment/virtualization-ai-401-operations-adapter --timeout=180s >/dev/null
-    [[ "$(oc --kubeconfig "$KUBECONFIG" get pvc virtualization-ai-401-evidence -n "$namespace" -o jsonpath='{.status.phase}')" == Bound ]]
+    [[ "$(oc --kubeconfig "$KUBECONFIG" get pvc virtualization-ai-401-evidence -n "$namespace" -o jsonpath='{.status.phase}')" == Bound ]] || exit 1
     outcome=ALLOW_REVIEW ;;
   virtualization-ai-501)
     trials='[{"kind":"BASELINE","concurrency":1,"requests":3,"success_rate":1,"p95_ms":100,"cpu_saturation_pct":20,"containment_breaches":0,"correlation_complete":true,"state_continuity":true},{"kind":"MIGRATION","concurrency":1,"requests":3,"success_rate":1,"p95_ms":120,"cpu_saturation_pct":22,"containment_breaches":0,"correlation_complete":true,"state_continuity":true},{"kind":"DISRUPTION","concurrency":1,"requests":3,"success_rate":1,"p95_ms":140,"cpu_saturation_pct":24,"containment_breaches":0,"correlation_complete":true,"state_continuity":true}]'
     request="$(jq -cn --arg ns "$namespace" --argjson trials "$trials" '{schema_version:"demo-story.redhat-intel.com/virtualization-ai-501/qualification-request/v1",request_id:"qualification-cert-001",requested_by:"certifier",fleet:{namespace:$ns,inference_service:"cpu-inference",virtual_machines:[{name:"inference-client-a",node:"worker-a",architecture:"amd64",cpu_vendor:"GenuineIntel"},{name:"inference-client-b",node:"worker-b",architecture:"amd64",cpu_vendor:"GenuineIntel"},{name:"inference-client-c",node:"worker-c",architecture:"amd64",cpu_vendor:"GenuineIntel"}]},envelope:{max_p95_ms:800,min_success_rate:0.98,max_concurrency:12,max_cpu_saturation_pct:90},trials:$trials,evidence_snapshot:[{schema_version:"demo-story.redhat-intel.com/virtualization-ai-501/evidence/v1",evidence_id:"ev",request_id:"qualification-cert-001",state:"DISCOVER",kind:"OPENSHIFT",source:"certification",source_state:"REHEARSAL",observed_at:"2026-09-29T12:00:00Z",freshness:"FRESH",digest:"sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",payload:{}}]}')"
     response="$(post "$endpoint" "$request")"
     jq -e '.decision == "ALLOW_REVIEW" and .qualification.status == "PASS" and .qualification.fleet_size == 3 and .authority.promotion_performed == false' <<<"$response" >/dev/null
-    [[ "$(oc --kubeconfig "$KUBECONFIG" get pvc virtualization-ai-501-evidence -n "$namespace" -o jsonpath='{.status.phase}')" == Bound ]]
+    [[ "$(oc --kubeconfig "$KUBECONFIG" get pvc virtualization-ai-501-evidence -n "$namespace" -o jsonpath='{.status.phase}')" == Bound ]] || exit 1
     outcome=ALLOW_REVIEW ;;
 esac
 
@@ -281,7 +282,7 @@ grep -qx node_list=DENIED <<<"$terminal_scope"
 
 stage=console-url
 console_url="$(oc --kubeconfig "$KUBECONFIG" whoami --show-console)"
-[[ "$console_url" == https://* ]]
+[[ "$console_url" == https://* ]] || exit 1
 
 jq -cn --arg namespace "$namespace" --arg cluster_ref "$expected_cluster" --arg catalog_id "$catalog_id" \
   --arg outcome "$outcome" --arg source_state "$journey_source_state" --arg request_origin "$journey_request_origin" \

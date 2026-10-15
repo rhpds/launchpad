@@ -1,0 +1,42 @@
+schema: launchpad/certification-probe-remediation/v1
+date: '2026-10-15'
+status: GREEN-LOCAL-FRESH-LIVE-PROOF-REQUIRED
+live_changes: false
+affected_catalogs: [virtualization-ai-401, virtualization-ai-501]
+finding:
+  prior_reports_marked_green: true
+  recorded_source_revision: empty
+  recorded_presentation_image: empty
+  recorded_adapter_image: empty
+  prior_exposure_proven: internal
+  old_reports_modified_or_reclassified_as_current_proof: false
+  conclusion: Prior readiness and functional observations cannot establish exact-release identity or fresh public-access certification.
+correction:
+  - Bind 401 and 501 source revisions and immutable image references to their current catalog definitions.
+  - Collect matching Deployment image references for every supported virtualization level instead of skipping 401 and 501.
+  - Require the new identity fields in both advanced certification contracts.
+  - Make all standalone double-bracket safety checks exit explicitly, including VM readiness, placement, PVC, route status and Console URL.
+  - Preserve rehearsal/model truth boundaries and namespace authorization checks.
+evidence_scope:
+  images: Deployment specifications matched to expected immutable references.
+  source_revision: Catalog-pinned identity; not independent node-image or build-provenance verification.
+  no_actual_cluster_calls_in_unit_tests: true
+  no_new_labs_provisioned: true
+proof:
+  source_contract_red: evidence/runs/virtualization-probe-identity-red-20261015.xml
+  initial_source_contract_report: evidence/runs/virtualization-probe-identity-green-local-20261015.xml
+  initial_report_retains_two_preexisting_release_assertion_failures: true
+  missing_source_negative_red: evidence/runs/virtualization-probe-identity-green-r2-20261015.xml
+  explicit_identity_guard_green: evidence/runs/virtualization-probe-identity-green-r3-20261015.xml
+  bash_safety_red: evidence/runs/virtualization-probe-bash-guards-red-20261015.xml
+  bash_safety_green: evidence/runs/virtualization-probe-bash-guards-green-20261015.xml
+  contract_requirement_red: evidence/runs/virtualization-certification-identity-red-20261015.xml
+  final_local_green: evidence/runs/virtualization-certification-identity-green-local-20261015.xml
+  final_local_tests_passed: 6
+  shell_syntax: PASS
+remaining:
+  - Fresh one-seat Flightpath runs with the corrected probe and exact source/image identity.
+  - Separate proof of external participant entry and operator access; internal results do not imply public coverage.
+  - Complete reclaim and independently verified zero residue.
+  - Reconcile older hardcoded release assertions only after the current release evidence satisfies the contract.
+  - Platform security remediation and final candidate certification remain open.
