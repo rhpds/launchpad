@@ -1,0 +1,33 @@
+schema: launchpad/backend-security-image-validation/v1
+date: '2026-10-15'
+status: SECURITY-BLOCKED
+source: 95fec905f1c2a3b6581de5e290f711af2ede37c1
+run: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/38758481803
+result: failure
+failed_gates:
+  - Block fixable high and critical vulnerabilities
+  - Block unresolved full-inventory security findings
+candidate_manifest_digest: sha256:d222ed9ae801475224b1f793e5f758ab9d31f83c0be01aee5978e88b66a83f69
+candidate_is_published_qualified_release: false
+full_scan:
+  retained_artifact: backend-vulnerability-scan-95fec905f1c2a3b6581de5e290f711af2ede37c1
+  report_sha256: 69a237e70f64608be6fda2aebb68be6202727f81750e779a648acacd307ccea8
+  high: 25
+  critical: 0
+  unrated: 2
+  suppressed_high_critical_unrated: 0
+  distinct_high_critical_ids: 15
+  high_critical_fix_states: {fixed: 2, not-fixed: 22, unspecified: 1}
+  preceding_high: 29
+  observed_high_reduction: 4
+  reduction_scope: Different candidate builds, each using its retained scanner inventory; not a claim that unresolved findings are safe.
+remaining_groups:
+  - Old Distribution registry dependency: two fixable High matches.
+  - Docker dependency: unresolved High matches.
+  - golang.org/x/crypto: two unrated matches requiring advisory-specific review.
+  - OS/runtime: Python, Expat, GnuTLS and util-linux family findings remain.
+verification:
+  staging_checker_rerun: BLOCKED
+  risk_acceptance: NOT-GRANTED
+  scanner_ignore_added: false
+  live_changes: false
