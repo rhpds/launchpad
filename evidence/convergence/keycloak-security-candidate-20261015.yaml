@@ -1,0 +1,31 @@
+schema: launchpad.redhat.com/identity-image-qualification/v1
+observed_date: '2026-10-15'
+result: image-qualified-live-upgrade-not-performed
+source_revision: edea74f6f85e10389d240ccc706b0c39fccf7dbf
+release_workflow: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/38792599972
+release_result: success
+workflow_revision: ac7cf94
+image: ghcr.io/jkershawrh/launchpad-keycloak@sha256:6b2c982c6a633066e424b3a94abdbcf4e169411c064cba497305e0d34ed1a4e7
+keycloak_version: 26.8.1
+platform: linux/amd64
+complete_vulnerability_inventory:
+  critical: 0
+  high: 0
+  medium: 25
+  low: 25
+checks:
+  exact_source_checkout: passed
+  authenticator_and_landing_contracts: passed
+  spi_build: passed
+  security_gate: passed
+  immutable_publish: passed
+  cosign_signature_verification: passed
+  registry_sbom_attestation_verification: passed
+  registry_provenance_verification: passed
+  verified_provenance_source_matches_checkout: true
+repository_visibility_changed: false
+live_identity_service_changed: false
+deployment_blockers:
+  - Isolated upgrade and database compatibility proof is required before replacing the current identity service.
+  - Historical promotion helper targets an obsolete repository and Keycloak CR; do not use it for the current launchpad-stage Deployment.
+browser_contrast_fixed_live: false
