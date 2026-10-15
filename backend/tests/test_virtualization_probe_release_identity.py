@@ -11,6 +11,34 @@ import yaml
 ROOT = Path(__file__).resolve().parents[2]
 
 
+@pytest.mark.parametrize("condition", ["ready", "transient", "wrong-revision"])
+def test_advanced_source_identity_waits_for_sync_without_accepting_wrong_revision(tmp_path, condition):
+    source = (ROOT / "scripts/certify-virtualization-ai-seat.sh").read_text()
+    phase = source.split("stage=source-identity", 1)[1].split("stage=runtime-images", 1)[0]
+    revision = "a" * 40
+    app = {"items": [{"spec": {"destination": {"namespace": "seat"}, "source": {
+        "repoURL": "https://github.com/jkershawrh/virtualization-ai-401.git",
+        "path": "charts/virtualization-ai-401", "targetRevision": revision}},
+        "status": {"sync": {"revision": "b" * 40 if condition == "wrong-revision" else revision,
+                              "status": "Synced"}}}]}
+    script = '''
+oc() {
+  count=0; test ! -f "$work_dir/count" || count=$(cat "$work_dir/count")
+  count=$((count+1)); printf '%s' "$count" > "$work_dir/count"
+  if [[ "$CONDITION" == transient && "$count" == 1 ]]; then
+    printf '%s' "$FAKE_APPLICATIONS" | jq '.items[0].status.sync.status = "OutOfSync"'
+  else printf '%s' "$FAKE_APPLICATIONS"; fi
+}
+sleep() { :; }
+''' + phase
+    result = subprocess.run(["bash", "-euo", "pipefail", "-c", script], env={
+        **os.environ, "catalog_id": "virtualization-ai-401", "namespace": "seat",
+        "source_revision": revision, "KUBECONFIG": "not-used", "work_dir": str(tmp_path),
+        "CONDITION": condition, "FAKE_APPLICATIONS": json.dumps(app),
+    }, capture_output=True, text=True, timeout=10)
+    assert (result.returncode == 0) is (condition != "wrong-revision"), result.stderr
+
+
 def test_probe_checks_do_not_rely_on_old_bash_errexit_for_double_brackets():
     source = (ROOT / "scripts/certify-virtualization-ai-seat.sh").read_text()
     bare_checks = [line.strip() for line in source.splitlines()

@@ -92,16 +92,29 @@ if [[ "$catalog_id" == virtualization-ai-301 ]]; then
   [[ "$placement_vmx" == true ]] || exit 1
 fi
 
-stage=runtime-images
-[[ "$source_revision" =~ ^[0-9a-f]{40}$ ]] || { printf 'missing exact source revision\n' >&2; exit 1; }
+stage=source-identity
 if [[ "$catalog_id" == virtualization-ai-401 || "$catalog_id" == virtualization-ai-501 ]]; then
-  oc --kubeconfig "$KUBECONFIG" get applications.argoproj.io -A -o json >"$work_dir/applications.json"
-  jq -e --arg namespace "$namespace" --arg revision "$source_revision" --arg repo "https://github.com/jkershawrh/${catalog_id}.git" \
+  source_verified=false
+  for _ in {1..30}; do
+    oc --kubeconfig "$KUBECONFIG" get applications.argoproj.io -A -o json >"$work_dir/applications.json"
+    if jq -e --arg namespace "$namespace" --arg revision "$source_revision" --arg repo "https://github.com/jkershawrh/${catalog_id}.git" \
     '[.items[] | select(.spec.destination.namespace == $namespace and .spec.source.repoURL == $repo)
       | select(.spec.source.path == ("charts/" + ($repo | split("/")[-1] | rtrimstr(".git"))))
       | select(.spec.source.targetRevision == $revision and .status.sync.revision == $revision and .status.sync.status == "Synced")]
-      | length == 1' "$work_dir/applications.json" >/dev/null
+      | length == 1' "$work_dir/applications.json" >/dev/null; then
+      source_verified=true
+      break
+    fi
+    sleep 2
+  done
+  if [[ "$source_verified" != true ]]; then
+    # Emit only source identity and sync state, never Helm values or Secrets.
+    jq -c --arg namespace "$namespace" '[.items[] | select(.spec.destination.namespace == $namespace) | {name:.metadata.name,repo:.spec.source.repoURL,path:.spec.source.path,target:.spec.source.targetRevision,sync:.status.sync}]' "$work_dir/applications.json" >&2
+    exit 1
+  fi
 fi
+stage=runtime-images
+[[ "$source_revision" =~ ^[0-9a-f]{40}$ ]] || { printf 'missing exact source revision\n' >&2; exit 1; }
 [[ "$expected_presentation_image" == *@sha256:* && "$expected_adapter_image" == *@sha256:* ]] || { printf 'missing immutable image identities\n' >&2; exit 1; }
 oc --kubeconfig "$KUBECONFIG" get deployments -n "$namespace" -o json >"$work_dir/deployments.json"
 # All supported levels must record matched immutable Deployment references.
