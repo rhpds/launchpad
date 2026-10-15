@@ -1,6 +1,20 @@
 schema: launchpad/staging-regression-checkpoint/v1
 date: '2026-10-15'
 status: NOT-QUALIFIED
+latest_full_regression:
+  source: 0f39b664
+  report: evidence/runs/backend-full-0f39b664-20261015.xml
+  sha256: 3df6796e58a2134dd9fc4a104362698622f608471184df9940c3a0fab5e92b02
+  passed: 2872
+  failed: 3
+  skipped: 27
+  deselected: 13
+  duration_seconds: 263.91
+  remaining:
+    - Sovereign 201 exposure and exact release agreement; separate uncommitted work is not included.
+    - Virtualization 401 current release versus historical public certification evidence.
+    - Virtualization 501 current release versus historical public certification evidence.
+  limits: No failed check is waived; the focused internal 401/501 passes do not satisfy current public browser proof.
 source: 330487e0
 full_regression:
   report: evidence/runs/backend-full-330487e0-20261015.xml

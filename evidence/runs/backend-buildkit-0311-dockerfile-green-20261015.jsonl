@@ -1,0 +1,84 @@
+{"Time":"2026-10-15T09:28:02.890113-05:00","Action":"start","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile"}
+{"Time":"2026-10-15T09:28:03.786211-05:00","Action":"run","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestFindAll"}
+{"Time":"2026-10-15T09:28:03.786346-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestFindAll","Output":"=== RUN   TestFindAll\n"}
+{"Time":"2026-10-15T09:28:03.786403-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestFindAll","Output":"--- PASS: TestFindAll (0.00s)\n"}
+{"Time":"2026-10-15T09:28:03.786426-05:00","Action":"pass","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestFindAll","Elapsed":0}
+{"Time":"2026-10-15T09:28:03.786438-05:00","Action":"run","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestFindAllNilNode"}
+{"Time":"2026-10-15T09:28:03.786443-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestFindAllNilNode","Output":"=== RUN   TestFindAllNilNode\n"}
+{"Time":"2026-10-15T09:28:03.786449-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestFindAllNilNode","Output":"--- PASS: TestFindAllNilNode (0.00s)\n"}
+{"Time":"2026-10-15T09:28:03.786465-05:00","Action":"pass","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestFindAllNilNode","Elapsed":0}
+{"Time":"2026-10-15T09:28:03.786472-05:00","Action":"run","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestInsertInstructions"}
+{"Time":"2026-10-15T09:28:03.786477-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestInsertInstructions","Output":"=== RUN   TestInsertInstructions\n"}
+{"Time":"2026-10-15T09:28:03.786666-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestInsertInstructions","Output":"--- PASS: TestInsertInstructions (0.00s)\n"}
+{"Time":"2026-10-15T09:28:03.786735-05:00","Action":"pass","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestInsertInstructions","Elapsed":0}
+{"Time":"2026-10-15T09:28:03.786784-05:00","Action":"run","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestInsertInstructionsNilNode"}
+{"Time":"2026-10-15T09:28:03.78679-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestInsertInstructionsNilNode","Output":"=== RUN   TestInsertInstructionsNilNode\n"}
+{"Time":"2026-10-15T09:28:03.786816-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestInsertInstructionsNilNode","Output":"--- PASS: TestInsertInstructionsNilNode (0.00s)\n"}
+{"Time":"2026-10-15T09:28:03.786823-05:00","Action":"pass","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestInsertInstructionsNilNode","Elapsed":0}
+{"Time":"2026-10-15T09:28:03.786828-05:00","Action":"run","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestInsertInstructionsPosOutOfRange"}
+{"Time":"2026-10-15T09:28:03.786832-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestInsertInstructionsPosOutOfRange","Output":"=== RUN   TestInsertInstructionsPosOutOfRange\n"}
+{"Time":"2026-10-15T09:28:03.786838-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestInsertInstructionsPosOutOfRange","Output":"--- PASS: TestInsertInstructionsPosOutOfRange (0.00s)\n"}
+{"Time":"2026-10-15T09:28:03.786848-05:00","Action":"pass","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestInsertInstructionsPosOutOfRange","Elapsed":0}
+{"Time":"2026-10-15T09:28:03.786853-05:00","Action":"run","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestInsertInstructionsUnparseable"}
+{"Time":"2026-10-15T09:28:03.786908-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestInsertInstructionsUnparseable","Output":"=== RUN   TestInsertInstructionsUnparseable\n"}
+{"Time":"2026-10-15T09:28:03.787051-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestInsertInstructionsUnparseable","Output":"--- PASS: TestInsertInstructionsUnparseable (0.00s)\n"}
+{"Time":"2026-10-15T09:28:03.787061-05:00","Action":"pass","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestInsertInstructionsUnparseable","Elapsed":0}
+{"Time":"2026-10-15T09:28:03.787065-05:00","Action":"run","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestLastBaseImage"}
+{"Time":"2026-10-15T09:28:03.787069-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestLastBaseImage","Output":"=== RUN   TestLastBaseImage\n"}
+{"Time":"2026-10-15T09:28:03.787094-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestLastBaseImage","Output":"--- PASS: TestLastBaseImage (0.00s)\n"}
+{"Time":"2026-10-15T09:28:03.787101-05:00","Action":"pass","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestLastBaseImage","Elapsed":0}
+{"Time":"2026-10-15T09:28:03.787105-05:00","Action":"run","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestLastBaseImageNilNode"}
+{"Time":"2026-10-15T09:28:03.787109-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestLastBaseImageNilNode","Output":"=== RUN   TestLastBaseImageNilNode\n"}
+{"Time":"2026-10-15T09:28:03.78713-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestLastBaseImageNilNode","Output":"--- PASS: TestLastBaseImageNilNode (0.00s)\n"}
+{"Time":"2026-10-15T09:28:03.787134-05:00","Action":"pass","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestLastBaseImageNilNode","Elapsed":0}
+{"Time":"2026-10-15T09:28:03.787138-05:00","Action":"run","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestBaseImages"}
+{"Time":"2026-10-15T09:28:03.787141-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestBaseImages","Output":"=== RUN   TestBaseImages\n"}
+{"Time":"2026-10-15T09:28:03.787205-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestBaseImages","Output":"--- PASS: TestBaseImages (0.00s)\n"}
+{"Time":"2026-10-15T09:28:03.787212-05:00","Action":"pass","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestBaseImages","Elapsed":0}
+{"Time":"2026-10-15T09:28:03.787216-05:00","Action":"run","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestBaseImagesNilNode"}
+{"Time":"2026-10-15T09:28:03.787219-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestBaseImagesNilNode","Output":"=== RUN   TestBaseImagesNilNode\n"}
+{"Time":"2026-10-15T09:28:03.787234-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestBaseImagesNilNode","Output":"--- PASS: TestBaseImagesNilNode (0.00s)\n"}
+{"Time":"2026-10-15T09:28:03.787239-05:00","Action":"pass","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestBaseImagesNilNode","Elapsed":0}
+{"Time":"2026-10-15T09:28:03.787243-05:00","Action":"run","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestLastExposedPorts"}
+{"Time":"2026-10-15T09:28:03.787247-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestLastExposedPorts","Output":"=== RUN   TestLastExposedPorts\n"}
+{"Time":"2026-10-15T09:28:03.787322-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestLastExposedPorts","Output":"--- PASS: TestLastExposedPorts (0.00s)\n"}
+{"Time":"2026-10-15T09:28:03.787328-05:00","Action":"pass","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestLastExposedPorts","Elapsed":0}
+{"Time":"2026-10-15T09:28:03.787332-05:00","Action":"run","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestLastExposedPortsNilNode"}
+{"Time":"2026-10-15T09:28:03.787336-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestLastExposedPortsNilNode","Output":"=== RUN   TestLastExposedPortsNilNode\n"}
+{"Time":"2026-10-15T09:28:03.78734-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestLastExposedPortsNilNode","Output":"--- PASS: TestLastExposedPortsNilNode (0.00s)\n"}
+{"Time":"2026-10-15T09:28:03.787344-05:00","Action":"pass","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestLastExposedPortsNilNode","Elapsed":0}
+{"Time":"2026-10-15T09:28:03.787348-05:00","Action":"run","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestExposedPorts"}
+{"Time":"2026-10-15T09:28:03.787351-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestExposedPorts","Output":"=== RUN   TestExposedPorts\n"}
+{"Time":"2026-10-15T09:28:03.787425-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestExposedPorts","Output":"--- PASS: TestExposedPorts (0.00s)\n"}
+{"Time":"2026-10-15T09:28:03.787431-05:00","Action":"pass","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestExposedPorts","Elapsed":0}
+{"Time":"2026-10-15T09:28:03.787436-05:00","Action":"run","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestLastExposedPortsVarAndRange"}
+{"Time":"2026-10-15T09:28:03.787439-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestLastExposedPortsVarAndRange","Output":"=== RUN   TestLastExposedPortsVarAndRange\n"}
+{"Time":"2026-10-15T09:28:03.787775-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestLastExposedPortsVarAndRange","Output":"--- PASS: TestLastExposedPortsVarAndRange (0.00s)\n"}
+{"Time":"2026-10-15T09:28:03.787791-05:00","Action":"pass","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestLastExposedPortsVarAndRange","Elapsed":0}
+{"Time":"2026-10-15T09:28:03.787798-05:00","Action":"run","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestExposedPortsNilNode"}
+{"Time":"2026-10-15T09:28:03.787802-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestExposedPortsNilNode","Output":"=== RUN   TestExposedPortsNilNode\n"}
+{"Time":"2026-10-15T09:28:03.787808-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestExposedPortsNilNode","Output":"--- PASS: TestExposedPortsNilNode (0.00s)\n"}
+{"Time":"2026-10-15T09:28:03.787814-05:00","Action":"pass","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestExposedPortsNilNode","Elapsed":0}
+{"Time":"2026-10-15T09:28:03.787818-05:00","Action":"run","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestNextValues"}
+{"Time":"2026-10-15T09:28:03.787823-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestNextValues","Output":"=== RUN   TestNextValues\n"}
+{"Time":"2026-10-15T09:28:03.787994-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestNextValues","Output":"--- PASS: TestNextValues (0.00s)\n"}
+{"Time":"2026-10-15T09:28:03.788007-05:00","Action":"pass","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestNextValues","Elapsed":0}
+{"Time":"2026-10-15T09:28:03.788011-05:00","Action":"run","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestNextValuesOnbuild"}
+{"Time":"2026-10-15T09:28:03.788015-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestNextValuesOnbuild","Output":"=== RUN   TestNextValuesOnbuild\n"}
+{"Time":"2026-10-15T09:28:03.788034-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestNextValuesOnbuild","Output":"--- PASS: TestNextValuesOnbuild (0.00s)\n"}
+{"Time":"2026-10-15T09:28:03.788043-05:00","Action":"pass","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestNextValuesOnbuild","Elapsed":0}
+{"Time":"2026-10-15T09:28:03.788047-05:00","Action":"run","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestNextValuesNilNode"}
+{"Time":"2026-10-15T09:28:03.788051-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestNextValuesNilNode","Output":"=== RUN   TestNextValuesNilNode\n"}
+{"Time":"2026-10-15T09:28:03.788055-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestNextValuesNilNode","Output":"--- PASS: TestNextValuesNilNode (0.00s)\n"}
+{"Time":"2026-10-15T09:28:03.788059-05:00","Action":"pass","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestNextValuesNilNode","Elapsed":0}
+{"Time":"2026-10-15T09:28:03.788063-05:00","Action":"run","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestKeyValueInstructions"}
+{"Time":"2026-10-15T09:28:03.788066-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestKeyValueInstructions","Output":"=== RUN   TestKeyValueInstructions\n"}
+{"Time":"2026-10-15T09:28:03.788131-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestKeyValueInstructions","Output":"--- PASS: TestKeyValueInstructions (0.00s)\n"}
+{"Time":"2026-10-15T09:28:03.78815-05:00","Action":"pass","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestKeyValueInstructions","Elapsed":0}
+{"Time":"2026-10-15T09:28:03.788156-05:00","Action":"run","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestFrom"}
+{"Time":"2026-10-15T09:28:03.78816-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestFrom","Output":"=== RUN   TestFrom\n"}
+{"Time":"2026-10-15T09:28:03.788165-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestFrom","Output":"--- PASS: TestFrom (0.00s)\n"}
+{"Time":"2026-10-15T09:28:03.788169-05:00","Action":"pass","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Test":"TestFrom","Elapsed":0}
+{"Time":"2026-10-15T09:28:03.788236-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Output":"PASS\n"}
+{"Time":"2026-10-15T09:28:03.789278-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Output":"ok  \tgithub.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile\t0.899s\n"}
+{"Time":"2026-10-15T09:28:03.792484-05:00","Action":"pass","Package":"github.com/openshift/oc/pkg/helpers/newapp/docker/dockerfile","Elapsed":0.902}

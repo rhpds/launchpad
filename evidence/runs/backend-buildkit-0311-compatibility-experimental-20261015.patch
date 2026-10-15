@@ -1,0 +1,33 @@
+diff --git a/pkg/helpers/newapp/docker/dockerfile/dockerfile.go b/pkg/helpers/newapp/docker/dockerfile/dockerfile.go
+index 7dcadc259..6177f28a9 100644
+--- a/pkg/helpers/newapp/docker/dockerfile/dockerfile.go
++++ b/pkg/helpers/newapp/docker/dockerfile/dockerfile.go
+@@ -157,7 +157,13 @@ func nextValues(node *parser.Node) []string {
+ 		return nil
+ 	}
+ 	var values []string
+-	for next := node.Next; next != nil; next = next.Next {
++	keyValue := strings.EqualFold(node.Value, command.Env) || strings.EqualFold(node.Value, command.Label)
++	for next, position := node.Next, 0; next != nil; next, position = next.Next, position+1 {
++		// BuildKit represents ENV/LABEL assignments as key, value, separator.
++		// Preserve literal '=' values; only the third positional node is metadata.
++		if keyValue && position%3 == 2 {
++			continue
++		}
+ 		values = append(values, next.Value)
+ 	}
+ 	return values
+diff --git a/pkg/helpers/newapp/docker/dockerfile/dockerfile_test.go b/pkg/helpers/newapp/docker/dockerfile/dockerfile_test.go
+index a92dc09d9..0f97acfa9 100644
+--- a/pkg/helpers/newapp/docker/dockerfile/dockerfile_test.go
++++ b/pkg/helpers/newapp/docker/dockerfile/dockerfile_test.go
+@@ -494,6 +494,9 @@ func TestNextValues(t *testing.T) {
+ 		`EXPOSE 8080`:                   {"8080"},
+ 		`VOLUME /var/run/www`:           {"/var/run/www"},
+ 		`ENV PATH=/bin`:                 {"PATH", "/bin"},
++		`ENV EQ== OTHER=two`:            {"EQ", "=", "OTHER", "two"},
++		`ENV LEGACY a=b`:                {"LEGACY", "a=b"},
++		`LABEL EQ== OTHER=two`:          {"EQ", "=", "OTHER", "two"},
+ 		`ADD file /home/`:               {"file", "/home/"},
+ 		`COPY dir/ /tmp/`:               {"dir/", "/tmp/"},
+ 		`RUN echo "Hello world!"`:       {`echo "Hello world!"`},

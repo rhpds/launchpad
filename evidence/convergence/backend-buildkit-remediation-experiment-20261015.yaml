@@ -1,0 +1,54 @@
+schema: launchpad/backend-buildkit-remediation-experiment/v1
+date: '2026-10-15'
+status: GREEN-COMPATIBILITY-ONLY-SECURITY-BLOCKED
+source:
+  repository: https://github.com/openshift/oc
+  commit: d0f23b14fbf35493e5b713e25ecf662ec239e76c
+  isolated_source: true
+  copied_archive_experiment_included: false
+  buildkit_replacement: v0.31.1
+  archive_compatibility_replacement: v0.1.0
+  other_overrides: Existing ten backend Containerfile replacements retained.
+red:
+  initial_upgrade: BuildKit selects go-archive v0.2.0, which removes the Compression alias used by Docker v28.5.2; compilation failed.
+  compatibility_hold: Keeping the existing v0.1.0 archive permits compilation but does not fix its vulnerability.
+  parser_failures:
+    - TestLastExposedPortsVarAndRange
+    - TestNextValues
+  excerpt: evidence/runs/backend-buildkit-0311-dockerfile-red-excerpt-20261015.jsonl
+  excerpt_sha256: 508117b0495a24c09f5f4dff5549cea729734aa2e755a1e490c31b40ba7e39ec
+adaptation:
+  description: ENV and LABEL AST assignments now contain positional separator nodes. Skip only the separator position, preserving literal equals-sign values and legacy assignments.
+  patch: evidence/runs/backend-buildkit-0311-compatibility-experimental-20261015.patch
+  patch_sha256: f9f6367da6c9f527def1479cb669074b419b5974fe15a1352ed954d82a319868
+  module_patch: evidence/runs/backend-buildkit-0311-module-experimental-20261015.patch
+  module_patch_sha256: 9187c06bb4c8bedafb2b704987716d93281ed191a009ee593fa3099660b14ae5
+green:
+  focused_parser_tests: 20
+  focused_parser_report: evidence/runs/backend-buildkit-0311-dockerfile-green-20261015.jsonl
+  focused_parser_sha256: 29d2b1f5f0ac62c2df2ae905e8bf8a7a4f6e2335d5fea59e6559231c21808ee9
+  full_newapp_helper_tests: 117
+  full_newapp_failed_tests: 0
+  full_newapp_packages: 7
+  summary: evidence/runs/backend-buildkit-0311-newapp-green-summary-20261015.json
+  summary_sha256: 74c222717315d394412aa49f2cbf1b8b50452dd44e05a32e9c2ce65f5070dd66
+  summary_scope: Structured test outcomes; raw full output retained in the disposable experiment directory, not represented as committed raw output.
+  linux_amd64_compile_exit: 0
+  go_toolchain: go1.26.9
+  cgo_enabled: false
+  build_tags: [include_gcs, include_oss, containers_image_openpgp]
+  binary_sha256: 5c55c4dc022f4d11d3e72fbfd0323c8d20d4b51c0888486f32177d07542c7435
+  raw_build_info_sha256: 42ae665846e1bfbf72df03529214edc076a63ad79c6dcc9d8dbfb7b77c72370c
+  raw_build_info_committed: false
+  dependency_summary: evidence/runs/backend-buildkit-0311-linux-dependency-summary-20261015.json
+  dependency_summary_sha256: 22b0d394c3959f6c5c4f4fb05806cce90d03ab5f26ddd333cf335b7373959d2e
+  dependency_summary_scope: Exact package paths, versions, replacements, toolchain and platform settings; module checksum strings omitted because the secret scanner flags public dependency checksum tokens. Raw build metadata remains unchanged outside Git.
+limits:
+  - No production Containerfile, CLI feature surface, live deployment, or scanner suppression changed.
+  - Successful compilation is not Linux execution, image scan, or deployed functionality proof.
+  - No reduction in the published vulnerability count is claimed without a fresh exact-image scan.
+  - Archive confinement and the remaining dependency/OS findings remain blocking.
+  - This experiment must not be promoted with the vulnerable archive compatibility hold.
+next:
+  - Resolve archive API compatibility and confinement without disabling signature support or deleting CLI features.
+  - Apply the reviewed complete remediation to the exact candidate build, rerun Linux runtime tests and the complete image scan.
