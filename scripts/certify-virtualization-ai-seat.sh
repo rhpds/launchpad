@@ -20,6 +20,8 @@ placement_node=""
 placement_architecture=""
 placement_vmx=false
 restart_evidence_preserved=false
+source_sync_status=""
+source_drift='[]'
 
 cleanup() {
   [[ -z "$forward_pid" ]] || kill "$forward_pid" >/dev/null 2>&1 || true
@@ -100,7 +102,8 @@ if [[ "$catalog_id" == virtualization-ai-401 || "$catalog_id" == virtualization-
     if jq -e --arg namespace "$namespace" --arg revision "$source_revision" --arg repo "https://github.com/jkershawrh/${catalog_id}.git" \
     '[.items[] | select(.spec.destination.namespace == $namespace and .spec.source.repoURL == $repo)
       | select(.spec.source.path == ("charts/" + ($repo | split("/")[-1] | rtrimstr(".git"))))
-      | select(.spec.source.targetRevision == $revision and .status.sync.revision == $revision and .status.sync.status == "Synced")]
+      | select(.spec.source.targetRevision == $revision and .status.sync.revision == $revision)
+      | select(.status.operationState.phase == "Succeeded" and .status.operationState.syncResult.revision == $revision)]
       | length == 1' "$work_dir/applications.json" >/dev/null; then
       source_verified=true
       break
@@ -109,9 +112,13 @@ if [[ "$catalog_id" == virtualization-ai-401 || "$catalog_id" == virtualization-
   done
   if [[ "$source_verified" != true ]]; then
     # Emit only source identity and sync state, never Helm values or Secrets.
-    jq -c --arg namespace "$namespace" '[.items[] | select(.spec.destination.namespace == $namespace) | {name:.metadata.name,repo:.spec.source.repoURL,path:.spec.source.path,target:.spec.source.targetRevision,sync:.status.sync}]' "$work_dir/applications.json" >&2
+    jq -c --arg namespace "$namespace" '[.items[] | select(.spec.destination.namespace == $namespace) | {name:.metadata.name,repo:.spec.source.repoURL,path:.spec.source.path,target:.spec.source.targetRevision,revision:.status.sync.revision,sync_status:.status.sync.status,phase:.status.operationState.phase,applied_revision:.status.operationState.syncResult.revision}]' "$work_dir/applications.json" >&2
     exit 1
   fi
+  # KubeVirt can default a VM after a successful apply. This is a source
+  # identity check, not a claim that every live object has zero drift.
+  source_sync_status="$(jq -r --arg ns "$namespace" --arg repo "https://github.com/jkershawrh/${catalog_id}.git" '.items[] | select(.spec.destination.namespace == $ns and .spec.source.repoURL == $repo) | .status.sync.status' "$work_dir/applications.json")"
+  source_drift="$(jq -c --arg ns "$namespace" --arg repo "https://github.com/jkershawrh/${catalog_id}.git" '[.items[] | select(.spec.destination.namespace == $ns and .spec.source.repoURL == $repo) | .status.resources[]? | select(.status != "Synced") | {kind,name,status}]' "$work_dir/applications.json")"
 fi
 stage=runtime-images
 [[ "$source_revision" =~ ^[0-9a-f]{40}$ ]] || { printf 'missing exact source revision\n' >&2; exit 1; }
@@ -335,4 +342,5 @@ jq -cn --arg namespace "$namespace" --arg cluster_ref "$expected_cluster" --arg 
   --arg terminal_scope "$terminal_scope" --argjson vm_count "$vm_count" --argjson vmi_count "$vmi_count" \
   --arg source_revision "$source_revision" --arg presentation_image "${presentation_image:-}" --arg adapter_image "${adapter_image:-}" --arg console_url "$console_url" \
   --argjson restart_evidence_preserved "$restart_evidence_preserved" \
-'{result:"GREEN-live-internal-seat",namespace:$namespace,cluster_ref:$cluster_ref,catalog_item_id:$catalog_id,provenance:{source_revision:$source_revision},runtime_images:{presentation:$presentation_image,adapter:$adapter_image},readiness:{vms_running:$vm_count,vmis_ready:$vmi_count,presentation_http_status:200,adapter_health:true},journey:{source_state:$source_state,outcome:$outcome,model_participated:(if $catalog_id == "virtualization-ai-301" then false else $model_participated end),model:$model,hardware:$hardware,intel_placement_verified:(if $catalog_id == "virtualization-ai-301" then $placement_vmx else null end),human_authority_preserved:true,request_origin:$request_origin},placement_receipt:(if $catalog_id == "virtualization-ai-301" then {node_name:$placement_node,architecture:$placement_architecture,kubevirt_vmx:$placement_vmx,source:"platform-node-and-vmi-status"} else null end),operator_journey:{console_url_present:($console_url|startswith("https://")),console_url:$console_url},terminal_scope:($terminal_scope|split("\n")),contains_sensitive_values:false} + {restart_evidence_preserved:$restart_evidence_preserved}'
+  --arg source_sync_status "$source_sync_status" --argjson source_drift "$source_drift" \
+'{result:"GREEN-live-internal-seat",namespace:$namespace,cluster_ref:$cluster_ref,catalog_item_id:$catalog_id,provenance:{source_revision:$source_revision,argo_sync_status:$source_sync_status,post_apply_drift:$source_drift},runtime_images:{presentation:$presentation_image,adapter:$adapter_image},readiness:{vms_running:$vm_count,vmis_ready:$vmi_count,presentation_http_status:200,adapter_health:true},journey:{source_state:$source_state,outcome:$outcome,model_participated:(if $catalog_id == "virtualization-ai-301" then false else $model_participated end),model:$model,hardware:$hardware,intel_placement_verified:(if $catalog_id == "virtualization-ai-301" then $placement_vmx else null end),human_authority_preserved:true,request_origin:$request_origin},placement_receipt:(if $catalog_id == "virtualization-ai-301" then {node_name:$placement_node,architecture:$placement_architecture,kubevirt_vmx:$placement_vmx,source:"platform-node-and-vmi-status"} else null end),operator_journey:{console_url_present:($console_url|startswith("https://")),console_url:$console_url},terminal_scope:($terminal_scope|split("\n")),contains_sensitive_values:false} + {restart_evidence_preserved:$restart_evidence_preserved}'

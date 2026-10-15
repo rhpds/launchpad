@@ -11,7 +11,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[2]
 
 
-@pytest.mark.parametrize("condition", ["ready", "transient", "wrong-revision"])
+@pytest.mark.parametrize("condition", ["ready", "transient", "controller-drift", "wrong-revision"])
 def test_advanced_source_identity_waits_for_sync_without_accepting_wrong_revision(tmp_path, condition):
     source = (ROOT / "scripts/certify-virtualization-ai-seat.sh").read_text()
     phase = source.split("stage=source-identity", 1)[1].split("stage=runtime-images", 1)[0]
@@ -20,13 +20,14 @@ def test_advanced_source_identity_waits_for_sync_without_accepting_wrong_revisio
         "repoURL": "https://github.com/jkershawrh/virtualization-ai-401.git",
         "path": "charts/virtualization-ai-401", "targetRevision": revision}},
         "status": {"sync": {"revision": "b" * 40 if condition == "wrong-revision" else revision,
-                              "status": "Synced"}}}]}
+                              "status": "OutOfSync" if condition == "controller-drift" else "Synced"},
+                   "operationState": {"phase": "Succeeded", "syncResult": {"revision": revision}}}}]}
     script = '''
 oc() {
   count=0; test ! -f "$work_dir/count" || count=$(cat "$work_dir/count")
   count=$((count+1)); printf '%s' "$count" > "$work_dir/count"
   if [[ "$CONDITION" == transient && "$count" == 1 ]]; then
-    printf '%s' "$FAKE_APPLICATIONS" | jq '.items[0].status.sync.status = "OutOfSync"'
+    printf '%s' "$FAKE_APPLICATIONS" | jq '.items[0].status.operationState.phase = "Running"'
   else printf '%s' "$FAKE_APPLICATIONS"; fi
 }
 sleep() { :; }
