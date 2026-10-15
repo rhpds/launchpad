@@ -213,6 +213,20 @@ def test_sovereign_201_exact_release_is_one_seat_live_certified() -> None:
     assert {"path": "journey.mode", "equals": "LIVE"} in assertions
     assert {"path": "journey.model_participated", "equals": True} in assertions
     assert {"path": "journey.model", "equals": "granite-3.2-8b-tools"} in assertions
+    evidence_path = ROOT / lab["live_certification"]["evidence"]
+    assert catalog["metadata"]["source_references"]["certification_evidence"] == lab["live_certification"]["evidence"]
+    receipt = json.loads(evidence_path.read_text())
+    expected_hash = evidence_path.with_suffix(".json.sha256").read_text().split()[0]
+    assert hashlib.sha256(evidence_path.read_bytes()).hexdigest() == expected_hash
+    assert receipt["result"] == "GREEN-live"
+    assert receipt["plan"]["exposure_policy"] == "internal"
+    result = receipt["seat_results"][0]["probe"]["result"]
+    assert result["source_revision"] == intake["sources"]["workload"]["revision"]
+    assert result["adapter_image"] == catalog["metadata"]["workload_helm_values"]["workload_image"]
+    assert result["presentation_image"] == catalog["metadata"]["workload_helm_values"]["presentation_image"]
+    assert len(receipt["seat_results"][0]["showroom"]) == 10
+    assert all(receipt["gates"].values())
+    assert all(value == 0 for value in receipt["cleanup"]["resource_counts"].values())
 
 
 def test_virtualization_301_pins_public_root_playbook_and_exact_internal_certification() -> None:

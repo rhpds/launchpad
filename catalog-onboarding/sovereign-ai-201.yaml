@@ -121,3 +121,5 @@ certification:
   - 1
   activation_blockers: []
   proof_contract: certification/catalog/sovereign-ai-201.yaml
+references:
+  certification_evidence: evidence/runs/sovereign-201-exact-strict-origin-r2-20261015.json

@@ -191,11 +191,11 @@ labs:
   sovereign-ai-201:
     display_name: "Sovereign AI 201: Build the Governed Inference Boundary"
     overall_status: one-seat-live-certified-active
-    story: {status: green-live, evidence: "The exact seat served the Northstar Claims Story and all four required Showroom checkpoints."}
-    show: {status: green-live, evidence: "Welcome, controls, qualification, and human-authority pages all returned 200 with their required markers."}
+    story: {status: green-live, evidence: "The October 15 exact-revision seat served the Northstar Claims Story and all ten required Showroom checkpoints."}
+    show: {status: green-live, evidence: "All ten October 15 content pages returned 200 with their required markers using verified origin TLS."}
     learn: {status: green-live, evidence: "The exact live journey retained the policy-first and human-authority contracts."}
     do: {status: green-live, evidence: "The seat executed the allowed, denied, injection, evidence, and namespace-scope probes."}
-    prove: {status: green-live, evidence: "Run r14 scored 100/100 with live model identity, redacted evidence, human authority, key revocation, and zero residue."}
+    prove: {status: green-live, evidence: "October 15 strict-origin r2 scored 100/100 with deployed source/image identities, live model identity, redacted evidence, human authority, key revocation, and zero residue."}
     operators: {status: green-live-partial, evidence: "Terminal namespace scope passed live; browser-level OpenShift Console SSO/navigation remains the activation blocker."}
     inference: {status: green-live, evidence: "The exact candidate proved granite-3.2-8b-tools participation through the namespace-scoped Flightpath MaaS path."}
     cleanup: {status: green-live, evidence: "Reclaim completed with model keys revoked and zero namespace, Application, PVC, PV, RoleBinding, Route, or Secret residue."}
@@ -205,7 +205,7 @@ labs:
       checked_out_branch: main
       local_head: 29e45a00e89f36a7b5180bb5884c541a9694cc0c
       published_head: 29e45a00e89f36a7b5180bb5884c541a9694cc0c
-      catalog_pinned_revision: 0fdcfba6c2db35190a768e561ac6b0665c76484b
+      catalog_pinned_revision: 29e45a00e89f36a7b5180bb5884c541a9694cc0c
       post_review_changes: exact-pinned-candidate-one-seat-live-certified
       local_validation:
         status: green-local
@@ -219,11 +219,11 @@ labs:
         adapter: ghcr.io/jkershawrh/sovereign-ai-201-adapter@sha256:a5b903e1287279087d1b442639ec864911638ff873712bdbf88ebea70cea2f4b
         showroom_content: ghcr.io/jkershawrh/sovereign-ai-201-showroom-content@sha256:56fbc6071efb353f0d43f0f7ef6aec3547f60d3764f3205bfd24b2ad0caf9528
     live_certification:
-      observed_at: "2026-09-30"
+      observed_at: "2026-10-15"
       result: GREEN-live
       rubric_score: 100
-      evidence: evidence/runs/flightpath-live-20260930-sovereign-ai-201-1seat-r14.json
-      proof: "The exact 0fdcfba candidate proved Showroom, live Granite inference, deterministic denials, evidence redaction, terminal isolation, human authority, reclaim, key revocation, and zero residue."
+      evidence: evidence/runs/sovereign-201-exact-strict-origin-r2-20261015.json
+      proof: "The exact 29e45a candidate proved all ten Showroom pages, verified origin TLS, deployed source and immutable image references, live Granite inference, deterministic denials, evidence redaction, terminal isolation, human authority, reclaim in 98.808 seconds, key revocation, and zero residue. Internal one-seat proof only; this is not public-browser qualification."
     next_action: retain one-seat internal orderability; require browser Console SSO evidence and a public-code lifecycle receipt before external activation or any seat-limit increase
 
   virtualization-ai-foundations-101:

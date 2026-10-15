@@ -137,4 +137,5 @@ metadata:
   workload_readiness: []
   source_content_repo: https://github.com/jkershawrh/sovereign-ai-201.git
   source_content_revision: 29e45a00e89f36a7b5180bb5884c541a9694cc0c
-  source_references: {}
+  source_references:
+    certification_evidence: evidence/runs/sovereign-201-exact-strict-origin-r2-20261015.json

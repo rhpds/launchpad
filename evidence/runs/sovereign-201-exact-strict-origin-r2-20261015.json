@@ -1,0 +1,336 @@
+{
+  "capacity_preview": {
+    "can_provision": true,
+    "catalog_seat_limit": 1,
+    "certification_override": false,
+    "certification_target_seats": null,
+    "estimated_resources": {
+      "cpu_millicores": 125,
+      "memory_mib": 160,
+      "pods": 2
+    },
+    "placement_reason": "single-cluster placement",
+    "reason": "Cluster can support 71 seats (CPU: 3088, Memory: 4841, Pods: 71; Eligible nodes: 3; 20.0% headroom)",
+    "resource_breakdown": {
+      "per_seat": {
+        "cpu_millicores": 125,
+        "memory_mib": 160,
+        "pods": 2
+      },
+      "shared": {
+        "cpu_millicores": 0,
+        "memory_mib": 0,
+        "pods": 0
+      },
+      "transient": {
+        "concurrent_seats": 1,
+        "cpu_millicores": 0,
+        "memory_mib": 0,
+        "pods": 0
+      }
+    },
+    "seats_requested": 1,
+    "selected_cluster": "flightpath"
+  },
+  "catalog_item_id": "sovereign-ai-201",
+  "cleanup": {
+    "model_keys_revoked": true,
+    "resource_counts": {
+      "applications.argoproj.io": 0,
+      "namespaces": 0,
+      "persistentvolumeclaims": 0,
+      "persistentvolumes": 0,
+      "rolebindings.rbac.authorization.k8s.io": 0,
+      "routes.route.openshift.io": 0,
+      "secrets": 0
+    },
+    "seconds": 98.808,
+    "status": "completed"
+  },
+  "completed_at": "2026-10-15T16:50:34.438307Z",
+  "contract": {
+    "catalog_version": "0.1.2-flightpath.1",
+    "certification_runner_image": "",
+    "git_commit": "c9565fcb322b21f432d4eda788f56362ed301ce8",
+    "intake_path": "catalog-onboarding/sovereign-ai-201.yaml",
+    "path": "certification/catalog/sovereign-ai-201.yaml",
+    "platform_manifest_sha256": "",
+    "sha256": "2b4cbd0162fc83204978cd2c902d99be7a8745349f0cfb89211b762f82e4c6d2"
+  },
+  "errors": [],
+  "gates": {
+    "all_seats_ready": true,
+    "capacity_passed": true,
+    "cleanup_completed": true,
+    "contract_valid": true,
+    "evidence_hashed": true,
+    "model_keys_revoked": true,
+    "namespace_isolation_passed": true,
+    "ready_within_limit": true,
+    "seat_probes_passed": true,
+    "sensitive_values_absent": true,
+    "showroom_pages_passed": true,
+    "single_cluster_assignment": true,
+    "zero_residue_cleanup": true
+  },
+  "order": {
+    "cluster_ref": "flightpath",
+    "namespaces": [
+      "launchpad-flightpath-candida-sovereign-ai-201-cf42c4"
+    ],
+    "ready_seconds": 57.623,
+    "seat_count": 1,
+    "session_ids": [
+      "49b15d3a-ec89-4131-9801-659ca7814fcd"
+    ],
+    "status_before_reclaim": "ready",
+    "workshop_id": "cc2bf839-a5db-452b-8cf5-cfa10b7ae0b8"
+  },
+  "plan": {
+    "all_seats_same_cluster": true,
+    "catalog_item_id": "sovereign-ai-201",
+    "certification_override": false,
+    "cluster_ref": "flightpath",
+    "current_certified_seats": 1,
+    "execution_eligible": true,
+    "exposure_policy": "internal",
+    "kubeconfig_server": "https://api.flightpath.fm2aihpcsed.com:6443",
+    "maximum_cleanup_seconds": 600,
+    "maximum_ready_seconds": 900,
+    "mutates_cluster": true,
+    "next_promotion_target": null,
+    "probe_concurrency": 1,
+    "provision_concurrency": 1,
+    "required_consecutive_runs": 1,
+    "seat_probe_count": 1,
+    "seats": 1,
+    "showroom_pages_per_seat": 10,
+    "workshop_orders": 1
+  },
+  "promotion": {
+    "consecutive_passing_runs": 1,
+    "eligible": true,
+    "required_consecutive_runs": 1
+  },
+  "proof_strategy": {
+    "BDD": "Given one workshop order, all seats must become ready before concurrent participant journeys run, and reclaim must leave zero residue.",
+    "CBT": "Contract parsing, API lifecycle, Showroom checks, lab-specific probes, isolation, rubric scoring, and cleanup are independently observable components.",
+    "CDD": "The versioned CatalogCertification document defines scale, Showroom, probe, cleanup, and promotion interfaces.",
+    "EDD": "The run writes immutable source identity, lifecycle timing, per-seat results, cleanup counts, rubric decisions, and a SHA-256 manifest.",
+    "TDD": "Contract, planner, assertion, runner, cleanup, and evidence behavior are protected by failing-then-passing tests."
+  },
+  "result": "GREEN-live",
+  "rubric": {
+    "categories": {
+      "authorization": {
+        "awarded": 15,
+        "passed": true,
+        "requires": [
+          "namespace_isolation_passed",
+          "sensitive_values_absent"
+        ],
+        "weight": 15
+      },
+      "cleanup": {
+        "awarded": 15,
+        "passed": true,
+        "requires": [
+          "cleanup_completed",
+          "zero_residue_cleanup",
+          "model_keys_revoked"
+        ],
+        "weight": 15
+      },
+      "contract_integrity": {
+        "awarded": 10,
+        "passed": true,
+        "requires": [
+          "contract_valid",
+          "evidence_hashed"
+        ],
+        "weight": 10
+      },
+      "participant_function": {
+        "awarded": 25,
+        "passed": true,
+        "requires": [
+          "showroom_pages_passed",
+          "seat_probes_passed"
+        ],
+        "weight": 25
+      },
+      "placement_capacity": {
+        "awarded": 15,
+        "passed": true,
+        "requires": [
+          "capacity_passed",
+          "single_cluster_assignment"
+        ],
+        "weight": 15
+      },
+      "provisioning_readiness": {
+        "awarded": 20,
+        "passed": true,
+        "requires": [
+          "all_seats_ready",
+          "ready_within_limit"
+        ],
+        "weight": 20
+      }
+    },
+    "passed": true,
+    "required": 100,
+    "score": 100
+  },
+  "run_id": "sovereign-201-exact-strict-origin-r2-20261015",
+  "schema": "launchpad.redhat.com/catalog-certification-evidence/v1",
+  "seat_results": [
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-sovereign-ai-201-cf42c4",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 23.355,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "adapter_image": "ghcr.io/jkershawrh/sovereign-ai-201-adapter@sha256:a5b903e1287279087d1b442639ec864911638ff873712bdbf88ebea70cea2f4b",
+          "cluster_ref": "flightpath",
+          "contains_sensitive_values": false,
+          "journey": {
+            "allow_path": "ALLOWED",
+            "deny_path": "POLICY_DENIED",
+            "evidence_id": "15c3a668-b418-40e2-8f50-75311d08201d",
+            "evidence_redacted": true,
+            "human_authority": true,
+            "injection_path": "INJECTION_BLOCKED",
+            "live_qualified": true,
+            "mode": "LIVE",
+            "model": "granite-3.2-8b-tools",
+            "model_identity_configured": true,
+            "model_participated": true
+          },
+          "namespace": "launchpad-flightpath-candida-sovereign-ai-201-cf42c4",
+          "presentation_image": "ghcr.io/jkershawrh/sovereign-ai-201-presentation@sha256:1348ec0131a9efcfdc1fe537a3c5127f2470d86e3178aae7f7d07bc6370cab5d",
+          "readiness": {
+            "health": true,
+            "presentation_http_status": 200
+          },
+          "result": "GREEN-live-internal-seat",
+          "source_revision": "29e45a00e89f36a7b5180bb5884c541a9694cc0c",
+          "terminal_scope": [
+            "project=launchpad-flightpath-candida-sovereign-ai-201-cf42c4",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "cf42c4a9-d7b3-407f-a299-a1a4e5e419fc",
+      "seat_number": 1,
+      "session_id": "49b15d3a-ec89-4131-9801-659ca7814fcd",
+      "showroom": [
+        {
+          "duration_seconds": 0.693,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.825,
+          "http_status": 200,
+          "id": "prerequisite",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.527,
+          "http_status": 200,
+          "id": "boundaries",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.557,
+          "http_status": 200,
+          "id": "contract",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.597,
+          "http_status": 200,
+          "id": "controls",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.589,
+          "http_status": 200,
+          "id": "qualify",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.601,
+          "http_status": 200,
+          "id": "fail-closed",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.578,
+          "http_status": 200,
+          "id": "authority",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.548,
+          "http_status": 200,
+          "id": "reclaim",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.478,
+          "http_status": 200,
+          "id": "conclusion",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    }
+  ],
+  "security": {
+    "contains_plaintext_credentials": false,
+    "credential_values_logged": false
+  },
+  "started_at": "2026-10-15T16:47:23.931514Z",
+  "validation_matrix": {
+    "all_seats_ready": "GREEN-live",
+    "capacity_passed": "GREEN-live",
+    "cleanup_completed": "GREEN-live",
+    "contract_valid": "GREEN-live",
+    "evidence_hashed": "GREEN-live",
+    "model_keys_revoked": "GREEN-live",
+    "namespace_isolation_passed": "GREEN-live",
+    "ready_within_limit": "GREEN-live",
+    "seat_probes_passed": "GREEN-live",
+    "sensitive_values_absent": "GREEN-live",
+    "showroom_pages_passed": "GREEN-live",
+    "single_cluster_assignment": "GREEN-live",
+    "zero_residue_cleanup": "GREEN-live"
+  }
+}
