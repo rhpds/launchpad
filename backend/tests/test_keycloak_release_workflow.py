@@ -66,8 +66,9 @@ def test_keycloak_spi_and_runtime_use_the_same_supported_patch_release():
     pom = (ROOT / "keycloak-authenticator/pom.xml").read_text()
     containerfile = (ROOT / "keycloak-authenticator/Containerfile").read_text()
     spi_version = re.search(r"<keycloak.version>([^<]+)</keycloak.version>", pom)
-    runtime_version = re.search(r"quay.io/keycloak/keycloak:([^\s]+)", containerfile)
+    runtime_version = re.search(r"quay.io/keycloak/keycloak:([^@\s]+)@sha256:([0-9a-f]{64})", containerfile)
 
     assert spi_version is not None
     assert runtime_version is not None
-    assert spi_version.group(1) == runtime_version.group(1) == "26.7.4"
+    assert spi_version.group(1) == runtime_version.group(1) == "26.8.1"
+    assert runtime_version.group(2) == "ed1cab21814c7d18ce8f0e11d5a1fa1c6923de12dd4c7625a18c5d34452a57a4"
