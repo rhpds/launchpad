@@ -253,9 +253,17 @@ def test_candidate_uses_immutable_images() -> None:
     assert all("@sha256:" in image for image in images)
 
 
-def test_candidate_uses_one_certified_backend_digest_for_every_control_plane_process() -> None:
+def test_candidate_uses_one_pinned_backend_digest_for_every_control_plane_process() -> None:
     documents = _render()
     backend_images: set[str] = set()
+    expected_processes = {
+        ("Deployment", "backend", "backend"),
+        ("Deployment", "lifecycle-worker", "lifecycle-worker"),
+        ("Deployment", "public-access-gateway", "gateway"),
+        ("CronJob", "lifecycle-scheduler", "lifecycle-scheduler"),
+        ("CronJob", "participant-identity-reconciler", "reconciler"),
+    }
+    observed = set()
     for document in documents:
         kind = document.get("kind")
         if kind in {"Deployment", "Job"}:
@@ -264,15 +272,17 @@ def test_candidate_uses_one_certified_backend_digest_for_every_control_plane_pro
             pod_spec = document["spec"]["jobTemplate"]["spec"]["template"]["spec"]
         else:
             continue
-        backend_images.update(
-            container["image"]
-            for container in pod_spec.get("containers", [])
-            if "launchpad-backend-flightpath@sha256:" in container["image"]
-        )
+        for container in pod_spec.get("containers", []):
+            process = (kind, document["metadata"]["name"], container["name"])
+            if process in expected_processes:
+                observed.add(process)
+                backend_images.add(container["image"])
+                assert {"name": "launchpad-backend-ghcr-pull"} in pod_spec["imagePullSecrets"]
 
+    assert observed == expected_processes
     assert backend_images == {
-        "ghcr.io/rhpds/launchpad-backend-flightpath@sha256:"
-        "dda9b9779f31976d469305cf928362921b5ad1083dffb12cbd1d2fe87939fccd"
+        "ghcr.io/jkershawrh/launchpad-backend-flightpath-candidate@sha256:"
+        "3bedbc0cef3c09c86e440eff8a883043c9dde9687fd686fe7c9fd1e1a24aabd8"
     }
 
 
@@ -292,7 +302,8 @@ def test_public_gateway_uses_the_candidate_registry_credential() -> None:
     documents = _render()
     deployment = _one(documents, "Deployment", "public-access-gateway")
     assert deployment["spec"]["template"]["spec"]["imagePullSecrets"] == [
-        {"name": "launchpad-registry-pull"}
+        {"name": "launchpad-registry-pull"},
+        {"name": "launchpad-backend-ghcr-pull"},
     ]
 
 

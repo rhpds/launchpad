@@ -472,6 +472,7 @@ spec:
     spec:
       imagePullSecrets:
         - name: launchpad-registry-pull
+        - name: launchpad-backend-ghcr-pull
       volumes:
         - name: cluster-ca-bundle
           configMap:
@@ -516,3 +517,4 @@ spec:
         spec:
           imagePullSecrets:
             - name: launchpad-registry-pull
+            - name: launchpad-backend-ghcr-pull

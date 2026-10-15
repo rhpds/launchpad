@@ -60,3 +60,30 @@ def test_rollback_preserves_candidate_shape_and_reverts_runtime_images() -> None
         "quay.io/rh-ee-jkershaw/launchpad-admin@"
         "sha256:b599a1d7b75005c55ce32fbe51db86d1aa3e8c0946260d0310dfa700f55acb29"
     )
+
+
+def test_rollback_reverts_every_backend_process_not_just_the_api():
+    expected = {
+        ("Deployment", "backend", "backend"),
+        ("Deployment", "lifecycle-worker", "lifecycle-worker"),
+        ("Deployment", "public-access-gateway", "gateway"),
+        ("CronJob", "lifecycle-scheduler", "lifecycle-scheduler"),
+        ("CronJob", "participant-identity-reconciler", "reconciler"),
+    }
+    observed = set()
+    for resource in _documents():
+        kind = resource.get("kind")
+        if kind not in {"Deployment", "CronJob"}:
+            continue
+        spec = resource["spec"]
+        pod = (spec["jobTemplate"]["spec"] if kind == "CronJob" else spec)["template"]["spec"]
+        for container in pod.get("containers", []):
+            identity = (kind, resource["metadata"]["name"], container["name"])
+            if identity not in expected:
+                continue
+            observed.add(identity)
+            assert container["image"] == (
+                "quay.io/rh-ee-jkershaw/launchpad-backend@sha256:"
+                "e922ef53a5e08ae957de8b0a034652f7d64d605e09bdc032a6405279ba9c16e1"
+            )
+    assert observed == expected

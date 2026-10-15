@@ -1,0 +1,37 @@
+schema: launchpad/flightpath-release-alignment/v1
+date: '2026-10-15'
+status: GREEN-LOCAL-SOURCE-ONLY-NOT-DEPLOYED
+scope: Candidate and rollback rendering; no live changes.
+defects:
+  - Candidate API and worker used one backend image while gateway and reconciliation jobs used an older image.
+  - The old assertion filtered by a historical repository name and did not inspect all five processes.
+  - Rollback transformations referenced image names that no longer matched the candidate.
+correction:
+  candidate_backend_image: ghcr.io/jkershawrh/launchpad-backend-flightpath-candidate@sha256:3bedbc0cef3c09c86e440eff8a883043c9dde9687fd686fe7c9fd1e1a24aabd8
+  image_scope:
+    - Deployment/backend/backend
+    - Deployment/lifecycle-worker/lifecycle-worker
+    - Deployment/public-access-gateway/gateway
+    - CronJob/lifecycle-scheduler/lifecycle-scheduler
+    - CronJob/participant-identity-reconciler/reconciler
+  pull_secret_reference: launchpad-backend-ghcr-pull
+  pull_secret_material_created_or_modified: false
+  rollback_backend_image: quay.io/rh-ee-jkershaw/launchpad-backend@sha256:e922ef53a5e08ae957de8b0a034652f7d64d605e09bdc032a6405279ba9c16e1
+  rollback_all_five_processes_asserted: true
+  rollback_portal_and_admin_names_match_candidate: true
+proof:
+  red: evidence/runs/flightpath-process-image-alignment-red-20261015.xml
+  initial_correction: evidence/runs/flightpath-process-image-alignment-green-local-20261015.xml
+  initial_correction_failures: 3
+  intermediate_green: evidence/runs/flightpath-process-image-alignment-green-r2-20261015.xml
+  invalid_test_path_attempt: evidence/runs/flightpath-process-image-alignment-green-r3-20261015.xml
+  invalid_attempt_not_counted_as_pass: true
+  green: evidence/runs/flightpath-process-image-alignment-green-r4-20261015.xml
+  passed: 18
+  identity_manifest_contracts: evidence/runs/flightpath-process-identity-contracts-20261015.xml
+limits:
+  - This aligns the existing pinned source image; it is not a newly built security-remediated candidate.
+  - No assertion of new image qualification or current signature verification is made here.
+  - A final qualified digest must replace this image across all five processes together.
+  - Do not apply this overlay until full regression, security, rollback and live canary gates permit rollout.
+  - No database restore or cluster restart is authorized by this source patch.

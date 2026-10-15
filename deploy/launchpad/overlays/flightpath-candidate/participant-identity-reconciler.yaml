@@ -89,6 +89,8 @@ spec:
             app.kubernetes.io/managed-by: kustomize
         spec:
           serviceAccountName: launchpad-participant-identity-reconciler
+          imagePullSecrets:
+            - name: launchpad-backend-ghcr-pull
           restartPolicy: Never
           containers:
             - name: reconciler
