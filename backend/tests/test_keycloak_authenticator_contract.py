@@ -1,6 +1,15 @@
 from pathlib import Path
 
 
+def test_login_card_explicitly_overrides_patternfly_background_for_light_text():
+    template = (
+        Path(__file__).resolve().parents[2]
+        / "keycloak-authenticator/src/main/resources/theme-resources/templates/launchpad-code.ftl"
+    ).read_text()
+    assert "--pf-v5-c-login__main--BackgroundColor: #191919" in template
+    assert "background: #191919 !important" in template
+
+
 def test_passwordless_authenticator_populates_required_profile_fields():
     source = (
         Path(__file__).resolve().parents[2]

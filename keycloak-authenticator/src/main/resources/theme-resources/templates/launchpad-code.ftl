@@ -7,7 +7,8 @@
       .pf-v5-c-login::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .3; background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px); background-size: 44px 44px; mask-image: linear-gradient(to bottom, rgba(0,0,0,.8), transparent 82%); }
       .pf-v5-c-login__container { display: block; width: 1040px !important; max-width: calc(100vw - 32px) !important; padding: 28px 0; }
       #kc-header { display: none; }
-      .pf-v5-c-login__main { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(340px, .75fr); border: 1px solid rgba(255,255,255,.12); border-radius: 16px; box-shadow: 0 18px 48px rgba(0, 0, 0, .34); overflow: hidden; background: rgba(25, 25, 25, .96); }
+      /* PatternFly's light card must not override the light-on-dark brand. */
+      .pf-v5-c-login__main { --pf-v5-c-login__main--BackgroundColor: #191919; display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(340px, .75fr); border: 1px solid rgba(255,255,255,.12); border-radius: 16px; box-shadow: 0 18px 48px rgba(0, 0, 0, .34); overflow: hidden; background: #191919 !important; }
       .pf-v5-c-login__main-header { display: block; padding: 34px 40px 38px; border-right: 1px solid rgba(255,255,255,.11); background: linear-gradient(145deg, rgba(255,255,255,.025), rgba(0,113,197,.045)); }
       .pf-v5-c-login__main-body { display: flex; flex-direction: column; justify-content: center; padding: 36px 38px; background: #212121; }
       #kc-page-title { width: 100%; margin: 0; text-align: center !important; }
