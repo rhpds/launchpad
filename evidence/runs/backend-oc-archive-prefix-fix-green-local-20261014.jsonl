@@ -1,0 +1,8 @@
+{"Time":"2026-10-14T17:44:28.148359-05:00","Action":"start","Package":"github.com/openshift/oc/pkg/cli/image/archive"}
+{"Time":"2026-10-14T17:44:29.218711-05:00","Action":"run","Package":"github.com/openshift/oc/pkg/cli/image/archive","Test":"TestLaunchpadArchiveRejectsSiblingPrefixEscape"}
+{"Time":"2026-10-14T17:44:29.223252-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/cli/image/archive","Test":"TestLaunchpadArchiveRejectsSiblingPrefixEscape","Output":"=== RUN   TestLaunchpadArchiveRejectsSiblingPrefixEscape\n"}
+{"Time":"2026-10-14T17:44:29.223873-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/cli/image/archive","Test":"TestLaunchpadArchiveRejectsSiblingPrefixEscape","Output":"--- PASS: TestLaunchpadArchiveRejectsSiblingPrefixEscape (0.01s)\n"}
+{"Time":"2026-10-14T17:44:29.226387-05:00","Action":"pass","Package":"github.com/openshift/oc/pkg/cli/image/archive","Test":"TestLaunchpadArchiveRejectsSiblingPrefixEscape","Elapsed":0.01}
+{"Time":"2026-10-14T17:44:29.22688-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/cli/image/archive","Output":"PASS\n"}
+{"Time":"2026-10-14T17:44:29.230193-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/cli/image/archive","Output":"ok  \tgithub.com/openshift/oc/pkg/cli/image/archive\t1.081s\n"}
+{"Time":"2026-10-14T17:44:29.230282-05:00","Action":"pass","Package":"github.com/openshift/oc/pkg/cli/image/archive","Elapsed":1.082}

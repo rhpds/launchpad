@@ -1,0 +1,17 @@
+{"Time":"2026-10-15T08:13:25.264693-05:00","Action":"start","Package":"github.com/openshift/oc/pkg/cli/image/archive"}
+{"Time":"2026-10-15T08:13:25.855118-05:00","Action":"run","Package":"github.com/openshift/oc/pkg/cli/image/archive","Test":"TestLaunchpadArchiveRejectsSiblingPrefixEscape"}
+{"Time":"2026-10-15T08:13:25.855563-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/cli/image/archive","Test":"TestLaunchpadArchiveRejectsSiblingPrefixEscape","Output":"=== RUN   TestLaunchpadArchiveRejectsSiblingPrefixEscape\n"}
+{"Time":"2026-10-15T08:13:25.857309-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/cli/image/archive","Test":"TestLaunchpadArchiveRejectsSiblingPrefixEscape","Output":"--- PASS: TestLaunchpadArchiveRejectsSiblingPrefixEscape (0.00s)\n"}
+{"Time":"2026-10-15T08:13:25.857331-05:00","Action":"pass","Package":"github.com/openshift/oc/pkg/cli/image/archive","Test":"TestLaunchpadArchiveRejectsSiblingPrefixEscape","Elapsed":0}
+{"Time":"2026-10-15T08:13:25.857368-05:00","Action":"run","Package":"github.com/openshift/oc/pkg/cli/image/archive","Test":"TestLaunchpadArchiveRejectsPreexistingSymlinkEscape"}
+{"Time":"2026-10-15T08:13:25.857373-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/cli/image/archive","Test":"TestLaunchpadArchiveRejectsPreexistingSymlinkEscape","Output":"=== RUN   TestLaunchpadArchiveRejectsPreexistingSymlinkEscape\n"}
+{"Time":"2026-10-15T08:13:25.858268-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/cli/image/archive","Test":"TestLaunchpadArchiveRejectsPreexistingSymlinkEscape","Output":"    launchpad_confinement_test.go:52: preexisting symlink escaped extraction root within disposable directory; extraction error: \u003cnil\u003e\n"}
+{"Time":"2026-10-15T08:13:25.859357-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/cli/image/archive","Test":"TestLaunchpadArchiveRejectsPreexistingSymlinkEscape","Output":"--- FAIL: TestLaunchpadArchiveRejectsPreexistingSymlinkEscape (0.00s)\n"}
+{"Time":"2026-10-15T08:13:25.859385-05:00","Action":"fail","Package":"github.com/openshift/oc/pkg/cli/image/archive","Test":"TestLaunchpadArchiveRejectsPreexistingSymlinkEscape","Elapsed":0}
+{"Time":"2026-10-15T08:13:25.85939-05:00","Action":"run","Package":"github.com/openshift/oc/pkg/cli/image/archive","Test":"TestLaunchpadArchivePreservesOrdinaryExtraction"}
+{"Time":"2026-10-15T08:13:25.859392-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/cli/image/archive","Test":"TestLaunchpadArchivePreservesOrdinaryExtraction","Output":"=== RUN   TestLaunchpadArchivePreservesOrdinaryExtraction\n"}
+{"Time":"2026-10-15T08:13:25.861208-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/cli/image/archive","Test":"TestLaunchpadArchivePreservesOrdinaryExtraction","Output":"--- PASS: TestLaunchpadArchivePreservesOrdinaryExtraction (0.00s)\n"}
+{"Time":"2026-10-15T08:13:25.861216-05:00","Action":"pass","Package":"github.com/openshift/oc/pkg/cli/image/archive","Test":"TestLaunchpadArchivePreservesOrdinaryExtraction","Elapsed":0}
+{"Time":"2026-10-15T08:13:25.861219-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/cli/image/archive","Output":"FAIL\n"}
+{"Time":"2026-10-15T08:13:25.862114-05:00","Action":"output","Package":"github.com/openshift/oc/pkg/cli/image/archive","Output":"FAIL\tgithub.com/openshift/oc/pkg/cli/image/archive\t0.597s\n"}
+{"Time":"2026-10-15T08:13:25.862129-05:00","Action":"fail","Package":"github.com/openshift/oc/pkg/cli/image/archive","Elapsed":0.597}

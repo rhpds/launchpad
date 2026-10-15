@@ -1,0 +1,52 @@
+schema: launchpad/full-build-regression/v1
+date: '2026-10-15'
+status: IN-PROGRESS-SECURITY-BLOCKED
+source: fe0ab39ee3bb8565a2d0c6c6a0602ef8caf79ffb
+source_isolation: Clean git archive; unrelated uncommitted catalog edits excluded.
+live_changes: false
+requester:
+  tests: 83
+  passed: 83
+  failed: 0
+  production_build: PASS
+  lint: PASS
+  report: evidence/runs/requester-full-regression-fe0ab39e-20261015.json
+  sha256: 5510cc45d9d1c2dd56de5217850a1054491af99566eb7e2acb202dd92b7f2bf6
+admin:
+  tests: 9
+  passed: 9
+  failed: 0
+  production_build: PASS
+  lint: PASS
+  report: evidence/runs/admin-full-regression-fe0ab39e-20261015.json
+  sha256: b0b119e8d964bb798912ad9464c38ea82f847fb9d9379e3393c1e803e31cafe7
+backend_and_scripts:
+  status: RUNNING
+  observed_runner_issue: Historical test_demo_migration.py launches a nested complete backend run with a 120-second timeout; nested failure retained by the outer run.
+  python: '3.12.13'
+  pytest: '8.4.2'
+  mode: mock
+  kubeconfig: Explicit nonexistent disposable path; no live cluster credential supplied.
+  selection: backend/tests scripts/tests, excluding tests marked local.
+  report: evidence/runs/backend-full-source-regression-fe0ab39e-20261015.xml
+  scope_limit: This is a source regression run, not the exact Linux container or live certification.
+archive:
+  test_fixture: backend/security-tests/oc_archive_confinement_test.go
+  fixture_sha256: db6d6aeb3ed459610dcad4422a8c4c04b537b1e3acf1187702a5ee2db1574c9f
+  pinned_oc_source: d0f23b14fbf35493e5b713e25ecf662ec239e76c
+  original_prefix_escape: CONFIRMED
+  original_red: evidence/runs/backend-oc-archive-prefix-escape-red-20261014.jsonl
+  narrow_prefix_patch: DISPOSABLE-EXPERIMENT-ONLY-NOT-ACCEPTED
+  narrow_patch_report: evidence/runs/backend-oc-archive-prefix-fix-green-local-20261014.jsonl
+  expanded_report: evidence/runs/backend-oc-archive-expanded-regression-20261015.jsonl
+  expanded_result:
+    sibling_prefix_escape: PASS
+    ordinary_extraction: PASS
+    preexisting_symlink_escape: FAIL
+  conclusion: A lexical prefix fix is insufficient; robust filesystem confinement is required before accepting remediation.
+  safety: Attempted escapes remain within test-owned temporary roots; no real resources targeted.
+release:
+  staging_qualified: false
+  deployed: false
+  published: false
+  waived_findings: false
