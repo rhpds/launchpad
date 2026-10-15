@@ -24,6 +24,15 @@ from app.services.catalog_onboarding import load_intake
 ROOT = Path(__file__).resolve().parents[2]
 
 
+@pytest.mark.parametrize("unrelated", [[], None, 42, "not a receipt", {"schema": "other"}])
+def test_history_ignores_unrelated_json_values(tmp_path, unrelated):
+    (tmp_path / "unrelated.json").write_text(json.dumps(unrelated))
+    assert _runner_module()._load_history(
+        tmp_path, catalog_item_id="sovereign-ai-201", seats=1,
+        contract_sha256="a" * 64,
+    ) == []
+
+
 def test_runner_treats_reclaimed_workshops_as_terminal():
     source = (ROOT / "scripts/catalog_certification.py").read_text()
     terminal_block = source.split("TERMINAL_WORKSHOP_STATUSES", 1)[1].split("}", 1)[0]

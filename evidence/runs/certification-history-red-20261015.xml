@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="4" skipped="0" tests="5" time="0.237" timestamp="2026-10-15T11:46:53.232121-05:00" hostname="jkershaw-mac"><testcase classname="backend.tests.test_catalog_certification" name="test_history_ignores_unrelated_json_values[unrelated0]" time="0.046"><failure message="AttributeError: 'list' object has no attribute 'get'">backend/tests/test_catalog_certification.py:30: in test_history_ignores_unrelated_json_values
+    assert _runner_module()._load_history(
+scripts/catalog_certification.py:618: in _load_history
+    if payload.get("schema") != "launchpad.redhat.com/catalog-certification-evidence/v1":
+       ^^^^^^^^^^^
+E   AttributeError: 'list' object has no attribute 'get'</failure></testcase><testcase classname="backend.tests.test_catalog_certification" name="test_history_ignores_unrelated_json_values[None]" time="0.001"><failure message="AttributeError: 'NoneType' object has no attribute 'get'">backend/tests/test_catalog_certification.py:30: in test_history_ignores_unrelated_json_values
+    assert _runner_module()._load_history(
+scripts/catalog_certification.py:618: in _load_history
+    if payload.get("schema") != "launchpad.redhat.com/catalog-certification-evidence/v1":
+       ^^^^^^^^^^^
+E   AttributeError: 'NoneType' object has no attribute 'get'</failure></testcase><testcase classname="backend.tests.test_catalog_certification" name="test_history_ignores_unrelated_json_values[42]" time="0.001"><failure message="AttributeError: 'int' object has no attribute 'get'">backend/tests/test_catalog_certification.py:30: in test_history_ignores_unrelated_json_values
+    assert _runner_module()._load_history(
+scripts/catalog_certification.py:618: in _load_history
+    if payload.get("schema") != "launchpad.redhat.com/catalog-certification-evidence/v1":
+       ^^^^^^^^^^^
+E   AttributeError: 'int' object has no attribute 'get'</failure></testcase><testcase classname="backend.tests.test_catalog_certification" name="test_history_ignores_unrelated_json_values[not a receipt]" time="0.001"><failure message="AttributeError: 'str' object has no attribute 'get'">backend/tests/test_catalog_certification.py:30: in test_history_ignores_unrelated_json_values
+    assert _runner_module()._load_history(
+scripts/catalog_certification.py:618: in _load_history
+    if payload.get("schema") != "launchpad.redhat.com/catalog-certification-evidence/v1":
+       ^^^^^^^^^^^
+E   AttributeError: 'str' object has no attribute 'get'</failure></testcase><testcase classname="backend.tests.test_catalog_certification" name="test_history_ignores_unrelated_json_values[unrelated4]" time="0.001" /></testsuite></testsuites>

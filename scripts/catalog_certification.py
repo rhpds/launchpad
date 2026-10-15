@@ -615,6 +615,8 @@ def _load_history(
             payload = json.loads(path.read_text())
         except (OSError, json.JSONDecodeError):
             continue
+        if not isinstance(payload, dict):
+            continue
         if payload.get("schema") != "launchpad.redhat.com/catalog-certification-evidence/v1":
             continue
         if payload.get("catalog_item_id") != catalog_item_id:
