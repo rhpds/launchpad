@@ -152,16 +152,33 @@ jobs:
           DIGEST_REF: ${{ steps.publish.outputs.digest_ref }}
         run: cosign sign --yes "$DIGEST_REF"
 
-      - name: Attest build provenance
+      - name: Attest and verify registry-backed build provenance
         if: ${{ inputs.publish }}
-        uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be
-        with:
-          subject-name: ${{ env.IMAGE_REPOSITORY }}
-          subject-digest: ${{ steps.publish.outputs.digest }}
+        env:
+          DIGEST_REF: ${{ steps.publish.outputs.digest_ref }}
+          EXPECTED_SOURCE: ${{ inputs.expected_sha }}
+          WORKFLOW_REVISION: ${{ github.workflow_sha }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SOURCE"
+          identity="${{ github.server_url }}/${{ github.workflow_ref }}"
+          issuer="https://token.actions.githubusercontent.com"
+          jq -n --arg source_revision "$EXPECTED_SOURCE" --arg workflow_revision "$WORKFLOW_REVISION" \
+            --arg repo "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY" --arg builder "$identity" --arg run "$GITHUB_RUN_ID" \
+            '{builder:{id:$builder},buildType:"https://github.com/Attestations/GitHubActionsWorkflow@v1",invocation:{configSource:{uri:("git+"+$repo),digest:{sha1:$source_revision},entryPoint:".github/workflows/keycloak-release.yml"},parameters:{source_revision:$source_revision,workflow_revision:$workflow_revision}},metadata:{buildInvocationId:$run},materials:[{uri:("git+"+$repo),digest:{sha1:$source_revision}}]}' > provenance.json
+          cosign attest --yes --type slsaprovenance --predicate provenance.json "$DIGEST_REF"
+          cosign attest --yes --type spdxjson --predicate sbom.spdx.json "$DIGEST_REF"
+          cosign verify --certificate-identity="$identity" --certificate-oidc-issuer="$issuer" "$DIGEST_REF" > signature-verification.json
+          cosign verify-attestation --type slsaprovenance --certificate-identity="$identity" --certificate-oidc-issuer="$issuer" "$DIGEST_REF" > provenance-verification.json
+          cosign verify-attestation --type spdxjson --certificate-identity="$identity" --certificate-oidc-issuer="$issuer" "$DIGEST_REF" > sbom-verification.json
+          jq -se --arg expected "$EXPECTED_SOURCE" '[.[] | (if type == "array" then .[] else . end) | .payload | @base64d | fromjson | .predicate.invocation.configSource.digest.sha1 == $expected] | length > 0 and all' provenance-verification.json
 
       - name: Retain the immutable release receipt
         if: ${{ inputs.publish }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: keycloak-release-${{ inputs.expected_sha }}
-          path: keycloak-release.json
+          path: |
+            keycloak-release.json
+            provenance.json
+            *-verification.json

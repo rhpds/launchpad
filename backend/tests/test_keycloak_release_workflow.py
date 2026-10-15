@@ -36,7 +36,10 @@ def test_keycloak_release_runs_contracts_and_supply_chain_gates():
     assert "only-fixed: true" in source
     assert "sbom.spdx.json" in source
     assert "cosign sign --yes" in source
-    assert "actions/attest-build-provenance" in source
+    assert "actions/attest-build-provenance" not in source
+    assert "cosign attest" in source
+    assert "cosign verify-attestation" in source
+    assert "source_revision" in source and "workflow_revision" in source
     assert 'schema_version:"launchpad.redhat.com/keycloak-release/v1"' in source
 
 

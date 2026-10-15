@@ -18,5 +18,7 @@ def test_terminal_release_checks_persistent_shell_and_supply_chain():
     for required in ('tmux', 'capture-pane', 'LAUNCHPAD_RECONNECT_OK',
                      'Block fixable high and critical vulnerabilities',
                      'cosign sign', 'cosign verify', 'sbom.spdx.json',
-                     'actions/attest-build-provenance@'):
+                     'cosign attest', 'cosign verify-attestation',
+                     'source_revision', 'workflow_revision'):
         assert required in source
+    assert 'actions/attest-build-provenance@' not in source
