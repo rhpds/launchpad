@@ -360,11 +360,17 @@ def _seat_probe(
         seat_number=seat_number,
     )
     started = time.monotonic()
+    probe_environment = os.environ.copy()
+    if isinstance(verify, str):
+        # Use the same explicit origin trust for Python, curl and other probe
+        # clients. Never mutate the runner process's global environment.
+        for ca_variable in ("CURL_CA_BUNDLE", "SSL_CERT_FILE", "REQUESTS_CA_BUNDLE"):
+            probe_environment[ca_variable] = verify
     try:
         completed = subprocess.run(
             argv,
             cwd=REPO_ROOT,
-            env=os.environ.copy(),
+            env=probe_environment,
             check=False,
             text=True,
             capture_output=True,

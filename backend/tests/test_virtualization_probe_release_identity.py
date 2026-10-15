@@ -18,6 +18,13 @@ def test_probe_checks_do_not_rely_on_old_bash_errexit_for_double_brackets():
     assert bare_checks == [], bare_checks
 
 
+def test_virtualization_presentation_probe_does_not_bypass_tls():
+    source = (ROOT / "scripts/certify-virtualization-ai-seat.sh").read_text()
+    presentation = source.split("stage=presentation", 1)[1].split("stage=adapter-forward", 1)[0]
+    assert "curl -fsSL" in presentation
+    assert "curl -k" not in presentation
+
+
 @pytest.mark.parametrize("catalog_id", ["virtualization-ai-401", "virtualization-ai-501"])
 def test_advanced_vm_probe_binds_the_current_source_and_immutable_images(catalog_id):
     metadata = yaml.safe_load((ROOT / "catalog" / catalog_id / "catalog-item.yaml").read_text())["metadata"]

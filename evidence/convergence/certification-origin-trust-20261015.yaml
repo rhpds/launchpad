@@ -1,0 +1,36 @@
+schema: launchpad/certification-origin-trust/v1
+date: '2026-10-15'
+status: GREEN-LOCAL-PENDING-STRICT-LIVE-RUN
+runtime_deployment_changed: false
+correction:
+  - Pass the explicit certification CA bundle to curl and Python probe clients without mutating the runner environment.
+  - Remove certificate-verification bypass from virtualization presentation probes.
+proof:
+  red: evidence/runs/certification-origin-trust-red-20261015.xml
+  first_correction: evidence/runs/certification-origin-trust-green-local-20261015.xml
+  first_correction_failures: 1
+  green: evidence/runs/certification-origin-trust-green-r2-20261015.xml
+  passed: 42
+preceding_functional_run:
+  catalog_id: virtualization-ai-401
+  source: 6a99927e
+  workshop_id: d8760671-4201-47e4-90dc-96ea0a970808
+  exposure_policy: internal
+  seats: 1
+  report: evidence/runs/virtualization-ai-401-exact-identity-r1-20261015.json
+  sha256: 7b2af06f71f8ccfc6b9df302d36194f49a6cde13287dc18d3882dbf752754399
+  rubric_score: 100
+  exact_source_and_deployment_image_references_verified: true
+  workload_truth: Rehearsal; no live model participation or production-scale claim.
+  cleanup_seconds: 87.504
+  independent_residue_counts: all-zero
+  model_keys_revoked: true
+  trust_limit: Showroom checks used the provided CA, but the earlier shell presentation check still bypassed TLS. Do not use this run as complete strict-origin-TLS proof.
+ca_artifact:
+  source: Existing Flightpath launchpad-cluster-ca-bundle ConfigMap; no certificate or DNS mutation.
+  sha256: 2e2a673e0d82153873127b159e85d4772d6a54214a6ca7014656b6e98c828ef6
+  contents_committed: false
+limits:
+  - No public participant browser journey is certified by an internal run.
+  - Fresh live proof is required for the stricter shell-origin trust path.
+  - The archive vulnerability and other platform staging gates remain unresolved.

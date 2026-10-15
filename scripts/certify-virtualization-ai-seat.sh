@@ -106,11 +106,9 @@ adapter_image="$(jq -er --arg expected "$expected_adapter_image" \
 
 stage=presentation
 app_host="$(oc --kubeconfig "$KUBECONFIG" get route "$route" -n "$namespace" -o jsonpath='{.spec.host}')"
-# Flightpath's internal wildcard application routes currently chain to the
-# cluster-local CA. Public participant traffic remains TLS-terminated at the
-# trusted Launchpad gateway; this probe intentionally verifies the internal
-# origin route while certificate replacement is tracked separately.
-presentation_status="$(curl -ksSL --retry 3 --retry-all-errors --max-time 90 -o /dev/null -w '%{http_code}' "https://${app_host}/")"
+# The runner propagates --ca-bundle into CURL_CA_BUNDLE for private origins.
+# Certificate verification must remain enabled for every origin request.
+presentation_status="$(curl -fsSL --retry 3 --retry-all-errors --max-time 90 -o /dev/null -w '%{http_code}' "https://${app_host}/")"
 [[ "$presentation_status" == 200 ]] || exit 1
 
 stage=adapter-forward

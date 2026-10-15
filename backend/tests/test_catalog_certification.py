@@ -63,6 +63,30 @@ def _runner_module():
     return module
 
 
+def test_seat_probe_inherits_the_explicit_ca_bundle_without_global_mutation(monkeypatch):
+    runner = _runner_module()
+    monkeypatch.setenv("CURL_CA_BUNDLE", "/ambient/old-ca.pem")
+    captured = {}
+
+    def run_probe(*args, **kwargs):
+        captured.update(kwargs["env"])
+        return SimpleNamespace(returncode=0, stdout='{"ready":true}', stderr="")
+
+    monkeypatch.setattr(runner.subprocess, "run", run_probe)
+    result = runner._seat_probe(
+        seat={"seat_number": 1, "seat_id": "one"},
+        session={"namespace": "test-seat", "cluster_ref": "flightpath"},
+        contract={"spec": {"target_cluster": "flightpath", "showroom": {"pages": []},
+                           "seat_probe": {"argv": ["true"], "timeout_seconds": 5,
+                                          "json_assertions": [{"path": "ready", "equals": True}]}}},
+        verify="/explicit/flightpath-ca.pem",
+    )
+    assert result["probe"]["passed"] is True
+    for key in ("CURL_CA_BUNDLE", "SSL_CERT_FILE", "REQUESTS_CA_BUNDLE"):
+        assert captured[key] == "/explicit/flightpath-ca.pem"
+    assert runner.os.environ["CURL_CA_BUNDLE"] == "/ambient/old-ca.pem"
+
+
 def test_immutable_cluster_runner_identity_replaces_worktree_dependency(monkeypatch):
     runner = _runner_module()
     monkeypatch.setenv("LAUNCHPAD_CANDIDATE_GIT_COMMIT", "a" * 40)
