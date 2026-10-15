@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="0.060" timestamp="2026-10-15T15:06:51.383122-05:00" hostname="jkershaw-mac"><testcase classname="backend.tests.test_terminal_os_refresh" name="test_terminal_refreshes_os_without_removing_learner_tools" time="0.001"><failure message="assert 'dnf -y --refresh upgrade' in 'FROM quay.io/rhpds/openshift-showroom-terminal-ocp@sha256:606317dc396db33b879c1d3807844990cd37bb0c787b0b525edbeb70283...usr/local/bin/launchpad-runttyd\nUSER 1001\n\nENTRYPOINT [&quot;/usr/bin/tini&quot;, &quot;--&quot;, &quot;/usr/local/bin/launchpad-runttyd&quot;]\n'">def test_terminal_refreshes_os_without_removing_learner_tools():
+        source = (ROOT / 'workshop-images/showroom-terminal/Containerfile').read_text()
+        assert 'FROM quay.io/rhpds/openshift-showroom-terminal-ocp@sha256:606317dc396db33b879c1d3807844990cd37bb0c787b0b525edbeb70283b5350' in source
+&gt;       assert 'dnf -y --refresh upgrade' in source
+E       assert 'dnf -y --refresh upgrade' in 'FROM quay.io/rhpds/openshift-showroom-terminal-ocp@sha256:606317dc396db33b879c1d3807844990cd37bb0c787b0b525edbeb70283...usr/local/bin/launchpad-runttyd\nUSER 1001\n\nENTRYPOINT ["/usr/bin/tini", "--", "/usr/local/bin/launchpad-runttyd"]\n'
+
+backend/tests/test_terminal_os_refresh.py:10: AssertionError</failure></testcase></testsuite></testsuites>

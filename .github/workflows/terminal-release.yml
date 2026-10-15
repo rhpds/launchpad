@@ -43,7 +43,7 @@ jobs:
         run: |
           set -euo pipefail
           python -m pip install ".[dev]"
-          python -m pytest backend/tests/test_showroom_gitops.py backend/tests/test_terminal_release_workflow.py -q
+          python -m pytest backend/tests/test_showroom_gitops.py backend/tests/test_terminal_release_workflow.py backend/tests/test_terminal_os_refresh.py -q
           bash -n workshop-images/showroom-terminal/launchpad-runttyd
 
       - name: Set up emulation
@@ -73,6 +73,15 @@ jobs:
             --entrypoint /usr/bin/bash \
             "${IMAGE_REPOSITORY}:git-${{ inputs.expected_sha }}" -se <<'SCRIPT'
           test -x /usr/bin/tmux
+          for tool in oc kubectl helm jq curl python3 git tmux; do
+            command -v "$tool"
+          done
+          oc version --client
+          helm version --short
+          jq --version
+          curl --version
+          python3 --version
+          git --version
           bash -n /usr/local/bin/launchpad-runttyd
           tmux -L certification -f /dev/null new-session -d -s lab
           trap 'tmux -L certification kill-server' EXIT
