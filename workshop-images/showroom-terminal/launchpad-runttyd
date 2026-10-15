@@ -58,6 +58,12 @@ cleanup_home_for_reclaim() {
 }
 
 trap cleanup_home_for_reclaim EXIT
+# The pinned base already includes tmux and runttyd's RUNCOMMAND override.
+# A WebSocket disconnect must detach the client, not discard exported learner
+# state. The socket and shell remain inside this seat's terminal container;
+# normal entitlement checks and namespace reclamation are unchanged.
+test -x /usr/bin/tmux
+export RUNCOMMAND="/usr/bin/tmux -L launchpad-seat -f /dev/null new-session -A -s lab"
 /usr/bin/runttyd &
 runttyd_pid=$!
 trap 'kill -TERM "${runttyd_pid}" 2>/dev/null || true' TERM INT HUP

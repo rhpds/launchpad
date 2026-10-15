@@ -254,6 +254,13 @@ def test_launchpad_terminal_defaults_oc_to_its_rotating_seat_identity():
     assert 'export MAAS_API_KEY="$(read_runtime_value MAAS_API_KEY)"' in entrypoint
 
 
+def test_terminal_reconnect_attaches_to_the_same_seat_scoped_shell():
+    entrypoint = (ROOT / "workshop-images/showroom-terminal/launchpad-runttyd").read_text()
+    assert 'export RUNCOMMAND="/usr/bin/tmux -L launchpad-seat -f /dev/null new-session -A -s lab"' in entrypoint
+    assert entrypoint.index("export RUNCOMMAND=") < entrypoint.index("/usr/bin/runttyd &")
+    assert "test -x /usr/bin/tmux" in entrypoint
+
+
 def test_launchpad_terminal_relaxes_home_permissions_before_persistent_volume_reclaim():
     entrypoint = (ROOT / "workshop-images/showroom-terminal/launchpad-runttyd").read_text()
 
