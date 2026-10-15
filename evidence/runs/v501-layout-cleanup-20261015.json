@@ -1,0 +1,18 @@
+{
+  "order_id": "79cedc4f-1525-40cc-af75-16ba45c2b146",
+  "namespace": "launchpad-flightpath-candida-v501-4546a6",
+  "status": "completed",
+  "lifecycle_seconds": 92.16741862497292,
+  "observation_seconds": 7.106759790913202,
+  "resource_counts": {
+    "namespaces": 0,
+    "applications.argoproj.io": 0,
+    "rolebindings.rbac.authorization.k8s.io": 0,
+    "persistentvolumeclaims": 0,
+    "persistentvolumes": 0,
+    "routes.route.openshift.io": 0,
+    "secrets": 0
+  },
+  "zero_residue": true,
+  "model_key_revocation_independently_checked": false
+}

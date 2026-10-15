@@ -1,0 +1,48 @@
+schema: launchpad.redhat.com/qualified-browser-canary/v1
+observed_date: '2026-10-15'
+cluster_ref: flightpath
+result: targeted-api-and-embedded-layout-regression-passed
+source_revision: 3f9d8c17a5ff9923b775b3965746edc51c5b1b28
+release_workflow: https://github.com/jkershawrh/virtualization-ai-501/actions/runs/38789495807
+release_result: success
+order_id: 79cedc4f-1525-40cc-af75-16ba45c2b146
+namespace: launchpad-flightpath-candida-v501-4546a6
+browser:
+  embedded_story_normal_clicks: passed
+  lower_primary_controls_visible: passed
+  conditions:
+    - decision: ALLOW_REVIEW
+      source_state: REHEARSAL
+    - decision: REFUSE
+      reason: Slo Envelope Breach
+      source_state: REHEARSAL
+    - decision: ABSTAIN
+      reason: Correlation Incomplete
+      source_state: REHEARSAL
+  screenshot: evidence/runs/v501-layout-third-condition-20261015.jpg
+workload_probe:
+  receipt: evidence/runs/v501-layout-qualified-probe-20261015.json
+  result: GREEN-live-internal-seat
+  exact_source_and_images_verified: true
+  vms_running: 3
+  vmis_ready: 3
+  presentation_http_status: 200
+  adapter_health: true
+  restart_evidence_preserved: true
+  namespace_isolation: passed
+  argo_vm_defaulting_drift: recorded-in-receipt-not-hidden
+cleanup:
+  receipt: evidence/runs/v501-layout-cleanup-20261015.json
+  status: completed
+  lifecycle_seconds: 92.167
+  zero_managed_resource_residue: true
+  independently_checked_model_key_revocation: false
+scope_limitations:
+  entire_lab_reexecuted_in_browser: false
+  inference_performed: false
+  fixture_data_presented_as_live_measurements: false
+  full_catalog_certification_or_staging_gate_claimed: false
+promotion:
+  promoted: false
+  reason: Targeted defect proof is not a substitute for the full catalog certification gate.
+  post_test_action: Restore pre-test catalog pins after verifying no other active sessions, then reload unchanged platform images.
