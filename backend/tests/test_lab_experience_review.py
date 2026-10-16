@@ -334,12 +334,12 @@ def test_advanced_and_virtualization_labs_pin_their_exact_releases() -> None:
             "workload": "sha256:b95d3779c254a352028cdfb13aecffb229113ef78d2dba332aef19596ca0d732",
         },
         "virtualization-ai-501": {
-            "revision": "78442e22eeed56b54d1e910ad8c2b847e3cd241a",
-            "presentation": "sha256:825fa99269c1bed2af4d1a3190203a29488ab032983e1e255d9b730963819acf",
-            "workload": "sha256:256400deedfe2103fd887f7665f9813039e1d613252d1e230683b8b82d4512b1",
+            "revision": "3f9d8c17a5ff9923b775b3965746edc51c5b1b28",
+            "presentation": "sha256:9b781323655549bc36dfacce832bb29e45cb94579cd4e798d45d08d1582bbe94",
+            "workload": "sha256:a94ba610ea10c735c72409302219f074381a4cbbf0fc6ce82b0647934fc3e255",
         },
         "virtualization-ai-401": {
-            "revision": "aee89597b325da490fa837b5639e6e71892c0ca1",
+            "revision": "69e57566be66e87da4d9889c9057158fd171dc73",
             "presentation": "sha256:23d13240db7100facdc9edf10c95636526816d7fca11f32bf6408112b018cde4",
             "workload": "sha256:b18c5a36cf18a2a3b45bc652600fc652c150227463c69cb50f0a039a55318431",
         },
@@ -377,7 +377,22 @@ def test_advanced_and_virtualization_labs_pin_their_exact_releases() -> None:
         }[catalog_id]
         assert review["labs"][catalog_id]["overall_status"] == expected_overall
         if catalog_id.startswith("virtualization-ai-"):
-            _assert_fresh_virt_one_seat_proof(catalog_id, "current-pin-r2")
+            # Current source-bound internal proof; historical public proof is
+            # tested separately and does not qualify this chart revision.
+            # The 501 proof is the 3f9d8c1 full-pin receipt (layout fix).
+            receipt_name = (
+                "virtualization-ai-501-1-seat-3f9d8c1-full-r3.json"
+                if catalog_id == "virtualization-ai-501"
+                else f"{catalog_id}-recreate-ledger-r3-20261015.json"
+            )
+            path = ROOT / f"evidence/runs/{receipt_name}"
+            proof = json.loads(path.read_text())
+            assert hashlib.sha256(path.read_bytes()).hexdigest() == path.with_suffix(".json.sha256").read_text().split()[0]
+            assert proof["result"] == "GREEN-live"
+            assert proof["rubric"]["score"] == 100
+            assert proof["seat_results"][0]["probe"]["result"]["provenance"]["source_revision"] == release["revision"]
+            assert proof["seat_results"][0]["probe"]["result"]["restart_evidence_preserved"] is True
+            assert all(value == 0 for value in proof["cleanup"]["resource_counts"].values())
 
     virtualization_401 = review["labs"]["virtualization-ai-401"]["source_state"]
     assert virtualization_401["published_revision"] == (

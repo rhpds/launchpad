@@ -23,13 +23,13 @@ learning:
 sources:
   showroom:
     repo_url: https://github.com/jkershawrh/virtualization-ai-501.git
-    revision: 6e5212e685d28781dcded0208ffece07aa07f6c2
+    revision: 3f9d8c17a5ff9923b775b3965746edc51c5b1b28
     playbook: default-site.yml
     start_path: showroom/content
     gitops_repo_url: https://github.com/jkershawrh/virtualization-ai-501.git
   workload:
     repo_url: https://github.com/jkershawrh/virtualization-ai-501.git
-    revision: 6e5212e685d28781dcded0208ffece07aa07f6c2
+    revision: 3f9d8c17a5ff9923b775b3965746edc51c5b1b28
     deploy_path: charts/virtualization-ai-501
     gitops_repo_url: https://github.com/jkershawrh/virtualization-ai-501.git
 runtime:
@@ -102,5 +102,7 @@ certification:
   activation_blockers: []
   proof_contract: certification/catalog/virtualization-ai-501.yaml
 references:
-  release_workflow: https://github.com/jkershawrh/virtualization-ai-501/actions/runs/36771381538
-  certification_evidence: evidence/runs/flightpath-live-20261002-virtualization-ai-501-public-1seat-r1.json
+  release_workflow: https://github.com/jkershawrh/virtualization-ai-501/actions/runs/38480918274
+  certification_evidence: evidence/runs/virtualization-ai-501-1-seat-3f9d8c1-full-r3.json
+  current_public_browser_validation: pending
+  historical_public_certification_evidence: evidence/runs/flightpath-live-20261002-virtualization-ai-501-public-1seat-r1.json

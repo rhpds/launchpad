@@ -67,9 +67,9 @@ case "$catalog_id" in
     expected_adapter_image="ghcr.io/jkershawrh/virtualization-ai-401-operations-adapter@sha256:b18c5a36cf18a2a3b45bc652600fc652c150227463c69cb50f0a039a55318431" ;;
   virtualization-ai-501)
     vm_names=(inference-client-a inference-client-b inference-client-c); service=virtualization-ai-501-qualification-adapter; route=virtualization-ai-501; endpoint=/api/v1/qualifications
-    source_revision="6e5212e685d28781dcded0208ffece07aa07f6c2"
-    expected_presentation_image="ghcr.io/jkershawrh/virtualization-ai-501-presentation@sha256:825fa99269c1bed2af4d1a3190203a29488ab032983e1e255d9b730963819acf"
-    expected_adapter_image="ghcr.io/jkershawrh/virtualization-ai-501-qualification-adapter@sha256:256400deedfe2103fd887f7665f9813039e1d613252d1e230683b8b82d4512b1" ;;
+    source_revision="3f9d8c17a5ff9923b775b3965746edc51c5b1b28"
+    expected_presentation_image="ghcr.io/jkershawrh/virtualization-ai-501-presentation@sha256:9b781323655549bc36dfacce832bb29e45cb94579cd4e798d45d08d1582bbe94"
+    expected_adapter_image="ghcr.io/jkershawrh/virtualization-ai-501-qualification-adapter@sha256:a94ba610ea10c735c72409302219f074381a4cbbf0fc6ce82b0647934fc3e255" ;;
   *) printf 'unsupported catalog: %s\n' "$catalog_id" >&2; exit 2 ;;
 esac
 

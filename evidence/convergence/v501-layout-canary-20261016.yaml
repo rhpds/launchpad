@@ -1,0 +1,69 @@
+schema: launchpad.redhat.com/v501-layout-canary/v1
+observed_date: '2026-10-16'
+result: PASSED-EMBEDDED-PANE-CONTROLS-REACHABLE-ZERO-RESIDUE
+scope: >-
+  Embedded-pane layout canary for the virtualization-ai-501 presentation
+  fix 3f9d8c1 "fix(story): keep qualification controls reachable in embedded
+  panes" (min-height:0 + overflow-y:auto on the workspace main). Proves the
+  qualification controls are reachable in the Showroom's embedded Story pane
+  and the three qualification conditions still decide correctly.
+cluster_ref: flightpath
+candidate:
+  source_revision: 3f9d8c17a5ff9923b775b3965746edc51c5b1b28
+  release_workflow: https://github.com/jkershawrh/virtualization-ai-501/actions/runs/38789495807
+  presentation_image: ghcr.io/jkershawrh/virtualization-ai-501-presentation@sha256:9b781323655549bc36dfacce832bb29e45cb94579cd4e798d45d08d1582bbe94
+  adapter_image: ghcr.io/jkershawrh/virtualization-ai-501-qualification-adapter@sha256:a94ba610ea10c735c72409302219f074381a4cbbf0fc6ce82b0647934fc3e255
+catalog_mutation:
+  method: canonical virtualization-ai-501 ConfigMap updated to the candidate pins; same-image backend and lifecycle-worker reload
+  pre_canary_snapshot: retained locally during the canary
+  outcome: promoted-and-retained (the canary passed; the cluster pin stays at 3f9d8c1)
+order:
+  request_id: e1010ab9-8098-417b-af41-5fdafa559781
+  session_id: 8d1adf47-71a0-43b4-929c-44c5058585cb
+  seat_validations: 8/8 passed
+  lifecycle: requested -> provisioning -> validating -> ready -> reclaimed
+browser:
+  participant_login: passed
+  showroom_story_pane: passed
+  embedded_presentation_frame: passed
+  tls: >-
+    explicit SPKI pin of the Flightpath OpenShift ingress certificate key in
+    the headless browser; no blanket certificate bypass
+  qualification_controls:
+    condition_1_reachable: 'passed (y=729 h=87)'
+    condition_2_reachable: 'passed (y=729 h=87)'
+    condition_3_reachable: 'passed (y=771 h=45)'
+  decisions: ALLOW_REVIEW -> REFUSE -> ABSTAIN
+  result_json: evidence/runs/v501-layout-canary-20261016.json
+  screenshots:
+    - evidence/runs/v501-layout-canary-landing-20261016.png
+    - evidence/runs/v501-layout-canary-story-pane-20261016.png
+    - evidence/runs/v501-layout-canary-condition-1-20261016.png
+    - evidence/runs/v501-layout-canary-condition-2-20261016.png
+    - evidence/runs/v501-layout-canary-condition-3-20261016.png
+cleanup:
+  session_status: reclaimed
+  namespace_removed: true
+  argo_applications_remaining: 0
+  residue: zero
+remaining_for_full_public_gate:
+  - >-
+    Current-revision public browser validation on the participant journey
+    remains the final-gate item tracked as current_public_browser_validation:
+    pending; this canary proves the embedded pane layout and decisions only.
+formal_certification:
+  observed_date: '2026-10-16'
+  receipt: evidence/runs/virtualization-ai-501-1-seat-3f9d8c1-full-r3.json
+  result: GREEN-live
+  rubric_score: 100
+  run_id: 3f9d8c1-full-r3
+  cluster_pin_alignment: >-
+    After the layout canary, the canonical ConfigMap's workload_revision and
+    showroom_content_ref were aligned to the full 3f9d8c1 pin (matching
+    source_content_revision and the deployed images), workers reloaded, and
+    the formal certification runner executed: seat probe verified source
+    revision 3f9d8c1, both immutable image digests, 3/3 VMIs ready,
+    restart-preserved ledger evidence, ALLOW_REVIEW journey with human
+    authority preserved, and zero-residue cleanup with revoked model keys.
+live_service_changed: true
+security_waiver_granted: false

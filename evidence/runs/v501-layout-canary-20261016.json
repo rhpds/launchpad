@@ -1,0 +1,45 @@
+{
+  "steps": [
+    {
+      "step": "participant_login",
+      "ok": true,
+      "detail": "https://labs.smg-helix.ai/labs/virtualization-ai-501-e1010ab9"
+    },
+    {
+      "step": "showroom_story_tab_opened",
+      "ok": true,
+      "detail": "https://showroom-launchpad-smoke-test-tenant-v501-e1010a.apps.flightpath.fm2aihpcsed.com/"
+    },
+    {
+      "step": "embedded_presentation_frame_found",
+      "ok": true,
+      "detail": "https://virtualization-ai-501-launchpad-smoke-test-tenant-v501-e1010a.apps.flightpath.fm2a"
+    },
+    {
+      "step": "condition_1_control_reachable",
+      "ok": true,
+      "detail": "y=729 h=87"
+    },
+    {
+      "step": "condition_2_control_reachable",
+      "ok": true,
+      "detail": "y=729 h=87"
+    },
+    {
+      "step": "condition_3_control_reachable",
+      "ok": true,
+      "detail": "y=771 h=45"
+    },
+    {
+      "step": "three_qualification_conditions",
+      "ok": true,
+      "detail": "ALLOW_REVIEW -> REFUSE -> ABSTAIN"
+    }
+  ],
+  "overall": "passed",
+  "decisions": [
+    "ALLOW_REVIEW",
+    "REFUSE",
+    "ABSTAIN"
+  ]
+}

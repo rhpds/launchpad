@@ -54,7 +54,19 @@ keycloak_stage_promotion_followup:
   rollback_backup_captured: true
   rollback_reference: quay.io/redhat-gpte/launchpad-backend@sha256:34b82be667f576d16e7c95394c6d6b30fba30d3d2ea970d0b346b4a179c0b5ba
   dark_card_template_verified_in_deployed_image: true
-  browser_login_flow_proof: deferred-to-final-acceptance-sweep-by-design
+  browser_login_flow_proof: evidence/convergence/keycloak-browser-login-proof-20261016.yaml
+v501_layout_and_certification_followup:
+  observed_date: '2026-10-16'
+  report: evidence/convergence/v501-layout-canary-20261016.yaml
+  result: LAYOUT-CANARY-PASSED-AND-FORMAL-CERTIFICATION-GREEN
+  source_revision: 3f9d8c17a5ff9923b775b3965746edc51c5b1b28
+  layout_fix: embedded-pane qualification controls reachable (min-height 0 + overflow-y auto)
+  browser_canary: 8-steps-passed-including-three-conditions-and-control-reachability
+  formal_certification: GREEN-live-rubric-100
+  certification_receipt: evidence/runs/virtualization-ai-501-1-seat-3f9d8c1-full-r3.json
+  cluster_catalog_pin: promoted-and-retained-at-3f9d8c1-source-chart-and-images
+  catalog_promotion: repo-pins-aligned-and-test-verified
+  remaining: current-revision public browser validation stays at the final gate
 latest_full_regression:
   source: 95fec905
   report: evidence/runs/backend-full-95fec905-20261015.xml
