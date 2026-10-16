@@ -44,6 +44,17 @@ terminal_cli_refresh_followup:
     skipped: 27
     deselected: 40
     limit: Working-tree regression; the exact-commit freeze step remains part of the staging candidate path.
+keycloak_stage_promotion_followup:
+  observed_date: '2026-10-16'
+  report: evidence/convergence/keycloak-stage-promotion-20261016.yaml
+  result: ISOLATED-PROOF-PASSED-AND-PROMOTED
+  isolated_upgrade_receipt: evidence/runs/flightpath-keycloak-isolated-upgrade-20261016.json
+  keycloak_upgrade: 26.7.2-to-26.8.1
+  deployment_ready: 2/2
+  rollback_backup_captured: true
+  rollback_reference: quay.io/redhat-gpte/launchpad-backend@sha256:34b82be667f576d16e7c95394c6d6b30fba30d3d2ea970d0b346b4a179c0b5ba
+  dark_card_template_verified_in_deployed_image: true
+  browser_login_flow_proof: deferred-to-final-acceptance-sweep-by-design
 latest_full_regression:
   source: 95fec905
   report: evidence/runs/backend-full-95fec905-20261015.xml

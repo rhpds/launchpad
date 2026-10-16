@@ -75,6 +75,12 @@ jq -se --arg expected "$source_revision" \
    | length > 0 and all' "$provenance_file" \
   || fail "provenance does not match the release source revision"
 
+# The Flightpath pull robot holds quay credentials scoped to the established
+# launchpad-backend repository only, so the qualified GHCR candidate is
+# deployed through its digest-identical quay mirror. Manifests are
+# content-addressed: the same digest is the same bytes.
+deploy_image="quay.io/redhat-gpte/launchpad-backend@${image##*@}"
+
 # The live stage identity must exist; this is read-only presence checking.
 ocp -n "$live_namespace" get deploy/keycloak >/dev/null \
   || fail "live stage keycloak deployment not found"
@@ -102,6 +108,14 @@ ocp -n "$test_namespace" create secret generic keycloak-upgrade-bootstrap \
   --from-literal=username=keycloak-test-admin \
   --from-literal=password="$test_admin_password" \
   --from-literal=broker-key="$test_broker_key" >/dev/null
+
+# The candidate image lives in the private GHCR registry; copy the stage pull
+# robot's dockerconfig secret so the isolated namespace can pull it.
+ocp -n "$live_namespace" get secret launchpad-registry-pull -o json \
+  | jq 'del(.metadata.namespace, .metadata.resourceVersion, .metadata.uid,
+            .metadata.creationTimestamp, .metadata.managedFields)' \
+  | ocp -n "$test_namespace" apply -f - >/dev/null \
+  || fail "copying the registry pull secret into the isolated namespace failed"
 
 ocp -n "$test_namespace" create -f - >/dev/null <<'POSTGRES'
 apiVersion: v1
@@ -163,11 +177,30 @@ live_db_password="$(ocp -n "$live_namespace" get secret "$live_db_secret" \
   -o jsonpath='{.data.POSTGRES_PASSWORD}' | base64 -d)"
 
 dump_file="$(mktemp)"
-ocp -n "$live_namespace" exec -i deploy/postgres -- \
+# NOTE: no -i on this exec — oc exec with an allocated-but-empty stdin truncates
+# the stdout stream; the footer and fidelity checks below still guard the result.
+ocp -n "$live_namespace" exec deploy/postgres -- \
   env PGPASSWORD="$live_db_password" pg_dump -U "$live_db_user" -d "$live_database" \
   --schema=keycloak --no-owner --no-privileges > "$dump_file" \
   || fail "read-only dump of the live keycloak schema failed"
 [[ -s "$dump_file" ]] || fail "live keycloak schema dump is empty"
+# A truncated stream can exit zero; only the completion footer proves the dump
+# finished (pg_dump 16 emits the footer followed by a \unrestrict guard line).
+grep -q '^-- PostgreSQL database dump complete$' "$dump_file" \
+  || fail "live keycloak schema dump is truncated (no pg_dump completion footer)"
+grep -q '^COPY keycloak.user_entity ' "$dump_file" \
+  || fail "live keycloak schema dump is missing the user entity table data"
+
+# Live baseline counts (read-only) prove restore fidelity later.
+live_user_count="$(ocp -n "$live_namespace" exec deploy/postgres -- \
+  env PGPASSWORD="$live_db_password" psql -U "$live_db_user" -d "$live_database" -tAc \
+  'select count(*) from keycloak.user_entity')"
+live_realm_count="$(ocp -n "$live_namespace" exec deploy/postgres -- \
+  env PGPASSWORD="$live_db_password" psql -U "$live_db_user" -d "$live_database" -tAc \
+  'select count(*) from keycloak.realm')"
+live_client_count="$(ocp -n "$live_namespace" exec deploy/postgres -- \
+  env PGPASSWORD="$live_db_password" psql -U "$live_db_user" -d "$live_database" -tAc \
+  'select count(*) from keycloak.client')"
 
 ocp -n "$test_namespace" exec -i deploy/postgres -- \
   env PGPASSWORD="$test_db_password" psql -U "$test_db_user" -d "$live_database" \
@@ -180,12 +213,22 @@ baseline_user_count="$(ocp -n "$test_namespace" exec deploy/postgres -- \
 baseline_realm_count="$(ocp -n "$test_namespace" exec deploy/postgres -- \
   env PGPASSWORD="$test_db_password" psql -U "$test_db_user" -d "$live_database" -tAc \
   'select count(*) from keycloak.realm')"
-[[ "$baseline_user_count" =~ ^[0-9]+$ && "$baseline_user_count" -gt 0 ]] \
-  || fail "restored copy has no user entities"
+baseline_client_count="$(ocp -n "$test_namespace" exec deploy/postgres -- \
+  env PGPASSWORD="$test_db_password" psql -U "$test_db_user" -d "$live_database" -tAc \
+  'select count(*) from keycloak.client')"
+[[ "$baseline_user_count" =~ ^[0-9]+$ ]] \
+  || fail "restored copy user count is not a number"
 [[ "$baseline_realm_count" =~ ^[0-9]+$ && "$baseline_realm_count" -gt 0 ]] \
   || fail "restored copy has no realms"
-printf 'Restored baseline: %s realms, %s user entities.\n' \
-  "$baseline_realm_count" "$baseline_user_count"
+# The isolated copy must match the live database exactly before any upgrade.
+[[ "$baseline_user_count" == "$live_user_count" ]] \
+  || fail "restore fidelity: user entities $live_user_count live vs $baseline_user_count restored"
+[[ "$baseline_realm_count" == "$live_realm_count" ]] \
+  || fail "restore fidelity: realms $live_realm_count live vs $baseline_realm_count restored"
+[[ "$baseline_client_count" == "$live_client_count" ]] \
+  || fail "restore fidelity: clients $live_client_count live vs $baseline_client_count restored"
+printf 'Restored baseline matches live: %s realms, %s clients, %s user entities.\n' \
+  "$baseline_realm_count" "$baseline_client_count" "$baseline_user_count"
 
 # The candidate runs against the isolated database copy only.
 ocp -n "$test_namespace" create -f - >/dev/null <<KEYCLOAK
@@ -204,9 +247,11 @@ spec:
         app.kubernetes.io/name: keycloak
         app.kubernetes.io/component: identity
     spec:
+      imagePullSecrets:
+        - name: launchpad-registry-pull
       containers:
         - name: keycloak
-          image: ${image}
+          image: ${deploy_image}
           args: [start, --optimized]
           env:
             - {name: KC_DB, value: postgres}
@@ -220,9 +265,9 @@ spec:
             - {name: KC_HEALTH_ENABLED, value: "true"}
             - {name: KC_HOSTNAME_STRICT, value: "false"}
             - {name: KC_PROXY_HEADERS, value: xforwarded}
-            - {name: KC_BOOTSTRAP_ADMIN_USERNAME}
+            - name: KC_BOOTSTRAP_ADMIN_USERNAME
               valueFrom: {secretKeyRef: {name: keycloak-upgrade-bootstrap, key: username}}
-            - {name: KC_BOOTSTRAP_ADMIN_PASSWORD}
+            - name: KC_BOOTSTRAP_ADMIN_PASSWORD
               valueFrom: {secretKeyRef: {name: keycloak-upgrade-bootstrap, key: password}}
             - {name: LAUNCHPAD_ACCESS_VALIDATION_URL, value: http://backend.launchpad-flightpath-candidate.svc:8000/api/v1/public-access/private/validate}
             - name: ACCESS_BROKER_KEY
@@ -250,17 +295,22 @@ if ocp -n "$test_namespace" logs deploy/keycloak | grep -E 'ERROR|Migration fail
 fi
 printf 'Migration log clean.\n'
 
-# Data integrity: the patch upgrade must not change realm or user counts.
+# Data integrity: the patch upgrade must not change realm, client or user counts.
 upgraded_user_count="$(ocp -n "$test_namespace" exec deploy/postgres -- \
   env PGPASSWORD="$test_db_password" psql -U "$test_db_user" -d "$live_database" -tAc \
   'select count(*) from keycloak.user_entity')"
 upgraded_realm_count="$(ocp -n "$test_namespace" exec deploy/postgres -- \
   env PGPASSWORD="$test_db_password" psql -U "$test_db_user" -d "$live_database" -tAc \
   'select count(*) from keycloak.realm')"
+upgraded_client_count="$(ocp -n "$test_namespace" exec deploy/postgres -- \
+  env PGPASSWORD="$test_db_password" psql -U "$test_db_user" -d "$live_database" -tAc \
+  'select count(*) from keycloak.client')"
 [[ "$upgraded_user_count" == "$baseline_user_count" ]] \
   || fail "user entity count changed during upgrade: $baseline_user_count -> $upgraded_user_count"
 [[ "$upgraded_realm_count" == "$baseline_realm_count" ]] \
   || fail "realm count changed during upgrade: $baseline_realm_count -> $upgraded_realm_count"
+[[ "$upgraded_client_count" == "$baseline_client_count" ]] \
+  || fail "client count changed during upgrade: $baseline_client_count -> $upgraded_client_count"
 
 # The candidate pod must carry the qualified authenticator artifact and the
 # fixed dark login card template (the 08f8655f contrast fix). The image is
@@ -281,18 +331,23 @@ grep -q 'launchpad-code' "$template_file" \
 mkdir -p "$(dirname "$receipt_out")"
 jq -n \
   --arg image "$image" \
+  --arg deploy_image "$deploy_image" \
   --arg source_revision "$source_revision" \
   --arg namespace "$test_namespace" \
   --argjson realms "$upgraded_realm_count" \
+  --argjson clients "$upgraded_client_count" \
   --argjson users "$upgraded_user_count" \
   '{schema_version:"launchpad.redhat.com/keycloak-isolated-upgrade/v1",
     result:"passed",
     image:$image,
+    deploy_image:$deploy_image,
     source_revision:$source_revision,
     namespace:$namespace,
     realm_count:$realms,
+    client_count:$clients,
     user_entity_count:$users,
     migration_errors:false,
+    restore_fidelity_verified:true,
     dark_card_template_verified:true}' > "$receipt_out"
 
 ocp delete namespace "$test_namespace" --wait=true >/dev/null

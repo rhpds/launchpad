@@ -80,6 +80,12 @@ jq -se --arg expected "$source_revision" \
    | length > 0 and all' "$provenance_file" \
   || fail "provenance does not match the release source revision"
 
+# The Flightpath pull robot holds quay credentials scoped to the established
+# launchpad-backend repository only, so promotion deploys the digest-identical
+# quay mirror of the verified GHCR candidate. Manifests are content-addressed:
+# the same digest is the same bytes.
+deploy_image="quay.io/redhat-gpte/launchpad-backend@${image##*@}"
+
 # The isolated upgrade proof is mandatory and must cover this exact image.
 upgrade_schema="$(jq -r '.schema_version // empty' "$upgrade_receipt")"
 upgrade_result="$(jq -r '.result // empty' "$upgrade_receipt")"
@@ -96,14 +102,30 @@ ocp -n "$stage_namespace" get deploy/keycloak >/dev/null \
 current_image="$(ocp -n "$stage_namespace" get deploy/keycloak \
   -o jsonpath='{.spec.template.spec.containers[0].image}')"
 printf 'Current image: %s\n' "$current_image"
-printf 'Candidate image: %s\n' "$image"
-[[ "$current_image" != "$image" ]] \
+printf 'Candidate image: %s (deployed as %s)\n' "$image" "$deploy_image"
+[[ "$current_image" != "$deploy_image" ]] \
   || fail "candidate image is already deployed"
+
+# Capture a rollback backup of the live identity schema before any change.
+# Read-only; the pg_dump completion footer proves the backup is complete.
+backup_file="${repo_root}/evidence/runs/flightpath-keycloak-rollback-backup-$(date -u +%Y%m%dT%H%M%SZ).sql"
+stage_db_user="$(ocp -n "$stage_namespace" get secret launchpad-db-secret \
+  -o jsonpath='{.data.POSTGRES_USER}' | base64 -d)"
+stage_db_password="$(ocp -n "$stage_namespace" get secret launchpad-db-secret \
+  -o jsonpath='{.data.POSTGRES_PASSWORD}' | base64 -d)"
+mkdir -p "$(dirname "$backup_file")"
+ocp -n "$stage_namespace" exec deploy/postgres -- \
+  env PGPASSWORD="$stage_db_password" pg_dump -U "$stage_db_user" -d launchpad_stage \
+  --schema=keycloak --no-owner --no-privileges > "$backup_file" \
+  || fail "rollback backup dump failed"
+grep -q '^-- PostgreSQL database dump complete$' "$backup_file" \
+  || fail "rollback backup is truncated (no pg_dump completion footer)"
+printf 'Rollback backup: %s\n' "$backup_file"
 
 # Capture a rollback reference before any change.
 printf 'Rollback reference: %s\n' "$current_image"
 
-ocp -n "$stage_namespace" set image deploy/keycloak "keycloak=${image}" >/dev/null
+ocp -n "$stage_namespace" set image deploy/keycloak "keycloak=${deploy_image}" >/dev/null
 ocp -n "$stage_namespace" rollout status deploy/keycloak --timeout=600s >/dev/null \
   || fail "stage keycloak did not become ready after promotion"
 
@@ -128,12 +150,14 @@ grep -Fq "Access your lab" <<<"$login_html" \
 mkdir -p "$(dirname "$evidence_out")"
 jq -n \
   --arg image "$image" \
+  --arg deploy_image "$deploy_image" \
   --arg source_revision "$source_revision" \
   --arg previous_image "$current_image" \
   --arg upgrade_receipt "$upgrade_receipt" \
   '{schema_version:"launchpad.redhat.com/keycloak-promotion/v1",
     result:"promoted",
     image:$image,
+    deploy_image:$deploy_image,
     previous_image:$previous_image,
     source_revision:$source_revision,
     isolated_upgrade_receipt:$upgrade_receipt}' > "$evidence_out"

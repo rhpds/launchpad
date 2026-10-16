@@ -1,0 +1,51 @@
+schema: launchpad.redhat.com/keycloak-stage-promotion/v1
+observed_date: '2026-10-16'
+result: ISOLATED-PROOF-PASSED-AND-PROMOTED
+candidate:
+  source_revision: edea74f6f85e10389d240ccc706b0c39fccf7dbf
+  image: ghcr.io/jkershawrh/launchpad-keycloak@sha256:6b2c982c6a633066e424b3a94abdbcf4e169411c064cba497305e0d34ed1a4e7
+  deploy_image: quay.io/redhat-gpte/launchpad-backend@sha256:6b2c982c6a633066e424b3a94abdbcf4e169411c064cba497305e0d34ed1a4e7
+  keycloak_version: 26.8.1
+  previous_keycloak_version: 26.7.2
+  previous_image: quay.io/redhat-gpte/launchpad-backend@sha256:34b82be667f576d16e7c95394c6d6b30fba30d3d2ea970d0b346b4a179c0b5ba
+mirror_note: >-
+  The Flightpath pull robot holds quay credentials scoped to the established
+  launchpad-backend repository only. The qualified GHCR candidate was copied
+  to quay with skopeo (digest-preserving): the raw manifest at the quay
+  reference hashes to the exact GHCR digest, so the deployed bytes are the
+  verified bytes. Supply-chain verification (cosign signature +
+  slsaprovenance attestation against the release source revision) runs
+  against the GHCR reference in both scripts.
+isolated_upgrade_proof:
+  receipt: evidence/runs/flightpath-keycloak-isolated-upgrade-20261016.json
+  result: passed
+  method: >-
+    Read-only pg_dump of the live keycloak schema restored into a disposable
+    namespace (launchpad-keycloak-upgrade-test); the candidate ran against
+    the restored copy and proved rollout readiness, clean migration logs,
+    unchanged realm/client/user counts (2/16/53) against live baselines, and
+    the fixed dark login card template in the deployed provider jar. The
+    live identity service and database were never mutated; teardown left
+    zero residue.
+promotion:
+  receipt: evidence/runs/flightpath-keycloak-promotion-20261016.json
+  rollback_backup: evidence/runs/flightpath-keycloak-rollback-backup-20261016T161437Z.sql
+  rollback_reference: quay.io/redhat-gpte/launchpad-backend@sha256:34b82be667f576d16e7c95394c6d6b30fba30d3d2ea970d0b346b4a179c0b5ba
+  post_promotion:
+    deployment_ready: '2/2'
+    deployed_template_dark_card_verified: true
+    public_portal_checks:
+      - What you can do in Launchpad
+      - Access your lab
+live_service_changed: true
+security_waiver_granted: false
+remaining_followup:
+  - >-
+    Full browser login-flow proof (email + code, dark card render, logout and
+    reauthentication) belongs to the final Flightpath acceptance sweep per the
+    order of operations; the promotion verified the deployed template artifact
+    and the public portal surface.
+  - >-
+    The obsolete promotion helper contract in backend/tests/
+    test_keycloak_release_workflow.py now targets the stage Deployment and
+    requires the isolated proof; keep it current with any helper change.

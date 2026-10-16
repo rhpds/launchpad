@@ -15,6 +15,16 @@ UPGRADE_TEST = ROOT / "scripts/test-flightpath-keycloak-upgrade.sh"
 PROMOTION = ROOT / "scripts/promote-flightpath-keycloak.sh"
 
 
+def test_scripts_deploy_the_quay_mirror_of_the_verified_ghcr_candidate():
+    for script in (UPGRADE_TEST, PROMOTION):
+        source = script.read_text()
+        # Supply chain is verified at GHCR where the signatures live; the
+        # Flightpath pull robot only has quay credentials scoped to the
+        # established launchpad-backend repository.
+        assert 'deploy_image="quay.io/redhat-gpte/launchpad-backend@${image##*@}"' in source
+        assert 'image: ${deploy_image}' in source or 'keycloak=${deploy_image}' in source
+
+
 def test_isolated_upgrade_test_fails_closed_on_usage_and_cluster():
     source = UPGRADE_TEST.read_text()
     assert 'set -euo pipefail' in source
@@ -54,6 +64,11 @@ def test_isolated_upgrade_test_proves_migration_data_theme_and_residue():
     source = UPGRADE_TEST.read_text()
     assert 'user_entity' in source, 'data integrity must compare user counts'
     assert 'keycloak.realm' in source, 'realm inventory must be verified'
+    assert 'keycloak.client' in source, 'client inventory must be verified'
+    # A truncated oc-exec stream can exit zero; only the footer proves the
+    # dump completed, and restore fidelity must be proven against live counts.
+    assert 'PostgreSQL database dump complete' in source
+    assert 'restore fidelity' in source
     assert '#191919' in source, 'the dark login card fix must be proven in the rendered page'
     assert 'launchpad.redhat.com/keycloak-isolated-upgrade/v1' in source
     assert 'result' in source and 'passed' in source

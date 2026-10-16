@@ -1,0 +1,9 @@
+{
+  "schema_version": "launchpad.redhat.com/keycloak-promotion/v1",
+  "result": "promoted",
+  "image": "ghcr.io/jkershawrh/launchpad-keycloak@sha256:6b2c982c6a633066e424b3a94abdbcf4e169411c064cba497305e0d34ed1a4e7",
+  "deploy_image": "quay.io/redhat-gpte/launchpad-backend@sha256:6b2c982c6a633066e424b3a94abdbcf4e169411c064cba497305e0d34ed1a4e7",
+  "previous_image": "quay.io/redhat-gpte/launchpad-backend@sha256:34b82be667f576d16e7c95394c6d6b30fba30d3d2ea970d0b346b4a179c0b5ba",
+  "source_revision": "edea74f6f85e10389d240ccc706b0c39fccf7dbf",
+  "isolated_upgrade_receipt": "evidence/runs/flightpath-keycloak-isolated-upgrade-20261016.json"
+}

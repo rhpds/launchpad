@@ -1,0 +1,14 @@
+{
+  "schema_version": "launchpad.redhat.com/keycloak-isolated-upgrade/v1",
+  "result": "passed",
+  "image": "ghcr.io/jkershawrh/launchpad-keycloak@sha256:6b2c982c6a633066e424b3a94abdbcf4e169411c064cba497305e0d34ed1a4e7",
+  "deploy_image": "quay.io/redhat-gpte/launchpad-backend@sha256:6b2c982c6a633066e424b3a94abdbcf4e169411c064cba497305e0d34ed1a4e7",
+  "source_revision": "edea74f6f85e10389d240ccc706b0c39fccf7dbf",
+  "namespace": "launchpad-keycloak-upgrade-test",
+  "realm_count": 2,
+  "client_count": 16,
+  "user_entity_count": 53,
+  "migration_errors": false,
+  "restore_fidelity_verified": true,
+  "dark_card_template_verified": true
+}
