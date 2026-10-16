@@ -86,6 +86,18 @@ verify \
   /tmp/roxctl-4.11.5
 install -m 0755 /tmp/roxctl-4.11.5 /usr/local/bin/roxctl
 
+# Remove every downloaded and extracted staging artifact so the complete-image
+# scan evaluates exactly one copy of each learner CLI and the published image
+# carries no duplicate binaries.
+rm -f /tmp/helm-v3.22.1-linux-amd64.tar.gz \
+  /tmp/openshift-client-linux-4.22.18.tar.gz \
+  /tmp/tkn-v0.46.1-linux-x86_64.tar.gz \
+  /tmp/tkn-pac-v0.52.0-linux-x86_64.tar.gz \
+  /tmp/opc-v1.24.0-linux-x86_64.tar.gz \
+  /tmp/kn-linux-amd64 /tmp/roxctl-4.11.5 \
+  /tmp/oc /tmp/kubectl /tmp/tkn /tmp/tkn-pac /tmp/opc /tmp/helm
+rm -rf /tmp/linux-amd64
+
 # odo: REMOVED with owner authorization on 2026-10-16. Upstream is at its
 # terminal v3.16.1 release with no fixed artifact available, and no lab
 # content references the tool. See the sourcing note at the top of this file

@@ -95,6 +95,26 @@ def test_containerfile_builds_skopeo_from_immutable_source():
     assert 'COPY --from=skopeo-build /out/skopeo /usr/bin/skopeo' in source
 
 
+def test_cli_refresh_removes_staging_artifacts_before_layer_close():
+    # Run 38916694544 proved the scanner picks up leftover /tmp copies of the
+    # installed binaries, double-counting findings and shipping duplicate
+    # binaries in the image. Every downloaded or extracted artifact must be
+    # removed in the same layer that installs the tools.
+    source = (ROOT / 'workshop-images/showroom-terminal/cli-refresh.sh').read_text()
+    assert 'rm -f /tmp/helm-v3.22.1-linux-amd64.tar.gz' in source
+    assert 'rm -rf /tmp/linux-amd64' in source
+    for leftover in (
+        '/tmp/kn-linux-amd64',
+        '/tmp/roxctl-4.11.5',
+        '/tmp/oc',
+        '/tmp/kubectl',
+        '/tmp/tkn',
+        '/tmp/tkn-pac',
+        '/tmp/opc',
+    ):
+        assert leftover in source, f'{leftover} must be removed after install'
+
+
 def test_terminal_release_workflow_proves_every_learner_cli_still_runs():
     source = (ROOT / '.github/workflows/terminal-release.yml').read_text()
     for tool in ('skopeo', 'helm', 'kn', 'kubectl', 'oc', 'opc', 'roxctl', 'tkn', 'tkn-pac'):
