@@ -120,16 +120,16 @@ queue:
       maintenance risk, not as a reason to invent a new pin.
 
   - catalog_item_id: intel-xeon6-agent-201
-    source_repository: https://github.com/jkershawrh/launchpad.git
-    current_catalog_revision: 1ed487299f043a89660916c9ce8a8ae5a155d6e3
+    source_repository: https://github.com/jkershawrh/intel-xeon6-ai-agent-201.git
+    current_catalog_revision: b48be002d8ddd7eba94c9d86d8284c9dba3ff020
     source_paths:
-      - content-intel-xeon6-agent-201/modules/ROOT/pages/index.adoc
-      - content-intel-xeon6-agent-201/modules/ROOT/pages/03-wire-agent.adoc
-      - content-intel-xeon6-agent-201/modules/ROOT/pages/99-conclusion.adoc
-      - site-intel-xeon6-agent-201.yml
+      - content/modules/ROOT/pages/index.adoc
+      - content/modules/ROOT/pages/03-wire-agent.adoc
+      - content/modules/ROOT/pages/05-prove-and-clean.adoc
+      - site.yml
     unchanged_workload:
       repository: https://github.com/rhpds/triforce.git
-      configured_revision: 201-v1.0.0
+      configured_revision: c8dcf5bcef1f926aa5867bcc1b86b69ec33b988d
       resolved_commit: c8dcf5bcef1f926aa5867bcc1b86b69ec33b988d
       tag_object: 2f94711efc01384ee4c334caa1720e2962180b14
       build_workflows:
@@ -139,10 +139,8 @@ queue:
       showroom_validation: .github/workflows/ci.yml
       immutable_showroom_image: null
     unpublished_artifacts:
-      - immutable Launchpad Git revision containing corrected lab content and proof
-      - matching showroom_content_ref in catalog and onboarding contracts
+      - immutable Launchpad Git revision containing the catalog, intake, and certification-contract pins
     narrow_next_action: >-
-      Publish the catalog/onboarding pin update and prefer the resolved workload
-      commit over the movable tag at the next contract revision. Then run a fresh
+      Publish the catalog/onboarding/certification pin update. Then run a fresh
       one-seat model/tool/UI/proof/reclaim certification; earlier 30-seat evidence
       covers the older content only.

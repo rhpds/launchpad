@@ -20,7 +20,11 @@ items:
       - Verify the synced workload Application revision and immutable Deployment image references.
       - Ignore unrelated top-level JSON values when collecting certification history.
   virtualization-ai-401:
-    status: red-current-public-certification
+    status: internal-resolved-public-visual-pending
+    current_source_revision: 69e57566be66e87da4d9889c9057158fd171dc73
+    current_internal_receipt: evidence/runs/virtualization-ai-401-recreate-ledger-r3-20261015.json
+    current_internal_score: 100
+    historical_failure_retained_below: true
     source_revision: aee89597b325da490fa837b5639e6e71892c0ca1
     workshop_id: 0550aa35-059e-4d19-a54e-f4c18cfe2f78
     namespace: launchpad-flightpath-candida-virtualization-ai-14c431
@@ -59,9 +63,11 @@ items:
       staged_secret_scan: passed
       publication: published-to-approved-source-branch
   virtualization-ai-501:
-    status: current-public-evidence-still-required
+    status: internal-resolved-public-visual-pending
+    current_source_revision: 6e5212e685d28781dcded0208ffece07aa07f6c2
+    current_internal_score: 100
     source_revision: 78442e22eeed56b54d1e910ad8c2b847e3cd241a
-    current_internal_receipt: evidence/runs/virtualization-ai-501-strict-origin-r1-20261015.json
+    current_internal_receipt: evidence/runs/virtualization-ai-501-recreate-ledger-r3-20261015.json
     internal_receipt_is_not_public_proof: true
     source_review: Adapter also uses a ReadWriteOnce ledger PVC with the default Deployment rolling-update strategy.
     runtime_restart_failure_reproduced: false
@@ -77,9 +83,30 @@ items:
       staged_secret_scan: passed
       publication: published-to-approved-source-branch
 next_live_run:
-  status: blocked-by-flightpath-api-timeout
-  live_catalog_mutated: false
-  platform_services_restarted: false
+  status: both-virtualization-internal-green-public-visual-proof-pending
+  live_catalog_mutated: true
+  platform_services_restarted: true
+  mutation_scope: Two canonical virtualization catalog ConfigMaps; same-image backend and lifecycle-worker reload after confirming no active labs. No cluster restart.
+  virtualization_401_current_internal_receipt: evidence/runs/virtualization-ai-401-recreate-ledger-r3-20261015.json
+  virtualization_401_internal_score: 100
+  virtualization_501_current_internal_receipt: evidence/runs/virtualization-ai-501-recreate-ledger-r3-20261015.json
+  virtualization_501_internal_score: 100
+  virtualization_501_cleanup: Zero remaining managed resources; model keys revoked; 99.509 seconds.
+  virtualization_401_cleanup: Zero remaining managed resources; model keys revoked; 98.457 seconds.
   probe_improvement: Require the synced Application revision, Recreate strategy, replacement readiness, reconnected port-forward, and byte-identical nonempty evidence ledger after restart for both 401 and 501.
-  required_next_step: Restore Flightpath connectivity, load the two new source pins with a no-active-labs guard and rollback, run one-seat internal/public certification, reclaim, and verify zero residue before closing either remaining evidence failure.
-release_gate: not-cleared; two original evidence failures remain open
+  required_next_step: Align current automated receipts and rerun regression first; defer fresh public-browser visual proof to the final gate as requested. Historical public receipts do not certify the new chart revisions.
+alignment_regression:
+  result: passed
+  report: evidence/runs/full-regression-final-alignment-20261015.xml
+  passed: 2900
+  failed: 0
+  skipped: 27
+  deselected: 13
+  duration_seconds: 72.39
+  scope: backend/tests and scripts/tests; not-local marker; legacy test_demo_migration.py excluded per existing regression selection.
+  skipped_cells_count_as_green: false
+  scoped_secret_scan: passed-no-leaks
+  live_deployment_changed_for_alignment: false
+  current_public_visual_validation: automated-browser-review-found-functional-gaps
+  public_browser_review: evidence/convergence/public-browser-review-20261015.yaml
+release_gate: not-cleared; automated alignment passed, browser review found login contrast, terminal state loss, and Story API 405; separate platform release/security gates remain outstanding
