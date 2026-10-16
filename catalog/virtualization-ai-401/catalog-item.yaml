@@ -126,4 +126,6 @@ metadata:
   source_content_revision: 69e57566be66e87da4d9889c9057158fd171dc73
   source_references:
     release_workflow: https://github.com/jkershawrh/virtualization-ai-401/actions/runs/38480912766
-    certification_evidence: evidence/runs/virtualization-ai-401-formal-current-pin-r2-20261013.json
+    certification_evidence: evidence/runs/virtualization-ai-401-recreate-ledger-r3-20261015.json
+    current_public_browser_validation: pending
+    historical_public_certification_evidence: evidence/runs/flightpath-live-20261002-virtualization-ai-401-public-1seat-r1.json

@@ -25,7 +25,7 @@ def test_401_active_experience_is_exact_truthful_and_one_seat_certified() -> Non
     contract = _yaml(CERTIFICATION)
     evidence = json.loads(EVIDENCE.read_text(encoding="utf-8"))
     metadata = catalog["metadata"]
-    revision = "f00b4bc075acf37f014b8ee55d5810625639b6b3"
+    revision = "69e57566be66e87da4d9889c9057158fd171dc73"
 
     assert catalog["status"] == intake["catalog"]["status"] == "active"
     assert metadata["certification_stage"] == intake["certification"]["stage"] == (
@@ -51,9 +51,29 @@ def test_401_active_experience_is_exact_truthful_and_one_seat_certified() -> Non
 
     references = metadata["source_references"]
     assert references["release_workflow"] == (
-        "https://github.com/jkershawrh/virtualization-ai-401/actions/runs/36761503526"
+        "https://github.com/jkershawrh/virtualization-ai-401/actions/runs/38480912766"
     )
-    assert references["certification_evidence"] == str(EVIDENCE.relative_to(ROOT))
+    assert references["historical_public_certification_evidence"] == str(EVIDENCE.relative_to(ROOT))
+    assert references["current_public_browser_validation"] == "pending"
+    current_path = ROOT / references["certification_evidence"]
+    assert intake["references"]["certification_evidence"] == references["certification_evidence"]
+    assert hashlib.sha256(current_path.read_bytes()).hexdigest() == current_path.with_suffix(".json.sha256").read_text().split()[0]
+    current = json.loads(current_path.read_text())
+    assert current["result"] == "GREEN-live"
+    assert current["rubric"]["score"] == 100
+    assert current["plan"]["seats"] == 1
+    assert all(current["gates"].values())
+    probe = current["seat_results"][0]["probe"]["result"]
+    assert probe["provenance"]["source_revision"] == revision
+    assert probe["restart_evidence_preserved"] is True
+    assert probe["readiness"]["vmis_ready"] == 1
+    assert probe["journey"]["model_participated"] is False
+    assert probe["journey"]["human_authority_preserved"] is True
+    for image in probe["runtime_images"].values():
+        assert image.split("@", 1)[1] in str(metadata["workload_helm_values"])
+    assert current["cleanup"]["model_keys_revoked"] is True
+    assert all(value == 0 for value in current["cleanup"]["resource_counts"].values())
+    # The remaining assertions preserve historical public-browser coverage only.
     assertions = contract["spec"]["seat_probe"]["json_assertions"]
     assert {"path": "journey.outcome", "equals": "ALLOW_REVIEW"} in assertions
 
