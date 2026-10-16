@@ -67,6 +67,14 @@ v501_layout_and_certification_followup:
   cluster_catalog_pin: promoted-and-retained-at-3f9d8c1-source-chart-and-images
   catalog_promotion: repo-pins-aligned-and-test-verified
   remaining: current-revision public browser validation stays at the final gate
+candidate_freeze_followup:
+  observed_date: '2026-10-16'
+  report: evidence/convergence/staging-candidate-freeze-20261016.yaml
+  result: CANDIDATE-FROZEN-REGRESSION-GREEN-GATES-VENDOR-PENDING
+  frozen_revision: a38f172297a98ccf139f2dc13a6090d05a24c9f3
+  exact_commit_regression: 2921-passed-0-failed
+  includes: 401-and-501-promotions-sovereign-scope-alignment-identity-and-terminal-work
+  remaining_before_acceptance: vendor-respins-owner-decisions-public-browser-proof-acceptance-sweep
 latest_full_regression:
   source: 95fec905
   report: evidence/runs/backend-full-95fec905-20261015.xml

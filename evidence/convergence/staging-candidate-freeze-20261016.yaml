@@ -1,0 +1,65 @@
+schema: launchpad/staging-candidate-freeze/v1
+observed_date: '2026-10-16'
+status: CANDIDATE-FROZEN-REGRESSION-GREEN-GATES-VENDOR-PENDING
+frozen_revision: a38f172297a98ccf139f2dc13a6090d05a24c9f3
+branch: codex/flightpath-migration-20260922
+exact_commit_regression:
+  report: evidence/runs/full-regression-candidate-freeze-a38f1722-20261016.xml
+  report_sha256: 95e128155ccbfc5da53ed09d06dc2bbef3f80e2f42fec793b594e187f00e04b3
+  passed: 2921
+  failed: 0
+  skipped: 27
+  deselected: 40
+  skipped_checks_count_as_green: false
+  tracked_tree_clean: true
+frozen_includes:
+  - >-
+    Terminal image CLI refresh (a66cd3bf): eight checksum-pinned vendor
+    artifacts, skopeo v1.24.1 immutable-source build, odo removed under owner
+    authorization, uid-1001 passwd restoration, /tmp staging cleanup.
+  - >-
+    Identity promotion (2c1294c3, 8fdb45a8): Keycloak 26.7.2 -> 26.8.1 with
+    isolated upgrade proof, digest-preserving quay mirror, rollback backup,
+    and the browser login-flow proof (8/8 steps, same-seat reauthentication).
+  - >-
+    virtualization-ai-501 promotion (647497bc): 3f9d8c1 layout fix promoted
+    end to end — embedded-pane browser canary, full cluster pin alignment,
+    formal certification GREEN-live 100/100.
+  - >-
+    virtualization-ai-401 promotion (a1d1eb67): 69e57566 Recreate-ledger
+    release with its GREEN-live 100/100 receipt.
+  - >-
+    Sovereign foundations scope alignment (746e9e71): 101/301 internal-only
+    until current public certification exists.
+  - >-
+    Flightpath TLS preflight DNS recording (7e3de08e) and evidence updates
+    (a38f1722).
+cluster_state_at_freeze:
+  backend: 1/1 ready
+  lifecycle_worker: 2/2 ready
+  keycloak: 26.8.1 at 2/2 ready (promoted and browser-proven)
+  catalog_pins:
+    virtualization-ai-401: 69e57566 promoted and retained
+    virtualization-ai-501: 3f9d8c1 promoted and retained
+  active_sessions: 0
+remaining_before_staging_acceptance:
+  - >-
+    Terminal and backend image security gates remain blocked on vendor
+    respins (go1.26.9/1.27.2 stdlib batch, dependency bumps, el9 errata);
+    re-scan is a workflow dispatch when respins land.
+  - >-
+    x/crypto GO-2026-5932 unrated deprecation advisory disposition (owner
+    decision) and the Console hostname cutover window (owner approval).
+  - >-
+    Current-revision public browser validation for virtualization 401/501
+    and the sovereign 201 source-bound proof run at the final acceptance
+    sweep against this frozen candidate.
+  - >-
+    Final Flightpath acceptance sweep: requester -> order -> admin
+    visibility -> participant login -> Showroom, workspace, terminal,
+    Console -> resume/logout -> reclaim with zero-residue verification.
+limits:
+  - The exact-commit regression is source-level proof; image publication and
+    live deployment gates remain fail-closed on the vendor-pending findings.
+  - No security exception, suppression or scanner ignore is in effect at this
+    revision.
