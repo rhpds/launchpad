@@ -12,7 +12,13 @@ ARG FULCIO_VERSION=v1.8.6
 ARG GO_COMPRESS_VERSION=v1.18.7
 ARG GO_BUILDKIT_VERSION=v0.31.1
 ARG GO_ARCHIVE_VERSION=v0.3.0
-ARG GO_DISTRIBUTION_VERSION=v3.1.0
+# distribution/v3 stays at the inherited 2023 pseudo-version on purpose:
+# GHSA-f2g3-hh2r-cwgc and GHSA-3p65-76g6-3w7r are fixed only in v3.1.0,
+# which removed the registry/client packages that openshift/library-go
+# imports (reference, registry/client, registry/client/auth, manifest/schema1).
+# oc master still pins this same pseudo-version, so the fix is not consumable
+# until upstream adapts. Both CVEs sit in registry-server code paths (redis
+# descriptor cache, pull-through cache) that the oc client does not execute.
 ENV GOTOOLCHAIN=go1.26.9
 ARG HELM_VERSION=4.3.0
 ARG HELM_SOURCE_COMMIT=bec5b06ed841fe5269972d864d5177944fd5970f
@@ -36,7 +42,6 @@ RUN git clone https://github.com/openshift/oc.git . \
       -replace=github.com/sigstore/fulcio=github.com/sigstore/fulcio@${FULCIO_VERSION} \
       -replace=github.com/klauspost/compress=github.com/klauspost/compress@${GO_COMPRESS_VERSION} \
       -replace=github.com/moby/buildkit=github.com/moby/buildkit@${GO_BUILDKIT_VERSION} \
-      -replace=github.com/distribution/distribution/v3=github.com/distribution/distribution/v3@${GO_DISTRIBUTION_VERSION} \
       -require=github.com/moby/go-archive@${GO_ARCHIVE_VERSION} \
     && go mod download -json github.com/moby/go-archive@${GO_ARCHIVE_VERSION} > /tmp/archive-upstream.json \
     && grep -F '"Sum": "h1:nos4BtzzUIqB406BgQnWGMI4qib9BZ8XUHU+ucv/n1c="' /tmp/archive-upstream.json \
@@ -78,10 +83,7 @@ RUN git clone https://github.com/openshift/oc.git . \
     | grep -F "${FULCIO_VERSION}" \
     && go version -m /tmp/oc-bin \
     | grep -F "github.com/klauspost/compress" \
-    | grep -F "${GO_COMPRESS_VERSION}" \
-    && go version -m /tmp/oc-bin \
-    | grep -F "github.com/distribution/distribution/v3" \
-    | grep -F "${GO_DISTRIBUTION_VERSION}"
+    | grep -F "${GO_COMPRESS_VERSION}"
 
 WORKDIR /tmp/helm
 RUN git clone https://github.com/helm/helm.git . \
