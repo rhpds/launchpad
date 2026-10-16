@@ -41,3 +41,17 @@ def test_cluster_clients_use_patched_toolchain_and_network_module() -> None:
     assert "ARG GO_X_NET_VERSION=v0.60.0" in text
     assert "golang.org/x/net=golang.org/x/net@${GO_X_NET_VERSION}" in text
     assert "COPY --from=oc-builder /tmp/helm-bin /usr/local/bin/helm" in text
+
+
+def test_oc_builder_replaces_vulnerable_distribution_dependency() -> None:
+    text = CONTAINERFILE.read_text()
+    # GHSA-f2g3-hh2r-cwgc and GHSA-3p65-76g6-3w7r (both High) are fixed only
+    # in distribution v3.1.0; the oc build must replace the inherited
+    # 2023 pseudo-version and prove the pinned version landed in the binary.
+    assert "ARG GO_DISTRIBUTION_VERSION=v3.1.0" in text
+    assert (
+        "github.com/distribution/distribution/v3=github.com/distribution/distribution/v3@${GO_DISTRIBUTION_VERSION}"
+        in text
+    )
+    assert 'grep -F "github.com/distribution/distribution/v3"' in text
+    assert 'grep -F "${GO_DISTRIBUTION_VERSION}"' in text
