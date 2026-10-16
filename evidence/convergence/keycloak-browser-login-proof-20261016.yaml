@@ -1,0 +1,49 @@
+schema: launchpad.redhat.com/keycloak-browser-login-proof/v1
+observed_date: '2026-10-16'
+result: PASSED-ALL-STEPS-ZERO-RESIDUE
+scope: >-
+  Browser login-flow proof for the promoted Flightpath stage identity
+  (Keycloak 26.8.1, promoted in keycloak-stage-promotion-20261016.yaml).
+  Real headless Chromium through the public passwordless journey on the
+  permanent participant origin.
+cluster_ref: flightpath
+order:
+  request_id: cc9cd4c9-25d1-4c60-8fc5-0c4111ad3596
+  session_id: a3931934-c323-45a4-a3db-47e862517751
+  catalog_item: virtualization-ai-401
+  tenant: smoke-test-tenant
+  exposure_policy: public_code
+  public_url: https://labs.smg-helix.ai/labs/virtualization-ai-401-cc9cd4c9
+  seat_validations: 6/6 passed
+  lifecycle: requested -> provisioning -> validating -> ready -> reclaimed
+browser_steps:
+  login_page_rendered: passed
+  dark_card_template_present: passed
+  email_code_login: passed
+  logout: passed
+  reauthentication_login_page: passed
+  dark_card_after_reauth: passed
+  reauthentication_same_identity: passed
+  same_seat_after_reauth: passed
+dark_card_detail: >-
+  The promoted image's fixed dark login card (#191919 login main card from
+  the 08f8655f contrast fix) renders in the served launchpad-code.ftl page
+  on first login and after reauthentication.
+participant_identity: promotion-proof-20261016@example.com
+seat_ref_stability: >-
+  The same seat reference (cc9cd4c9-25d1-4c60-8fc5-0c4111ad3596) was
+  returned after logout and reauthentication with the same email and code.
+result_artifacts:
+  json: evidence/runs/keycloak-2681-browser-proof-20261016.json
+  screenshots:
+    - evidence/runs/keycloak-2681-login-dark-card-20261016.png
+    - evidence/runs/keycloak-2681-participant-landing-20261016.png
+    - evidence/runs/keycloak-2681-logged-out-20261016.png
+    - evidence/runs/keycloak-2681-reauthenticated-20261016.png
+cleanup:
+  session_status: reclaimed
+  namespace_removed: true
+  namespace: launchpad-smoke-test-tenant-virtualization-ai-cc9cd4
+  residue: zero
+live_service_changed: false
+security_waiver_granted: false

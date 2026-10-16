@@ -1,0 +1,49 @@
+{
+  "participant_email": "promotion-proof-20261016@example.com",
+  "steps": [
+    {
+      "step": "login_page_rendered",
+      "ok": true,
+      "detail": "https://labs.smg-helix.ai/realms/launchpad-public/protocol/openid-connect/auth?client_id=launchpad-public-gateway&prompt=login&redirect_uri=https%3A%2F%2Flabs.smg-helix.ai%2Foauth2%2Fcallback&response_type=code&scope=openid+email+profile&state=jUK-gQXLWuFNYSHCDxzGLFmthgBCvANneec0sDVKdN0%3A%2Flabs%2Fvirtualization-ai-401-cc9cd4c9"
+    },
+    {
+      "step": "dark_card_template_present",
+      "ok": true,
+      "detail": "#191919 found in rendered login page"
+    },
+    {
+      "step": "email_code_login",
+      "ok": true,
+      "detail": "https://labs.smg-helix.ai/labs/virtualization-ai-401-cc9cd4c9"
+    },
+    {
+      "step": "logout",
+      "ok": true,
+      "detail": "https://labs.smg-helix.ai/realms/launchpad-public/protocol/openid-connect/logout"
+    },
+    {
+      "step": "reauthentication_login_page",
+      "ok": true,
+      "detail": "https://labs.smg-helix.ai/realms/launchpad-public/protocol/openid-connect/auth?client_id=launchpad-public-gateway&prompt=login&redirect_uri=https%3A%2F%2Flabs.smg-helix.ai%2Foauth2%2Fcallback&response_type=code&scope=openid+email+profile&state=Glrt3YEMWsqIo21thFitg2_VKiR0ENrsoXtI79FjUUk%3A%2Flabs%2Fvirtualization-ai-401-cc9cd4c9"
+    },
+    {
+      "step": "dark_card_after_reauth",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "step": "reauthentication_same_identity",
+      "ok": true,
+      "detail": "https://labs.smg-helix.ai/labs/virtualization-ai-401-cc9cd4c9"
+    },
+    {
+      "step": "same_seat_after_reauth",
+      "ok": true,
+      "detail": "cc9cd4c9-25d1-4c60-8fc5-0c4111ad3596 vs cc9cd4c9-25d1-4c60-8fc5-0c4111ad3596"
+    }
+  ],
+  "landing_url": "https://labs.smg-helix.ai/labs/virtualization-ai-401-cc9cd4c9",
+  "first_seat_ref": "cc9cd4c9-25d1-4c60-8fc5-0c4111ad3596",
+  "second_seat_ref": "cc9cd4c9-25d1-4c60-8fc5-0c4111ad3596",
+  "overall": "passed"
+}
