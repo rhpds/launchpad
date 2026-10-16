@@ -4,7 +4,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from preflight_flightpath_tls import DEFAULT_HOSTS, evaluate
+from preflight_flightpath_tls import DEFAULT_HOSTS, _probe_host, evaluate
 
 
 def test_default_preflight_covers_all_candidate_browser_routes() -> None:
@@ -62,3 +62,26 @@ def test_preflight_passes_only_when_every_host_is_browser_ready() -> None:
     )
 
     assert report["passed"] is True
+
+
+def test_probe_reports_resolved_addresses_when_tls_is_not_trusted(monkeypatch) -> None:
+    monkeypatch.setattr(
+        "preflight_flightpath_tls.socket.getaddrinfo",
+        lambda *args, **kwargs: [
+            (2, 1, 6, "", ("192.0.2.20", 443)),
+            (2, 1, 6, "", ("192.0.2.10", 443)),
+            (2, 1, 6, "", ("192.0.2.20", 443)),
+        ],
+    )
+
+    def reject_connection(*args, **kwargs):
+        raise ConnectionRefusedError
+
+    monkeypatch.setattr(
+        "preflight_flightpath_tls.socket.create_connection", reject_connection
+    )
+
+    result = _probe_host("requester.example")
+
+    assert result["resolved_addresses"] == ["192.0.2.10", "192.0.2.20"]
+    assert result["failure"] == "connection-failed"

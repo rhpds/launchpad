@@ -17,8 +17,23 @@ DEFAULT_HOSTS = (
 
 
 def _probe_host(host: str, timeout: float = 10) -> dict:
-    result = {"host": host, "trusted": False, "http_status": None}
+    result = {
+        "host": host,
+        "resolved_addresses": [],
+        "trusted": False,
+        "http_status": None,
+    }
     try:
+        result["resolved_addresses"] = sorted(
+            {
+                address[4][0]
+                for address in socket.getaddrinfo(
+                    host,
+                    443,
+                    type=socket.SOCK_STREAM,
+                )
+            }
+        )
         context = ssl.create_default_context()
         with (
             socket.create_connection((host, 443), timeout=timeout) as connection,
