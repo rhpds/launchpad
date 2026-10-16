@@ -489,8 +489,10 @@ The repository now contains roughly 34 MiB of instructional images. The
 adapted playbook uses the pinned PatternFly 6 Showroom theme; content delivery
 therefore uses the same immutable Git-first path as the other Launchpad labs.
 
-The namespace-scoped workload is now `gitops_ready: true`, while the catalog
-item remains `draft` and capped at five internal seats. Arena now provides a functional
+The namespace-scoped workload is retained as `gitops_ready: true`, while the catalog
+item remains `deprecated` and cannot be ordered. The five-seat value records the
+largest historical certification run; it is not a current order or promotion limit.
+Arena provided a functional
 shared MLflow service backed by persistent PostgreSQL with verified OpenShift
 service-ca TLS, plus a supported OpenShift Logging 6.6 one-seat pilot. The
 participant can query application logs in the assigned namespace and is denied
@@ -503,6 +505,7 @@ measured steady topology from 13 to 12 pods per seat. Four rollout/bootstrap
 pods remain a bounded transient cost for each of the two concurrently
 provisioned seats. Per-seat DSPA and database instances remain isolated because
 sharing a project-scoped RHOAI pipeline service would change the participant
-security boundary. The 25-seat gate still requires measured live capacity,
-durable S3-compatible object storage, dynamic block storage, and a
-production-sized Loki topology.
+security boundary. At decommission, the uncompleted 25-seat gate still lacked
+measured live capacity, durable S3-compatible object storage, dynamic block
+storage, and a production-sized Loki topology. That gate is closed rather than
+queued: the deprecated item must not be promoted or recertified.

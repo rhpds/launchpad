@@ -28,12 +28,10 @@ def test_sovereign_ai_301_is_terminal_scoped_and_allocates_no_model_access() -> 
     assert metadata["certification_stage"] == "1-seat-certified"
     assert metadata["allowed_exposure_policies"] == runtime[
         "allowed_exposure_policies"
-    ] == ["internal", "public_code"]
-    assert metadata["public_access_certification_stage"] == "one-seat-certified"
-    assert metadata["public_max_workshop_seats"] == 1
-    assert metadata["source_references"]["certification_evidence"] == (
-        "evidence/runs/flightpath-live-20261002-sovereign-ai-301-public-1seat-r1.json"
-    )
+    ] == ["internal"]
+    assert metadata["public_access_certification_stage"] == "not-certified"
+    assert metadata["public_max_workshop_seats"] == 0
+    assert metadata["source_references"] == {}
     assert metadata["certification_transfer"] == "none"
     assert metadata["recommended_next_items"] == ["sovereign-ai-401"]
     assert metadata["required_models"] == runtime["required_models"] == []
@@ -47,14 +45,16 @@ def test_sovereign_ai_301_is_terminal_scoped_and_allocates_no_model_access() -> 
     assert runtime["workload"]["runtime_secret_name"] == ""
     assert runtime["workload"]["runtime_secret_sources"] == {}
     expected_gitops_repo = "https://github.com/jkershawrh/sovereign-ai-301.git"
-    expected_revision = "a07902e0f58af8bd01a9e7f156bf89687173b72e"
+    expected_revision = "cd11e52b29c27d6532e6304cca4efe47ac359373"
     assert metadata["showroom_content_repo_url"] == expected_gitops_repo
     assert metadata["workload_repo"] == expected_gitops_repo
     assert intake["sources"]["showroom"]["gitops_repo_url"] == expected_gitops_repo
     assert intake["sources"]["workload"]["gitops_repo_url"] == expected_gitops_repo
     assert metadata["showroom_content_ref"] == expected_revision
     assert metadata["workload_revision"] == expected_revision
-    assert review["source_state"]["catalog_pinned_revision"] == expected_revision
+    assert review["source_state"]["catalog_pinned_revision"] == (
+        "a07902e0f58af8bd01a9e7f156bf89687173b72e"
+    )
     assert metadata["workload_routes"] == runtime["workload"]["routes"] == {
         "ui": "story"
     }
@@ -62,11 +62,9 @@ def test_sovereign_ai_301_is_terminal_scoped_and_allocates_no_model_access() -> 
     assert "get route story" in probe_source
     assert "curl -fsSkL" in probe_source
 
-    expected_tabs = ["story", "terminal"]
+    expected_tabs = ["story", "terminal", "openshift-console"]
     assert [tab["id"] for tab in metadata["showroom_tabs"]] == expected_tabs
     assert [tab["id"] for tab in runtime["tabs"]] == expected_tabs
-    assert "Console" not in review["operators"]["evidence"]
-    assert "Console" not in review["next_action"]
     assert "Terminal" in review["operators"]["evidence"]
     assert "truthful rehearsal product" in review["next_action"]
     assert review["source_state"]["certification_target"] == "truthful-rehearsal-only"
@@ -77,7 +75,7 @@ def test_sovereign_ai_301_is_terminal_scoped_and_allocates_no_model_access() -> 
     assert welcome == {
         "id": "welcome",
         "path": "/www/sovereign-ai-301/main/index.html",
-        "marker": "Northstar Claims: build the confidential-inference trust chain",
+        "marker": "Northstar Claims: qualify a sovereign inference design",
     }
     assert {"path": "journey.model_invoked", "equals": False} in assertions
     assert {"path": "journey.confidential_runtime_enabled", "equals": False} in assertions
@@ -110,3 +108,4 @@ def test_sovereign_ai_301_rehearsal_proof_cannot_transfer_to_live_tdx() -> None:
         assert expected in assertions
 
     assert catalog["metadata"]["activation_blockers"] == []
+    assert catalog["metadata"]["public_access_certification_stage"] == "not-certified"

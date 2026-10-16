@@ -13,7 +13,7 @@ def _load(path: str) -> dict:
     return yaml.safe_load((ROOT / path).read_text(encoding="utf-8"))
 
 
-def test_sovereign_ai_101_orderability_matches_exact_rehearsal_proof() -> None:
+def test_sovereign_ai_101_is_one_seat_full_journey_certified() -> None:
     catalog = _load("catalog/sovereign-ai-101/catalog-item.yaml")
     intake = _load("catalog-onboarding/sovereign-ai-101.yaml")
     contract = _load("certification/catalog/sovereign-ai-101.yaml")
@@ -23,11 +23,14 @@ def test_sovereign_ai_101_orderability_matches_exact_rehearsal_proof() -> None:
     certification = intake["certification"]
 
     assert catalog["status"] == intake["catalog"]["status"] == "active"
-    assert metadata["certification_stage"] == certification["stage"] == "1-seat-certified"
+    assert metadata["certification_stage"] == certification["stage"] == (
+        "1-seat-certified"
+    )
     assert metadata["max_workshop_seats"] == certification["max_workshop_seats"] == 1
-    assert metadata["activation_blockers"] == certification["activation_blockers"] == []
-    assert metadata["allowed_exposure_policies"] == ["internal", "public_code"]
-    assert runtime["allowed_exposure_policies"] == ["internal", "public_code"]
+    assert metadata["activation_blockers"] == certification["activation_blockers"]
+    assert metadata["activation_blockers"] == []
+    assert metadata["allowed_exposure_policies"] == ["internal"]
+    assert runtime["allowed_exposure_policies"] == ["internal"]
 
     assert metadata["required_models"] == runtime["required_models"] == []
     assert metadata["inference_endpoint"] == runtime["inference_endpoint"] == "none"

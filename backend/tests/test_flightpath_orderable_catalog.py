@@ -90,25 +90,22 @@ def test_specialty_catalog_status_matches_certification_evidence():
     assert {catalog_id: items[catalog_id]["status"] for catalog_id in expected} == expected
 
 
-def test_rebuilt_sovereign_101_is_one_seat_certified_and_public_orderable():
-    item = _effective_flightpath_items()["sovereign-ai-101"]
-    metadata = item["metadata"]
+def test_sovereign_foundations_are_active_at_the_proven_internal_one_seat_limit():
+    items = _effective_flightpath_items()
 
-    assert item["status"] == "active"
-    assert metadata["certification_stage"] == "1-seat-certified"
-    assert metadata["max_workshop_seats"] == 1
-    assert metadata["allowed_exposure_policies"] == ["internal", "public_code"]
-    assert metadata["activation_blockers"] == []
-    assert metadata["showroom_content_ref"] == (
-        "6d7c6f267407d42ca465b8a381d841d8b5b77567"
-    )
-    assert metadata["workload_revision"] == metadata["showroom_content_ref"]
-    assert metadata["workload_helm_values"]["workload_image"].endswith(
-        "@sha256:c7f5058213960ceb1a268506f43fe666c4cf5df62ce7d6e444dd277b34886958"
-    )
-    assert metadata["workload_helm_values"]["presentation_image"].endswith(
-        "@sha256:c9301b53eca8b8a20c9f87d142363b7c9b0f2abffeb36fd6b97ee3ebb895ec2d"
-    )
+    expected_stages = {
+        "sovereign-ai-101": "1-seat-certified",
+        "sovereign-ai-201": "1-seat-certified",
+        "sovereign-ai-301": "1-seat-certified",
+    }
+    for catalog_id, expected_stage in expected_stages.items():
+        item = items[catalog_id]
+        metadata = item["metadata"]
+        assert item["status"] == "active"
+        assert metadata["certification_stage"] == expected_stage
+        assert metadata["max_workshop_seats"] == 1
+        assert metadata["activation_blockers"] == []
+        assert metadata["allowed_exposure_policies"] == ["internal"]
 
 
 def test_agentic_501_is_mounted_as_a_bounded_one_seat_rehearsal():

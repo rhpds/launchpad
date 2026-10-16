@@ -70,7 +70,6 @@ runtime:
     source: cluster.console_url
   allowed_exposure_policies:
   - internal
-  - public_code
   workload:
     source_kind: kustomize
     gitops_ready: true

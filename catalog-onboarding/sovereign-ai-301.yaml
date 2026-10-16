@@ -6,7 +6,7 @@ catalog:
     resource policy, independent inference authorization, refusal states, and human
     authority.
   category: guided_build
-  version: 0.1.1
+  version: 0.2.0
   status: active
 learning:
   learning_level: '301'
@@ -27,13 +27,13 @@ learning:
 sources:
   showroom:
     repo_url: https://github.com/jkershawrh/sovereign-ai-301.git
-    revision: a07902e0f58af8bd01a9e7f156bf89687173b72e
+    revision: cd11e52b29c27d6532e6304cca4efe47ac359373
     playbook: showroom/default-site.yml
     start_path: content
     gitops_repo_url: https://github.com/jkershawrh/sovereign-ai-301.git
   workload:
     repo_url: https://github.com/jkershawrh/sovereign-ai-301.git
-    revision: a07902e0f58af8bd01a9e7f156bf89687173b72e
+    revision: cd11e52b29c27d6532e6304cca4efe47ac359373
     deploy_path: charts/sovereign-ai-301
     gitops_repo_url: https://github.com/jkershawrh/sovereign-ai-301.git
 runtime:
@@ -69,27 +69,29 @@ runtime:
   - id: terminal
     title: Terminal
     source: showroom.terminal
+  - id: openshift-console
+    title: OpenShift Console
+    source: cluster.console_url
   allowed_exposure_policies:
   - internal
-  - public_code
   workload:
     source_kind: chart
     gitops_ready: true
     release_name: sovereign-ai-301
     helm_values:
       values_overlay: charts/sovereign-ai-301/values.published.yaml
-      workload_image: ghcr.io/jkershawrh/sovereign-ai-301-qualifier@sha256:1f23f2fb1d3f12c676399c56fcedc4a57c5291cc9b0a883ad4103dd680f8db31
-      presentation_image: ghcr.io/jkershawrh/sovereign-ai-301-presentation@sha256:203a386123a2ea34198a0b3a67c967481d4a72300f232010a48af4c4209f5893
+      workload_image: ghcr.io/jkershawrh/sovereign-ai-301-qualifier@sha256:498db8c1603bb834b815ea66addfc719901d8f6c6744dca4721e30e3d966197f
+      presentation_image: ghcr.io/jkershawrh/sovereign-ai-301-presentation@sha256:305966b7fcaeb8bfb2a88b08274c74fef89e2d129f146154152d455b3c1d0c33
       source_state: REHEARSAL
       confidential_runtime_enabled: false
       live_tdx_claimed: false
       image:
         repository: ghcr.io/jkershawrh/sovereign-ai-301-qualifier
-        digest: sha256:9972430351ea2b5b8c6f8798e3b9baf244194fc29b48471d42cb2ee06f497e62
+        digest: sha256:498db8c1603bb834b815ea66addfc719901d8f6c6744dca4721e30e3d966197f
       presentation:
         image:
           repository: ghcr.io/jkershawrh/sovereign-ai-301-presentation
-          digest: sha256:203a386123a2ea34198a0b3a67c967481d4a72300f232010a48af4c4209f5893
+          digest: sha256:305966b7fcaeb8bfb2a88b08274c74fef89e2d129f146154152d455b3c1d0c33
     runtime_secret_name: ''
     runtime_secret_value_path: ''
     runtime_secret_sources: {}
@@ -100,11 +102,9 @@ certification:
   stage: 1-seat-certified
   certified_seats: 1
   max_workshop_seats: 1
-  public_access_stage: one-seat-certified
-  public_max_workshop_seats: 1
+  public_access_stage: not-certified
+  public_max_workshop_seats: 0
   promotion_sequence:
   - 1
   activation_blockers: []
   proof_contract: certification/catalog/sovereign-ai-301.yaml
-references:
-  certification_evidence: evidence/runs/flightpath-live-20261002-sovereign-ai-301-public-1seat-r1.json

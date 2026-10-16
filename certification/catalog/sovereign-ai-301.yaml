@@ -11,10 +11,15 @@ spec:
     - {seats: 1, required_consecutive_runs: 1, probe_concurrency: 1, maximum_ready_seconds: 900, maximum_cleanup_seconds: 600}
   showroom:
     pages:
-      - {id: welcome, path: /www/sovereign-ai-301/main/index.html, marker: "Northstar Claims: build the confidential-inference trust chain"}
+      - {id: welcome, path: /www/sovereign-ai-301/main/index.html, marker: "Northstar Claims: qualify a sovereign inference design"}
+      - {id: mission, path: /www/sovereign-ai-301/main/00-mission.html, marker: "Accept the Northstar mission"}
+      - {id: protection, path: /www/sovereign-ai-301/main/01-protection.html, marker: "Draw the protection boundary"}
       - {id: challenge, path: /www/sovereign-ai-301/main/02-challenge.html, marker: "Challenge and evidence"}
       - {id: appraisal, path: /www/sovereign-ai-301/main/03-appraise.html, marker: "Appraise measured identity"}
+      - {id: release, path: /www/sovereign-ai-301/main/04-release.html, marker: "Authorize one resource, not inference"}
       - {id: refusal, path: /www/sovereign-ai-301/main/05-failures.html, marker: "Refuse unsafe states"}
+      - {id: handoff, path: /www/sovereign-ai-301/main/06-handoff.html, marker: "Hand off evidence and preserve reclaim ownership"}
+      - {id: cleanup, path: /www/sovereign-ai-301/main/07-cleanup.html, marker: "Prove cleanup without deleting the platform"}
   seat_probe:
     argv: [bash, scripts/certify-sovereign-ai-301-seat.sh, "{namespace}", "{cluster_ref}"]
     timeout_seconds: 600

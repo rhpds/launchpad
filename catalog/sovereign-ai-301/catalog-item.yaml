@@ -4,7 +4,7 @@ description: Trace capability, challenge-bound workload identity, evidence appra
   resource policy, independent inference authorization, refusal states, and human
   authority.
 category: guided_build
-version: 0.1.1
+version: 0.2.0
 status: active
 required_capabilities:
 - openshift
@@ -40,7 +40,7 @@ metadata:
   certification_transfer: none
   showroom: true
   showroom_content_repo_url: https://github.com/jkershawrh/sovereign-ai-301.git
-  showroom_content_ref: a07902e0f58af8bd01a9e7f156bf89687173b72e
+  showroom_content_ref: cd11e52b29c27d6532e6304cca4efe47ac359373
   showroom_content_playbook: showroom/default-site.yml
   showroom_content_start_path: content
   operator_workshop: true
@@ -55,9 +55,8 @@ metadata:
   certification_proof_contract: certification/catalog/sovereign-ai-301.yaml
   allowed_exposure_policies:
   - internal
-  - public_code
-  public_access_certification_stage: one-seat-certified
-  public_max_workshop_seats: 1
+  public_access_certification_stage: not-certified
+  public_max_workshop_seats: 0
   showroom_journey: sovereign-ai-301
   showroom_title: "Sovereign AI 301 \u2014 Confidential Inference and Intel TDX Foundations"
   namespace_slug: sovereign-ai-301
@@ -70,6 +69,9 @@ metadata:
   - id: terminal
     title: Terminal
     source: showroom.terminal
+  - id: openshift-console
+    title: OpenShift Console
+    source: cluster.console_url
   workshop_cluster_ref: flightpath
   required_models: []
   inference_endpoint: none
@@ -86,7 +88,7 @@ metadata:
   workshop_node_headroom_pods: 0
   workshop_node_required_labels: {}
   workload_repo: https://github.com/jkershawrh/sovereign-ai-301.git
-  workload_revision: a07902e0f58af8bd01a9e7f156bf89687173b72e
+  workload_revision: cd11e52b29c27d6532e6304cca4efe47ac359373
   workload_deploy_type: helm
   workload_deployment_scope: seat
   workload_deploy_path: charts/sovereign-ai-301
@@ -95,18 +97,18 @@ metadata:
   workload_release_name: sovereign-ai-301
   workload_helm_values:
     values_overlay: charts/sovereign-ai-301/values.published.yaml
-    workload_image: ghcr.io/jkershawrh/sovereign-ai-301-qualifier@sha256:1f23f2fb1d3f12c676399c56fcedc4a57c5291cc9b0a883ad4103dd680f8db31
-    presentation_image: ghcr.io/jkershawrh/sovereign-ai-301-presentation@sha256:203a386123a2ea34198a0b3a67c967481d4a72300f232010a48af4c4209f5893
+    workload_image: ghcr.io/jkershawrh/sovereign-ai-301-qualifier@sha256:498db8c1603bb834b815ea66addfc719901d8f6c6744dca4721e30e3d966197f
+    presentation_image: ghcr.io/jkershawrh/sovereign-ai-301-presentation@sha256:305966b7fcaeb8bfb2a88b08274c74fef89e2d129f146154152d455b3c1d0c33
     source_state: REHEARSAL
     confidential_runtime_enabled: false
     live_tdx_claimed: false
     image:
       repository: ghcr.io/jkershawrh/sovereign-ai-301-qualifier
-      digest: sha256:9972430351ea2b5b8c6f8798e3b9baf244194fc29b48471d42cb2ee06f497e62
+      digest: sha256:498db8c1603bb834b815ea66addfc719901d8f6c6744dca4721e30e3d966197f
     presentation:
       image:
         repository: ghcr.io/jkershawrh/sovereign-ai-301-presentation
-        digest: sha256:203a386123a2ea34198a0b3a67c967481d4a72300f232010a48af4c4209f5893
+        digest: sha256:305966b7fcaeb8bfb2a88b08274c74fef89e2d129f146154152d455b3c1d0c33
   workload_ignore_differences: []
   workload_runtime_secret_name: ''
   workload_runtime_secret_sources: {}
@@ -116,6 +118,5 @@ metadata:
     ui: story
   workload_readiness: []
   source_content_repo: https://github.com/jkershawrh/sovereign-ai-301.git
-  source_content_revision: a07902e0f58af8bd01a9e7f156bf89687173b72e
-  source_references:
-    certification_evidence: evidence/runs/flightpath-live-20261002-sovereign-ai-301-public-1seat-r1.json
+  source_content_revision: cd11e52b29c27d6532e6304cca4efe47ac359373
+  source_references: {}
