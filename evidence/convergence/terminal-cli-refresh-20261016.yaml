@@ -1,7 +1,7 @@
 schema: launchpad.redhat.com/terminal-cli-refresh/v1
 observed_date: '2026-10-16'
-status: REFRESH-COMMITTED-ODO-REMOVED-SCAN-PENDING
-source_revision: pending-removal-commit
+status: REFRESH-AND-REMOVAL-COMPLETE-GATE-BLOCKED-ON-VENDOR-PENDING-RESIDUE
+source_revision: a66cd3bfde94dea2dd9f3059f05399141543c010
 platform_scope: workshop-images/showroom-terminal only
 live_deployment_performed: false
 image_published: false
@@ -10,6 +10,62 @@ owner_guidance: >-
   security remains a concern and no waivers are granted, but the immediate
   objective is clearing fixable HIGH/CRITICAL findings pragmatically until
   lab-request traction justifies deeper investment.
+ci_runs:
+  runtime_proof: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/38915736986
+  runtime_proof_result: >-
+    All ten learner CLIs (including odo, pre-removal) executed offline as
+    uid 1001 after the uid-1001 passwd restoration; runtime check passed.
+  scan_with_tmp_duplication: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/38916694544
+  scan_with_tmp_duplication_result: >-
+    Build, runtime check and full vulnerability inventory passed. The gate
+    blocked on remaining findings. The inventory also proved cli-refresh.sh
+    left six /tmp copies of installed binaries that the scanner catalogued
+    as duplicates; fixed in a66cd3bf. Disk-exhaustion crash in the earlier
+    run 38915736986 fixed by the runner cleanup step in ef2c91ed.
+  final_scan: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/38918487384
+  final_scan_result: >-
+    Build, runtime check and full vulnerability inventory passed; the
+    security gate blocked on the vendor-pending residue as designed.
+    Retained artifact:
+    terminal-release-evidence-a66cd3bfde94dea2dd9f3059f05399141543c010.
+scan_result:
+  comparison_unit: fixable matches and per-binary distinct High/Critical CVEs
+  preceding_candidate:
+    source_revision: f992a26b1787c1c01430005cc81a7cbfc5effd7f
+    fixable_matches: 1472
+    per_binary_distinct: 102 critical, 688 high
+  refreshed_candidate:
+    fixable_matches: 379
+    per_binary_distinct: 22 critical, 228 high
+    module_distinct: 4 critical, 59 high
+    binaries_scanned: >-
+      exactly eight; helm carries zero findings and odo is removed
+    per_binary:
+      helm: 0C 0H
+      skopeo: 1C 11H
+      kn: 3C 36H
+      kubectl: 3C 38H
+      oc: 3C 38H
+      opc: 3C 40H
+      roxctl: 3C 22H
+      tkn: 3C 23H
+      tkn-pac: 3C 20H
+    remaining_by_module_distinct:
+      stdlib: 3C 33H
+      x/net: 1C 4H
+      grpc: 3H
+      x/crypto: 3H
+      distribution: 2H
+      buildkit: 2H
+      go-git: 2H
+      fulcio: 2H
+      x/mod: 2H
+      otel: 1H
+      spdystream: 1H
+      go-jose: 1H
+      go-billy: 1H
+      go-archive: 1H
+      x/text: 1H
 refreshed_tools:
   helm:
     version: v3.22.1
@@ -84,10 +140,28 @@ remaining_blockers:
     tkn, tkn-pac and oc/kubectl vendor builds predate the fixed toolchains.
     Clearing requires vendor respins; no waiver.
   - >-
-    Vendor dependency lag: x/net, grpc, buildkit, fulcio, spdystream,
-    go-jose, go-billy, go-archive and distribution findings inside the
-    refreshed vendor binaries. Clearing requires upstream dependency bumps.
-  - skopeo vendored x/net and grpc lag their fixed versions at the v1.24.1 tag.
+    Vendor dependency lag: x/net, x/crypto, x/text, grpc, buildkit, fulcio,
+    spdystream, go-jose, go-git, go-billy, go-archive, distribution and
+    otel findings inside the refreshed vendor binaries. Clearing requires
+    upstream dependency bumps.
+  - >-
+    skopeo vendored x/crypto, x/net, x/text and grpc lag their fixed
+    versions at the v1.24.1 source tag; the go1.27.2 build cleared
+    every stdlib finding as intended.
+backend_parallel_finding:
+  distribution_note: >-
+    The backend image's two fixable distribution High findings
+    (GHSA-f2g3-hh2r-cwgc, GHSA-3p65-76g6-3w7r) are NOT consumable by oc:
+    the fixed v3.1.0 removed the registry/client packages that
+    openshift/library-go imports, and oc master still pins the same 2023
+    pseudo-version. Both CVEs sit in registry-server code paths the oc
+    client does not execute. Attempted in d3274b41, reverted with the
+    constraint documented in 506e739a and the backend Containerfile.
+  el9_rpm_note: >-
+    The 20 el9 RPM High findings (expat, python3, gnutls, util-linux
+    family) are confirmed Affected by Red Hat's own security data with
+    errata pending (CVE-2026-53613, CVE-2026-19445 verified directly);
+    nothing is actionable on the platform side.
 limits:
   - Local grype preview numbers are not release evidence; the authoritative
     complete-image scan is the CI vulnerability gate on the exact commit.

@@ -1,6 +1,49 @@
 schema: launchpad/staging-regression-checkpoint/v1
 date: '2026-10-15'
 status: NOT-QUALIFIED
+latest_security_followup:
+  source: 95fec905f1c2a3b6581de5e290f711af2ede37c1
+  result: SECURITY-BLOCKED
+  high: 25
+  critical: 0
+  unrated: 2
+  report: evidence/convergence/backend-security-95fec905-20261015.yaml
+  security_waiver_granted: false
+  live_rollout_performed: false
+browser_remediation_followup:
+  report: evidence/convergence/browser-remediation-20261015.yaml
+  targeted_501_browser_and_cleanup: passed
+  full_501_public_catalog_gate_claimed: false
+  identity_image: qualified-not-deployed
+  terminal_image: os-refresh-build-and-runtime-passed-embedded-cli-security-blocked
+  terminal_report: evidence/convergence/terminal-os-refresh-20261015.yaml
+  local_working_tree_regression:
+    report: evidence/runs/full-regression-private-provenance-20261015.xml
+    passed: 2904
+    failed: 0
+    skipped: 27
+    deselected: 13
+    limit: This working-tree regression does not supersede an exact clean-source image or live certification gate.
+terminal_cli_refresh_followup:
+  observed_date: '2026-10-16'
+  report: evidence/convergence/terminal-cli-refresh-20261016.yaml
+  source_revision: a66cd3bfde94dea2dd9f3059f05399141543c010
+  result: BUILD-RUNTIME-AND-SCAN-GREEN-GATE-BLOCKED-ON-VENDOR-PENDING-RESIDUE
+  ci_run: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/38918487384
+  fixable_matches_reduction: 1472-to-379
+  per_binary_distinct_reduction: 102C-688H-to-22C-228H
+  helm_findings: zero
+  odo: removed-under-owner-authorization-2026-10-16
+  runtime_check: all-eight-refreshed-learner-clis-proven-offline-as-uid-1001
+  remaining_cause: go1.26.9/1.27.2 stdlib advisory batch plus vendor dependency lag; no fix consumable without vendor respins
+  security_waiver_granted: false
+  live_rollout_performed: false
+  working_tree_regression:
+    passed: 2914
+    failed: 0
+    skipped: 27
+    deselected: 40
+    limit: Working-tree regression; the exact-commit freeze step remains part of the staging candidate path.
 latest_full_regression:
   source: 95fec905
   report: evidence/runs/backend-full-95fec905-20261015.xml
