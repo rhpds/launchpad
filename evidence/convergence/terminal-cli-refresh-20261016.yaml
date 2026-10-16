@@ -1,0 +1,96 @@
+schema: launchpad.redhat.com/terminal-cli-refresh/v1
+observed_date: '2026-10-16'
+status: REFRESH-COMMITTED-ODO-REMOVED-SCAN-PENDING
+source_revision: pending-removal-commit
+platform_scope: workshop-images/showroom-terminal only
+live_deployment_performed: false
+image_published: false
+owner_guidance: >-
+  Owner direction recorded 2026-10-16: the platform is just out of pilot;
+  security remains a concern and no waivers are granted, but the immediate
+  objective is clearing fixable HIGH/CRITICAL findings pragmatically until
+  lab-request traction justifies deeper investment.
+refreshed_tools:
+  helm:
+    version: v3.22.1
+    source: https://get.helm.sh/helm-v3.22.1-linux-amd64.tar.gz
+    checksum_basis: vendor-published .sha256sum
+    local_scan_fixable_high_critical: 0
+  oc:
+    version: 4.22.18
+    source: https://mirror.openshift.com/pub/openshift-v4/amd64/clients/ocp/4.22.18/openshift-client-linux-4.22.18.tar.gz
+    checksum_basis: computed-from-exact-vendor-artifact
+    note: bundle ships the oc binary for both oc and kubectl, matching the inherited layout
+    local_scan_fixable_high_critical: 1 critical, 18 high
+  kn:
+    version: v1.23.0
+    source: https://github.com/knative/client/releases/download/knative-v1.23.0/kn-linux-amd64
+    checksum_basis: computed-from-exact-vendor-artifact
+    local_scan_fixable_high_critical: 1 critical, 13 high
+  tkn:
+    version: v0.46.1
+    source: https://github.com/tektoncd/cli/releases/download/v0.46.1/tkn_0.46.1_Linux_x86_64.tar.gz
+    checksum_basis: vendor-published checksums.txt
+    local_scan_fixable_high_critical: 1 critical, 9 high
+  tkn-pac:
+    version: v0.52.0
+    source: https://github.com/openshift-pipelines/pipelines-as-code/releases/download/v0.52.0/tkn-pac_0.52.0_linux_x86_64.tar.gz
+    checksum_basis: vendor-published checksums.txt
+    quirk: release tarball binary reports version "nightly"; official checksum verified
+    local_scan_fixable_high_critical: 1 critical, 8 high
+  opc:
+    version: v1.24.0
+    source: https://github.com/openshift-pipelines/opc/releases/download/v1.24.0/opc_1.24.0_linux_x86_64.tar.gz
+    checksum_basis: vendor-published checksums.txt
+    local_scan_fixable_high_critical: 1 critical, 17 high
+  roxctl:
+    version: 4.11.5
+    source: https://mirror.openshift.com/pub/rhacs/assets/4.11.5/bin/linux/roxctl
+    checksum_basis: computed-from-exact-vendor-artifact
+    local_scan_fixable_high_critical: 2 critical, 9 high
+  skopeo:
+    version: v1.24.1
+    source: checksum-pinned upstream source tag built in Containerfile
+    builder: golang:1.27.2 digest-pinned
+    build_tags: containers_image_openpgp exclude_graphdriver_btrfs
+    reason: no release binaries exist; vendor container image requires GLIBC 2.43 (incompatible with el10 base)
+    local_scan_note: >-
+      local preview built with go1.26.4 showed stdlib findings that the CI
+      go1.27.2 build clears; remaining dep findings are vendored x/net and
+      grpc lagging their fixed versions upstream
+removed_tools:
+  odo:
+    removal_authorized_by_owner: 2026-10-16
+    rationale: >-
+      Upstream redhat-developer/odo and the Red Hat client mirror both ended
+      at v3.16.1 (built with go1.21.10); no fixed artifact exists. No lab
+      content references odo (zero hits across showroom and catalog sources).
+      It carried 21 Critical + 106 High fixable findings in the preceding
+      complete-image scan (evidence/convergence/terminal-os-refresh-20261015.yaml).
+    restore_path: >-
+      Re-add a checksum-pinned vendor or source-built odo when a fixed
+      upstream release exists or lab content requires the tool.
+runtime_user_regression:
+  defect: >-
+    The el10 package upgrade consolidates /etc/passwd and drops the base
+    image's hand-added uid 1001 entry; learner CLIs performing user lookups
+    fail with "user: unknown userid 1001". Predates this branch; exposed by
+    the new odo version assertion in the isolated runtime check.
+  fix: Containerfile restores the exact inherited passwd entry after dnf upgrade.
+  ci_proof: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/38915736986
+remaining_blockers:
+  - >-
+    go stdlib advisory batch fixed only in go1.26.9/1.27.2: kn, opc, roxctl,
+    tkn, tkn-pac and oc/kubectl vendor builds predate the fixed toolchains.
+    Clearing requires vendor respins; no waiver.
+  - >-
+    Vendor dependency lag: x/net, grpc, buildkit, fulcio, spdystream,
+    go-jose, go-billy, go-archive and distribution findings inside the
+    refreshed vendor binaries. Clearing requires upstream dependency bumps.
+  - skopeo vendored x/net and grpc lag their fixed versions at the v1.24.1 tag.
+limits:
+  - Local grype preview numbers are not release evidence; the authoritative
+    complete-image scan is the CI vulnerability gate on the exact commit.
+  - The runtime compatibility proof covers version commands offline; it does
+    not re-execute full lab journeys.
+  - No security exception, suppression or scanner ignore was added.

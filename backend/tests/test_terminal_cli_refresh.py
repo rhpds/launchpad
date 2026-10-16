@@ -22,10 +22,11 @@ PINNED_CLI_TOOLS = {
     'skopeo': 'v1.24.1',
 }
 
-# odo is at its terminal upstream release (v3.16.1) and no fixed artifact
-# exists from the vendor or the Red Hat mirror. It must be retained untouched
-# rather than stripped to reduce finding counts.
-UNREFRESHED_TOOLS = ('odo',)
+# odo was removed with owner authorization on 2026-10-16: upstream ended at
+# v3.16.1 with no fixed artifact, no lab content references it, and it carried
+# 21 Critical + 106 High fixable findings. The removal, rationale and restore
+# path must stay documented in cli-refresh.sh.
+REMOVED_TOOLS = ('odo',)
 
 
 def test_cli_refresh_script_pins_every_tool_with_immutable_checksums():
@@ -42,7 +43,24 @@ def test_cli_refresh_script_pins_every_tool_with_immutable_checksums():
     )
     assert 'sha256sum --check' in source
     assert '|| true' not in source
-    assert 'rm -f /usr/local/bin/odo' not in source and 'rm -f /usr/bin/odo' not in source
+
+
+def test_cli_refresh_documents_the_authorized_odo_removal():
+    script = (ROOT / 'workshop-images/showroom-terminal/cli-refresh.sh').read_text()
+    for tool in REMOVED_TOOLS:
+        assert f'rm -f /usr/local/bin/{tool}' in script, (
+            f'{tool} removal must be explicit in cli-refresh.sh'
+        )
+        assert 'owner authorization' in script, (
+            'the removal must record the authorization basis'
+        )
+        assert 'restore path' in script.lower() or 'Restore path' in script, (
+            'the removal must document how to restore the tool'
+        )
+        assert 'v3.16.1' in script, 'the terminal upstream version must be recorded'
+        assert f'{tool} version' not in (
+            ROOT / '.github/workflows/terminal-release.yml'
+        ).read_text(), f'{tool} is removed and must not be asserted in the runtime check'
 
 
 def test_containerfile_runs_cli_refresh_after_os_refresh_before_entrypoint():
@@ -77,15 +95,9 @@ def test_containerfile_builds_skopeo_from_immutable_source():
     assert 'COPY --from=skopeo-build /out/skopeo /usr/bin/skopeo' in source
 
 
-def test_cli_refresh_documentes_the_unrefreshable_odo_blocker():
-    script = (ROOT / 'workshop-images/showroom-terminal/cli-refresh.sh').read_text()
-    for tool in UNREFRESHED_TOOLS:
-        assert tool in script, f'{tool} retention must be documented in cli-refresh.sh'
-
-
 def test_terminal_release_workflow_proves_every_learner_cli_still_runs():
     source = (ROOT / '.github/workflows/terminal-release.yml').read_text()
-    for tool in ('skopeo', 'helm', 'kn', 'kubectl', 'oc', 'odo', 'opc', 'roxctl', 'tkn', 'tkn-pac'):
+    for tool in ('skopeo', 'helm', 'kn', 'kubectl', 'oc', 'opc', 'roxctl', 'tkn', 'tkn-pac'):
         assert f'command -v "$tool"' in source or f'command -v {tool}' in source, (
             f'{tool} must remain present and executable in the runtime check'
         )

@@ -74,7 +74,7 @@ jobs:
             --entrypoint /usr/bin/bash \
             "${IMAGE_REPOSITORY}:git-${{ inputs.expected_sha }}" -se <<'SCRIPT'
           test -x /usr/bin/tmux
-          for tool in oc kubectl helm skopeo kn odo opc roxctl tkn tkn-pac jq curl python3 git tmux; do
+          for tool in oc kubectl helm skopeo kn opc roxctl tkn tkn-pac jq curl python3 git tmux; do
             command -v "$tool"
           done
           oc version --client
@@ -82,7 +82,6 @@ jobs:
           helm version --short
           skopeo --version
           kn version
-          odo version
           opc version
           roxctl version
           tkn version

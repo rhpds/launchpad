@@ -12,13 +12,14 @@
 #     the Containerfile (pinned Go toolchain + checksum-pinned source tarball)
 #     because skopeo publishes no release binaries and the vendor container
 #     image targets an incompatible glibc.
-#   - odo is retained at its inherited upstream binary. redhat-developer/odo
-#     and the Red Hat mirror both end at v3.16.1 (built with go1.21.10), so no
-#     fixed vendor artifact exists. The learner tool is NOT removed; its
-#     inherited findings remain a documented release-gate blocker pending a
-#     sourcing decision.
-#   - No tool is stripped, no failure is ignored, and no security exception is
-#     introduced by this script.
+#   - odo is REMOVED with owner authorization (2026-10-16): upstream
+#     redhat-developer/odo and the Red Hat mirror both ended at v3.16.1
+#     (built with go1.21.10), no fixed artifact exists, and no lab content
+#     references the tool. It carried 21 Critical + 106 High fixable findings
+#     in the complete-image scan. Restore path: re-add a pinned vendor or
+#     source-built odo when a fixed release exists or lab content requires it.
+#   - No other tool is stripped, no failure is ignored, and no security
+#     exception is introduced by this script.
 set -euo pipefail
 
 verify() {
@@ -85,6 +86,8 @@ verify \
   /tmp/roxctl-4.11.5
 install -m 0755 /tmp/roxctl-4.11.5 /usr/local/bin/roxctl
 
-# odo: retained unchanged from the base image (upstream terminal release
-# v3.16.1, no fixed artifact exists). Deliberately not downloaded, replaced,
-# or removed; see the sourcing note at the top of this file.
+# odo: REMOVED with owner authorization on 2026-10-16. Upstream is at its
+# terminal v3.16.1 release with no fixed artifact available, and no lab
+# content references the tool. See the sourcing note at the top of this file
+# for the rationale and the documented restore path.
+rm -f /usr/local/bin/odo
