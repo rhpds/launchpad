@@ -57,11 +57,18 @@ def test_flightpath_promotion_verifies_digest_attestation_and_signature():
     source = (ROOT / "scripts/promote-flightpath-keycloak.sh").read_text()
 
     assert "api.flightpath.fm2aihpcsed.com:6443" in source
-    assert "ghcr\\.io/rhpds/launchpad-keycloak@sha256:" in source
-    assert 'gh attestation verify "oci://$image" --repo rhpds/launchpad' in source
+    assert "ghcr\\.io/jkershawrh/launchpad-keycloak@sha256:" in source
+    # GitHub native attestation is unavailable for this private repository;
+    # registry-backed cosign provenance is the verification path.
+    assert "gh attestation" not in source
     assert 'cosign verify "$image"' in source
+    assert "cosign verify-attestation" in source
     assert "token.actions.githubusercontent.com" in source
-    assert "patch keycloak keycloak" in source
+    # The isolated upgrade proof is mandatory and must match the image.
+    assert "keycloak-isolated-upgrade/v1" in source
+    # The target is the stage Deployment, not the obsolete Keycloak CR.
+    assert "set image deploy/keycloak" in source
+    assert "patch keycloak keycloak" not in source
     assert "What you can do in Launchpad" in source
 
 
