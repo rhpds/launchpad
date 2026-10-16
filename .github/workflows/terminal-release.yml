@@ -108,6 +108,13 @@ jobs:
           test "$(tmux -L certification display-message -p -t lab '#{pane_pid}')" = "$shell_pid"
           SCRIPT
 
+      - name: Free runner disk space for the vulnerability scan
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc \
+            /opt/hostedtoolcache/CodeQL /usr/local/.ghcup
+          sudo docker builder prune -f
+          df -h /
+
       - name: Inventory all candidate vulnerabilities
         uses: anchore/scan-action@1638637db639e0ade3258b51db49a9a137574c3e
         with:
