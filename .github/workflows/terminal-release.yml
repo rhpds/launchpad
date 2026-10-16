@@ -43,8 +43,9 @@ jobs:
         run: |
           set -euo pipefail
           python -m pip install ".[dev]"
-          python -m pytest backend/tests/test_showroom_gitops.py backend/tests/test_terminal_release_workflow.py backend/tests/test_terminal_os_refresh.py -q
+          python -m pytest backend/tests/test_showroom_gitops.py backend/tests/test_terminal_release_workflow.py backend/tests/test_terminal_os_refresh.py backend/tests/test_terminal_cli_refresh.py -q
           bash -n workshop-images/showroom-terminal/launchpad-runttyd
+          bash -n workshop-images/showroom-terminal/cli-refresh.sh
 
       - name: Set up emulation
         uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130
@@ -73,11 +74,19 @@ jobs:
             --entrypoint /usr/bin/bash \
             "${IMAGE_REPOSITORY}:git-${{ inputs.expected_sha }}" -se <<'SCRIPT'
           test -x /usr/bin/tmux
-          for tool in oc kubectl helm jq curl python3 git tmux; do
+          for tool in oc kubectl helm skopeo kn odo opc roxctl tkn tkn-pac jq curl python3 git tmux; do
             command -v "$tool"
           done
           oc version --client
+          kubectl version --client
           helm version --short
+          skopeo --version
+          kn version
+          odo version
+          opc version
+          roxctl version
+          tkn version
+          tkn-pac version
           jq --version
           curl --version
           python3 --version

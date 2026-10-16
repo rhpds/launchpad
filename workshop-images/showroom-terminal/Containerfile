@@ -1,3 +1,17 @@
+# skopeo v1.24.1 built from the immutable upstream source tag with a pinned
+# Go toolchain. skopeo publishes no release binaries, and the vendor container
+# image is built against an incompatible glibc, so the checksum-pinned source
+# tarball is the immutable artifact. CGO_ENABLED=0 matches the static upstream
+# build shape.
+FROM golang:1.27.2@sha256:820153096fda4de6ac1b7194d12e416b7dd8f4e9a33d17e0345b111b945162d8 AS skopeo-build
+ADD --checksum=sha256:6a3f342a327ec7684198eb0e15114940b6101506db48d9a96590f5942cb3b335 \
+  https://github.com/containers/skopeo/archive/refs/tags/v1.24.1.tar.gz /tmp/skopeo-v1.24.1.tar.gz
+RUN tar -xzf /tmp/skopeo-v1.24.1.tar.gz -C /tmp \
+  && cd /tmp/skopeo-1.24.1 \
+  && CGO_ENABLED=0 go build -trimpath \
+    -tags "containers_image_openpgp exclude_graphdriver_btrfs" \
+    -o /out/skopeo ./cmd/skopeo
+
 FROM quay.io/rhpds/openshift-showroom-terminal-ocp@sha256:606317dc396db33b879c1d3807844990cd37bb0c787b0b525edbeb70283b5350
 
 USER 0
@@ -5,6 +19,15 @@ USER 0
 # Embedded standalone CLIs remain subject to the complete image security scan.
 RUN dnf -y --refresh upgrade \
     && dnf clean all
+
+COPY --from=skopeo-build /out/skopeo /usr/bin/skopeo
+RUN chmod 0755 /usr/bin/skopeo
+
+# Refresh the remaining embedded learner CLIs from checksum-pinned vendor
+# artifacts; see cli-refresh.sh for the pins and the odo sourcing note.
+COPY cli-refresh.sh /tmp/cli-refresh.sh
+RUN bash /tmp/cli-refresh.sh && rm -f /tmp/cli-refresh.sh
+
 COPY launchpad-runttyd /usr/local/bin/launchpad-runttyd
 RUN chmod 0755 /usr/local/bin/launchpad-runttyd
 USER 1001
