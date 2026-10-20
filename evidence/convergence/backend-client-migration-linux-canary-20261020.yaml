@@ -1,0 +1,20 @@
+schema: launchpad/backend-client-migration-linux-canary/v1
+date: '2026-10-20'
+source_revision: f847bec9b12f4f8817479f713c4eaf5d2678c3da
+run: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/39491412989
+status: BUILD-IN-PROGRESS
+platform: linux/amd64
+publish_requested: false
+deployment_requested: false
+source_evidence: evidence/convergence/backend-client-migration-20261020.yaml
+additional_target_closure:
+  report: evidence/runs/client-migration-linux-amd64-module-closure-20261020.txt
+  legacy_docker_sdk_present: false
+  limitation: Package dependency listing is not execution of the Linux binary or a vulnerability scan.
+security_gates:
+  revision_binding: unchanged
+  full_inventory: required
+  suppressed_and_unrated_findings: remain_blocking
+  risk_acceptance: NOT-GRANTED
+staging_qualified: false
+live_labs_changed: false
