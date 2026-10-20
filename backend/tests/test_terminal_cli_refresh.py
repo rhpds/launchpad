@@ -151,7 +151,7 @@ def test_skopeo_source_build_pins_and_tests_fixed_dependencies():
         ('golang.org/x/net', 'v0.60.0'),
         ('golang.org/x/text', 'v0.41.0'),
         ('golang.org/x/crypto', 'v0.57.0'),
-        ('google.golang.org/grpc', 'v1.83.1'),
+        ('google.golang.org/grpc', 'v1.83.2'),
     ):
         assert f'-replace={module}={module}@{version}' in source
         assert f'grep -F "{module}"' in source

@@ -12,7 +12,7 @@ RUN tar -xzf /tmp/skopeo-v1.24.1.tar.gz -C /tmp \
     -replace=golang.org/x/net=golang.org/x/net@v0.60.0 \
     -replace=golang.org/x/text=golang.org/x/text@v0.41.0 \
     -replace=golang.org/x/crypto=golang.org/x/crypto@v0.57.0 \
-    -replace=google.golang.org/grpc=google.golang.org/grpc@v1.83.1 \
+    -replace=google.golang.org/grpc=google.golang.org/grpc@v1.83.2 \
   && CGO_ENABLED=0 go test -mod=mod -count=1 \
     -tags "containers_image_openpgp exclude_graphdriver_btrfs" ./cmd/skopeo \
   && CGO_ENABLED=0 go build -mod=mod -trimpath \
@@ -22,7 +22,7 @@ RUN tar -xzf /tmp/skopeo-v1.24.1.tar.gz -C /tmp \
   && grep -F "golang.org/x/net" /out/skopeo-build-info.txt | grep -F "v0.60.0" \
   && grep -F "golang.org/x/text" /out/skopeo-build-info.txt | grep -F "v0.41.0" \
   && grep -F "golang.org/x/crypto" /out/skopeo-build-info.txt | grep -F "v0.57.0" \
-  && grep -F "google.golang.org/grpc" /out/skopeo-build-info.txt | grep -F "v1.83.1"
+  && grep -F "google.golang.org/grpc" /out/skopeo-build-info.txt | grep -F "v1.83.2"
 
 FROM quay.io/rhpds/openshift-showroom-terminal-ocp@sha256:606317dc396db33b879c1d3807844990cd37bb0c787b0b525edbeb70283b5350
 
