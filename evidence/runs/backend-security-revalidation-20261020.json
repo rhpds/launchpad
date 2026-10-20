@@ -1,0 +1,34 @@
+{
+  "schema": "launchpad.redhat.com/image-security-revalidation-result/v1",
+  "observed_date": "2026-10-20",
+  "component": "backend",
+  "source_revision": "8b8fc909fe057a8803334ed3d37c1625acd96ea7",
+  "manifest_digest": "sha256:49f2ec78b83aa6f963bb6c59a056eeaccde826060b2b15eda74919ce13923b2a",
+  "full_inventory_decision": {
+    "schema": "launchpad/backend-staging-security/v1",
+    "staging_security_gate": "BLOCKED",
+    "platform_staging_qualified": false,
+    "high_matches": 35,
+    "critical_matches": 0,
+    "suppressed_high_matches": 0,
+    "suppressed_critical_matches": 0,
+    "suppressed_unrated_matches": 0,
+    "unrated_matches": 2,
+    "distinct_high_critical_ids": 16,
+    "high_critical_fix_states": {
+      "fixed": 2,
+      "not-fixed": 32,
+      "unspecified": 1
+    },
+    "risk_acceptance": "NOT-GRANTED"
+  },
+  "full_inventory_sha256": "4f85853aa7832af03f4a9b8cf819daeba43e1262ac94b682f3ad1024ae1cd46a",
+  "fixable_report_sha256": "cbb1ec5e7b60e2af6a9ea19c36245ee22ad9705d764eccf49b9dab63fd8da879",
+  "fixable_distinct_advisory_package_pairs_by_severity": {
+    "High": 2
+  },
+  "distinct_pair_definition": "Unique advisory ID, package name, severity; not match count or per-binary count.",
+  "image_published": false,
+  "deployed": false,
+  "security_exception_granted": false
+}

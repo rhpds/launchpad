@@ -1,0 +1,78 @@
+schema: launchpad.redhat.com/image-security-revalidation/v1
+observed_date: '2026-10-20'
+status: BOTH-IMAGES-BUILD-AND-RUNTIME-PASS-SECURITY-BLOCKED
+tested_source: 8b8fc909fe057a8803334ed3d37c1625acd96ea7
+frozen_application_source: a38f172297a98ccf139f2dc13a6090d05a24c9f3
+runtime_recipes_and_workflows_unchanged_since_freeze: true
+runtime_recipe_comparison_scope:
+  - backend/Containerfile
+  - backend/security-patches
+  - backend/security-tests
+  - workshop-images/showroom-terminal
+  - .github/workflows/backend-release.yml
+  - .github/workflows/terminal-release.yml
+builds:
+  backend:
+    run: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/39473152288
+    publication_requested: false
+    result: BUILD-AND-RUNTIME-PASS-SECURITY-BLOCKED
+    summary: evidence/runs/backend-security-revalidation-20261020.json
+    manifest_digest: sha256:49f2ec78b83aa6f963bb6c59a056eeaccde826060b2b15eda74919ce13923b2a
+    full_inventory_sha256: 4f85853aa7832af03f4a9b8cf819daeba43e1262ac94b682f3ad1024ae1cd46a
+    fixable_distinct_advisory_package_pairs: {High: 2}
+    full_inventory_matches: {Critical: 0, High: 35, Unknown: 2}
+    suppressed_high_critical_unrated_matches: 0
+    blocker_cleared: false
+    candidate_interpreter_tests:
+      retained_artifact: backend-runtime-regression-8b8fc909fe057a8803334ed3d37c1625acd96ea7
+      report_name: candidate-interpreter.xml
+      report_sha256: 504080ca88a69a378105dff66197306a82b2f23109588b82da431d7befb5db04
+      passed: 68
+      failed: 0
+      errors: 0
+      skipped: 0
+  terminal:
+    run: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/39473156694
+    publication_requested: false
+    result: BUILD-AND-RUNTIME-PASS-SECURITY-BLOCKED
+    summary: evidence/runs/terminal-security-revalidation-20261020.json
+    manifest_digest: sha256:cefd6a5a5cf861507af4848fc830e411b55130f071b81997027cc39828ccf17e
+    full_inventory_sha256: 28f21e93b7c88d060c11407dd7d549a29e87089aaa784d8e2a077f1628329a1b
+    fixable_distinct_advisory_package_pairs: {Critical: 4, High: 59}
+    full_inventory_matches: {Critical: 31, High: 350, Unknown: 10}
+    suppressed_high_critical_unrated_matches: 0
+    blocker_cleared: false
+focused_contracts:
+  report: evidence/runs/security-release-contracts-20261020.xml
+  passed: 22
+  failed: 0
+  scope: Terminal supply chain and OS refresh contracts, manual release boundary, and fail-closed backend staging scan checks.
+vendor_release_recheck:
+  checked_official_github_latest_release_metadata:
+    skopeo: v1.24.1
+    knative_client: knative-v1.23.0
+    tekton_cli: v0.46.1
+    pipelines_as_code: v0.52.0
+    openshift_pipelines_opc: v1.24.0
+  openshift_supported_4_22_client_stream: 4.22.18
+  newer_release_found_in_checked_streams: false
+  limit: Release metadata does not replace an exact-artifact vulnerability scan and does not establish that other branches or tools have no updates.
+boundaries:
+  cluster_mutations: false
+  credential_mutations: false
+  network_or_dns_mutations: false
+  image_publication: false
+  active_scanner_ignore_rules: 0
+  new_security_exceptions: false
+  vulnerability_acceptance_granted: false
+  platform_staging_qualified: false
+next_actions:
+  - Keep the candidate unqualified while the image gates remain blocked; no waiver or automatic promotion.
+  - Obtain compatible vendor fixes for embedded CLI dependencies and pending OS errata, or complete the separately owner-approved advisory applicability review. This run grants no risk acceptance.
+  - Resolve the Mac/VPN overlapping-route problem separately before live Flightpath acceptance tests.
+limits:
+  - Fresh builds can consume newer OS packages and vulnerability databases even when source recipes are unchanged; any result must be tied to the resulting image and scan digest.
+  - The current Mac/VPN routing overlap remains a separate live-access blocker; this check does not change routing.
+  - No exploit, production penetration test or security-control bypass is part of this work.
+  - Backend High match count is now 35 in the current complete inventory; the older 25-match result is historical and is not the present scan baseline. Source recipes are unchanged, but the built dependencies and scanner database may differ.
+  - Image release decisions run in GitHub Actions with Grype and the repository checker; these workflow files contain no OpenAI API integration. Codex safeguards apply separately to assistant activity.

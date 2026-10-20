@@ -1,6 +1,17 @@
 schema: launchpad/staging-regression-checkpoint/v1
 date: '2026-10-15'
 status: NOT-QUALIFIED
+latest_security_revalidation_20261020:
+  source: 8b8fc909fe057a8803334ed3d37c1625acd96ea7
+  report: evidence/convergence/image-security-revalidation-20261020.yaml
+  result: BOTH-IMAGES-BUILD-AND-RUNTIME-PASS-SECURITY-BLOCKED
+  backend_full_inventory: {High: 35, Critical: 0, Unknown: 2}
+  terminal_fixable_distinct_advisory_package_pairs: {Critical: 4, High: 59}
+  candidate_interpreter_tests_passed: 68
+  local_focused_contracts_passed: 22
+  image_publication: false
+  live_rollout: false
+  security_exception_granted: false
 latest_security_followup:
   source: 95fec905f1c2a3b6581de5e290f711af2ede37c1
   result: SECURITY-BLOCKED
