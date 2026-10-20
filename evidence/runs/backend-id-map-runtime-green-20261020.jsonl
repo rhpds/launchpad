@@ -1,0 +1,8 @@
+{"Time":"2026-10-20T13:35:49.664172-05:00","Action":"start","Package":"launchpad-ownership-probe"}
+{"Time":"2026-10-20T13:35:50.259772-05:00","Action":"run","Package":"launchpad-ownership-probe","Test":"TestLaunchpadRemapIDsPreservesDistinctUserAndGroup"}
+{"Time":"2026-10-20T13:35:50.259823-05:00","Action":"output","Package":"launchpad-ownership-probe","Test":"TestLaunchpadRemapIDsPreservesDistinctUserAndGroup","Output":"=== RUN   TestLaunchpadRemapIDsPreservesDistinctUserAndGroup\n"}
+{"Time":"2026-10-20T13:35:50.259854-05:00","Action":"output","Package":"launchpad-ownership-probe","Test":"TestLaunchpadRemapIDsPreservesDistinctUserAndGroup","Output":"--- PASS: TestLaunchpadRemapIDsPreservesDistinctUserAndGroup (0.00s)\n"}
+{"Time":"2026-10-20T13:35:50.259857-05:00","Action":"pass","Package":"launchpad-ownership-probe","Test":"TestLaunchpadRemapIDsPreservesDistinctUserAndGroup","Elapsed":0}
+{"Time":"2026-10-20T13:35:50.259862-05:00","Action":"output","Package":"launchpad-ownership-probe","Output":"PASS\n"}
+{"Time":"2026-10-20T13:35:50.26037-05:00","Action":"output","Package":"launchpad-ownership-probe","Output":"ok  \tlaunchpad-ownership-probe\t0.596s\n"}
+{"Time":"2026-10-20T13:35:50.260384-05:00","Action":"pass","Package":"launchpad-ownership-probe","Elapsed":0.596}

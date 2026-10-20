@@ -8,11 +8,28 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/docker/docker/pkg/idtools"
 )
 
 type launchpadAlter func(*tar.Header) (bool, error)
 
 func (f launchpadAlter) Alter(h *tar.Header) (bool, error) { return f(h) }
+
+func TestLaunchpadRemapIDsPreservesDistinctUserAndGroup(t *testing.T) {
+	remap := RemapIDs{mappings: &idtools.IdentityMapping{
+		UIDMaps: []idtools.IDMap{{ContainerID: 0, HostID: 10000, Size: 1000}},
+		GIDMaps: []idtools.IDMap{{ContainerID: 0, HostID: 20000, Size: 1000}},
+	}}
+	header := &tar.Header{Uid: 11, Gid: 33}
+	ok, err := remap.Alter(header)
+	if err != nil || !ok {
+		t.Fatalf("identity mapping failed: ok=%v err=%v", ok, err)
+	}
+	if header.Uid != 10011 || header.Gid != 20033 {
+		t.Fatalf("ownership mapping lost distinct IDs: uid=%d gid=%d", header.Uid, header.Gid)
+	}
+}
 
 func launchpadTar(t *testing.T, headers ...*tar.Header) []byte {
 	t.Helper()

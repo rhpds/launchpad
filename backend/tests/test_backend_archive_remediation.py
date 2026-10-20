@@ -37,3 +37,12 @@ def test_oc_patch_delegates_writes_and_preserves_header_alterations():
     assert "-func createTarFile(" in patch
     assert "+\t\tif keyValue && position%3 == 2 {" in patch
     assert "ENV EQ== OTHER=two" in patch
+
+
+def test_archive_mapping_preserves_separate_user_and_group_ids():
+    patch = (ROOT / "backend/security-patches/oc-client.patch").read_text()
+    assert "+\thdr.Uid, hdr.Gid = ids.UID, ids.GID" in patch
+    assert "+\thdr.Uid, hdr.Gid = ids.UID, ids.UID" not in patch
+    tests = (ROOT / "backend/security-tests/oc_archive_compatibility_test.go").read_text()
+    assert "TestLaunchpadRemapIDsPreservesDistinctUserAndGroup" in tests
+    assert "header.Uid != 10011 || header.Gid != 20033" in tests

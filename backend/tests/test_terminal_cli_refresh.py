@@ -87,7 +87,7 @@ def test_containerfile_builds_skopeo_from_immutable_source():
         in source
     )
     assert 'refs/tags/v1.24.1.tar.gz' in source
-    assert 'CGO_ENABLED=0 go build -trimpath' in source
+    assert 'CGO_ENABLED=0 go build -mod=mod -trimpath' in source
     # Static-build tags from the upstream Makefile (DISABLE_CGO / cross
     # targets); without them the vendored gpgme binding fails to build.
     assert 'containers_image_openpgp' in source
@@ -143,3 +143,20 @@ def test_cli_refresh_uses_official_vendor_sources_only():
     ]
     for url in urls:
         assert url.startswith(allowed_hosts), f'unexpected artifact source: {url}'
+
+
+def test_skopeo_source_build_pins_and_tests_fixed_dependencies():
+    source = (ROOT / 'workshop-images/showroom-terminal/Containerfile').read_text()
+    for module, version in (
+        ('golang.org/x/net', 'v0.60.0'),
+        ('golang.org/x/text', 'v0.41.0'),
+        ('golang.org/x/crypto', 'v0.57.0'),
+        ('google.golang.org/grpc', 'v1.83.1'),
+    ):
+        assert f'-replace={module}={module}@{version}' in source
+        assert f'grep -F "{module}"' in source
+        assert f'grep -F "{version}"' in source
+    assert 'go test -mod=mod' in source
+    assert 'go build -mod=mod -trimpath' in source
+    assert 'skopeo-build-info.txt' in source
+    assert 'COPY --from=skopeo-build /out/skopeo-build-info.txt' in source

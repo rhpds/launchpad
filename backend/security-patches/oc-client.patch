@@ -100,7 +100,7 @@ index 611528d78..b1ec652e8 100644
  func (r RemapIDs) Alter(hdr *tar.Header) (bool, error) {
  	ids, err := r.mappings.ToHost(idtools.Identity{UID: hdr.Uid, GID: hdr.Gid})
 -	hdr.Uid, hdr.Gid = ids.UID, ids.GID
-+	hdr.Uid, hdr.Gid = ids.UID, ids.UID
++	hdr.Uid, hdr.Gid = ids.UID, ids.GID
  	return true, err
  }
  

@@ -8,9 +8,21 @@ ADD --checksum=sha256:6a3f342a327ec7684198eb0e15114940b6101506db48d9a96590f5942c
   https://github.com/containers/skopeo/archive/refs/tags/v1.24.1.tar.gz /tmp/skopeo-v1.24.1.tar.gz
 RUN tar -xzf /tmp/skopeo-v1.24.1.tar.gz -C /tmp \
   && cd /tmp/skopeo-1.24.1 \
-  && CGO_ENABLED=0 go build -trimpath \
+  && go mod edit \
+    -replace=golang.org/x/net=golang.org/x/net@v0.60.0 \
+    -replace=golang.org/x/text=golang.org/x/text@v0.41.0 \
+    -replace=golang.org/x/crypto=golang.org/x/crypto@v0.57.0 \
+    -replace=google.golang.org/grpc=google.golang.org/grpc@v1.83.1 \
+  && CGO_ENABLED=0 go test -mod=mod -count=1 \
+    -tags "containers_image_openpgp exclude_graphdriver_btrfs" ./cmd/skopeo \
+  && CGO_ENABLED=0 go build -mod=mod -trimpath \
     -tags "containers_image_openpgp exclude_graphdriver_btrfs" \
-    -o /out/skopeo ./cmd/skopeo
+    -o /out/skopeo ./cmd/skopeo \
+  && go version -m /out/skopeo > /out/skopeo-build-info.txt \
+  && grep -F "golang.org/x/net" /out/skopeo-build-info.txt | grep -F "v0.60.0" \
+  && grep -F "golang.org/x/text" /out/skopeo-build-info.txt | grep -F "v0.41.0" \
+  && grep -F "golang.org/x/crypto" /out/skopeo-build-info.txt | grep -F "v0.57.0" \
+  && grep -F "google.golang.org/grpc" /out/skopeo-build-info.txt | grep -F "v1.83.1"
 
 FROM quay.io/rhpds/openshift-showroom-terminal-ocp@sha256:606317dc396db33b879c1d3807844990cd37bb0c787b0b525edbeb70283b5350
 
@@ -26,6 +38,7 @@ RUN dnf -y --refresh upgrade \
       || echo '1001:*:1001:0:container user:/home/lab-user:/bin/sh' >> /etc/passwd; }
 
 COPY --from=skopeo-build /out/skopeo /usr/bin/skopeo
+COPY --from=skopeo-build /out/skopeo-build-info.txt /opt/launchpad-client-proof/skopeo-build-info.txt
 RUN chmod 0755 /usr/bin/skopeo
 
 # Refresh the remaining embedded learner CLIs from checksum-pinned vendor

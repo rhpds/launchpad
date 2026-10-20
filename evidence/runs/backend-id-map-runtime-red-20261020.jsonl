@@ -1,0 +1,9 @@
+{"Time":"2026-10-20T13:35:25.330089-05:00","Action":"start","Package":"launchpad-ownership-probe"}
+{"Time":"2026-10-20T13:35:25.626795-05:00","Action":"run","Package":"launchpad-ownership-probe","Test":"TestLaunchpadRemapIDsPreservesDistinctUserAndGroup"}
+{"Time":"2026-10-20T13:35:25.62689-05:00","Action":"output","Package":"launchpad-ownership-probe","Test":"TestLaunchpadRemapIDsPreservesDistinctUserAndGroup","Output":"=== RUN   TestLaunchpadRemapIDsPreservesDistinctUserAndGroup\n"}
+{"Time":"2026-10-20T13:35:25.626912-05:00","Action":"output","Package":"launchpad-ownership-probe","Test":"TestLaunchpadRemapIDsPreservesDistinctUserAndGroup","Output":"    mapping_test.go:14: ownership mapping lost distinct IDs: uid=10011 gid=10011\n"}
+{"Time":"2026-10-20T13:35:25.626922-05:00","Action":"output","Package":"launchpad-ownership-probe","Test":"TestLaunchpadRemapIDsPreservesDistinctUserAndGroup","Output":"--- FAIL: TestLaunchpadRemapIDsPreservesDistinctUserAndGroup (0.00s)\n"}
+{"Time":"2026-10-20T13:35:25.626924-05:00","Action":"fail","Package":"launchpad-ownership-probe","Test":"TestLaunchpadRemapIDsPreservesDistinctUserAndGroup","Elapsed":0}
+{"Time":"2026-10-20T13:35:25.626929-05:00","Action":"output","Package":"launchpad-ownership-probe","Output":"FAIL\n"}
+{"Time":"2026-10-20T13:35:25.627385-05:00","Action":"output","Package":"launchpad-ownership-probe","Output":"FAIL\tlaunchpad-ownership-probe\t0.297s\n"}
+{"Time":"2026-10-20T13:35:25.627401-05:00","Action":"fail","Package":"launchpad-ownership-probe","Elapsed":0.297}
