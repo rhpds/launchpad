@@ -1,0 +1,8 @@
+--- a/pkg/helpers/newapp/newapptest/newapp_test.go
++++ b/pkg/helpers/newapp/newapptest/newapp_test.go
+@@ -1034,0 +1035 @@
++				Resolvers: cmd.Resolvers{DockerSearcher: fakeDockerSearcher()},
+@@ -1322,0 +1324 @@
++				Resolvers: cmd.Resolvers{DockerSearcher: fakeDockerSearcher()},
+@@ -1345,0 +1348 @@
++				Resolvers: cmd.Resolvers{DockerSearcher: fakeDockerSearcher()},

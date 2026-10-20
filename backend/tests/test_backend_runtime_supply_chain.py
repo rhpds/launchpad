@@ -1,6 +1,5 @@
 from pathlib import Path
 
-
 CONTAINERFILE = Path(__file__).resolve().parents[1] / "Containerfile"
 
 
@@ -43,15 +42,17 @@ def test_cluster_clients_use_patched_toolchain_and_network_module() -> None:
     assert "COPY --from=oc-builder /tmp/helm-bin /usr/local/bin/helm" in text
 
 
-def test_oc_builder_documents_the_unconsumable_distribution_fix() -> None:
+def test_oc_builder_requires_a_reviewed_adapter_for_the_distribution_fix() -> None:
     text = CONTAINERFILE.read_text()
     # GHSA-f2g3-hh2r-cwgc and GHSA-3p65-76g6-3w7r are fixed only in
     # distribution v3.1.0, which removed the registry/client packages that
     # openshift/library-go imports. A pinned replace to v3.1.0 breaks the
-    # oc build (verified in run 38916954262), and oc master still pins the
-    # same 2023 pseudo-version. The constraint must stay documented in the
-    # Containerfile instead of carrying a broken replace.
-    assert "distribution/v3 stays at the inherited 2023 pseudo-version on purpose" in text
-    assert "GHSA-f2g3-hh2r-cwgc and GHSA-3p65-76g6-3w7r are fixed only in v3.1.0" in text
-    assert "registry-server code paths" in text
-    assert "GO_DISTRIBUTION_VERSION" not in text
+    # oc build (verified in run 38916954262). The candidate may consume the
+    # fix only through the explicit, tested source adapter—not a bare replace.
+    assert "ARG GO_DISTRIBUTION_VERSION=v3.1.0" in text
+    assert "prepare_client_modules.sh" in text
+    assert "github.com/distribution/distribution/v3/manifest/schema1" in text
+    source = (CONTAINERFILE.parent / 'security-patches/prepare_client_modules.sh').read_text()
+    assert 'distribution-upstream.json' in source
+    assert 'distribution-legacy-upstream.json' in source
+    assert 'distribution_compat.go' in source

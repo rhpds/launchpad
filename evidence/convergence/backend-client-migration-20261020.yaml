@@ -1,0 +1,67 @@
+schema: launchpad/backend-client-migration/v1
+date: '2026-10-20'
+base_launchpad_source: 0005cc3c
+status: SOURCE-GREEN-LINUX-IMAGE-PROOF-PENDING
+scope: Backend's source-built OpenShift client only; no deployed workload or terminal runtime image changed.
+upstream_oc_source: d0f23b14fbf35493e5b713e25ecf662ec239e76c
+candidate:
+  docker_helper_client: github.com/fsouza/go-dockerclient@v1.13.2
+  moby_api: github.com/moby/moby/api@v1.56.1
+  moby_client: github.com/moby/moby/client@v0.6.2
+  identity_mapping: github.com/moby/sys/user@v0.4.1
+  archive: github.com/moby/go-archive@v0.3.0
+  distribution_base: github.com/distribution/distribution/v3@v3.1.0
+  distribution_legacy_helpers: v3.0.0-20230519140516-983358f8e250 reference and manifest/schema1 only
+  containers_image: v5.36.2 with only its legacy Docker version-comparison import migrated
+  architecture: Source-tested on darwin/arm64; Linux package dependency closure also checked. Linux binary/image execution is still required.
+implementation:
+  - Use maintained split Moby API/client modules and standalone archive/user helpers instead of old Docker SDK imports.
+  - Start with checksum-verified patched Distribution 3.1.0, expose its maintained internal client through compatibility facades, and retain legacy reference parsing and schema-1 conversion helpers.
+  - Preserve descriptor semantics with an explicit legacy adapter; add non-panicking pagination over the existing authoritative tag-list protocol.
+  - Preserve all legacy OpenPGP code and verify its existing version-3 compatibility fixtures.
+  - Retain source checksums, fixture-source commit, adapter hashes, and compiled module closure in the future image's client proof directory.
+  - Fail the image build if the old github.com/docker/docker module appears in the actual compiled dependency closure.
+red_green:
+  recipe_red: evidence/runs/client-module-recipe-red-20261020.xml
+  recipe_green: evidence/runs/client-module-recipe-green-20261020.xml
+  focused_contracts: {passed: 19, failed: 0}
+  source_green: evidence/runs/client-migration-source-green-20261020.jsonl
+  go_tests_and_subtests: {passed: 696, failed: 0, skipped: 0, tested_packages: 18}
+  legacy_openpgp_green: evidence/runs/client-migration-legacy-openpgp-green-20261020.jsonl
+  legacy_openpgp_tests: {passed: 3, failed: 0}
+  linux_dependency_closure: evidence/runs/client-migration-linux-module-closure-20261020.txt
+  legacy_docker_sdk_in_linux_dependency_closure: false
+  full_python_regression:
+    report: evidence/runs/full-regression-client-migration-final-20261020.xml
+    passed: 2949
+    failed: 0
+    skipped: 27
+    deselected: 13
+    duration_seconds: 217.44
+    scope: Working-tree mock-mode regression. An additional fixture-scope contract added after full-suite collection passes in the 19-test focused suite. Skipped checks are not counted green.
+    preceding_contract_red: evidence/runs/full-regression-client-migration-20261020.xml
+rejected_and_repaired_trials:
+  archive_033:
+    report: evidence/runs/client-migration-archive-033-red-20261020.jsonl
+    result: Two existing strict escape-rejection regressions fail. No security test was weakened or removed.
+    decision: Do not adopt archive 0.3.3 or the helper-client release that requires it. Upgrade from helper 1.10.0 to compatible 1.13.2, while explicitly upgrading its nested Moby API/client and retaining the actual tested archive 0.3.0 source and identity.
+    upstream_comparison: https://github.com/fsouza/go-dockerclient/compare/v1.13.2...v1.13.3
+  fixture_layout_and_public_registry_assumptions:
+    reports:
+      - evidence/runs/client-migration-source-fixture-red-20261020.jsonl
+      - evidence/runs/client-migration-source-search-fixture-red-20261020.jsonl
+    repairs: Restore and dereference module-omitted test fixtures from exact upstream image commit d464a2540c2f0554dc27c268bfcfa181b2061ab3. Supply the existing fake image searcher in only three Fedora-dependent unit fixtures; preserve every assertion and the default search fixture behavior.
+    limitation: Hermetic build-generation unit fixtures are not proof against a real public container registry. Separate loopback registry protocol, upstream authentication, schema-1 and reference-parser tests run independently.
+    no_removed_test_cases: true
+security:
+  image_vulnerability_reduction_claimed: false
+  scan_waivers_added: false
+  ignored_findings_added: false
+  legacy_openpgp_advisory: Unresolved and remains blocking; owner requested legacy compatibility, not a security waiver.
+  vendor_rhel_findings: Still pending compatible supported errata.
+  staging_qualified: false
+operations:
+  cluster_mutations: false
+  live_labs_changed: false
+  image_publication: false
+  ci_image_build: pending

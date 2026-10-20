@@ -1,0 +1,40 @@
+--- a/reference/reference.go
++++ b/reference/reference.go
+@@ -31,0 +32 @@
++	modernreference "github.com/distribution/reference"
+@@ -67,4 +68 @@
+-type Reference interface {
+-	// String returns the full reference
+-	String() string
+-}
++type Reference = modernreference.Reference
+@@ -111,4 +109 @@
+-type Named interface {
+-	Reference
+-	Name() string
+-}
++type Named = modernreference.Named
+@@ -117,4 +112 @@
+-type Tagged interface {
+-	Reference
+-	Tag() string
+-}
++type Tagged = modernreference.Tagged
+@@ -123,4 +115 @@
+-type NamedTagged interface {
+-	Named
+-	Tag() string
+-}
++type NamedTagged = modernreference.NamedTagged
+@@ -130,4 +119 @@
+-type Digested interface {
+-	Reference
+-	Digest() digest.Digest
+-}
++type Digested = modernreference.Digested
+@@ -137,4 +123 @@
+-type Canonical interface {
+-	Named
+-	Digest() digest.Digest
+-}
++type Canonical = modernreference.Canonical

@@ -1,0 +1,51 @@
+--- a/pkg/cli/image/archive/archive.go
++++ b/pkg/cli/image/archive/archive.go
+@@ -10 +10 @@
+-	"github.com/docker/docker/pkg/idtools"
++	"github.com/moby/sys/user"
+@@ -25 +25 @@
+-	ChownOpts            *idtools.Identity
++	ChownOpts            *securearchive.ChownOpts
+@@ -44 +44 @@
+-type RemapIDs struct{ mappings *idtools.IdentityMapping }
++type RemapIDs struct{ mappings *user.IdentityMapping }
+@@ -47,2 +47,2 @@
+-	ids, err := r.mappings.ToHost(idtools.Identity{UID: hdr.Uid, GID: hdr.Gid})
+-	hdr.Uid, hdr.Gid = ids.UID, ids.GID
++	uid, gid, err := r.mappings.ToHost(hdr.Uid, hdr.Gid)
++	hdr.Uid, hdr.Gid = uid, gid
+--- a/pkg/cli/image/archive/archive_linux.go
++++ b/pkg/cli/image/archive/archive_linux.go
+@@ -9,2 +9,2 @@
+-	"github.com/docker/docker/pkg/archive"
+-	"github.com/docker/docker/pkg/system"
++	"github.com/containers/storage/pkg/system"
++	"github.com/moby/go-archive"
+--- a/pkg/cli/image/archive/archive_other.go
++++ b/pkg/cli/image/archive/archive_other.go
+@@ -6 +6 @@
+-import "github.com/docker/docker/pkg/archive"
++import "github.com/moby/go-archive"
+--- a/pkg/cli/image/extract/extract.go
++++ b/pkg/cli/image/extract/extract.go
+@@ -20 +20 @@
+-	dockerarchive "github.com/docker/docker/pkg/archive"
++	dockerarchive "github.com/moby/go-archive/compression"
+--- a/pkg/cli/admin/release/new.go
++++ b/pkg/cli/admin/release/new.go
+@@ -24 +24 @@
+-	"github.com/docker/docker/pkg/archive"
++	"github.com/moby/go-archive/compression"
+@@ -1131 +1131 @@
+-		r, err := archive.DecompressStream(r)
++		r, err := compression.DecompressStream(r)
+--- a/pkg/cli/image/manifest/dockercredentials/credential_store_factory.go
++++ b/pkg/cli/image/manifest/dockercredentials/credential_store_factory.go
+@@ -9 +9 @@
+-	"github.com/docker/docker/api/types/registry"
++	"github.com/moby/moby/api/types/registry"
+--- a/pkg/cli/image/manifest/manifest.go
++++ b/pkg/cli/image/manifest/manifest.go
+@@ -683 +683 @@
+-		if err := builder.AppendReference(d); err != nil {
++		if err := builder.AppendReference(distribution.LegacyDescriptor(d)); err != nil {

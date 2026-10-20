@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/docker/docker/pkg/idtools"
+	"github.com/moby/sys/user"
 )
 
 type launchpadAlter func(*tar.Header) (bool, error)
@@ -17,9 +17,9 @@ type launchpadAlter func(*tar.Header) (bool, error)
 func (f launchpadAlter) Alter(h *tar.Header) (bool, error) { return f(h) }
 
 func TestLaunchpadRemapIDsPreservesDistinctUserAndGroup(t *testing.T) {
-	remap := RemapIDs{mappings: &idtools.IdentityMapping{
-		UIDMaps: []idtools.IDMap{{ContainerID: 0, HostID: 10000, Size: 1000}},
-		GIDMaps: []idtools.IDMap{{ContainerID: 0, HostID: 20000, Size: 1000}},
+	remap := RemapIDs{mappings: &user.IdentityMapping{
+		UIDMaps: []user.IDMap{{ID: 0, ParentID: 10000, Count: 1000}},
+		GIDMaps: []user.IDMap{{ID: 0, ParentID: 20000, Count: 1000}},
 	}}
 	header := &tar.Header{Uid: 11, Gid: 33}
 	ok, err := remap.Alter(header)

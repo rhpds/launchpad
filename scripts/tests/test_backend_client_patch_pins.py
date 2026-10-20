@@ -56,7 +56,7 @@ def test_archive_upgrade_requires_the_reviewed_compatibility_and_confinement_fix
     assert "archive_compat.go /tmp/launchpad-go-archive/launchpad_compat.go" in text
     assert "git apply --check /opt/launchpad-security-patches/oc-client.patch" in text
     assert "./pkg/cli/image/archive ./pkg/cli/image/extract" in text
-    assert "./pkg/helpers/newapp/docker/dockerfile" in text
+    assert "./pkg/helpers/newapp/..." in text  # Includes the existing parser regressions.
     assert "OPENSHIFT_CLIENT_COMMIT=d0f23b14fbf35493e5b713e25ecf662ec239e76c" in text
 
 

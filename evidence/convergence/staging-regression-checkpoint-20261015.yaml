@@ -1,6 +1,14 @@
 schema: launchpad/staging-regression-checkpoint/v1
 date: '2026-10-15'
 status: NOT-QUALIFIED
+backend_client_migration_20261020:
+  report: evidence/convergence/backend-client-migration-20261020.yaml
+  status: SOURCE-GREEN-LINUX-IMAGE-PROOF-PENDING
+  source_tests_and_subtests_passed: 696
+  legacy_openpgp_tests_passed: 3
+  legacy_docker_sdk_in_linux_dependency_closure: false
+  image_vulnerability_reduction_claimed: false
+  live_rollout: false
 candidate_scan_binding_20261020:
   report: evidence/convergence/image-scan-binding-20261020.yaml
   status: LOCAL-TESTED-NOT-DEPLOYED

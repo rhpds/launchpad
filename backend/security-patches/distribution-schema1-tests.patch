@@ -1,0 +1,5 @@
+--- a/manifest/schema1/config_builder_test.go
++++ b/manifest/schema1/config_builder_test.go
+@@ -198 +198 @@
+-		if err := builder.AppendReference(d); err != nil {
++		if err := builder.AppendReference(distribution.LegacyDescriptor(d)); err != nil {

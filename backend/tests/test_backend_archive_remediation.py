@@ -14,7 +14,7 @@ def test_backend_builds_fixed_archive_and_compatible_parser_with_regressions():
     assert "-require=github.com/moby/go-archive@${GO_ARCHIVE_VERSION}" in recipe
     assert "-replace=github.com/moby/go-archive=/tmp/launchpad-go-archive" in recipe
     assert "./pkg/cli/image/archive ./pkg/cli/image/extract" in recipe
-    assert "./pkg/helpers/newapp/docker/dockerfile" in recipe
+    assert "./pkg/helpers/newapp/..." in recipe  # Includes the existing Dockerfile parser suite.
     assert "include_gcs include_oss containers_image_openpgp" in recipe
     assert "go-archive@v0.1.0" not in recipe
     assert "h1:nos4BtzzUIqB406BgQnWGMI4qib9BZ8XUHU+ucv/n1c=" in recipe
