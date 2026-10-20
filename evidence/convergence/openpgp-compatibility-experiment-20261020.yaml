@@ -1,0 +1,23 @@
+schema: launchpad/openpgp-compatibility-experiment/v1
+date: '2026-10-20'
+status: REJECTED-FOR-IMAGE-INTEGRATION-COMPATIBILITY-DECISION-REQUIRED
+advisory: https://vuln.go.dev/ID/GO-2026-5932.json
+baseline_module: github.com/containers/image/v5@v5.36.2
+candidate_module: github.com/ProtonMail/go-crypto@v1.4.1
+candidate_module_sum: h1:9RfcZHqEQUvP8RzecWEUafnZVtEvrBVL9BiF67IQOfM=
+candidate_patch: evidence/experiments/openpgp-maintained-backport-20261020.patch
+scope: Disposable module copies only; neither Containerfile nor deployed binary changed for this experiment.
+toolchain: go1.26.9 darwin/arm64 with CGO_ENABLED=0
+reproduction:
+  candidate_setup: Use git apply --unidiff-zero with the retained patch on a copy of the pinned baseline module, then go mod edit -require=github.com/ProtonMail/go-crypto@v1.4.1.
+  command: go test -mod=mod -count=1 -json -tags containers_image_openpgp -run '^Test(NewGPGSigningMechanismInDirectory|NewEphemeralGPGSigningMechanism|GPGSigningMechanismVerify)$' ./signature
+  baseline_result: All three focused upstream compatibility tests pass.
+  candidate_result: All three fail on fixtures/invalid-blob.signature-v3 with LiteralData not followed by signature.
+  baseline_evidence: evidence/runs/openpgp-compatibility-baseline-20261020.jsonl
+  candidate_evidence: evidence/runs/openpgp-compatibility-candidate-red-20261020.jsonl
+full_suite_limitations: The initial complete module test also lacked gpgconf and some module-excluded fixtures locally. The focused baseline/candidate comparison avoids those setup failures; it does not claim a full signature-suite or Linux image pass.
+decision_required: Determine whether legacy version-3 OpenPGP signatures are an intended supported input. Do not weaken the maintained verifier or remove the failing compatibility tests just to qualify the migration.
+vendor_wait: false
+image_integration: false
+security_waiver: false
+live_lab_change: false

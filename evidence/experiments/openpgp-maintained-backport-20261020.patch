@@ -1,0 +1,32 @@
+--- a/signature/mechanism.go
++++ b/signature/mechanism.go
+@@ -12,6 +12 @@
+-	// This code is used only to parse the data in an explicitly-untrusted
+-	// code path, where cryptography is not relevant. For now, continue to
+-	// use this frozen deprecated implementation. When mechanism_openpgp.go
+-	// migrates to another implementation, this should migrate as well.
+-	//lint:ignore SA1019 See above
+-	"golang.org/x/crypto/openpgp" //nolint:staticcheck
++	"github.com/ProtonMail/go-crypto/openpgp"
+--- a/signature/mechanism_openpgp.go
++++ b/signature/mechanism_openpgp.go
+@@ -18,8 +18 @@
+-	// This is a fallback code; the primary recommendation is to use the gpgme mechanism
+-	// implementation, which is out-of-process and more appropriate for handling long-term private key material
+-	// than any Go implementation.
+-	// For this verify-only fallback, we haven't reviewed any of the
+-	// existing alternatives to choose; so, for now, continue to
+-	// use this frozen deprecated implementation.
+-	//lint:ignore SA1019 See above
+-	"golang.org/x/crypto/openpgp" //nolint:staticcheck
++	"github.com/ProtonMail/go-crypto/openpgp"
+@@ -28 +21 @@
+-// A GPG/OpenPGP signing mechanism, implemented using x/crypto/openpgp.
++// A verify-only GPG/OpenPGP mechanism using the maintained ProtonMail implementation.
+@@ -162,4 +155,2 @@
+-	} else if md.SignatureV3 == nil {
+-		// Coverage: If md.SignedBy != nil, the final md.UnverifiedBody.Read() either sets one of md.Signature or md.SignatureV3,
+-		// or sets md.SignatureError.
+-		return nil, "", internal.NewInvalidSignatureError("Unexpected openpgp.MessageDetails: neither Signature nor SignatureV3 is set")
++	} else {
++		return nil, "", internal.NewInvalidSignatureError("Missing verified OpenPGP signature")

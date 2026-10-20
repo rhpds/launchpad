@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="8" skipped="0" tests="21" time="0.122" timestamp="2026-10-20T14:24:31.924430-05:00" hostname="jkershaw-mac"><testcase classname="backend.tests.test_terminal_release_workflow" name="test_terminal_release_is_manual_exact_revision_and_has_no_deployment" time="0.001" /><testcase classname="backend.tests.test_terminal_release_workflow" name="test_terminal_release_checks_persistent_shell_and_supply_chain" time="0.000" /><testcase classname="backend.tests.test_terminal_release_workflow" name="test_terminal_release_blocks_unresolved_inventory_before_publication" time="0.005"><failure message="StopIteration">def test_terminal_release_blocks_unresolved_inventory_before_publication():
+        source = (ROOT / '.github/workflows/terminal-release.yml').read_text()
+        steps = yaml.safe_load(source)['jobs']['release']['steps']
+&gt;       gate = next(step for step in steps
+                    if step['name'] == 'Block unresolved full-inventory security findings')
+E       StopIteration
+
+backend/tests/test_terminal_release_workflow.py:32: StopIteration</failure></testcase><testcase classname="scripts.tests.test_backend_staging_security_gate" name="test_high_findings_block_staging_regardless_of_fix_state[not-fixed]" time="0.001" /><testcase classname="scripts.tests.test_backend_staging_security_gate" name="test_high_findings_block_staging_regardless_of_fix_state[wont-fix]" time="0.000" /><testcase classname="scripts.tests.test_backend_staging_security_gate" name="test_high_findings_block_staging_regardless_of_fix_state[fixed]" time="0.000" /><testcase classname="scripts.tests.test_backend_staging_security_gate" name="test_high_findings_block_staging_regardless_of_fix_state[]" time="0.000" /><testcase classname="scripts.tests.test_backend_staging_security_gate" name="test_critical_blocks_and_duplicates_are_not_distinct_vulnerabilities" time="0.000" /><testcase classname="scripts.tests.test_backend_staging_security_gate" name="test_clean_scan_only_passes_security_scan_not_platform_staging" time="0.000" /><testcase classname="scripts.tests.test_backend_staging_security_gate" name="test_malformed_inventory_fails_closed[report0]" time="0.000" /><testcase classname="scripts.tests.test_backend_staging_security_gate" name="test_malformed_inventory_fails_closed[report1]" time="0.000" /><testcase classname="scripts.tests.test_backend_staging_security_gate" name="test_malformed_inventory_fails_closed[report2]" time="0.000" /><testcase classname="scripts.tests.test_backend_staging_security_gate" name="test_suppressed_high_cannot_disappear_from_staging_decision" time="0.000" /><testcase classname="scripts.tests.test_backend_staging_security_gate" name="test_fixable_only_report_cannot_be_used_for_staging" time="0.000" /><testcase classname="scripts.tests.test_backend_staging_security_gate" name="test_terminal_full_inventory_blocks_without_risk_acceptance[False-High]" time="0.000"><failure message="TypeError: summarize() got an unexpected keyword argument 'component'">severity = 'High', suppressed = False
+
+    @pytest.mark.parametrize('severity', ['High', 'Critical', 'Unknown'])
+    @pytest.mark.parametrize('suppressed', [False, True])
+    def test_terminal_full_inventory_blocks_without_risk_acceptance(severity, suppressed):
+        report = {'matches': [] if suppressed else [_match(severity)]}
+        if suppressed:
+            report['ignoredMatches'] = [_match(severity)]
+&gt;       result = _gate().summarize(report, component='terminal')
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: summarize() got an unexpected keyword argument 'component'
+
+scripts/tests/test_backend_staging_security_gate.py:72: TypeError</failure></testcase><testcase classname="scripts.tests.test_backend_staging_security_gate" name="test_terminal_full_inventory_blocks_without_risk_acceptance[False-Critical]" time="0.000"><failure message="TypeError: summarize() got an unexpected keyword argument 'component'">severity = 'Critical', suppressed = False
+
+    @pytest.mark.parametrize('severity', ['High', 'Critical', 'Unknown'])
+    @pytest.mark.parametrize('suppressed', [False, True])
+    def test_terminal_full_inventory_blocks_without_risk_acceptance(severity, suppressed):
+        report = {'matches': [] if suppressed else [_match(severity)]}
+        if suppressed:
+            report['ignoredMatches'] = [_match(severity)]
+&gt;       result = _gate().summarize(report, component='terminal')
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: summarize() got an unexpected keyword argument 'component'
+
+scripts/tests/test_backend_staging_security_gate.py:72: TypeError</failure></testcase><testcase classname="scripts.tests.test_backend_staging_security_gate" name="test_terminal_full_inventory_blocks_without_risk_acceptance[False-Unknown]" time="0.000"><failure message="TypeError: summarize() got an unexpected keyword argument 'component'">severity = 'Unknown', suppressed = False
+
+    @pytest.mark.parametrize('severity', ['High', 'Critical', 'Unknown'])
+    @pytest.mark.parametrize('suppressed', [False, True])
+    def test_terminal_full_inventory_blocks_without_risk_acceptance(severity, suppressed):
+        report = {'matches': [] if suppressed else [_match(severity)]}
+        if suppressed:
+            report['ignoredMatches'] = [_match(severity)]
+&gt;       result = _gate().summarize(report, component='terminal')
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: summarize() got an unexpected keyword argument 'component'
+
+scripts/tests/test_backend_staging_security_gate.py:72: TypeError</failure></testcase><testcase classname="scripts.tests.test_backend_staging_security_gate" name="test_terminal_full_inventory_blocks_without_risk_acceptance[True-High]" time="0.000"><failure message="TypeError: summarize() got an unexpected keyword argument 'component'">severity = 'High', suppressed = True
+
+    @pytest.mark.parametrize('severity', ['High', 'Critical', 'Unknown'])
+    @pytest.mark.parametrize('suppressed', [False, True])
+    def test_terminal_full_inventory_blocks_without_risk_acceptance(severity, suppressed):
+        report = {'matches': [] if suppressed else [_match(severity)]}
+        if suppressed:
+            report['ignoredMatches'] = [_match(severity)]
+&gt;       result = _gate().summarize(report, component='terminal')
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: summarize() got an unexpected keyword argument 'component'
+
+scripts/tests/test_backend_staging_security_gate.py:72: TypeError</failure></testcase><testcase classname="scripts.tests.test_backend_staging_security_gate" name="test_terminal_full_inventory_blocks_without_risk_acceptance[True-Critical]" time="0.000"><failure message="TypeError: summarize() got an unexpected keyword argument 'component'">severity = 'Critical', suppressed = True
+
+    @pytest.mark.parametrize('severity', ['High', 'Critical', 'Unknown'])
+    @pytest.mark.parametrize('suppressed', [False, True])
+    def test_terminal_full_inventory_blocks_without_risk_acceptance(severity, suppressed):
+        report = {'matches': [] if suppressed else [_match(severity)]}
+        if suppressed:
+            report['ignoredMatches'] = [_match(severity)]
+&gt;       result = _gate().summarize(report, component='terminal')
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: summarize() got an unexpected keyword argument 'component'
+
+scripts/tests/test_backend_staging_security_gate.py:72: TypeError</failure></testcase><testcase classname="scripts.tests.test_backend_staging_security_gate" name="test_terminal_full_inventory_blocks_without_risk_acceptance[True-Unknown]" time="0.000"><failure message="TypeError: summarize() got an unexpected keyword argument 'component'">severity = 'Unknown', suppressed = True
+
+    @pytest.mark.parametrize('severity', ['High', 'Critical', 'Unknown'])
+    @pytest.mark.parametrize('suppressed', [False, True])
+    def test_terminal_full_inventory_blocks_without_risk_acceptance(severity, suppressed):
+        report = {'matches': [] if suppressed else [_match(severity)]}
+        if suppressed:
+            report['ignoredMatches'] = [_match(severity)]
+&gt;       result = _gate().summarize(report, component='terminal')
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: summarize() got an unexpected keyword argument 'component'
+
+scripts/tests/test_backend_staging_security_gate.py:72: TypeError</failure></testcase><testcase classname="scripts.tests.test_backend_staging_security_gate" name="test_unknown_component_is_not_accepted" time="0.000"><failure message="TypeError: summarize() got an unexpected keyword argument 'component'">def test_unknown_component_is_not_accepted():
+        with pytest.raises(ValueError, match='component'):
+&gt;           _gate().summarize({'matches': []}, component='unreviewed')
+E           TypeError: summarize() got an unexpected keyword argument 'component'
+
+scripts/tests/test_backend_staging_security_gate.py:81: TypeError</failure></testcase></testsuite></testsuites>

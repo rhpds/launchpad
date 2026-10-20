@@ -1,0 +1,271 @@
+{
+  "observed_date": "2026-10-20",
+  "scope": "Current backend RPM High/Critical CVEs, official Red Hat RHEL 9 package-state data",
+  "findings": [
+    {
+      "id": "CVE-2026-19445",
+      "source": "https://access.redhat.com/hydra/rest/securitydata/cve/CVE-2026-19445.json",
+      "response_sha256": "cfefba236986f6aa1d6fc9fbadfd77acea991f58f5424ff20bed40b440a3929a",
+      "rhel9_states": [
+        {
+          "product_name": "Red Hat Enterprise Linux 9",
+          "fix_state": "Out of support scope",
+          "package_name": "python3.11",
+          "cpe": "cpe:/o:redhat:enterprise_linux:9"
+        },
+        {
+          "product_name": "Red Hat Enterprise Linux 9",
+          "fix_state": "Affected",
+          "package_name": "python3.9",
+          "cpe": "cpe:/o:redhat:enterprise_linux:9",
+          "impact": "important"
+        }
+      ],
+      "status": "retrieved"
+    },
+    {
+      "id": "CVE-2026-19553",
+      "source": "https://access.redhat.com/hydra/rest/securitydata/cve/CVE-2026-19553.json",
+      "response_sha256": "65ee1f62fc8e050c74367f56a4f2988f771b3e7a7fa07f17e4f7b76cfcd80a5b",
+      "rhel9_states": [
+        {
+          "product_name": "Red Hat Enterprise Linux 9",
+          "fix_state": "Out of support scope",
+          "package_name": "python3.11",
+          "cpe": "cpe:/o:redhat:enterprise_linux:9"
+        },
+        {
+          "product_name": "Red Hat Enterprise Linux 9",
+          "fix_state": "Affected",
+          "package_name": "python3.9",
+          "cpe": "cpe:/o:redhat:enterprise_linux:9"
+        }
+      ],
+      "status": "retrieved"
+    },
+    {
+      "id": "CVE-2026-53613",
+      "source": "https://access.redhat.com/hydra/rest/securitydata/cve/CVE-2026-53613.json",
+      "response_sha256": "b8431f8f252c1b1fed1782fc70d96a776ec983ab9d13de31c0565c8a1987c472",
+      "rhel9_states": [
+        {
+          "product_name": "Red Hat Enterprise Linux 9",
+          "fix_state": "Affected",
+          "package_name": "util-linux",
+          "cpe": "cpe:/o:redhat:enterprise_linux:9"
+        }
+      ],
+      "status": "retrieved"
+    },
+    {
+      "id": "CVE-2026-53615",
+      "source": "https://access.redhat.com/hydra/rest/securitydata/cve/CVE-2026-53615.json",
+      "response_sha256": "667813e8caadd0f3f3d2cda2e1ac5c8c6c501188797db4bbce4e2dc5f53cc985",
+      "rhel9_states": [
+        {
+          "product_name": "Red Hat Enterprise Linux 9",
+          "fix_state": "Affected",
+          "package_name": "util-linux",
+          "cpe": "cpe:/o:redhat:enterprise_linux:9"
+        }
+      ],
+      "status": "retrieved"
+    },
+    {
+      "id": "CVE-2026-57585",
+      "source": "https://access.redhat.com/hydra/rest/securitydata/cve/CVE-2026-57585.json",
+      "response_sha256": "37ac528fbd0f89974ba46b289e9c856642a4fd2b547a18fb1588f57e607052df",
+      "rhel9_states": [
+        {
+          "product_name": "Red Hat Enterprise Linux 9",
+          "fix_state": "Affected",
+          "package_name": "python3.12-pip",
+          "cpe": "cpe:/o:redhat:enterprise_linux:9"
+        },
+        {
+          "product_name": "Red Hat Enterprise Linux 9",
+          "fix_state": "Affected",
+          "package_name": "python3.14-pip",
+          "cpe": "cpe:/o:redhat:enterprise_linux:9"
+        },
+        {
+          "product_name": "Red Hat Enterprise Linux 9",
+          "fix_state": "Affected",
+          "package_name": "python-pip",
+          "cpe": "cpe:/o:redhat:enterprise_linux:9"
+        }
+      ],
+      "status": "retrieved"
+    },
+    {
+      "id": "CVE-2026-76641",
+      "source": "https://access.redhat.com/hydra/rest/securitydata/cve/CVE-2026-76641.json",
+      "response_sha256": "718dd0d1fe8baf08e9fa6ba28040536471d579c89feef5ade8b15c5ac352984d",
+      "rhel9_states": [
+        {
+          "product_name": "Red Hat Enterprise Linux 9",
+          "fix_state": "Affected",
+          "package_name": "expat",
+          "cpe": "cpe:/o:redhat:enterprise_linux:9"
+        },
+        {
+          "product_name": "Red Hat Enterprise Linux 9",
+          "fix_state": "Affected",
+          "package_name": "firefox",
+          "cpe": "cpe:/o:redhat:enterprise_linux:9"
+        },
+        {
+          "product_name": "Red Hat Enterprise Linux 9",
+          "fix_state": "Affected",
+          "package_name": "thunderbird",
+          "cpe": "cpe:/o:redhat:enterprise_linux:9"
+        }
+      ],
+      "status": "retrieved"
+    },
+    {
+      "id": "CVE-2026-77214",
+      "source": "https://access.redhat.com/hydra/rest/securitydata/cve/CVE-2026-77214.json",
+      "response_sha256": "08bf8da103370b4b74ee7a6f77f5bc297546bd7180a17b4decb441f06c2f93e2",
+      "rhel9_states": [
+        {
+          "product_name": "Red Hat Enterprise Linux 9",
+          "fix_state": "Affected",
+          "package_name": "expat",
+          "cpe": "cpe:/o:redhat:enterprise_linux:9"
+        },
+        {
+          "product_name": "Red Hat Enterprise Linux 9",
+          "fix_state": "Affected",
+          "package_name": "firefox",
+          "cpe": "cpe:/o:redhat:enterprise_linux:9"
+        },
+        {
+          "product_name": "Red Hat Enterprise Linux 9",
+          "fix_state": "Affected",
+          "package_name": "thunderbird",
+          "cpe": "cpe:/o:redhat:enterprise_linux:9"
+        }
+      ],
+      "status": "retrieved"
+    },
+    {
+      "id": "CVE-2026-79824",
+      "source": "https://access.redhat.com/hydra/rest/securitydata/cve/CVE-2026-79824.json",
+      "response_sha256": "b35baab32aa7065c98f9dfd28d573efc0b0d5e4cc8b40ff7a71f49027304d862",
+      "rhel9_states": [
+        {
+          "product_name": "Red Hat Enterprise Linux 9",
+          "fix_state": "Affected",
+          "package_name": "python3.12",
+          "cpe": "cpe:/o:redhat:enterprise_linux:9"
+        },
+        {
+          "product_name": "Red Hat Enterprise Linux 9",
+          "fix_state": "Affected",
+          "package_name": "python3.14",
+          "cpe": "cpe:/o:redhat:enterprise_linux:9"
+        },
+        {
+          "product_name": "Red Hat Enterprise Linux 9",
+          "fix_state": "Affected",
+          "package_name": "python3.9",
+          "cpe": "cpe:/o:redhat:enterprise_linux:9"
+        }
+      ],
+      "status": "retrieved"
+    },
+    {
+      "id": "CVE-2026-88647",
+      "source": "https://access.redhat.com/hydra/rest/securitydata/cve/CVE-2026-88647.json",
+      "response_sha256": "4e10a529b2c4142e0c97818350ff12be83a211f324d2c1f3c7a0302d255c80dd",
+      "rhel9_states": [
+        {
+          "product_name": "Red Hat Enterprise Linux 9",
+          "fix_state": "Affected",
+          "package_name": "gnutls",
+          "cpe": "cpe:/o:redhat:enterprise_linux:9"
+        }
+      ],
+      "status": "retrieved"
+    },
+    {
+      "id": "CVE-2026-97687",
+      "source": "https://access.redhat.com/hydra/rest/securitydata/cve/CVE-2026-97687.json",
+      "response_sha256": "af1055a2b20a5edd3a0c318fe0780e082b21b526f172dcf476f6650b5c58901a",
+      "rhel9_states": [
+        {
+          "product_name": "Red Hat Enterprise Linux 9",
+          "fix_state": "Not affected",
+          "package_name": "python3.12-pip",
+          "cpe": "cpe:/o:redhat:enterprise_linux:9"
+        },
+        {
+          "product_name": "Red Hat Enterprise Linux 9",
+          "fix_state": "Affected",
+          "package_name": "python3.12-urllib3",
+          "cpe": "cpe:/o:redhat:enterprise_linux:9"
+        },
+        {
+          "product_name": "Red Hat Enterprise Linux 9",
+          "fix_state": "Not affected",
+          "package_name": "python3.14-pip",
+          "cpe": "cpe:/o:redhat:enterprise_linux:9"
+        },
+        {
+          "product_name": "Red Hat Enterprise Linux 9",
+          "fix_state": "Not affected",
+          "package_name": "python-pip",
+          "cpe": "cpe:/o:redhat:enterprise_linux:9"
+        },
+        {
+          "product_name": "Red Hat Enterprise Linux 9",
+          "fix_state": "Affected",
+          "package_name": "python-urllib3",
+          "cpe": "cpe:/o:redhat:enterprise_linux:9"
+        }
+      ],
+      "status": "retrieved"
+    },
+    {
+      "id": "CVE-2026-97689",
+      "source": "https://access.redhat.com/hydra/rest/securitydata/cve/CVE-2026-97689.json",
+      "response_sha256": "b3f7f9509710d620dfd6ec1e1de30c5fe30cc8317a768be04a7296f648c81048",
+      "rhel9_states": [
+        {
+          "product_name": "Red Hat Enterprise Linux 9",
+          "fix_state": "Not affected",
+          "package_name": "python3.12-pip",
+          "cpe": "cpe:/o:redhat:enterprise_linux:9"
+        },
+        {
+          "product_name": "Red Hat Enterprise Linux 9",
+          "fix_state": "Affected",
+          "package_name": "python3.12-urllib3",
+          "cpe": "cpe:/o:redhat:enterprise_linux:9"
+        },
+        {
+          "product_name": "Red Hat Enterprise Linux 9",
+          "fix_state": "Not affected",
+          "package_name": "python3.14-pip",
+          "cpe": "cpe:/o:redhat:enterprise_linux:9"
+        },
+        {
+          "product_name": "Red Hat Enterprise Linux 9",
+          "fix_state": "Not affected",
+          "package_name": "python-pip",
+          "cpe": "cpe:/o:redhat:enterprise_linux:9"
+        },
+        {
+          "product_name": "Red Hat Enterprise Linux 9",
+          "fix_state": "Affected",
+          "package_name": "python-urllib3",
+          "cpe": "cpe:/o:redhat:enterprise_linux:9"
+        }
+      ],
+      "status": "retrieved"
+    }
+  ],
+  "risk_acceptance_granted": false,
+  "missing_vendor_data_implies_safe": false
+}

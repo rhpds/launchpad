@@ -1,6 +1,20 @@
 schema: launchpad/staging-regression-checkpoint/v1
 date: '2026-10-15'
 status: NOT-QUALIFIED
+bounded_image_remediation_20261020:
+  backend_source: a86fca580cbad9fad1da425630ee45f6475230e7
+  terminal_source: 1da2e8687ebf07945180bdeac831581b1ea10c8e
+  report: evidence/convergence/image-remediation-20261020.yaml
+  result: BOTH-IMAGES-RUNTIME-GREEN-SECURITY-BLOCKED
+  live_rollout: false
+  security_waiver_granted: false
+  terminal_full_inventory_gate:
+    status: SOURCE-TESTED-NOT-DEPLOYED
+    report: evidence/convergence/image-remediation-20261020.yaml
+    focused_tests_passed: 38
+  openpgp_trial:
+    report: evidence/convergence/openpgp-compatibility-experiment-20261020.yaml
+    status: COMPATIBILITY-DECISION-REQUIRED-NOT-INTEGRATED
 latest_security_revalidation_20261020:
   source: 8b8fc909fe057a8803334ed3d37c1625acd96ea7
   report: evidence/convergence/image-security-revalidation-20261020.yaml

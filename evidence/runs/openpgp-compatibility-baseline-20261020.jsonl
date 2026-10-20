@@ -1,0 +1,16 @@
+{"Time":"2026-10-20T14:26:26.940066-05:00","Action":"start","Package":"github.com/containers/image/v5/signature"}
+{"Time":"2026-10-20T14:26:28.021811-05:00","Action":"run","Package":"github.com/containers/image/v5/signature","Test":"TestNewGPGSigningMechanismInDirectory"}
+{"Time":"2026-10-20T14:26:28.021926-05:00","Action":"output","Package":"github.com/containers/image/v5/signature","Test":"TestNewGPGSigningMechanismInDirectory","Output":"=== RUN   TestNewGPGSigningMechanismInDirectory\n"}
+{"Time":"2026-10-20T14:26:28.027302-05:00","Action":"output","Package":"github.com/containers/image/v5/signature","Test":"TestNewGPGSigningMechanismInDirectory","Output":"--- PASS: TestNewGPGSigningMechanismInDirectory (0.01s)\n"}
+{"Time":"2026-10-20T14:26:28.027331-05:00","Action":"pass","Package":"github.com/containers/image/v5/signature","Test":"TestNewGPGSigningMechanismInDirectory","Elapsed":0.01}
+{"Time":"2026-10-20T14:26:28.027352-05:00","Action":"run","Package":"github.com/containers/image/v5/signature","Test":"TestNewEphemeralGPGSigningMechanism"}
+{"Time":"2026-10-20T14:26:28.027368-05:00","Action":"output","Package":"github.com/containers/image/v5/signature","Test":"TestNewEphemeralGPGSigningMechanism","Output":"=== RUN   TestNewEphemeralGPGSigningMechanism\n"}
+{"Time":"2026-10-20T14:26:28.029885-05:00","Action":"output","Package":"github.com/containers/image/v5/signature","Test":"TestNewEphemeralGPGSigningMechanism","Output":"--- PASS: TestNewEphemeralGPGSigningMechanism (0.00s)\n"}
+{"Time":"2026-10-20T14:26:28.029903-05:00","Action":"pass","Package":"github.com/containers/image/v5/signature","Test":"TestNewEphemeralGPGSigningMechanism","Elapsed":0}
+{"Time":"2026-10-20T14:26:28.029917-05:00","Action":"run","Package":"github.com/containers/image/v5/signature","Test":"TestGPGSigningMechanismVerify"}
+{"Time":"2026-10-20T14:26:28.029924-05:00","Action":"output","Package":"github.com/containers/image/v5/signature","Test":"TestGPGSigningMechanismVerify","Output":"=== RUN   TestGPGSigningMechanismVerify\n"}
+{"Time":"2026-10-20T14:26:28.033121-05:00","Action":"output","Package":"github.com/containers/image/v5/signature","Test":"TestGPGSigningMechanismVerify","Output":"--- PASS: TestGPGSigningMechanismVerify (0.00s)\n"}
+{"Time":"2026-10-20T14:26:28.033175-05:00","Action":"pass","Package":"github.com/containers/image/v5/signature","Test":"TestGPGSigningMechanismVerify","Elapsed":0}
+{"Time":"2026-10-20T14:26:28.033204-05:00","Action":"output","Package":"github.com/containers/image/v5/signature","Output":"PASS\n"}
+{"Time":"2026-10-20T14:26:28.035453-05:00","Action":"output","Package":"github.com/containers/image/v5/signature","Output":"ok  \tgithub.com/containers/image/v5/signature\t1.095s\n"}
+{"Time":"2026-10-20T14:26:28.035502-05:00","Action":"pass","Package":"github.com/containers/image/v5/signature","Elapsed":1.095}

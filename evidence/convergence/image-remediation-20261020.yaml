@@ -1,0 +1,124 @@
+schema: launchpad.redhat.com/bounded-image-remediation/v1
+observed_date: '2026-10-20'
+status: BOTH-IMAGES-RUNTIME-GREEN-SECURITY-BLOCKED
+source_revision: a86fca580cbad9fad1da425630ee45f6475230e7
+terminal_followup_source: 1da2e8687ebf07945180bdeac831581b1ea10c8e
+supersedes_runtime_candidate_for_testing_only: 8b8fc909fe057a8803334ed3d37c1625acd96ea7
+live_images_changed: false
+image_publication_requested: false
+security_gate_waived: false
+fixes:
+  backend_ownership_mapping:
+    defect: The local archive adapter assigned ids.UID to both Uid and Gid, corrupting distinct ownership mappings.
+    correction: Preserve ids.GID independently; the root-confined extraction implementation remains unchanged.
+    recipe_red: evidence/runs/backend-id-map-red-20261020.xml
+    runtime_red: evidence/runs/backend-id-map-runtime-red-20261020.jsonl
+    runtime_green: evidence/runs/backend-id-map-runtime-green-20261020.jsonl
+    runtime_scope: Exact mapping type and method extracted from the patch, tested with the real pinned Docker idtools library in a disposable local component harness. This is not the complete Linux client proof.
+    full_package_regression: New TestLaunchpadRemapIDsPreservesDistinctUserAndGroup is included in the existing image-build archive package test step.
+    scanner_count_reduction_claimed: false
+  terminal_skopeo_dependencies:
+    upstream_source: checksum-pinned skopeo v1.24.1
+    fixed_dependency_candidates:
+      golang.org/x/net: v0.60.0
+      golang.org/x/text: v0.41.0
+      golang.org/x/crypto: v0.57.0
+      google.golang.org/grpc: v1.83.2
+    correction: Resolve the pinned graph in module mode rather than build the vulnerable vendored graph, execute the upstream command unit suite, and verify selected dependency versions in retained binary build information.
+    red: evidence/runs/terminal-skopeo-dependencies-red-20261020.xml
+    grpc_followup_red: evidence/runs/terminal-grpc-patch-red-20261020.xml
+    grpc_followup_focused_green: evidence/runs/image-fixes-grpc-patch-green-20261020.xml
+    first_image_result:
+      source: a86fca580cbad9fad1da425630ee45f6475230e7
+      skopeo_before_fixable_high_critical: {Critical: 1, High: 11}
+      skopeo_after_first_fixable_high_critical: {Critical: 0, High: 1}
+      remaining_id: GHSA-2v4p-qf9q-27wj
+      cause: The 1.83 branch requires patch 1.83.2; the first candidate at 1.83.1 remained affected. The security gate caught this and publication stayed blocked.
+      primary_advisory: https://github.com/grpc/grpc-go/security/advisories/GHSA-2v4p-qf9q-27wj
+    compatibility_and_image_scan: Build, upstream command tests and terminal runtime passed; full image security gate blocked.
+    corrected_image_result:
+      source: 1da2e8687ebf07945180bdeac831581b1ea10c8e
+      skopeo_high_critical: {Critical: 0, High: 0}
+      skopeo_unrated: [GO-2026-5932]
+      full_inventory: {Critical: 30, High: 339, Unknown: 10}
+      report_sha256: 8c45d98155e6a0dde8664671f521671a1ecf2365da9b3ce4192b0c0e85e94390
+      note: Module-level unrated finding remains visible; no applicability waiver or whole-image pass is claimed.
+    scanner_count_reduction_claimed: true
+focused_regression:
+  report: evidence/runs/image-fixes-focused-green-20261020.xml
+  passed: 33
+  failed: 0
+full_working_tree_regression:
+  report: evidence/runs/full-regression-image-fixes-grpc-patch-20261020.xml
+  passed: 2923
+  failed: 0
+  skipped: 27
+  deselected: 13
+  skipped_checks_count_as_green: false
+  exact_image_or_live_proof: false
+ci:
+  backend:
+    run: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/39476285397
+    result: BUILD-AND-RUNTIME-PASS-SECURITY-BLOCKED
+    full_inventory: {High: 35, Critical: 0, Unknown: 2}
+    publish: false
+  terminal:
+    run: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/39476289708
+    result: BUILD-AND-RUNTIME-PASS-SECURITY-BLOCKED
+    publish: false
+  terminal_grpc_patch_followup:
+    run: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/39478349935
+    source: 1da2e8687ebf07945180bdeac831581b1ea10c8e
+    result: BUILD-AND-RUNTIME-PASS-SECURITY-BLOCKED
+    publish: false
+gate_hardening:
+  defect: Terminal release enforced only fixable High/Critical results, unlike the backend full-inventory gate.
+  correction: Reuse the existing fail-closed gate with a terminal component label; unresolved and suppressed High/Critical/Unknown findings block publication even when the fixable scanner fails first.
+  red: evidence/runs/terminal-full-inventory-red-20261020.xml
+  green: evidence/runs/terminal-full-inventory-green-20261020.xml
+  passed: 38
+  failed: 0
+  raw_terminal_scan_replay: BLOCKED with 339 High, 30 Critical and 10 Unknown findings; no acceptance granted.
+  broad_working_tree_regression:
+    report: evidence/runs/full-regression-image-gates-20261020.xml
+    passed: 2931
+    failed: 0
+    skipped: 27
+    deselected: 13
+    duration_seconds: 177.65
+    scope: Working-tree mock-mode suite; three additional CLI tests added after full-suite collection passed in the 38-test focused run. Not an exact-image or live qualification proof.
+openpgp_migration_experiment:
+  report: evidence/convergence/openpgp-compatibility-experiment-20261020.yaml
+  status: REJECTED-FOR-IMAGE-INTEGRATION-COMPATIBILITY-DECISION-REQUIRED
+  vendor_wait: false
+vendor_review:
+  rhel9_rpm_advisories:
+    report: evidence/runs/backend-vendor-states-20261020.json
+    queried: 11
+    retrieved: 11
+    current_rhel9_state: Affected for every checked advisory
+    protected_installer_stack: An isolated read-only DNF dry run refused Python 3.9 removal because DNF and Yum require it. No protected-package override or removal was attempted.
+    wait_under_current_base: Compatible Red Hat errata for the affected runtime packages. A different minimal runtime base would be a separate image redesign and qualification effort.
+  other_terminal_clis:
+    boundary: Keep supported checksum-pinned vendor binaries. No additional tool removal is authorized or performed here.
+    wait_under_current_boundary: Compatible fixed vendor respins for oc/kubectl, kn, opc, roxctl, tkn and tkn-pac. Independently rebuilding these would be a separate source-maintenance and compatibility-certification effort, not technically impossible.
+  backend_distribution:
+    fix_version: v3.1.0
+    constraint: That release removes registry client packages required by the pinned OpenShift library graph; the prior direct-upgrade experiment failed. Do not repeat an incompatible blanket override.
+    options: Compatible upstream client migration or a separately reviewed backport/refactor. Existing package/symbol applicability evidence does not itself authorize risk acceptance.
+  backend_docker_sdk:
+    current_line: github.com/docker/docker v28.5.2+incompatible
+    constraint: Primary advisory GHSA-rg2x-37c3-w2rh lists no patched release in the legacy module line; the maintained v2 module has a different migration boundary.
+    options: Compatible upstream SDK migration or separately tested backport/applicability review. Do not invent a safe replacement version or remove the findings without review.
+  backend_unrated_advisory:
+    advisory: GO-2026-5932
+    primary_source: https://vuln.go.dev/ID/GO-2026-5932.json
+    meaning: The deprecated golang.org/x/crypto/openpgp packages are unmaintained and have known security issues; the advisory recommends the maintained ProtonMail fork for required OpenPGP interoperability.
+    not_a_patch_version_fix: A blanket x/crypto version bump does not remove these deprecated imports. Determine actual linked imports, then validate a maintained implementation migration if used.
+    decision: Retain as unresolved pending advisory-specific owner/security review; an unrated finding is not automatically safe and is not automatically a vendor erratum.
+boundaries:
+  cluster_mutations: false
+  network_or_dns_mutations: false
+  new_scanner_ignores: false
+  new_risk_acceptance: false
+  staging_qualified: false

@@ -1,6 +1,9 @@
 """A fixable-only release scan must not silently grant staging qualification."""
 
 import importlib.util
+import json
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -61,3 +64,39 @@ def test_fixable_only_report_cannot_be_used_for_staging():
     report = {"matches": [], "descriptor": {"configuration": {"only-fixed": True}}}
     with pytest.raises(ValueError, match="filtered"):
         _gate().summarize(report)
+
+
+@pytest.mark.parametrize('severity', ['High', 'Critical', 'Unknown'])
+@pytest.mark.parametrize('suppressed', [False, True])
+def test_terminal_full_inventory_blocks_without_risk_acceptance(severity, suppressed):
+    report = {'matches': [] if suppressed else [_match(severity)]}
+    if suppressed:
+        report['ignoredMatches'] = [_match(severity)]
+    result = _gate().summarize(report, component='terminal')
+    assert result['schema'] == 'launchpad/terminal-staging-security/v1'
+    assert result['staging_security_gate'] == 'BLOCKED'
+    assert result['risk_acceptance'] == 'NOT-GRANTED'
+    assert result['platform_staging_qualified'] is False
+
+
+def test_unknown_component_is_not_accepted():
+    with pytest.raises(ValueError, match='component'):
+        _gate().summarize({'matches': []}, component='unreviewed')
+
+
+@pytest.mark.parametrize('severity,exit_code', [('Unknown', 1), ('High', 1), ('Medium', 0)])
+def test_terminal_cli_returns_gate_status_and_binds_report_hash(tmp_path, severity, exit_code):
+    import hashlib
+
+    report = tmp_path / 'inventory.json'
+    raw = json.dumps({'matches': [_match(severity)]}).encode()
+    report.write_bytes(raw)
+    process = subprocess.run(
+        [sys.executable, str(ROOT / 'scripts/check_backend_staging_security.py'),
+         str(report), '--component', 'terminal'], check=False, capture_output=True, text=True,
+    )
+    assert process.returncode == exit_code
+    decision = json.loads(process.stdout)
+    assert decision['schema'] == 'launchpad/terminal-staging-security/v1'
+    assert decision['report_sha256'] == hashlib.sha256(raw).hexdigest()
+    assert decision['platform_staging_qualified'] is False

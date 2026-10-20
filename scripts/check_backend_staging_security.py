@@ -9,7 +9,9 @@ from collections import Counter
 from pathlib import Path
 
 
-def summarize(report: dict) -> dict:
+def summarize(report: dict, *, component: str = 'backend') -> dict:
+    if component not in {'backend', 'terminal'}:
+        raise ValueError('Unsupported image component')
     if not isinstance(report, dict) or not isinstance(report.get("matches"), list):
         raise ValueError("A complete Grype matches inventory is required")  # noqa: TRY004
     configuration = report.get("descriptor", {}).get("configuration", {})
@@ -48,7 +50,7 @@ def summarize(report: dict) -> dict:
         for severity in ("High", "Critical", "Unknown")
     )
     return {
-        "schema": "launchpad/backend-staging-security/v1",
+        "schema": f"launchpad/{component}-staging-security/v1",
         "staging_security_gate": "BLOCKED" if blocked else "PASS-SCAN-ONLY",
         "platform_staging_qualified": False,
         "high_matches": counts["High"],
@@ -66,11 +68,12 @@ def summarize(report: dict) -> dict:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("report", type=Path)
+    parser.add_argument('--component', choices=('backend', 'terminal'), default='backend')
     args = parser.parse_args()
     try:
         raw = args.report.read_bytes()
         report = json.loads(raw)
-        result = summarize(report)
+        result = summarize(report, component=args.component)
         result["report_sha256"] = hashlib.sha256(raw).hexdigest()
     except (OSError, ValueError) as exc:
         print(json.dumps({"staging_security_gate": "INVALID", "error": str(exc)}))
