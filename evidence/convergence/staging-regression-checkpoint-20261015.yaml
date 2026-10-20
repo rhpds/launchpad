@@ -1,6 +1,12 @@
 schema: launchpad/staging-regression-checkpoint/v1
 date: '2026-10-15'
 status: NOT-QUALIFIED
+candidate_scan_binding_20261020:
+  report: evidence/convergence/image-scan-binding-20261020.yaml
+  status: LOCAL-TESTED-NOT-DEPLOYED
+  retained_backend_scan: IDENTITY-VERIFIED-SECURITY-BLOCKED
+  retained_terminal_scan: IDENTITY-VERIFIED-SECURITY-BLOCKED
+  openpgp_owner_decision: Preserve legacy version-3 compatibility; no security waiver granted.
 bounded_image_remediation_20261020:
   backend_source: a86fca580cbad9fad1da425630ee45f6475230e7
   terminal_source: 1da2e8687ebf07945180bdeac831581b1ea10c8e

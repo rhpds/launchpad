@@ -100,3 +100,57 @@ def test_terminal_cli_returns_gate_status_and_binds_report_hash(tmp_path, severi
     assert decision['schema'] == 'launchpad/terminal-staging-security/v1'
     assert decision['report_sha256'] == hashlib.sha256(raw).hexdigest()
     assert decision['platform_staging_qualified'] is False
+
+
+def _image_report():
+    return {
+        'matches': [],
+        'source': {'type': 'image', 'target': {
+            'userInput': 'example.invalid/candidate:git-test',
+            'imageID': 'sha256:' + 'a' * 64,
+            'manifestDigest': 'sha256:' + 'b' * 64,
+        }},
+        'descriptor': {'name': 'grype', 'configuration': {}},
+    }
+
+
+def test_image_gate_binds_report_to_candidate_and_retains_identity():
+    result = _gate().summarize(
+        _image_report(), expected_image='example.invalid/candidate:git-test',
+        expected_image_id='sha256:' + 'a' * 64,
+    )
+    assert result['candidate_identity_verified'] is True
+    assert result['image_id'] == 'sha256:' + 'a' * 64
+    assert result['manifest_digest'] == 'sha256:' + 'b' * 64
+
+
+@pytest.mark.parametrize('change', ['wrong-tag', 'wrong-id', 'not-image', 'missing-source',
+                                  'missing-descriptor', 'wrong-scanner', 'missing-digest'])
+def test_image_gate_rejects_stale_or_incomplete_candidate_report(change):
+    report = _image_report()
+    if change == 'wrong-tag':
+        report['source']['target']['userInput'] = 'example.invalid/other:old'
+    elif change == 'wrong-id':
+        report['source']['target']['imageID'] = 'sha256:' + 'c' * 64
+    elif change == 'not-image':
+        report['source']['type'] = 'directory'
+    elif change == 'missing-source':
+        del report['source']
+    elif change == 'missing-descriptor':
+        del report['descriptor']
+    elif change == 'wrong-scanner':
+        report['descriptor']['name'] = 'unknown'
+    else:
+        del report['source']['target']['manifestDigest']
+    with pytest.raises(ValueError):
+        _gate().summarize(report, expected_image='example.invalid/candidate:git-test',
+                          expected_image_id='sha256:' + 'a' * 64)
+
+
+@pytest.mark.parametrize('setting,value', [('exclude', ['**/oc']), ('ignore-wontfix', True),
+                                        ('only-notfixed', True), ('only-fixed', True)])
+def test_filtered_candidate_inventory_cannot_qualify(setting, value):
+    report = _image_report()
+    report['descriptor']['configuration'][setting] = value
+    with pytest.raises(ValueError, match='filtered'):
+        _gate().summarize(report)

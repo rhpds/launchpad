@@ -35,6 +35,8 @@ def test_terminal_release_blocks_unresolved_inventory_before_publication():
     assert "steps.runtime_smoke.outcome == 'success'" in gate['if']
     assert 'check_backend_staging_security.py vulnerability-report.json' in gate['run']
     assert '--component terminal' in gate['run']
+    assert "docker image inspect --format '{{.Id}}'" in gate['run']
+    assert '--expected-image "$candidate" --expected-image-id "$candidate_id"' in gate['run']
     assert 'continue-on-error' not in gate
     assert '|| true' not in gate['run']
     runtime = next(step for step in steps if step['name'] == 'Verify isolated persistent shell runtime')

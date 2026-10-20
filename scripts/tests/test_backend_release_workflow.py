@@ -100,6 +100,8 @@ def test_full_inventory_gate_blocks_publication_and_retains_decision() -> None:
     assert "continue-on-error" not in gate
     assert "python3 scripts/check_backend_staging_security.py vulnerability-report.json" in gate["run"]
     assert "> staging-security-decision.json" in gate["run"]
+    assert "docker image inspect --format '{{.Id}}'" in gate['run']
+    assert '--expected-image "$candidate" --expected-image-id "$candidate_id"' in gate['run']
     assert names.index(gate["name"]) < names.index("Publish immutable candidate and record digest")
     retained = next(s for s in steps if s.get("name") == "Retain vulnerability evidence even when the gate blocks")
     assert "always()" in retained["if"]

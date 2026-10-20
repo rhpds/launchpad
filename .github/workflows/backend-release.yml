@@ -212,7 +212,10 @@ jobs:
           set -euo pipefail
           # Fixable-only results are insufficient: suppressed, unresolved and
           # unrated findings also block publication. This does not grant staging.
+          candidate="${IMAGE_REPOSITORY}:git-${{ inputs.expected_sha }}"
+          candidate_id="$(docker image inspect --format '{{.Id}}' "$candidate")"
           python3 scripts/check_backend_staging_security.py vulnerability-report.json \
+            --expected-image "$candidate" --expected-image-id "$candidate_id" \
             > staging-security-decision.json
 
       - name: Retain vulnerability evidence even when the gate blocks

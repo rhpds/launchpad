@@ -142,8 +142,12 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          candidate="${IMAGE_REPOSITORY}:git-${{ inputs.expected_sha }}"
+          candidate_id="$(docker image inspect --format '{{.Id}}' "$candidate")"
           python3 scripts/check_backend_staging_security.py vulnerability-report.json \
-            --component terminal > staging-security-decision.json
+            --component terminal \
+            --expected-image "$candidate" --expected-image-id "$candidate_id" \
+            > staging-security-decision.json
 
       - name: Generate the SBOM
         uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610

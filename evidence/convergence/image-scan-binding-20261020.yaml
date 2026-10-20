@@ -1,0 +1,56 @@
+schema: launchpad/image-scan-binding/v1
+date: '2026-10-20'
+base_source: 4e0da6c3
+status: LOCAL-TESTED-NOT-DEPLOYED
+scope: Backend and terminal release workflows and their offline security decision tool only. No image recipe, lab, identity, cluster, DNS, or runtime changes.
+defect: A report could be summarized without verifying that it describes the exact image being released; path-excluded and wont-fix-filtered inventories were not rejected.
+correction:
+  - Release workflows supply the exact candidate reference and the image ID obtained from the local Docker daemon.
+  - The decision requires a Grype descriptor, image source, matching reference and image ID, and valid manifest digest.
+  - Filtered inventories are invalid; unresolved and suppressed High/Critical/Unknown findings still block release.
+  - Historical summary callers remain compatible, but their output explicitly reports that candidate identity was not verified.
+tests:
+  red: evidence/runs/image-scan-binding-red-20261020.xml
+  green: evidence/runs/image-scan-binding-green-20261020.xml
+  focused_passed: 43
+  focused_failed: 0
+  full_regression:
+    report: evidence/runs/full-regression-scan-binding-20261020.xml
+    passed: 2946
+    failed: 0
+    skipped: 27
+    deselected: 13
+    duration_seconds: 100.50
+    limitation: Working-tree mock-mode regression, not an exact-image build or live staging acceptance. Skipped checks are not counted green.
+retained_scan_replay:
+  backend:
+    source: a86fca580cbad9fad1da425630ee45f6475230e7
+    report_sha256: 3c04f2509e1f0d1adc9634950b3f801492934bf34fb9a70e3147ab3f7dae717b
+    image_id: sha256:da200cf2a6dba776b05c12b527d4acb11e462aaa02fa1b43c52f0568933223be
+    identity_verified: true
+    result: BLOCKED
+    inventory: {High: 35, Critical: 0, Unknown: 2}
+  terminal:
+    source: 1da2e8687ebf07945180bdeac831581b1ea10c8e
+    report_sha256: 8c45d98155e6a0dde8664671f521671a1ecf2365da9b3ce4192b0c0e85e94390
+    image_id: sha256:1a05e377cd67049146c60435a50af0d477ec826bcbe53cc9ad5ed31c95bc102c
+    identity_verified: true
+    result: BLOCKED
+    inventory: {High: 339, Critical: 30, Unknown: 10}
+  limitation: Retained scan replay validates new decision logic; it is not a fresh scan, a new image build, or live proof.
+openpgp_owner_decision:
+  decision: Keep legacy version-3 signature compatibility for now.
+  authority: Explicit user reply during this work on 2026-10-20.
+  experiment: evidence/convergence/openpgp-compatibility-experiment-20261020.yaml
+  consequence: Maintained-library trial remains excluded from image recipes. No verifier weakening, ignored finding, or security acceptance is authorized.
+remaining_owned_work:
+  - Compatible registry client migration or separately reviewed source backport; a direct Distribution v3.1.0 override does not compile with the inherited client API.
+  - Compatible Docker SDK migration or separately reviewed source backport; the current legacy module has no patched release for the tracked advisories.
+  - An OpenPGP implementation migration that preserves the explicitly required legacy compatibility, or a later approved compatibility-policy change.
+vendor_waits_unchanged: Supported RHEL package errata and compatible vendor-built CLI releases; see the preceding image-remediation record.
+boundaries:
+  live_lab_mutations: false
+  image_publication: false
+  scanner_ignores_added: false
+  risk_acceptance_granted: false
+  staging_qualified: false
