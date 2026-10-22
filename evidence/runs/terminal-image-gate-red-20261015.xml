@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="2" time="0.093" timestamp="2026-10-15T14:05:24.800648-05:00" hostname="jkershaw-mac"><testcase classname="backend.tests.test_terminal_release_workflow" name="test_terminal_release_is_manual_exact_revision_and_has_no_deployment" time="0.001"><failure message="FileNotFoundError: [Errno 2] No such file or directory: '/Users/jkershaw/Documents/launchpad/.github/workflows/terminal-release.yml'">backend/tests/test_terminal_release_workflow.py:7: in test_terminal_release_is_manual_exact_revision_and_has_no_deployment
+    source = (ROOT / '.github/workflows/terminal-release.yml').read_text()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/pathlib.py:1013: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '/Users/jkershaw/Documents/launchpad/.github/workflows/terminal-release.yml'</failure></testcase><testcase classname="backend.tests.test_terminal_release_workflow" name="test_terminal_release_checks_persistent_shell_and_supply_chain" time="0.000"><failure message="FileNotFoundError: [Errno 2] No such file or directory: '/Users/jkershaw/Documents/launchpad/.github/workflows/terminal-release.yml'">backend/tests/test_terminal_release_workflow.py:17: in test_terminal_release_checks_persistent_shell_and_supply_chain
+    source = (ROOT / '.github/workflows/terminal-release.yml').read_text()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/pathlib.py:1013: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '/Users/jkershaw/Documents/launchpad/.github/workflows/terminal-release.yml'</failure></testcase></testsuite></testsuites>

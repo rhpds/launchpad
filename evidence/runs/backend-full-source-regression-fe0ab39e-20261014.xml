@@ -1,0 +1,451 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="46" failures="0" skipped="0" tests="46" time="6.269" timestamp="2026-10-14T17:44:27.522348-05:00" hostname="jkershaw-mac"><testcase classname="" name="backend.tests.test_admin" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_admin.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_admin.py:8: in &lt;module&gt;
+    from app.api.deps import catalog_adapter, lifecycle_job_store, provisioning_service
+/private/tmp/launchpad-full-regression.PCfV4q/backend/app/api/deps.py:6: in &lt;module&gt;
+    from fastapi import HTTPException
+E   ModuleNotFoundError: No module named 'fastapi'</error></testcase><testcase classname="" name="backend.tests.test_agentops_node_spreading" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_agentops_node_spreading.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_agentops_node_spreading.py:11: in &lt;module&gt;
+    from app.adapters.openshift.provisioning import OpenShiftProvisioningAdapter
+/private/tmp/launchpad-full-regression.PCfV4q/backend/app/adapters/openshift/provisioning.py:18: in &lt;module&gt;
+    import requests
+E   ModuleNotFoundError: No module named 'requests'</error></testcase><testcase classname="" name="backend.tests.test_api" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_api.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_api.py:2: in &lt;module&gt;
+    from fastapi.testclient import TestClient
+E   ModuleNotFoundError: No module named 'fastapi'</error></testcase><testcase classname="" name="backend.tests.test_api_workflow" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_api_workflow.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_api_workflow.py:7: in &lt;module&gt;
+    from app.api.deps import (
+/private/tmp/launchpad-full-regression.PCfV4q/backend/app/api/deps.py:6: in &lt;module&gt;
+    from fastapi import HTTPException
+E   ModuleNotFoundError: No module named 'fastapi'</error></testcase><testcase classname="" name="backend.tests.test_catalog_intake_api" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_catalog_intake_api.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_catalog_intake_api.py:4: in &lt;module&gt;
+    from app.api.deps import catalog_adapter, catalog_intake_submission_service
+/private/tmp/launchpad-full-regression.PCfV4q/backend/app/api/deps.py:6: in &lt;module&gt;
+    from fastapi import HTTPException
+E   ModuleNotFoundError: No module named 'fastapi'</error></testcase><testcase classname="" name="backend.tests.test_catalog_intake_candidate_policy" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_catalog_intake_candidate_policy.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_catalog_intake_candidate_policy.py:7: in &lt;module&gt;
+    from app.adapters.openshift.provisioning import OpenShiftProvisioningAdapter
+/private/tmp/launchpad-full-regression.PCfV4q/backend/app/adapters/openshift/provisioning.py:18: in &lt;module&gt;
+    import requests
+E   ModuleNotFoundError: No module named 'requests'</error></testcase><testcase classname="" name="backend.tests.test_demo_frontend_image" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_demo_frontend_image.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_demo_frontend_image.py:2: in &lt;module&gt;
+    from app.adapters.openshift.provisioning import (
+/private/tmp/launchpad-full-regression.PCfV4q/backend/app/adapters/openshift/provisioning.py:18: in &lt;module&gt;
+    import requests
+E   ModuleNotFoundError: No module named 'requests'</error></testcase><testcase classname="" name="backend.tests.test_demo_provisioning" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_demo_provisioning.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_demo_provisioning.py:9: in &lt;module&gt;
+    from fastapi.testclient import TestClient
+E   ModuleNotFoundError: No module named 'fastapi'</error></testcase><testcase classname="" name="backend.tests.test_edge_cases" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_edge_cases.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_edge_cases.py:7: in &lt;module&gt;
+    from fastapi.testclient import TestClient
+E   ModuleNotFoundError: No module named 'fastapi'</error></testcase><testcase classname="" name="backend.tests.test_event_admission_forecast" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_event_admission_forecast.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_event_admission_forecast.py:7: in &lt;module&gt;
+    from app.main import app
+/private/tmp/launchpad-full-regression.PCfV4q/backend/app/main.py:6: in &lt;module&gt;
+    from fastapi import FastAPI, Response
+E   ModuleNotFoundError: No module named 'fastapi'</error></testcase><testcase classname="" name="backend.tests.test_event_capacity_provider" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_event_capacity_provider.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_event_capacity_provider.py:8: in &lt;module&gt;
+    from app.api import deps
+/private/tmp/launchpad-full-regression.PCfV4q/backend/app/api/deps.py:6: in &lt;module&gt;
+    from fastapi import HTTPException
+E   ModuleNotFoundError: No module named 'fastapi'</error></testcase><testcase classname="" name="backend.tests.test_event_cleanup_postgres" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_event_cleanup_postgres.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_event_cleanup_postgres.py:25: in &lt;module&gt;
+    from app.services.event_orchestration import EventOrchestrationService
+/private/tmp/launchpad-full-regression.PCfV4q/backend/app/services/event_orchestration.py:31: in &lt;module&gt;
+    from app.services.public_access import (
+/private/tmp/launchpad-full-regression.PCfV4q/backend/app/services/public_access.py:13: in &lt;module&gt;
+    from argon2 import PasswordHasher
+E   ModuleNotFoundError: No module named 'argon2'</error></testcase><testcase classname="" name="backend.tests.test_event_kubernetes_inventory_observer" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_event_kubernetes_inventory_observer.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_event_kubernetes_inventory_observer.py:13: in &lt;module&gt;
+    from app.services.event_kubernetes_inventory_observer import (
+/private/tmp/launchpad-full-regression.PCfV4q/backend/app/services/event_kubernetes_inventory_observer.py:16: in &lt;module&gt;
+    from kubernetes.utils.quantity import parse_quantity
+E   ModuleNotFoundError: No module named 'kubernetes'</error></testcase><testcase classname="" name="backend.tests.test_event_manifest_contract" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_event_manifest_contract.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_event_manifest_contract.py:5: in &lt;module&gt;
+    from app.api import deps
+/private/tmp/launchpad-full-regression.PCfV4q/backend/app/api/deps.py:6: in &lt;module&gt;
+    from fastapi import HTTPException
+E   ModuleNotFoundError: No module named 'fastapi'</error></testcase><testcase classname="" name="backend.tests.test_event_model_slot_source" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_event_model_slot_source.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_event_model_slot_source.py:11: in &lt;module&gt;
+    from app.services.event_model_slot_source import FileModelSlotSource
+/private/tmp/launchpad-full-regression.PCfV4q/backend/app/services/event_model_slot_source.py:19: in &lt;module&gt;
+    from app.services.event_kubernetes_inventory_observer import ModelSlotObservation
+/private/tmp/launchpad-full-regression.PCfV4q/backend/app/services/event_kubernetes_inventory_observer.py:16: in &lt;module&gt;
+    from kubernetes.utils.quantity import parse_quantity
+E   ModuleNotFoundError: No module named 'kubernetes'</error></testcase><testcase classname="" name="backend.tests.test_event_namespace_identity" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_event_namespace_identity.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_event_namespace_identity.py:5: in &lt;module&gt;
+    from app.adapters.openshift.provisioning import OpenShiftProvisioningAdapter
+/private/tmp/launchpad-full-regression.PCfV4q/backend/app/adapters/openshift/provisioning.py:18: in &lt;module&gt;
+    import requests
+E   ModuleNotFoundError: No module named 'requests'</error></testcase><testcase classname="" name="backend.tests.test_event_orchestration" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_event_orchestration.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_event_orchestration.py:20: in &lt;module&gt;
+    from app.services.event_orchestration import (
+/private/tmp/launchpad-full-regression.PCfV4q/backend/app/services/event_orchestration.py:31: in &lt;module&gt;
+    from app.services.public_access import (
+/private/tmp/launchpad-full-regression.PCfV4q/backend/app/services/public_access.py:13: in &lt;module&gt;
+    from argon2 import PasswordHasher
+E   ModuleNotFoundError: No module named 'argon2'</error></testcase><testcase classname="" name="backend.tests.test_event_participant_journey" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_event_participant_journey.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_event_participant_journey.py:8: in &lt;module&gt;
+    from app.api import deps
+/private/tmp/launchpad-full-regression.PCfV4q/backend/app/api/deps.py:6: in &lt;module&gt;
+    from fastapi import HTTPException
+E   ModuleNotFoundError: No module named 'fastapi'</error></testcase><testcase classname="" name="backend.tests.test_event_reservation_api" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_event_reservation_api.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_event_reservation_api.py:5: in &lt;module&gt;
+    from app.api import deps
+/private/tmp/launchpad-full-regression.PCfV4q/backend/app/api/deps.py:6: in &lt;module&gt;
+    from fastapi import HTTPException
+E   ModuleNotFoundError: No module named 'fastapi'</error></testcase><testcase classname="" name="backend.tests.test_health_detailed" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_health_detailed.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_health_detailed.py:8: in &lt;module&gt;
+    from fastapi.testclient import TestClient
+E   ModuleNotFoundError: No module named 'fastapi'</error></testcase><testcase classname="" name="backend.tests.test_intelligence_api" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_intelligence_api.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_intelligence_api.py:10: in &lt;module&gt;
+    from fastapi.testclient import TestClient
+E   ModuleNotFoundError: No module named 'fastapi'</error></testcase><testcase classname="" name="backend.tests.test_launchpad_observability" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_launchpad_observability.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_launchpad_observability.py:19: in &lt;module&gt;
+    from fastapi.testclient import TestClient
+E   ModuleNotFoundError: No module named 'fastapi'</error></testcase><testcase classname="" name="backend.tests.test_local_gitops_destination" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_local_gitops_destination.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_local_gitops_destination.py:3: in &lt;module&gt;
+    from app.adapters.openshift.provisioning import _gitops_destination_server
+/private/tmp/launchpad-full-regression.PCfV4q/backend/app/adapters/openshift/provisioning.py:18: in &lt;module&gt;
+    import requests
+E   ModuleNotFoundError: No module named 'requests'</error></testcase><testcase classname="" name="backend.tests.test_multicluster" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_multicluster.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_multicluster.py:8: in &lt;module&gt;
+    from app.adapters.openshift.client_factory import ClusterClientFactory
+/private/tmp/launchpad-full-regression.PCfV4q/backend/app/adapters/openshift/client_factory.py:7: in &lt;module&gt;
+    from kubernetes import client, config
+E   ModuleNotFoundError: No module named 'kubernetes'</error></testcase><testcase classname="" name="backend.tests.test_oauth_identity" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_oauth_identity.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_oauth_identity.py:2: in &lt;module&gt;
+    from app.api.routers.auth_identity import current_identity
+/private/tmp/launchpad-full-regression.PCfV4q/backend/app/api/routers/auth_identity.py:1: in &lt;module&gt;
+    from fastapi import APIRouter, Depends
+E   ModuleNotFoundError: No module named 'fastapi'</error></testcase><testcase classname="" name="backend.tests.test_oidc_tokens" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_oidc_tokens.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_oidc_tokens.py:6: in &lt;module&gt;
+    from app.auth import oidc
+/private/tmp/launchpad-full-regression.PCfV4q/backend/app/auth/oidc.py:16: in &lt;module&gt;
+    import requests
+E   ModuleNotFoundError: No module named 'requests'</error></testcase><testcase classname="" name="backend.tests.test_openshift_image_pull_grant" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_openshift_image_pull_grant.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_openshift_image_pull_grant.py:9: in &lt;module&gt;
+    from app.adapters.openshift.provisioning import OpenShiftProvisioningAdapter
+/private/tmp/launchpad-full-regression.PCfV4q/backend/app/adapters/openshift/provisioning.py:18: in &lt;module&gt;
+    import requests
+E   ModuleNotFoundError: No module named 'requests'</error></testcase><testcase classname="" name="backend.tests.test_participant_identity_cleanup" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_participant_identity_cleanup.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_participant_identity_cleanup.py:2: in &lt;module&gt;
+    from app.identity_reconciler_main import PostgresDisabledIdentitySource
+/private/tmp/launchpad-full-regression.PCfV4q/backend/app/identity_reconciler_main.py:8: in &lt;module&gt;
+    from app.adapters.openshift.participant_identity_cleanup import (
+/private/tmp/launchpad-full-regression.PCfV4q/backend/app/adapters/openshift/participant_identity_cleanup.py:4: in &lt;module&gt;
+    from kubernetes import client, config
+E   ModuleNotFoundError: No module named 'kubernetes'</error></testcase><testcase classname="" name="backend.tests.test_participant_identity_cleanup_adapters" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_participant_identity_cleanup_adapters.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_participant_identity_cleanup_adapters.py:3: in &lt;module&gt;
+    from app.adapters.openshift import participant_identity_cleanup as adapters
+/private/tmp/launchpad-full-regression.PCfV4q/backend/app/adapters/openshift/participant_identity_cleanup.py:4: in &lt;module&gt;
+    from kubernetes import client, config
+E   ModuleNotFoundError: No module named 'kubernetes'</error></testcase><testcase classname="" name="backend.tests.test_portal_api_cdd" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_portal_api_cdd.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_portal_api_cdd.py:8: in &lt;module&gt;
+    from app.main import app
+/private/tmp/launchpad-full-regression.PCfV4q/backend/app/main.py:6: in &lt;module&gt;
+    from fastapi import FastAPI, Response
+E   ModuleNotFoundError: No module named 'fastapi'</error></testcase><testcase classname="" name="backend.tests.test_public_access" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_public_access.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_public_access.py:6: in &lt;module&gt;
+    from app.api.routers import public_access as public_access_router
+/private/tmp/launchpad-full-regression.PCfV4q/backend/app/api/routers/public_access.py:9: in &lt;module&gt;
+    from fastapi import APIRouter, Cookie, Depends, Header, HTTPException, Request, Response
+E   ModuleNotFoundError: No module named 'fastapi'</error></testcase><testcase classname="" name="backend.tests.test_public_gateway" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_public_gateway.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_public_gateway.py:4: in &lt;module&gt;
+    from app.public_gateway import (
+/private/tmp/launchpad-full-regression.PCfV4q/backend/app/public_gateway.py:19: in &lt;module&gt;
+    import websockets
+E   ModuleNotFoundError: No module named 'websockets'</error></testcase><testcase classname="" name="backend.tests.test_public_gateway_availability_contract" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_public_gateway_availability_contract.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_public_gateway_availability_contract.py:4: in &lt;module&gt;
+    from app.public_gateway import app
+/private/tmp/launchpad-full-regression.PCfV4q/backend/app/public_gateway.py:19: in &lt;module&gt;
+    import websockets
+E   ModuleNotFoundError: No module named 'websockets'</error></testcase><testcase classname="" name="backend.tests.test_reclaim_live_source" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_reclaim_live_source.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_reclaim_live_source.py:12: in &lt;module&gt;
+    from app.services.reclaim_live_source import (
+/private/tmp/launchpad-full-regression.PCfV4q/backend/app/services/reclaim_live_source.py:20: in &lt;module&gt;
+    from app.services.event_kubernetes_inventory_observer import _list_all
+/private/tmp/launchpad-full-regression.PCfV4q/backend/app/services/event_kubernetes_inventory_observer.py:16: in &lt;module&gt;
+    from kubernetes.utils.quantity import parse_quantity
+E   ModuleNotFoundError: No module named 'kubernetes'</error></testcase><testcase classname="" name="backend.tests.test_requester_api_contract" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_requester_api_contract.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_requester_api_contract.py:3: in &lt;module&gt;
+    from app.main import app
+/private/tmp/launchpad-full-regression.PCfV4q/backend/app/main.py:6: in &lt;module&gt;
+    from fastapi import FastAPI, Response
+E   ModuleNotFoundError: No module named 'fastapi'</error></testcase><testcase classname="" name="backend.tests.test_retained_volume_residue" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_retained_volume_residue.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_retained_volume_residue.py:4: in &lt;module&gt;
+    from kubernetes.client.exceptions import ApiException
+E   ModuleNotFoundError: No module named 'kubernetes'</error></testcase><testcase classname="" name="backend.tests.test_session_response_security" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_session_response_security.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_session_response_security.py:5: in &lt;module&gt;
+    from app.api.deps import provisioning_service, public_access_service
+/private/tmp/launchpad-full-regression.PCfV4q/backend/app/api/deps.py:6: in &lt;module&gt;
+    from fastapi import HTTPException
+E   ModuleNotFoundError: No module named 'fastapi'</error></testcase><testcase classname="" name="backend.tests.test_showroom_provisioning" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_showroom_provisioning.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_showroom_provisioning.py:5: in &lt;module&gt;
+    from app.adapters.openshift.provisioning import OpenShiftProvisioningAdapter
+/private/tmp/launchpad-full-regression.PCfV4q/backend/app/adapters/openshift/provisioning.py:18: in &lt;module&gt;
+    import requests
+E   ModuleNotFoundError: No module named 'requests'</error></testcase><testcase classname="" name="backend.tests.test_staging_access_cleanup_gaps" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_staging_access_cleanup_gaps.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_staging_access_cleanup_gaps.py:7: in &lt;module&gt;
+    from app.auth import oauth
+/private/tmp/launchpad-full-regression.PCfV4q/backend/app/auth/oauth.py:15: in &lt;module&gt;
+    from fastapi import Depends, HTTPException, Request
+E   ModuleNotFoundError: No module named 'fastapi'</error></testcase><testcase classname="" name="backend.tests.test_stargate_integration" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_stargate_integration.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_stargate_integration.py:7: in &lt;module&gt;
+    from fastapi.testclient import TestClient
+E   ModuleNotFoundError: No module named 'fastapi'</error></testcase><testcase classname="" name="backend.tests.test_tenant_authorization" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_tenant_authorization.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_tenant_authorization.py:1: in &lt;module&gt;
+    from app.api.deps import provisioning_service, tenant_store
+/private/tmp/launchpad-full-regression.PCfV4q/backend/app/api/deps.py:6: in &lt;module&gt;
+    from fastapi import HTTPException
+E   ModuleNotFoundError: No module named 'fastapi'</error></testcase><testcase classname="" name="backend.tests.test_tenant_gateway_reconciliation" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_tenant_gateway_reconciliation.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_tenant_gateway_reconciliation.py:4: in &lt;module&gt;
+    from app.adapters.openshift.provisioning import OpenShiftProvisioningAdapter
+/private/tmp/launchpad-full-regression.PCfV4q/backend/app/adapters/openshift/provisioning.py:18: in &lt;module&gt;
+    import requests
+E   ModuleNotFoundError: No module named 'requests'</error></testcase><testcase classname="" name="backend.tests.test_workload_gitops" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_workload_gitops.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_workload_gitops.py:14: in &lt;module&gt;
+    from kubernetes.client.exceptions import ApiException
+E   ModuleNotFoundError: No module named 'kubernetes'</error></testcase><testcase classname="" name="backend.tests.test_workshop_api" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_workshop_api.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_workshop_api.py:5: in &lt;module&gt;
+    from fastapi.testclient import TestClient
+E   ModuleNotFoundError: No module named 'fastapi'</error></testcase><testcase classname="" name="backend.tests.test_workshop_order_contract" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_workshop_order_contract.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_workshop_order_contract.py:9: in &lt;module&gt;
+    from app.api.deps import provisioning_service as api_provisioning_service
+/private/tmp/launchpad-full-regression.PCfV4q/backend/app/api/deps.py:6: in &lt;module&gt;
+    from fastapi import HTTPException
+E   ModuleNotFoundError: No module named 'fastapi'</error></testcase><testcase classname="" name="backend.tests.test_workshop_response_security" time="0.000"><error message="collection failure">ImportError while importing test module '/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_workshop_response_security.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/private/tmp/launchpad-full-regression.PCfV4q/backend/tests/test_workshop_response_security.py:6: in &lt;module&gt;
+    from app.api.deps import provisioning_service
+/private/tmp/launchpad-full-regression.PCfV4q/backend/app/api/deps.py:6: in &lt;module&gt;
+    from fastapi import HTTPException
+E   ModuleNotFoundError: No module named 'fastapi'</error></testcase></testsuite></testsuites>
