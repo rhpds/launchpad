@@ -1,0 +1,100 @@
+schema: launchpad.redhat.com/participant-browser-review/v1
+observed_date: '2026-10-15'
+cluster_ref: flightpath
+environment: deployed-candidate
+scope: Disposable one-seat public orders; no platform deployment changes.
+result: RED-browser-integration-gaps-not-release-qualified
+virtualization-ai-401:
+  order_id: 5eaa13df-ebcc-498d-9b23-67500d9f3cd6
+  expected_catalog_source_revision: 69e57566be66e87da4d9889c9057158fd171dc73
+  namespace: launchpad-flightpath-candida-virtualization-ai-45349c
+  browser_observations:
+    trusted_tls_no_interstitial: passed
+    email_code_login: passed
+    participant_landing: passed
+    open_lab: passed
+    branded_showroom: passed
+    instructions_loaded: passed
+    run_in_terminal_environment_setup: passed-visible-command-output
+    run_in_terminal_health_command: invoked-output-not-independently-reviewed
+    embedded_story: passed
+    story_navigation_observed: OBSERVE, PREFLIGHT, PROPOSE
+    remaining_story_navigation: pending
+    embedded_console: passed-namespace-pods-loaded-after-delayed-initial-load
+    logout: passed-Keycloak-confirmation-and-logged-out-screen
+    reauthentication_required_after_logout: passed
+    code_reauthentication_recovers_same_seat: passed
+  cleanup:
+    status: completed
+    resource_counts:
+      namespaces: 0
+      applications.argoproj.io: 0
+      rolebindings.rbac.authorization.k8s.io: 0
+      persistentvolumeclaims: 0
+      persistentvolumes: 0
+      routes.route.openshift.io: 0
+      secrets: 0
+    model_key_revocation_independently_checked_in_this_browser_run: false
+  screenshots:
+    - evidence/runs/virtualization-401-public-console-spinner-20261015.jpg
+    - evidence/runs/virtualization-401-public-console-loaded-20261015.jpg
+findings:
+  - id: PUBLIC-LOGIN-CONTRAST
+    severity: usability
+    status: open
+    observation: Pale heading and field labels render on a white login card and are difficult to read.
+    screenshot: evidence/runs/public-login-contrast-defect-20261015.jpg
+    source_deployment_drift: Deployed login copy/layout differs from the current repository template; exact deployed theme artifact must be identified before fixing.
+  - id: PUBLIC-CONSOLE-INITIAL-LOAD
+    severity: usability
+    status: observed-eventually-loaded
+    observation: Embedded Console initially displayed a spinner over multiple observations, then loaded the namespace pod list without separate login or a new tab. No precise latency measurement was captured.
+  - id: PUBLIC-TERMINAL-STATE-LOSS
+    severity: learner-workflow
+    status: reproduced
+    observation: 501 terminal disconnected while reviewing Story. Enter reconnected successfully to a fresh shell, but the previously exported QUAL_URL was UNSET.
+    screenshot: evidence/runs/virtualization-501-terminal-state-loss-20261015.jpg
+  - id: V501-STORY-API-405
+    severity: functional-integration
+    status: reproduced
+    observation: Run qualification conditions and the next capacity condition both displayed Live endpoint returned HTTP 405. Story clearly labeled the fallback as REHEARSAL; this does not prove deployed API connectivity.
+    screenshot: evidence/runs/virtualization-501-story-api-405-20261015.jpg
+    source_review: src/live/demoAdapter.ts in the pinned 501 source uses an origin-absolute /api/v1/qualifications POST, not the order-scoped tool adapter route. The browser observed HTTP 405; full request routing diagnosis and a regression test remain required.
+virtualization-ai-501:
+  order_id: c5c61f41-ccbc-4eff-a0f8-1a15227da0e8
+  namespace: launchpad-flightpath-candida-v501-2b9123
+  expected_catalog_source_revision: 6e5212e685d28781dcded0208ffece07aa07f6c2
+  status: browser-review-functional-gaps-found
+  browser_observations:
+    same_identity_add_lab_code: passed
+    participant_landing: passed
+    open_lab: passed
+    branded_showroom: passed
+    instructions_loaded: passed
+    run_in_terminal_environment_setup: passed-visible-output
+    run_in_terminal_health_command: passed-status-ok-mode-REHEARSAL-authority-HUMAN_PROMOTION_REQUIRED
+    terminal_reconnect: recovered-but-exported-state-lost
+    embedded_console: passed-assigned-namespace-six-pods-visible
+    story_navigation: DISCOVER, BASELINE, MIGRATE, DISRUPT, CORRELATE, QUALIFY, HANDOFF
+    story_api_connectivity: failed-HTTP-405-labeled-rehearsal-fallback
+    all_three_interactive_conditions_completed: false
+    public_abuse_rotation_expiry_fault_checks: not-run
+  cleanup:
+    status: completed
+    resource_counts:
+      namespaces: 0
+      applications.argoproj.io: 0
+      rolebindings.rbac.authorization.k8s.io: 0
+      persistentvolumeclaims: 0
+      persistentvolumes: 0
+      routes.route.openshift.io: 0
+      secrets: 0
+    model_key_revocation_independently_checked_in_this_browser_run: false
+  screenshots:
+    - evidence/runs/virtualization-501-public-terminal-20261015.jpg
+    - evidence/runs/virtualization-501-terminal-state-loss-20261015.jpg
+    - evidence/runs/virtualization-501-story-api-405-20261015.jpg
+security:
+  plaintext_code_persisted: false
+  browser_security_warning_bypassed: false
+  skipped_checks_count_as_green: false

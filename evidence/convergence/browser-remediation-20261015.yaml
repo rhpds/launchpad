@@ -1,0 +1,114 @@
+schema: launchpad.redhat.com/browser-remediation/v1
+observed_date: '2026-10-15'
+cluster_ref: flightpath
+live_platform_image_changed: false
+same_image_platform_reload: performed-for-catalog-subPath-refresh
+live_catalog_changed: temporary-501-canary-pins-restored-after-test
+release_gate: not-cleared
+platform_focused_regression:
+  report: evidence/runs/browser-remediation-regression-20261015.xml
+  passed: 99
+  failed: 0
+  scope: Keycloak template contracts, public gateway, gateway availability, and public tunnel contracts.
+full_regression:
+  report: evidence/runs/full-regression-private-provenance-20261015.xml
+  passed: 2904
+  failed: 0
+  skipped: 27
+  deselected: 13
+  duration_seconds: 64.39
+  skipped_checks_count_as_green: false
+items:
+  V501-STORY-API-405:
+    status: api-fixed-qualified-and-browser-proven-embedded-layout-followup
+    source_revision: 03d87a4f95f112cdaaadeded38503ef4c4889ca7
+    source_branch: codex/single-writer-ledger-rollout-20261015
+    source_repo: https://github.com/jkershawrh/virtualization-ai-501
+    workflow: https://github.com/jkershawrh/virtualization-ai-501/actions/runs/38787565596
+    workflow_ref: refs/heads/main
+    workflow_checkout_input: 03d87a4f95f112cdaaadeded38503ef4c4889ca7
+    signing_identity_note: The release workflow verifies its main-branch certificate identity. Dispatch uses main's workflow but checks out and validates the exact tested candidate input; main source was not modified.
+    successful_source_browser_gate: https://github.com/jkershawrh/virtualization-ai-501/actions/runs/38787172900
+    predecessor_cancel_requested: true
+    predecessor_cancel_reason: Re-dispatch exact same source under the workflow's configured main-branch signing identity before publication and signature verification. No security gate removed.
+    prior_workflow: https://github.com/jkershawrh/virtualization-ai-501/actions/runs/38786574995
+    prior_workflow_failure: Architecture reveal test force-clicked a transiently hidden control; browser gate failed closed. Replaced force-click with normal visibility/stability-aware click; no skipped checks added.
+    second_failed_workflow: https://github.com/jkershawrh/virtualization-ai-501/actions/runs/38786804959
+    second_failure_followup: Removing force alone was insufficient. Test now verifies each question changed, answer is visible, and architecture completion is reached, retaining all four layers and fit checks.
+    correction: Presentation-relative browser API URL plus namespaced same-origin Nginx proxy to the qualification adapter. Public entitlement validation remains unchanged.
+    red: evidence/runs/virt501-story-api-mount-red-20261015.xml
+    green: evidence/runs/virt501-story-api-mount-green-20261015.xml
+    source_tests_passed: 39
+    frontend_tests_passed: 34
+    production_frontend_build: passed
+    dependency_audit: zero-vulnerabilities-at-local-install
+    live_verification: evidence/convergence/v501-story-api-canary-20261015.yaml
+    qualified_release_result: success
+    layout_followup_source: 3f9d8c17a5ff9923b775b3965746edc51c5b1b28
+    layout_followup_workflow: https://github.com/jkershawrh/virtualization-ai-501/actions/runs/38789495807
+    layout_source_tests_passed: 40
+    layout_frontend_tests_passed: 34
+    layout_ci_source_and_browser_gate: passed
+    layout_image_release_gates: passed-signed-sbom-and-provenance-verified
+    layout_browser_result: All three embedded conditions completed using normal clicks; lower controls visible in the default pane.
+    layout_browser_screenshot: evidence/runs/v501-layout-third-condition-20261015.jpg
+    layout_workload_probe: evidence/runs/v501-layout-qualified-probe-20261015.json
+    layout_workload_result: GREEN-live-internal-seat
+    layout_order_id: 79cedc4f-1525-40cc-af75-16ba45c2b146
+    layout_cleanup: completed-zero-managed-resource-residue
+    layout_cleanup_receipt: evidence/runs/v501-layout-cleanup-20261015.json
+    layout_targeted_report: evidence/convergence/v501-layout-canary-20261015.yaml
+    limitations: Entire lab content was not reexecuted in this browser pass. Measurements remain rehearsal fixtures; no inference claim is made.
+    canary_cleanup: completed-zero-resource-residue
+    post_canary_catalog: restored-original-data
+    post_restore_backend_and_workers: healthy
+  PUBLIC-LOGIN-CONTRAST:
+    status: security-clean-signed-source-verified-candidate-qualified-not-deployed
+    source_revision: 08f8655f187ec11e7cfc5b4d2bc74e6ec42631fc
+    source_repo: https://github.com/jkershawrh/intel-ai-launchpad
+    source_branch: codex/flightpath-migration-20260922
+    workflow_registration: Existing manual build-only workflow registered on private main at 91c737d; no application merge and no cluster deployment.
+    workflow: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/38788261700
+    build_blocker: Candidate built and contracts passed, but fixable HIGH/CRITICAL vulnerability gate failed. No security waiver or bypass applied.
+    findings_include: Critical findings in bcprov-jdk18on and netty-handler, with additional High package findings. Exact inventory retained in the workflow artifact.
+    upstream_remediation_source: edea74f6f85e10389d240ccc706b0c39fccf7dbf
+    upstream_version: 26.8.1
+    upstream_inventory: zero-HIGH-zero-CRITICAL-25-Medium-25-Low
+    upstream_scan_workflow: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/38790957294
+    upstream_release_failure: Native GitHub attestations are unavailable for user-owned private repositories. Repository visibility was not changed.
+    provenance_correction: Registry-backed Cosign provenance and SBOM attestations, verified against the workflow identity and exact checked-out source revision.
+    provenance_source: c5cb18e7
+    provenance_requalification_workflow: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/38792599972
+    provenance_requalification_result: success
+    qualified_image: ghcr.io/jkershawrh/launchpad-keycloak@sha256:6b2c982c6a633066e424b3a94abdbcf4e169411c064cba497305e0d34ed1a4e7
+    qualified_inventory: zero-HIGH-zero-CRITICAL-25-Medium-25-Low
+    diagnosis: Browser computed styles show a white PatternFly login main panel behind rgb(240,240,240) heading and label text.
+    correction: Explicit PatternFly login-panel background variable and dark background override.
+    red: evidence/runs/login-card-contrast-red-20261015.xml
+    green: evidence/runs/login-card-contrast-green-20261015.xml
+    contract_tests_passed: 7
+    deployed_keycloak_image: quay.io/redhat-gpte/launchpad-backend@sha256:34b82be667f576d16e7c95394c6d6b30fba30d3d2ea970d0b346b4a179c0b5ba
+    next_step: Qualify a new exact identity image and browser-check the deployed CSS. No in-place provider edits.
+    deployment_guard: Do not run the legacy promote-flightpath-keycloak.sh against this candidate; it still targets the historical repository and Keycloak CR namespace rather than the current launchpad-stage Deployment. Prove upgrade/database compatibility in isolation before replacing the current identity service.
+  PUBLIC-TERMINAL-STATE-LOSS:
+    status: persistent-shell-runtime-passed-image-security-gate-blocked-not-deployed
+    source_revision: b2f36c22733f266dcc534edc05d156261974db4b
+    source_branch: codex/flightpath-migration-20260922
+    observation: Reconnect creates a new shell; previously exported QUAL_URL is UNSET.
+    diagnosis: Disconnect cause is not yet established. Filtered router errors include upstream HTTP/1.0 503 handshake failures, but those have not been correlated to the observed disconnect and include the reclaim period.
+    correction: Use the pinned base's existing tmux through runttyd RUNCOMMAND; reattach to a container-local seat shell. Does not change identity, namespace RBAC, token lifetime, or reclaim.
+    base_inspection: Successful extraction of /usr/bin/runttyd and /usr/bin/tmux from the exact pinned base image confirmed RUNCOMMAND support and existing tmux binary; no new packages installed.
+    red: evidence/runs/terminal-shell-preservation-red-20261015.xml
+    green: evidence/runs/terminal-shell-preservation-green-20261015.xml
+    local_contract_tests_passed: 20
+    shell_syntax_check: passed
+    live_verification: pending-new-terminal-image-and-disposable-seat
+    image_workflow: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/38791217294
+    image_runtime_test: Passed real container tmux shell-PID and exported-marker persistence checks.
+    security_gate: failed-closed
+    security_scope: 288 unique fixable HIGH-or-CRITICAL package/version/fix rows, not a unique CVE count.
+    inherited_affected_tools: [skopeo, helm, kn, kubectl, odo, opc, roxctl, tkn, tkn-pac]
+    inherited_os_packages_also_affected: true
+    security_bypass_applied: false
+    next_step: Qualify a new terminal image; prove exported variable, shell PID, and in-progress command survive a forced browser reconnect, then verify entitlement denial and namespace reclaim still terminate access.
+historical_certification_receipts_modified: false

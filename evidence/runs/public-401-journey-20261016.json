@@ -1,0 +1,49 @@
+{
+  "seat_kind": "401",
+  "participant_email": "public-journey-401@example.com",
+  "steps": [
+    {
+      "step": "login_dark_card",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "step": "email_code_login_and_landing",
+      "ok": true,
+      "detail": "https://labs.smg-helix.ai/labs/virtualization-ai-401-9a53a648"
+    },
+    {
+      "step": "showroom_instructions_loaded",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "step": "embedded_story_loaded",
+      "ok": true,
+      "detail": "https://virt401-0932ae0b3d.apps.flightpath.fm2aihpcsed.com/"
+    },
+    {
+      "step": "terminal_alive_marker_executed",
+      "ok": false,
+      "detail": ""
+    },
+    {
+      "step": "embedded_console_loaded",
+      "ok": false,
+      "detail": ""
+    },
+    {
+      "step": "logout",
+      "ok": true,
+      "detail": "https://labs.smg-helix.ai/realms/launchpad-public/protocol/openid-connect/logout"
+    },
+    {
+      "step": "reauthentication_same_seat",
+      "ok": true,
+      "detail": "9a53a648-fe18-4f23-aa33-593a365fa40f vs 9a53a648-fe18-4f23-aa33-593a365fa40f"
+    }
+  ],
+  "first_seat_ref": "9a53a648-fe18-4f23-aa33-593a365fa40f",
+  "second_seat_ref": "9a53a648-fe18-4f23-aa33-593a365fa40f",
+  "overall": "failed"
+}

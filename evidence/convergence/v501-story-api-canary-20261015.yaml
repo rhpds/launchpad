@@ -1,0 +1,62 @@
+schema: launchpad.redhat.com/qualified-browser-canary/v1
+observed_date: '2026-10-15'
+cluster_ref: flightpath
+result: api-fix-proven-full-visual-gate-not-cleared
+source_revision: 03d87a4f95f112cdaaadeded38503ef4c4889ca7
+release_workflow: https://github.com/jkershawrh/virtualization-ai-501/actions/runs/38787565596
+release_result: success
+images:
+  presentation: ghcr.io/jkershawrh/virtualization-ai-501-presentation@sha256:f9fb16f9d8f932f524054d7c6b077fb59cc80b0bdc4d41dd71bafe34cc0cc795
+  adapter: ghcr.io/jkershawrh/virtualization-ai-501-qualification-adapter@sha256:fda65d48fc15f703070b9486942b43d57139e87c2cb8d8be731027dec64ae9be
+order_id: f77c6d4c-afaa-4c5e-bebc-89aca177d04c
+namespace: launchpad-flightpath-candida-v501-668b96
+browser:
+  trusted_tls: passed-no-warning-bypass
+  claim_and_open_lab: passed
+  embedded_story: passed
+  recovered_api_conditions:
+    - condition: envelope-satisfied
+      decision: ALLOW_REVIEW
+      source_state: REHEARSAL
+      fallback_error_visible: false
+    - condition: capacity-boundary
+      decision: REFUSE
+      reason: Slo Envelope Breach
+      source_state: REHEARSAL
+      fallback_error_visible: false
+    - condition: correlation-gap
+      decision: ABSTAIN
+      reason: Correlation Incomplete
+      source_state: REHEARSAL
+      fallback_error_visible: false
+  restart_overlap: One request during the deliberate adapter restart returned a labeled HTTP 502 fallback. Preserved as a failure observation; all three conditions were rerun successfully in a fresh document after restart completed.
+  screenshot: evidence/runs/v501-story-qualified-browser-abstain-20261015.jpg
+  remaining_finding: Lower primary controls clip at the embedded narrow-pane width. Full visual qualification remains open.
+workload_probe:
+  receipt: evidence/runs/virtualization-ai-501-story-qualified-seat-probe-20261015.json
+  result: GREEN-live-internal-seat
+  source_and_images_verified: true
+  restart_evidence_preserved: true
+  vms_and_vmis_ready: 3
+  namespace_isolation: passed
+  argo_vm_post_apply_drift: recorded-not-hidden
+scope_limitations:
+  entire_lab_content_reexecuted_in_browser: false
+  inferred_live_intel_inference: false
+  fixture_data_presented_as_live_measurements: false
+  complete_public_certification_claimed: false
+cleanup:
+  workshop_status: completed
+  resource_counts:
+    namespaces: 0
+    applications.argoproj.io: 0
+    rolebindings.rbac.authorization.k8s.io: 0
+    persistentvolumeclaims: 0
+    persistentvolumes: 0
+    routes.route.openshift.io: 0
+    secrets: 0
+  model_key_revocation_independently_checked_in_this_browser_run: false
+promotion:
+  promoted: false
+  previous_catalog_snapshot: /private/tmp/launchpad-v501-catalog-before-story-fix-20261015.json
+  post_canary_catalog: restore-pre-canary-pins-until-layout-gate-passes
