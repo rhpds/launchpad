@@ -1,0 +1,61 @@
+{
+  "cluster": "flightpath",
+  "timestamp": "2026-10-13T19:56:02.192Z",
+  "results": [
+    {
+      "catalog": "virtualization-ai-foundations-101",
+      "namespace": "launchpad-flightpath-candida-virtualization-ai-204bb7",
+      "session_id": "b7c5b2d7-a107-4d1a-beac-26cbd0b1532f",
+      "model_key_present": false,
+      "model_key_revocation": null,
+      "namespace_count": 0,
+      "pv_count": 0,
+      "application_count": 0,
+      "external_rolebinding_count": 0
+    },
+    {
+      "catalog": "virtualization-ai-201",
+      "namespace": "launchpad-flightpath-candida-virtualization-ai-b95f8d",
+      "session_id": "1e7dbe16-177d-477c-b870-e0f234ad1d28",
+      "model_key_present": false,
+      "model_key_revocation": null,
+      "namespace_count": 0,
+      "pv_count": 0,
+      "application_count": 0,
+      "external_rolebinding_count": 0
+    },
+    {
+      "catalog": "virtualization-ai-301",
+      "namespace": "launchpad-flightpath-candida-virtualization-ai-d87f2d",
+      "session_id": "825b7063-134c-43e5-a969-971ef0ed869a",
+      "model_key_present": false,
+      "model_key_revocation": null,
+      "namespace_count": 0,
+      "pv_count": 0,
+      "application_count": 0,
+      "external_rolebinding_count": 0
+    },
+    {
+      "catalog": "virtualization-ai-401",
+      "namespace": "launchpad-flightpath-candida-virtualization-ai-8a3c36",
+      "session_id": "6f978c2e-03bb-412c-a337-696b4c0881b2",
+      "model_key_present": false,
+      "model_key_revocation": null,
+      "namespace_count": 0,
+      "pv_count": 0,
+      "application_count": 0,
+      "external_rolebinding_count": 0
+    },
+    {
+      "catalog": "virtualization-ai-501",
+      "namespace": "launchpad-flightpath-candida-v501-875f2c",
+      "session_id": "8c512595-2694-493a-8e0a-1555469f5d93",
+      "model_key_present": false,
+      "model_key_revocation": null,
+      "namespace_count": 0,
+      "pv_count": 1,
+      "application_count": 0,
+      "external_rolebinding_count": 0
+    }
+  ]
+}

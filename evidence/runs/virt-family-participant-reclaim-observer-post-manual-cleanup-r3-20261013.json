@@ -1,0 +1,98 @@
+{
+  "cluster": "flightpath",
+  "timestamp": "2026-10-13T19:59:21.781Z",
+  "previous_observation": "virt-family-participant-reclaim-observer-verified-r2-20261013.json",
+  "manual_cleanup": {
+    "catalog": "virtualization-ai-501",
+    "pv": "pvc-f1c29870-94e2-4825-84bd-ff6256da1f46",
+    "action": "Changed only the released test PV reclaim policy from Retain to Delete. The controller removed it before the explicit deletion command, which returned NotFound.",
+    "automatic_cleanup_passed": false
+  },
+  "results": [
+    {
+      "catalog": "virtualization-ai-foundations-101",
+      "namespace": "launchpad-flightpath-candida-virtualization-ai-204bb7",
+      "session_id": "b7c5b2d7-a107-4d1a-beac-26cbd0b1532f",
+      "status": "reclaimed",
+      "model_key_present": false,
+      "model_key_revocation": {
+        "key_id": "ca72ab9e6964469d2e6ed76fd35e04e9185c83e64d9588c24606064afdf6d894",
+        "provider": "litellm",
+        "confirmed_at": "2026-10-13T19:37:29.820689Z",
+        "confirmation_id": "http-success"
+      },
+      "namespace_count": 0,
+      "pv_count": 0,
+      "application_count": 0,
+      "external_rolebinding_count": 0
+    },
+    {
+      "catalog": "virtualization-ai-201",
+      "namespace": "launchpad-flightpath-candida-virtualization-ai-b95f8d",
+      "session_id": "1e7dbe16-177d-477c-b870-e0f234ad1d28",
+      "status": "reclaimed",
+      "model_key_present": false,
+      "model_key_revocation": {
+        "key_id": "69cc289b43b0e1631721bd51e830da9f9b9277b9643c2be81576b176083801e2",
+        "provider": "litellm",
+        "confirmed_at": "2026-10-13T19:41:52.586371Z",
+        "confirmation_id": "http-success"
+      },
+      "namespace_count": 0,
+      "pv_count": 0,
+      "application_count": 0,
+      "external_rolebinding_count": 0
+    },
+    {
+      "catalog": "virtualization-ai-301",
+      "namespace": "launchpad-flightpath-candida-virtualization-ai-d87f2d",
+      "session_id": "825b7063-134c-43e5-a969-971ef0ed869a",
+      "status": "reclaimed",
+      "model_key_present": false,
+      "model_key_revocation": {
+        "key_id": "71f7a4b2328916c9e580a8aad67d1dcd7e0491c15ebb2616eeec02d56dda4192",
+        "provider": "litellm",
+        "confirmed_at": "2026-10-13T19:45:56.528867Z",
+        "confirmation_id": "http-success"
+      },
+      "namespace_count": 0,
+      "pv_count": 0,
+      "application_count": 0,
+      "external_rolebinding_count": 0
+    },
+    {
+      "catalog": "virtualization-ai-401",
+      "namespace": "launchpad-flightpath-candida-virtualization-ai-8a3c36",
+      "session_id": "6f978c2e-03bb-412c-a337-696b4c0881b2",
+      "status": "reclaimed",
+      "model_key_present": false,
+      "model_key_revocation": {
+        "key_id": "7abe0cf132ec243d887592415072de12283bd71a4f591c44d742821f0801e9c3",
+        "provider": "litellm",
+        "confirmed_at": "2026-10-13T19:49:37.664640Z",
+        "confirmation_id": "http-success"
+      },
+      "namespace_count": 0,
+      "pv_count": 0,
+      "application_count": 0,
+      "external_rolebinding_count": 0
+    },
+    {
+      "catalog": "virtualization-ai-501",
+      "namespace": "launchpad-flightpath-candida-v501-875f2c",
+      "session_id": "8c512595-2694-493a-8e0a-1555469f5d93",
+      "status": "reclaimed",
+      "model_key_present": false,
+      "model_key_revocation": {
+        "key_id": "5e38280eda8de3819ddcc0f3ad970bc4f15baaeccc09d871c5e2f276d9fea3f3",
+        "provider": "litellm",
+        "confirmed_at": "2026-10-13T19:53:28.629028Z",
+        "confirmation_id": "http-success"
+      },
+      "namespace_count": 0,
+      "pv_count": 0,
+      "application_count": 0,
+      "external_rolebinding_count": 0
+    }
+  ]
+}

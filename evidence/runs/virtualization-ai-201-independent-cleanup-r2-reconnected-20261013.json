@@ -1,0 +1,27 @@
+{
+  "schema": "launchpad/independent-cleanup-observer/v1",
+  "cluster": "flightpath",
+  "catalog": "virtualization-ai-201",
+  "order_id": "05091d7a-2085-4c84-8e42-6b77fedd5af8",
+  "session_id": "90c5ba4f-f79c-40ee-af18-4bab034fa961",
+  "namespace": "launchpad-flightpath-candida-virtualization-ai-417529",
+  "observed_at": "2026-10-14T00:29:57.333Z",
+  "inventory": {
+    "namespace": 0,
+    "persistent_volume": 0,
+    "application": 0,
+    "external_role_binding": 0
+  },
+  "session_status": "reclaimed",
+  "model_key_present": false,
+  "model_key_revocation": {
+    "key_id": "82358531b72cb1a196860c246758d38298d2d84185d0ea96bf5ddd7211052f43",
+    "provider": "litellm",
+    "confirmed_at": "2026-10-14T00:27:38.123929Z",
+    "confirmation_id": "http-success"
+  },
+  "public_policy_enabled": false,
+  "active_claims": 0,
+  "passed": true,
+  "limitation": "Read-only observer does not independently prove cached-browser denial or Keycloak external account disablement."
+}

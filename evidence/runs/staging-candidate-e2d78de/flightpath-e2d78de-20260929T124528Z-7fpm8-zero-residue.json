@@ -1,0 +1,82 @@
+{
+  "all_catalogs_green": true,
+  "candidate_git_commit": "e2d78de667096c7be6e277ec01bf6c29a4a1ffb4",
+  "candidate_manifest_sha256": "c2aaac7b3805bd4adf3edf6f4996e30bddb11d6f16fa7eb37b42fb19477306cb",
+  "certification_bundles": [
+    {
+      "catalog_item_id": "agent-reliability",
+      "result": "GREEN-live",
+      "sha256": "9501e4bcffb3021ad7682bc82cc417da6a4f77fd1acdd5b65082a2efaef9e0ea"
+    },
+    {
+      "catalog_item_id": "ai-sandbox",
+      "result": "GREEN-live",
+      "sha256": "b6c65a6c78f2a1a3eb6b61e96d039831191d8aae1e2d6ae83704ed2aa5d3dd05"
+    },
+    {
+      "catalog_item_id": "cpu-inference-serving",
+      "result": "GREEN-live",
+      "sha256": "2ef922e903023900ec9f267ea6f44b8e208762c251008d49c6f1c6c4a6b1bd4b"
+    },
+    {
+      "catalog_item_id": "hybrid-fraud-detection",
+      "result": "GREEN-live",
+      "sha256": "4a02ab3cf157d1b0878456352a01391432820d420c4a8ca632b00b56dbe751ad"
+    },
+    {
+      "catalog_item_id": "intel-llm-cpu-serving",
+      "result": "GREEN-live",
+      "sha256": "6e741413dae59bea3d03ad3d7ed9ac5decb37c1599a8b7cc569fdde33e5d007b"
+    },
+    {
+      "catalog_item_id": "intel-llm-tool-calling",
+      "result": "GREEN-live",
+      "sha256": "2af7b94b1d019b06611d8cf01ad581a8d79a8b26cba2598035a738344abd03f7"
+    },
+    {
+      "catalog_item_id": "intel-xeon6-agent-201",
+      "result": "GREEN-live",
+      "sha256": "2d50e5fc9b2de24fa75e30d40f213c5e18d395f9e4c3008cd6de2791c34aa452"
+    },
+    {
+      "catalog_item_id": "multi-agent-quickstart",
+      "result": "GREEN-live",
+      "sha256": "620fda23562a9f43c5815a45306e280ccad7473de4284ecd4d728665382d8da5"
+    },
+    {
+      "catalog_item_id": "network-operations-agent",
+      "result": "GREEN-live",
+      "sha256": "51a3e8705faa42deb6a7f16bcef7b4caae2fc1d938f9d745c1f721489c44861b"
+    },
+    {
+      "catalog_item_id": "openshift-operators-workshop",
+      "result": "GREEN-live",
+      "sha256": "0f2e01272f485897d253ffe8a8e4a1e50902e68e1c6db49ebb7d24137aa9caa7"
+    },
+    {
+      "catalog_item_id": "rag-on-xeon",
+      "result": "GREEN-live",
+      "sha256": "cdd82343e09ffa7a2a4aa7f1cbe750636f714bd824b2612fd7d7aba5faf08a2a"
+    }
+  ],
+  "database_counts": {
+    "active_sessions": 0,
+    "active_workshops": 0,
+    "residual_access_policies_created_by_run": 0,
+    "residual_access_sessions_created_by_run": 0,
+    "residual_entitlements_created_by_run": 0,
+    "residual_identities_created_by_run": 0,
+    "residual_session_credentials_created_by_run": 0
+  },
+  "observed_at": "2026-09-29T13:25:08.471139+00:00",
+  "resource_counts": {
+    "argo_applications": 0,
+    "seat_namespaces": 0,
+    "session_rolebindings": 0,
+    "session_routes": 0,
+    "session_secrets": 0
+  },
+  "result": "GREEN-live",
+  "schema": "launchpad.redhat.com/staging-zero-residue/v1",
+  "zero_residue": true
+}
