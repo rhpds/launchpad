@@ -1,0 +1,500 @@
+{
+  "capacity_preview": {
+    "can_provision": true,
+    "catalog_seat_limit": 5,
+    "certification_override": true,
+    "certification_target_seats": 5,
+    "estimated_resources": {
+      "cpu_millicores": 825,
+      "memory_mib": 2320,
+      "pods": 5
+    },
+    "placement_reason": "single-cluster placement",
+    "reason": "Cluster can support 203 seats (CPU: 2423, Memory: 1730, Pods: 203; Eligible nodes: 3; 20.0% headroom)",
+    "resource_breakdown": {
+      "per_seat": {
+        "cpu_millicores": 165,
+        "memory_mib": 464,
+        "pods": 1
+      },
+      "shared": {
+        "cpu_millicores": 0,
+        "memory_mib": 0,
+        "pods": 0
+      },
+      "transient": {
+        "concurrent_seats": 5,
+        "cpu_millicores": 0,
+        "memory_mib": 0,
+        "pods": 0
+      }
+    },
+    "seats_requested": 5,
+    "selected_cluster": "flightpath"
+  },
+  "catalog_item_id": "openshift-operators-workshop",
+  "cleanup": {
+    "model_keys_revoked": true,
+    "resource_counts": {
+      "applications.argoproj.io": 0,
+      "namespaces": 0,
+      "persistentvolumeclaims": 0,
+      "persistentvolumes": 0,
+      "rolebindings.rbac.authorization.k8s.io": 0,
+      "routes.route.openshift.io": 0,
+      "secrets": 0
+    },
+    "seconds": 55.598,
+    "status": "completed"
+  },
+  "completed_at": "2026-09-29T03:15:11.673761Z",
+  "contract": {
+    "catalog_version": "1.0.1-flightpath.1",
+    "git_commit": "079f4829938cb01ee491198001e68db04282d05a",
+    "intake_path": "catalog-onboarding/openshift-operators-workshop.yaml",
+    "path": "certification/catalog/openshift-operators-workshop.yaml",
+    "sha256": "a4c255229875a44dd8a0e85930272f3d5d8c25738415a45a80cd653a7d724830"
+  },
+  "errors": [],
+  "gates": {
+    "all_seats_ready": true,
+    "capacity_passed": true,
+    "cleanup_completed": true,
+    "contract_valid": true,
+    "evidence_hashed": true,
+    "model_keys_revoked": true,
+    "namespace_isolation_passed": true,
+    "ready_within_limit": true,
+    "seat_probes_passed": true,
+    "sensitive_values_absent": true,
+    "showroom_pages_passed": true,
+    "single_cluster_assignment": true,
+    "zero_residue_cleanup": true
+  },
+  "order": {
+    "cluster_ref": "flightpath",
+    "namespaces": [
+      "launchpad-flightpath-candida-openshift-operator-970daa",
+      "launchpad-flightpath-candida-openshift-operator-3bea3d",
+      "launchpad-flightpath-candida-openshift-operator-375a44",
+      "launchpad-flightpath-candida-openshift-operator-5bc118",
+      "launchpad-flightpath-candida-openshift-operator-d82c5b"
+    ],
+    "ready_seconds": 69.173,
+    "seat_count": 5,
+    "session_ids": [
+      "0aad6efa-110d-4522-8fbc-914907d20c5c",
+      "1c26a068-baa7-4e05-9b35-7a1a02619468",
+      "b0bb1f4c-b184-479d-b7cb-93544dc4f406",
+      "f6cc8c27-81cd-4385-b57a-fd59d8005c59",
+      "b232f361-5b11-4af9-8701-aa244cd9fff9"
+    ],
+    "status_before_reclaim": "ready",
+    "workshop_id": "d10cef41-34bf-4e1c-89e1-1d707bad62a7"
+  },
+  "plan": {
+    "all_seats_same_cluster": true,
+    "catalog_item_id": "openshift-operators-workshop",
+    "certification_override": true,
+    "cluster_ref": "flightpath",
+    "current_certified_seats": 1,
+    "execution_eligible": true,
+    "exposure_policy": "internal",
+    "kubeconfig_server": "https://api.flightpath.fm2aihpcsed.com:6443",
+    "maximum_cleanup_seconds": 900,
+    "maximum_ready_seconds": 1500,
+    "mutates_cluster": true,
+    "next_promotion_target": 5,
+    "probe_concurrency": 5,
+    "provision_concurrency": 5,
+    "required_consecutive_runs": 1,
+    "seat_probe_count": 5,
+    "seats": 5,
+    "showroom_pages_per_seat": 3,
+    "workshop_orders": 1
+  },
+  "promotion": {
+    "consecutive_passing_runs": 1,
+    "eligible": true,
+    "required_consecutive_runs": 1
+  },
+  "proof_strategy": {
+    "BDD": "Given one workshop order, all seats must become ready before concurrent participant journeys run, and reclaim must leave zero residue.",
+    "CBT": "Contract parsing, API lifecycle, Showroom checks, lab-specific probes, isolation, rubric scoring, and cleanup are independently observable components.",
+    "CDD": "The versioned CatalogCertification document defines scale, Showroom, probe, cleanup, and promotion interfaces.",
+    "EDD": "The run writes immutable source identity, lifecycle timing, per-seat results, cleanup counts, rubric decisions, and a SHA-256 manifest.",
+    "TDD": "Contract, planner, assertion, runner, cleanup, and evidence behavior are protected by failing-then-passing tests."
+  },
+  "result": "GREEN-live",
+  "rubric": {
+    "categories": {
+      "authorization": {
+        "awarded": 15,
+        "passed": true,
+        "requires": [
+          "namespace_isolation_passed",
+          "sensitive_values_absent"
+        ],
+        "weight": 15
+      },
+      "cleanup": {
+        "awarded": 15,
+        "passed": true,
+        "requires": [
+          "cleanup_completed",
+          "zero_residue_cleanup",
+          "model_keys_revoked"
+        ],
+        "weight": 15
+      },
+      "contract_integrity": {
+        "awarded": 10,
+        "passed": true,
+        "requires": [
+          "contract_valid",
+          "evidence_hashed"
+        ],
+        "weight": 10
+      },
+      "participant_function": {
+        "awarded": 25,
+        "passed": true,
+        "requires": [
+          "showroom_pages_passed",
+          "seat_probes_passed"
+        ],
+        "weight": 25
+      },
+      "placement_capacity": {
+        "awarded": 15,
+        "passed": true,
+        "requires": [
+          "capacity_passed",
+          "single_cluster_assignment"
+        ],
+        "weight": 15
+      },
+      "provisioning_readiness": {
+        "awarded": 20,
+        "passed": true,
+        "requires": [
+          "all_seats_ready",
+          "ready_within_limit"
+        ],
+        "weight": 20
+      }
+    },
+    "passed": true,
+    "required": 100,
+    "score": 100
+  },
+  "run_id": "20260929T031242Z-bb8fa96c",
+  "schema": "launchpad.redhat.com/catalog-certification-evidence/v1",
+  "seat_results": [
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-openshift-operator-970daa",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 16.447,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "cluster_ref": "flightpath",
+          "contains_sensitive_values": false,
+          "exercise": {
+            "resources_removed": true,
+            "response_marker": true,
+            "rollout_ready": true,
+            "route_http_status": 200
+          },
+          "namespace": "launchpad-flightpath-candida-openshift-operator-970daa",
+          "result": "GREEN-live-internal-seat",
+          "terminal_scope": [
+            "project=launchpad-flightpath-candida-openshift-operator-970daa",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "970daa59-1e1c-4b8b-bee0-71f495812e86",
+      "seat_number": 1,
+      "session_id": "0aad6efa-110d-4522-8fbc-914907d20c5c",
+      "showroom": [
+        {
+          "duration_seconds": 0.525,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.306,
+          "http_status": 200,
+          "id": "discover",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.306,
+          "http_status": 200,
+          "id": "deploy",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    },
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-openshift-operator-3bea3d",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 15.567,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "cluster_ref": "flightpath",
+          "contains_sensitive_values": false,
+          "exercise": {
+            "resources_removed": true,
+            "response_marker": true,
+            "rollout_ready": true,
+            "route_http_status": 200
+          },
+          "namespace": "launchpad-flightpath-candida-openshift-operator-3bea3d",
+          "result": "GREEN-live-internal-seat",
+          "terminal_scope": [
+            "project=launchpad-flightpath-candida-openshift-operator-3bea3d",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "3bea3d25-ef67-4849-8800-cf4cb0fbc474",
+      "seat_number": 2,
+      "session_id": "1c26a068-baa7-4e05-9b35-7a1a02619468",
+      "showroom": [
+        {
+          "duration_seconds": 0.427,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.388,
+          "http_status": 200,
+          "id": "discover",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.338,
+          "http_status": 200,
+          "id": "deploy",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    },
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-openshift-operator-375a44",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 15.434,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "cluster_ref": "flightpath",
+          "contains_sensitive_values": false,
+          "exercise": {
+            "resources_removed": true,
+            "response_marker": true,
+            "rollout_ready": true,
+            "route_http_status": 200
+          },
+          "namespace": "launchpad-flightpath-candida-openshift-operator-375a44",
+          "result": "GREEN-live-internal-seat",
+          "terminal_scope": [
+            "project=launchpad-flightpath-candida-openshift-operator-375a44",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "375a44f2-efd3-41b0-93ab-2b899777a390",
+      "seat_number": 3,
+      "session_id": "b0bb1f4c-b184-479d-b7cb-93544dc4f406",
+      "showroom": [
+        {
+          "duration_seconds": 0.58,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.392,
+          "http_status": 200,
+          "id": "discover",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.36,
+          "http_status": 200,
+          "id": "deploy",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    },
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-openshift-operator-5bc118",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 16.451,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "cluster_ref": "flightpath",
+          "contains_sensitive_values": false,
+          "exercise": {
+            "resources_removed": true,
+            "response_marker": true,
+            "rollout_ready": true,
+            "route_http_status": 200
+          },
+          "namespace": "launchpad-flightpath-candida-openshift-operator-5bc118",
+          "result": "GREEN-live-internal-seat",
+          "terminal_scope": [
+            "project=launchpad-flightpath-candida-openshift-operator-5bc118",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "5bc11899-898a-4808-a35b-e5c1dc193ba2",
+      "seat_number": 4,
+      "session_id": "f6cc8c27-81cd-4385-b57a-fd59d8005c59",
+      "showroom": [
+        {
+          "duration_seconds": 0.578,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.358,
+          "http_status": 200,
+          "id": "discover",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.252,
+          "http_status": 200,
+          "id": "deploy",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    },
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-openshift-operator-d82c5b",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 15.566,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "cluster_ref": "flightpath",
+          "contains_sensitive_values": false,
+          "exercise": {
+            "resources_removed": true,
+            "response_marker": true,
+            "rollout_ready": true,
+            "route_http_status": 200
+          },
+          "namespace": "launchpad-flightpath-candida-openshift-operator-d82c5b",
+          "result": "GREEN-live-internal-seat",
+          "terminal_scope": [
+            "project=launchpad-flightpath-candida-openshift-operator-d82c5b",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "d82c5bd8-fadf-4d18-8ceb-e9abb151942e",
+      "seat_number": 5,
+      "session_id": "b232f361-5b11-4af9-8701-aa244cd9fff9",
+      "showroom": [
+        {
+          "duration_seconds": 0.467,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.304,
+          "http_status": 200,
+          "id": "discover",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.374,
+          "http_status": 200,
+          "id": "deploy",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    }
+  ],
+  "security": {
+    "contains_plaintext_credentials": false,
+    "credential_values_logged": false
+  },
+  "started_at": "2026-09-29T03:12:42.921254Z",
+  "validation_matrix": {
+    "all_seats_ready": "GREEN-live",
+    "capacity_passed": "GREEN-live",
+    "cleanup_completed": "GREEN-live",
+    "contract_valid": "GREEN-live",
+    "evidence_hashed": "GREEN-live",
+    "model_keys_revoked": "GREEN-live",
+    "namespace_isolation_passed": "GREEN-live",
+    "ready_within_limit": "GREEN-live",
+    "seat_probes_passed": "GREEN-live",
+    "sensitive_values_absent": "GREEN-live",
+    "showroom_pages_passed": "GREEN-live",
+    "single_cluster_assignment": "GREEN-live",
+    "zero_residue_cleanup": "GREEN-live"
+  }
+}

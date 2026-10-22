@@ -1,0 +1,545 @@
+{
+  "capacity_preview": {
+    "can_provision": true,
+    "catalog_seat_limit": 1,
+    "certification_override": true,
+    "certification_target_seats": 5,
+    "estimated_resources": {
+      "cpu_millicores": 750,
+      "memory_mib": 960,
+      "pods": 15
+    },
+    "placement_reason": "Entire workshop assigned to flightpath; seats will not be split",
+    "reason": "Cluster can support 68 seats (CPU: 2666, Memory: 4182, Pods: 68; Eligible nodes: 3; 20.0% headroom)",
+    "resource_breakdown": {
+      "per_seat": {
+        "cpu_millicores": 150,
+        "memory_mib": 192,
+        "pods": 3
+      },
+      "shared": {
+        "cpu_millicores": 0,
+        "memory_mib": 0,
+        "pods": 0
+      },
+      "transient": {
+        "concurrent_seats": 5,
+        "cpu_millicores": 0,
+        "memory_mib": 0,
+        "pods": 0
+      }
+    },
+    "seats_requested": 5,
+    "selected_cluster": "flightpath"
+  },
+  "catalog_item_id": "agent-reliability",
+  "cleanup": {
+    "model_keys_revoked": true,
+    "resource_counts": {
+      "applications.argoproj.io": 0,
+      "namespaces": 0,
+      "persistentvolumeclaims": 0,
+      "persistentvolumes": 0,
+      "rolebindings.rbac.authorization.k8s.io": 0,
+      "routes.route.openshift.io": 0,
+      "secrets": 0
+    },
+    "seconds": 213.914,
+    "status": "completed"
+  },
+  "completed_at": "2026-09-29T01:37:45.966693Z",
+  "contract": {
+    "catalog_version": "0.1.0-flightpath.1",
+    "git_commit": "079f4829938cb01ee491198001e68db04282d05a",
+    "intake_path": "catalog-onboarding/agent-reliability.yaml",
+    "path": "certification/catalog/agent-reliability.yaml",
+    "sha256": "f3b47c6fbdf1c46e7eda62fff692779fbe85403e6c9909b4c21c8b24b0a83542"
+  },
+  "errors": [],
+  "gates": {
+    "all_seats_ready": true,
+    "capacity_passed": true,
+    "cleanup_completed": true,
+    "contract_valid": true,
+    "evidence_hashed": true,
+    "model_keys_revoked": true,
+    "namespace_isolation_passed": false,
+    "ready_within_limit": true,
+    "seat_probes_passed": false,
+    "sensitive_values_absent": false,
+    "showroom_pages_passed": true,
+    "single_cluster_assignment": true,
+    "zero_residue_cleanup": true
+  },
+  "order": {
+    "cluster_ref": "flightpath",
+    "namespaces": [
+      "launchpad-flightpath-candida-agent-reliability-e37c03",
+      "launchpad-flightpath-candida-agent-reliability-10c56f",
+      "launchpad-flightpath-candida-agent-reliability-980f14",
+      "launchpad-flightpath-candida-agent-reliability-df9c5e",
+      "launchpad-flightpath-candida-agent-reliability-7539f5"
+    ],
+    "ready_seconds": 81.466,
+    "seat_count": 5,
+    "session_ids": [
+      "d3352e65-3666-407e-9ca5-a5a69e863fa8",
+      "de510817-5e77-4a85-aa83-003c0ca104bb",
+      "e9760559-3163-40ae-8551-c16d47c339b9",
+      "9fcc68ea-27a7-4454-8256-9914fd4d9304",
+      "8b69b56e-56ad-4813-91d5-a8447ef9ddc5"
+    ],
+    "status_before_reclaim": "ready",
+    "workshop_id": "beb91fcd-a46e-4e67-9b8d-011a4b10a3e1"
+  },
+  "plan": {
+    "all_seats_same_cluster": true,
+    "catalog_item_id": "agent-reliability",
+    "certification_override": true,
+    "cluster_ref": "flightpath",
+    "current_certified_seats": 1,
+    "execution_eligible": true,
+    "exposure_policy": "internal",
+    "kubeconfig_server": "https://api.flightpath.fm2aihpcsed.com:6443",
+    "maximum_cleanup_seconds": 900,
+    "maximum_ready_seconds": 1800,
+    "mutates_cluster": true,
+    "next_promotion_target": 5,
+    "probe_concurrency": 5,
+    "provision_concurrency": 1,
+    "required_consecutive_runs": 1,
+    "seat_probe_count": 5,
+    "seats": 5,
+    "showroom_pages_per_seat": 6,
+    "workshop_orders": 1
+  },
+  "promotion": {
+    "consecutive_passing_runs": 0,
+    "eligible": false,
+    "required_consecutive_runs": 1
+  },
+  "proof_strategy": {
+    "BDD": "Given one workshop order, all seats must become ready before concurrent participant journeys run, and reclaim must leave zero residue.",
+    "CBT": "Contract parsing, API lifecycle, Showroom checks, lab-specific probes, isolation, rubric scoring, and cleanup are independently observable components.",
+    "CDD": "The versioned CatalogCertification document defines scale, Showroom, probe, cleanup, and promotion interfaces.",
+    "EDD": "The run writes immutable source identity, lifecycle timing, per-seat results, cleanup counts, rubric decisions, and a SHA-256 manifest.",
+    "TDD": "Contract, planner, assertion, runner, cleanup, and evidence behavior are protected by failing-then-passing tests."
+  },
+  "result": "RED-live",
+  "rubric": {
+    "categories": {
+      "authorization": {
+        "awarded": 0,
+        "passed": false,
+        "requires": [
+          "namespace_isolation_passed",
+          "sensitive_values_absent"
+        ],
+        "weight": 15
+      },
+      "cleanup": {
+        "awarded": 15,
+        "passed": true,
+        "requires": [
+          "cleanup_completed",
+          "zero_residue_cleanup",
+          "model_keys_revoked"
+        ],
+        "weight": 15
+      },
+      "contract_integrity": {
+        "awarded": 10,
+        "passed": true,
+        "requires": [
+          "contract_valid",
+          "evidence_hashed"
+        ],
+        "weight": 10
+      },
+      "participant_function": {
+        "awarded": 0,
+        "passed": false,
+        "requires": [
+          "showroom_pages_passed",
+          "seat_probes_passed"
+        ],
+        "weight": 25
+      },
+      "placement_capacity": {
+        "awarded": 15,
+        "passed": true,
+        "requires": [
+          "capacity_passed",
+          "single_cluster_assignment"
+        ],
+        "weight": 15
+      },
+      "provisioning_readiness": {
+        "awarded": 20,
+        "passed": true,
+        "requires": [
+          "all_seats_ready",
+          "ready_within_limit"
+        ],
+        "weight": 20
+      }
+    },
+    "passed": false,
+    "required": 100,
+    "score": 60
+  },
+  "run_id": "flightpath-agent-reliability-five-seat-current-r1-20260928",
+  "schema": "launchpad.redhat.com/catalog-certification-evidence/v1",
+  "seat_results": [
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-agent-reliability-e37c03",
+      "probe": {
+        "assertion_failures": [
+          "seat probe exited with status 1"
+        ],
+        "duration_seconds": 1.514,
+        "exit_code": 1,
+        "failure_stage": "setup",
+        "passed": false
+      },
+      "seat_id": "e37c03ad-17d8-4028-bb72-60f902164dd9",
+      "seat_number": 1,
+      "session_id": "d3352e65-3666-407e-9ca5-a5a69e863fa8",
+      "showroom": [
+        {
+          "duration_seconds": 0.441,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.418,
+          "http_status": 200,
+          "id": "healthy",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.388,
+          "http_status": 200,
+          "id": "prompt-injection",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.381,
+          "http_status": 200,
+          "id": "authorization",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.391,
+          "http_status": 200,
+          "id": "inference-disruption",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.355,
+          "http_status": 200,
+          "id": "recovery",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    },
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-agent-reliability-10c56f",
+      "probe": {
+        "assertion_failures": [
+          "seat probe exited with status 1"
+        ],
+        "duration_seconds": 2.618,
+        "exit_code": 1,
+        "failure_stage": "route-discovery",
+        "passed": false
+      },
+      "seat_id": "10c56f21-9cb6-4913-9885-58e0a3bceaa5",
+      "seat_number": 2,
+      "session_id": "de510817-5e77-4a85-aa83-003c0ca104bb",
+      "showroom": [
+        {
+          "duration_seconds": 0.464,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.42,
+          "http_status": 200,
+          "id": "healthy",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.382,
+          "http_status": 200,
+          "id": "prompt-injection",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.399,
+          "http_status": 200,
+          "id": "authorization",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.381,
+          "http_status": 200,
+          "id": "inference-disruption",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.372,
+          "http_status": 200,
+          "id": "recovery",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    },
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-agent-reliability-980f14",
+      "probe": {
+        "assertion_failures": [
+          "seat probe exited with status 1"
+        ],
+        "duration_seconds": 34.824,
+        "exit_code": 1,
+        "failure_stage": "runtime-contract",
+        "passed": false
+      },
+      "seat_id": "980f1419-9e7f-4654-b0b0-f880508baaeb",
+      "seat_number": 3,
+      "session_id": "e9760559-3163-40ae-8551-c16d47c339b9",
+      "showroom": [
+        {
+          "duration_seconds": 0.434,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.41,
+          "http_status": 200,
+          "id": "healthy",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.396,
+          "http_status": 200,
+          "id": "prompt-injection",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.375,
+          "http_status": 200,
+          "id": "authorization",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.394,
+          "http_status": 200,
+          "id": "inference-disruption",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.352,
+          "http_status": 200,
+          "id": "recovery",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    },
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-agent-reliability-df9c5e",
+      "probe": {
+        "assertion_failures": [
+          "seat probe exited with status 1"
+        ],
+        "duration_seconds": 1.525,
+        "exit_code": 1,
+        "failure_stage": "setup",
+        "passed": false
+      },
+      "seat_id": "df9c5e51-ecc4-47cb-8264-9a6e2886f7f0",
+      "seat_number": 4,
+      "session_id": "9fcc68ea-27a7-4454-8256-9914fd4d9304",
+      "showroom": [
+        {
+          "duration_seconds": 0.453,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.424,
+          "http_status": 200,
+          "id": "healthy",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.379,
+          "http_status": 200,
+          "id": "prompt-injection",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.395,
+          "http_status": 200,
+          "id": "authorization",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.368,
+          "http_status": 200,
+          "id": "inference-disruption",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.394,
+          "http_status": 200,
+          "id": "recovery",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    },
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-agent-reliability-7539f5",
+      "probe": {
+        "assertion_failures": [
+          "seat probe exited with status 1"
+        ],
+        "duration_seconds": 30.621,
+        "exit_code": 1,
+        "failure_stage": "terminal-scope",
+        "passed": false
+      },
+      "seat_id": "7539f556-2e82-484f-b00e-eec17e66b9a6",
+      "seat_number": 5,
+      "session_id": "8b69b56e-56ad-4813-91d5-a8447ef9ddc5",
+      "showroom": [
+        {
+          "duration_seconds": 0.497,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.395,
+          "http_status": 200,
+          "id": "healthy",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.398,
+          "http_status": 200,
+          "id": "prompt-injection",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.383,
+          "http_status": 200,
+          "id": "authorization",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.373,
+          "http_status": 200,
+          "id": "inference-disruption",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.438,
+          "http_status": 200,
+          "id": "recovery",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    }
+  ],
+  "security": {
+    "contains_plaintext_credentials": false,
+    "credential_values_logged": false
+  },
+  "started_at": "2026-09-29T01:32:04.444721Z",
+  "validation_matrix": {
+    "all_seats_ready": "GREEN-live",
+    "capacity_passed": "GREEN-live",
+    "cleanup_completed": "GREEN-live",
+    "contract_valid": "GREEN-live",
+    "evidence_hashed": "GREEN-live",
+    "model_keys_revoked": "GREEN-live",
+    "namespace_isolation_passed": "RED-live",
+    "ready_within_limit": "GREEN-live",
+    "seat_probes_passed": "RED-live",
+    "sensitive_values_absent": "RED-live",
+    "showroom_pages_passed": "GREEN-live",
+    "single_cluster_assignment": "GREEN-live",
+    "zero_residue_cleanup": "GREEN-live"
+  }
+}

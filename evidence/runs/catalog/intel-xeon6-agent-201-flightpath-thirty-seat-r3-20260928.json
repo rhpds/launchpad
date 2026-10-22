@@ -1,0 +1,2335 @@
+{
+  "capacity_preview": {
+    "can_provision": true,
+    "catalog_seat_limit": 30,
+    "certification_override": true,
+    "certification_target_seats": 30,
+    "estimated_resources": {
+      "cpu_millicores": 12450,
+      "memory_mib": 27360,
+      "pods": 90
+    },
+    "placement_reason": "single-cluster placement",
+    "reason": "Cluster can support 68 seats (CPU: 963, Memory: 880, Pods: 68; Eligible nodes: 3; 20.0% headroom)",
+    "resource_breakdown": {
+      "per_seat": {
+        "cpu_millicores": 415,
+        "memory_mib": 912,
+        "pods": 3
+      },
+      "shared": {
+        "cpu_millicores": 0,
+        "memory_mib": 0,
+        "pods": 0
+      },
+      "transient": {
+        "concurrent_seats": 5,
+        "cpu_millicores": 0,
+        "memory_mib": 0,
+        "pods": 0
+      }
+    },
+    "seats_requested": 30,
+    "selected_cluster": "flightpath"
+  },
+  "catalog_item_id": "intel-xeon6-agent-201",
+  "cleanup": {
+    "model_keys_revoked": true,
+    "resource_counts": {
+      "applications.argoproj.io": 0,
+      "namespaces": 0,
+      "persistentvolumeclaims": 0,
+      "persistentvolumes": 0,
+      "rolebindings.rbac.authorization.k8s.io": 0,
+      "routes.route.openshift.io": 0,
+      "secrets": 0
+    },
+    "seconds": 420.549,
+    "status": "completed"
+  },
+  "completed_at": "2026-09-28T23:48:09.913127Z",
+  "contract": {
+    "catalog_version": "1.0.8-flightpath.1",
+    "git_commit": "079f4829938cb01ee491198001e68db04282d05a",
+    "intake_path": "catalog-onboarding/intel-xeon6-agent-201.yaml",
+    "path": "certification/catalog/intel-xeon6-agent-201.yaml",
+    "sha256": "94fdc86ca59a8f0ad3c8192c56952de947d0867ec57699a08e97b05d72cd5f41"
+  },
+  "errors": [],
+  "gates": {
+    "all_seats_ready": true,
+    "capacity_passed": true,
+    "cleanup_completed": true,
+    "contract_valid": true,
+    "evidence_hashed": true,
+    "model_keys_revoked": true,
+    "namespace_isolation_passed": true,
+    "ready_within_limit": true,
+    "seat_probes_passed": true,
+    "sensitive_values_absent": true,
+    "showroom_pages_passed": true,
+    "single_cluster_assignment": true,
+    "zero_residue_cleanup": true
+  },
+  "order": {
+    "cluster_ref": "flightpath",
+    "namespaces": [
+      "launchpad-flightpath-candida-intel-xeon6-agent-986a2b",
+      "launchpad-flightpath-candida-intel-xeon6-agent-5f9052",
+      "launchpad-flightpath-candida-intel-xeon6-agent-4fa989",
+      "launchpad-flightpath-candida-intel-xeon6-agent-34a726",
+      "launchpad-flightpath-candida-intel-xeon6-agent-d75508",
+      "launchpad-flightpath-candida-intel-xeon6-agent-2024de",
+      "launchpad-flightpath-candida-intel-xeon6-agent-879eb5",
+      "launchpad-flightpath-candida-intel-xeon6-agent-d039cb",
+      "launchpad-flightpath-candida-intel-xeon6-agent-166098",
+      "launchpad-flightpath-candida-intel-xeon6-agent-1cac03",
+      "launchpad-flightpath-candida-intel-xeon6-agent-8592b9",
+      "launchpad-flightpath-candida-intel-xeon6-agent-005c5d",
+      "launchpad-flightpath-candida-intel-xeon6-agent-23d76c",
+      "launchpad-flightpath-candida-intel-xeon6-agent-c64057",
+      "launchpad-flightpath-candida-intel-xeon6-agent-19ea36",
+      "launchpad-flightpath-candida-intel-xeon6-agent-822205",
+      "launchpad-flightpath-candida-intel-xeon6-agent-2459d1",
+      "launchpad-flightpath-candida-intel-xeon6-agent-2c6eed",
+      "launchpad-flightpath-candida-intel-xeon6-agent-48d720",
+      "launchpad-flightpath-candida-intel-xeon6-agent-7f3c7c",
+      "launchpad-flightpath-candida-intel-xeon6-agent-dbe011",
+      "launchpad-flightpath-candida-intel-xeon6-agent-154c4e",
+      "launchpad-flightpath-candida-intel-xeon6-agent-6b61ce",
+      "launchpad-flightpath-candida-intel-xeon6-agent-5f6dde",
+      "launchpad-flightpath-candida-intel-xeon6-agent-bc6059",
+      "launchpad-flightpath-candida-intel-xeon6-agent-23ab44",
+      "launchpad-flightpath-candida-intel-xeon6-agent-3201cd",
+      "launchpad-flightpath-candida-intel-xeon6-agent-e73900",
+      "launchpad-flightpath-candida-intel-xeon6-agent-b5d356",
+      "launchpad-flightpath-candida-intel-xeon6-agent-ff0392"
+    ],
+    "ready_seconds": 278.829,
+    "seat_count": 30,
+    "session_ids": [
+      "38768328-dcda-4224-a756-c9c88f186052",
+      "43b3d8af-a910-480d-a16b-76214538eb29",
+      "9174e15a-2e0d-423c-be8d-fb2454a34e7e",
+      "97ee612d-437d-4fe2-8bdf-d10916f5f030",
+      "255f7305-6d42-4968-a52d-6d4a08416829",
+      "46444221-50a1-45c6-b2a9-fb0001a0a072",
+      "7bab7f72-ceee-47b7-aa7d-34016abc585f",
+      "1d207205-d4fe-4354-a0b5-96c2a81d817b",
+      "2ccb8742-427e-4cab-8cca-34e1d5b8e1d7",
+      "80d8bf14-4979-4f50-b86e-abfe8b03f717",
+      "4c12d4d3-3a6d-4e40-b114-6e416e150922",
+      "79e5666d-70a4-4cc9-a45b-aa04187644bf",
+      "87acd2c7-0738-4b61-b567-9a5c78f1a263",
+      "20ad7fb5-9230-4be3-8d3e-b6007980336e",
+      "213fff12-ba5f-4e08-83ca-fc51f513ae38",
+      "2bba449e-dc27-451a-a461-dbc8568bcaf5",
+      "146c3a08-0955-4fc5-9491-9b14805a7440",
+      "fd7cadad-5572-4af9-89e7-d83962b681fa",
+      "106b2bb0-c567-48b0-b271-1d69c46c4772",
+      "74a99591-f006-49f4-b1e7-1d01a0ed8fd9",
+      "f9a57c4e-abe7-4d2e-add6-7cf1fad7edd3",
+      "cbefe70a-d41b-4967-b43b-296dca428b61",
+      "09328383-3251-4b23-87b2-8867db65aa29",
+      "42eee715-ea98-49c7-b335-4c2edacbc45d",
+      "80c0bedb-2b85-4a13-920a-7cf18ac1766d",
+      "ccd81712-75f0-41b4-a2ef-9d6fe29c480d",
+      "28eeeabc-21c5-47b7-93f7-6a05bbc135f1",
+      "4e524cd1-4785-40eb-a41c-778f78c84a32",
+      "5bbd4217-5809-41d6-9dff-a552b902542a",
+      "01acde95-b1fc-4780-91e9-b726952525e6"
+    ],
+    "status_before_reclaim": "ready",
+    "workshop_id": "1eda99c1-c2b9-41cf-a3d2-af8b4b8c3b4c"
+  },
+  "plan": {
+    "all_seats_same_cluster": true,
+    "catalog_item_id": "intel-xeon6-agent-201",
+    "certification_override": true,
+    "cluster_ref": "flightpath",
+    "current_certified_seats": 25,
+    "execution_eligible": true,
+    "exposure_policy": "internal",
+    "kubeconfig_server": "https://api.flightpath.fm2aihpcsed.com:6443",
+    "maximum_cleanup_seconds": 1500,
+    "maximum_ready_seconds": 3300,
+    "mutates_cluster": true,
+    "next_promotion_target": 30,
+    "probe_concurrency": 10,
+    "provision_concurrency": 5,
+    "required_consecutive_runs": 3,
+    "seat_probe_count": 30,
+    "seats": 30,
+    "showroom_pages_per_seat": 4,
+    "workshop_orders": 1
+  },
+  "promotion": {
+    "consecutive_passing_runs": 3,
+    "eligible": true,
+    "required_consecutive_runs": 3
+  },
+  "proof_strategy": {
+    "BDD": "Given one workshop order, all seats must become ready before concurrent participant journeys run, and reclaim must leave zero residue.",
+    "CBT": "Contract parsing, API lifecycle, Showroom checks, lab-specific probes, isolation, rubric scoring, and cleanup are independently observable components.",
+    "CDD": "The versioned CatalogCertification document defines scale, Showroom, probe, cleanup, and promotion interfaces.",
+    "EDD": "The run writes immutable source identity, lifecycle timing, per-seat results, cleanup counts, rubric decisions, and a SHA-256 manifest.",
+    "TDD": "Contract, planner, assertion, runner, cleanup, and evidence behavior are protected by failing-then-passing tests."
+  },
+  "result": "GREEN-live",
+  "rubric": {
+    "categories": {
+      "authorization": {
+        "awarded": 15,
+        "passed": true,
+        "requires": [
+          "namespace_isolation_passed",
+          "sensitive_values_absent"
+        ],
+        "weight": 15
+      },
+      "cleanup": {
+        "awarded": 15,
+        "passed": true,
+        "requires": [
+          "cleanup_completed",
+          "zero_residue_cleanup",
+          "model_keys_revoked"
+        ],
+        "weight": 15
+      },
+      "contract_integrity": {
+        "awarded": 10,
+        "passed": true,
+        "requires": [
+          "contract_valid",
+          "evidence_hashed"
+        ],
+        "weight": 10
+      },
+      "participant_function": {
+        "awarded": 25,
+        "passed": true,
+        "requires": [
+          "showroom_pages_passed",
+          "seat_probes_passed"
+        ],
+        "weight": 25
+      },
+      "placement_capacity": {
+        "awarded": 15,
+        "passed": true,
+        "requires": [
+          "capacity_passed",
+          "single_cluster_assignment"
+        ],
+        "weight": 15
+      },
+      "provisioning_readiness": {
+        "awarded": 20,
+        "passed": true,
+        "requires": [
+          "all_seats_ready",
+          "ready_within_limit"
+        ],
+        "weight": 20
+      }
+    },
+    "passed": true,
+    "required": 100,
+    "score": 100
+  },
+  "run_id": "flightpath-agent-201-thirty-seat-r3-20260928",
+  "schema": "launchpad.redhat.com/catalog-certification-evidence/v1",
+  "seat_results": [
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-986a2b",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 90.718,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "agent_journey": {
+            "functional_agent": true
+          },
+          "cluster_ref": "flightpath",
+          "contains_sensitive_values": false,
+          "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-986a2b",
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "MAAS_API_KEY",
+            "MAAS_API_URL",
+            "MAAS_ENDPOINT",
+            "MAAS_MODEL"
+          ],
+          "setup_passed": true,
+          "terminal_scope": [
+            "project=launchpad-flightpath-candida-intel-xeon6-agent-986a2b",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "986a2b7c-99fd-490e-9f68-660553a65b03",
+      "seat_number": 1,
+      "session_id": "38768328-dcda-4224-a756-c9c88f186052",
+      "showroom": [
+        {
+          "duration_seconds": 0.434,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.401,
+          "http_status": 200,
+          "id": "deploy-tools",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.395,
+          "http_status": 200,
+          "id": "wire-agent",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.397,
+          "http_status": 200,
+          "id": "test-and-tune",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    },
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-5f9052",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 82.524,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "agent_journey": {
+            "functional_agent": true
+          },
+          "cluster_ref": "flightpath",
+          "contains_sensitive_values": false,
+          "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-5f9052",
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "MAAS_API_KEY",
+            "MAAS_API_URL",
+            "MAAS_ENDPOINT",
+            "MAAS_MODEL"
+          ],
+          "setup_passed": true,
+          "terminal_scope": [
+            "project=launchpad-flightpath-candida-intel-xeon6-agent-5f9052",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "5f9052f4-fe00-484f-bd19-71ece9973b80",
+      "seat_number": 2,
+      "session_id": "43b3d8af-a910-480d-a16b-76214538eb29",
+      "showroom": [
+        {
+          "duration_seconds": 0.529,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.408,
+          "http_status": 200,
+          "id": "deploy-tools",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.4,
+          "http_status": 200,
+          "id": "wire-agent",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.459,
+          "http_status": 200,
+          "id": "test-and-tune",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    },
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-4fa989",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 83.768,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "agent_journey": {
+            "functional_agent": true
+          },
+          "cluster_ref": "flightpath",
+          "contains_sensitive_values": false,
+          "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-4fa989",
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "MAAS_API_KEY",
+            "MAAS_API_URL",
+            "MAAS_ENDPOINT",
+            "MAAS_MODEL"
+          ],
+          "setup_passed": true,
+          "terminal_scope": [
+            "project=launchpad-flightpath-candida-intel-xeon6-agent-4fa989",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "4fa989c0-49e0-4e99-b0fc-266343697c51",
+      "seat_number": 3,
+      "session_id": "9174e15a-2e0d-423c-be8d-fb2454a34e7e",
+      "showroom": [
+        {
+          "duration_seconds": 0.483,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.402,
+          "http_status": 200,
+          "id": "deploy-tools",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.386,
+          "http_status": 200,
+          "id": "wire-agent",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.399,
+          "http_status": 200,
+          "id": "test-and-tune",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    },
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-34a726",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 85.134,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "agent_journey": {
+            "functional_agent": true
+          },
+          "cluster_ref": "flightpath",
+          "contains_sensitive_values": false,
+          "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-34a726",
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "MAAS_API_KEY",
+            "MAAS_API_URL",
+            "MAAS_ENDPOINT",
+            "MAAS_MODEL"
+          ],
+          "setup_passed": true,
+          "terminal_scope": [
+            "project=launchpad-flightpath-candida-intel-xeon6-agent-34a726",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "34a726ab-e263-4685-a2c1-b3b22bc88f8c",
+      "seat_number": 4,
+      "session_id": "97ee612d-437d-4fe2-8bdf-d10916f5f030",
+      "showroom": [
+        {
+          "duration_seconds": 0.43,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.448,
+          "http_status": 200,
+          "id": "deploy-tools",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.401,
+          "http_status": 200,
+          "id": "wire-agent",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.41,
+          "http_status": 200,
+          "id": "test-and-tune",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    },
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-d75508",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 83.529,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "agent_journey": {
+            "functional_agent": true
+          },
+          "cluster_ref": "flightpath",
+          "contains_sensitive_values": false,
+          "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-d75508",
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "MAAS_API_KEY",
+            "MAAS_API_URL",
+            "MAAS_ENDPOINT",
+            "MAAS_MODEL"
+          ],
+          "setup_passed": true,
+          "terminal_scope": [
+            "project=launchpad-flightpath-candida-intel-xeon6-agent-d75508",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "d75508c6-e159-4558-862b-ce5f8534b7cc",
+      "seat_number": 5,
+      "session_id": "255f7305-6d42-4968-a52d-6d4a08416829",
+      "showroom": [
+        {
+          "duration_seconds": 0.369,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.454,
+          "http_status": 200,
+          "id": "deploy-tools",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.424,
+          "http_status": 200,
+          "id": "wire-agent",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.379,
+          "http_status": 200,
+          "id": "test-and-tune",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    },
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-2024de",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 81.975,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "agent_journey": {
+            "functional_agent": true
+          },
+          "cluster_ref": "flightpath",
+          "contains_sensitive_values": false,
+          "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-2024de",
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "MAAS_API_KEY",
+            "MAAS_API_URL",
+            "MAAS_ENDPOINT",
+            "MAAS_MODEL"
+          ],
+          "setup_passed": true,
+          "terminal_scope": [
+            "project=launchpad-flightpath-candida-intel-xeon6-agent-2024de",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "2024deb5-fe8d-446b-9932-d8eb27d89d8d",
+      "seat_number": 6,
+      "session_id": "46444221-50a1-45c6-b2a9-fb0001a0a072",
+      "showroom": [
+        {
+          "duration_seconds": 0.517,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.402,
+          "http_status": 200,
+          "id": "deploy-tools",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.401,
+          "http_status": 200,
+          "id": "wire-agent",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.427,
+          "http_status": 200,
+          "id": "test-and-tune",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    },
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-879eb5",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 83.929,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "agent_journey": {
+            "functional_agent": true
+          },
+          "cluster_ref": "flightpath",
+          "contains_sensitive_values": false,
+          "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-879eb5",
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "MAAS_API_KEY",
+            "MAAS_API_URL",
+            "MAAS_ENDPOINT",
+            "MAAS_MODEL"
+          ],
+          "setup_passed": true,
+          "terminal_scope": [
+            "project=launchpad-flightpath-candida-intel-xeon6-agent-879eb5",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "879eb5e6-f3fa-4ade-901d-0f02dfc40b51",
+      "seat_number": 7,
+      "session_id": "7bab7f72-ceee-47b7-aa7d-34016abc585f",
+      "showroom": [
+        {
+          "duration_seconds": 0.478,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.406,
+          "http_status": 200,
+          "id": "deploy-tools",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.403,
+          "http_status": 200,
+          "id": "wire-agent",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.429,
+          "http_status": 200,
+          "id": "test-and-tune",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    },
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-d039cb",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 86.23,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "agent_journey": {
+            "functional_agent": true
+          },
+          "cluster_ref": "flightpath",
+          "contains_sensitive_values": false,
+          "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-d039cb",
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "MAAS_API_KEY",
+            "MAAS_API_URL",
+            "MAAS_ENDPOINT",
+            "MAAS_MODEL"
+          ],
+          "setup_passed": true,
+          "terminal_scope": [
+            "project=launchpad-flightpath-candida-intel-xeon6-agent-d039cb",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "d039cb80-dcb2-4de4-bf7a-f8a8946b1797",
+      "seat_number": 8,
+      "session_id": "1d207205-d4fe-4354-a0b5-96c2a81d817b",
+      "showroom": [
+        {
+          "duration_seconds": 0.367,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.399,
+          "http_status": 200,
+          "id": "deploy-tools",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.444,
+          "http_status": 200,
+          "id": "wire-agent",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.401,
+          "http_status": 200,
+          "id": "test-and-tune",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    },
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-166098",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 81.896,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "agent_journey": {
+            "functional_agent": true
+          },
+          "cluster_ref": "flightpath",
+          "contains_sensitive_values": false,
+          "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-166098",
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "MAAS_API_KEY",
+            "MAAS_API_URL",
+            "MAAS_ENDPOINT",
+            "MAAS_MODEL"
+          ],
+          "setup_passed": true,
+          "terminal_scope": [
+            "project=launchpad-flightpath-candida-intel-xeon6-agent-166098",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "1660981b-c405-4912-a416-5131ff25f78e",
+      "seat_number": 9,
+      "session_id": "2ccb8742-427e-4cab-8cca-34e1d5b8e1d7",
+      "showroom": [
+        {
+          "duration_seconds": 0.474,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.405,
+          "http_status": 200,
+          "id": "deploy-tools",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.419,
+          "http_status": 200,
+          "id": "wire-agent",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.429,
+          "http_status": 200,
+          "id": "test-and-tune",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    },
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-1cac03",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 85.83,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "agent_journey": {
+            "functional_agent": true
+          },
+          "cluster_ref": "flightpath",
+          "contains_sensitive_values": false,
+          "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-1cac03",
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "MAAS_API_KEY",
+            "MAAS_API_URL",
+            "MAAS_ENDPOINT",
+            "MAAS_MODEL"
+          ],
+          "setup_passed": true,
+          "terminal_scope": [
+            "project=launchpad-flightpath-candida-intel-xeon6-agent-1cac03",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "1cac036e-0462-4463-8baa-65ffb0c0cfc2",
+      "seat_number": 10,
+      "session_id": "80d8bf14-4979-4f50-b86e-abfe8b03f717",
+      "showroom": [
+        {
+          "duration_seconds": 0.426,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.441,
+          "http_status": 200,
+          "id": "deploy-tools",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.413,
+          "http_status": 200,
+          "id": "wire-agent",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.421,
+          "http_status": 200,
+          "id": "test-and-tune",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    },
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-8592b9",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 84.065,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "agent_journey": {
+            "functional_agent": true
+          },
+          "cluster_ref": "flightpath",
+          "contains_sensitive_values": false,
+          "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-8592b9",
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "MAAS_API_KEY",
+            "MAAS_API_URL",
+            "MAAS_ENDPOINT",
+            "MAAS_MODEL"
+          ],
+          "setup_passed": true,
+          "terminal_scope": [
+            "project=launchpad-flightpath-candida-intel-xeon6-agent-8592b9",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "8592b9a1-b10d-4517-860a-8d35a55899c5",
+      "seat_number": 11,
+      "session_id": "4c12d4d3-3a6d-4e40-b114-6e416e150922",
+      "showroom": [
+        {
+          "duration_seconds": 0.427,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.375,
+          "http_status": 200,
+          "id": "deploy-tools",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.943,
+          "http_status": 200,
+          "id": "wire-agent",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.355,
+          "http_status": 200,
+          "id": "test-and-tune",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    },
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-005c5d",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 81.854,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "agent_journey": {
+            "functional_agent": true
+          },
+          "cluster_ref": "flightpath",
+          "contains_sensitive_values": false,
+          "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-005c5d",
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "MAAS_API_KEY",
+            "MAAS_API_URL",
+            "MAAS_ENDPOINT",
+            "MAAS_MODEL"
+          ],
+          "setup_passed": true,
+          "terminal_scope": [
+            "project=launchpad-flightpath-candida-intel-xeon6-agent-005c5d",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "005c5da6-f5c7-41aa-ab2f-b433d958bf06",
+      "seat_number": 12,
+      "session_id": "79e5666d-70a4-4cc9-a45b-aa04187644bf",
+      "showroom": [
+        {
+          "duration_seconds": 0.431,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.454,
+          "http_status": 200,
+          "id": "deploy-tools",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.823,
+          "http_status": 200,
+          "id": "wire-agent",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.408,
+          "http_status": 200,
+          "id": "test-and-tune",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    },
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-23d76c",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 85.546,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "agent_journey": {
+            "functional_agent": true
+          },
+          "cluster_ref": "flightpath",
+          "contains_sensitive_values": false,
+          "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-23d76c",
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "MAAS_API_KEY",
+            "MAAS_API_URL",
+            "MAAS_ENDPOINT",
+            "MAAS_MODEL"
+          ],
+          "setup_passed": true,
+          "terminal_scope": [
+            "project=launchpad-flightpath-candida-intel-xeon6-agent-23d76c",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "23d76cab-abf2-445c-96a3-2625f9104b7a",
+      "seat_number": 13,
+      "session_id": "87acd2c7-0738-4b61-b567-9a5c78f1a263",
+      "showroom": [
+        {
+          "duration_seconds": 0.941,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.392,
+          "http_status": 200,
+          "id": "deploy-tools",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.362,
+          "http_status": 200,
+          "id": "wire-agent",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.406,
+          "http_status": 200,
+          "id": "test-and-tune",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    },
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-c64057",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 83.629,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "agent_journey": {
+            "functional_agent": true
+          },
+          "cluster_ref": "flightpath",
+          "contains_sensitive_values": false,
+          "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-c64057",
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "MAAS_API_KEY",
+            "MAAS_API_URL",
+            "MAAS_ENDPOINT",
+            "MAAS_MODEL"
+          ],
+          "setup_passed": true,
+          "terminal_scope": [
+            "project=launchpad-flightpath-candida-intel-xeon6-agent-c64057",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "c64057b2-cfeb-433f-8610-46d80d7fc5a4",
+      "seat_number": 14,
+      "session_id": "20ad7fb5-9230-4be3-8d3e-b6007980336e",
+      "showroom": [
+        {
+          "duration_seconds": 0.487,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.312,
+          "http_status": 200,
+          "id": "deploy-tools",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.431,
+          "http_status": 200,
+          "id": "wire-agent",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.387,
+          "http_status": 200,
+          "id": "test-and-tune",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    },
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-19ea36",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 83.423,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "agent_journey": {
+            "functional_agent": true
+          },
+          "cluster_ref": "flightpath",
+          "contains_sensitive_values": false,
+          "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-19ea36",
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "MAAS_API_KEY",
+            "MAAS_API_URL",
+            "MAAS_ENDPOINT",
+            "MAAS_MODEL"
+          ],
+          "setup_passed": true,
+          "terminal_scope": [
+            "project=launchpad-flightpath-candida-intel-xeon6-agent-19ea36",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "19ea3601-cedb-4328-bee4-7945210d1886",
+      "seat_number": 15,
+      "session_id": "213fff12-ba5f-4e08-83ca-fc51f513ae38",
+      "showroom": [
+        {
+          "duration_seconds": 0.418,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.4,
+          "http_status": 200,
+          "id": "deploy-tools",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.403,
+          "http_status": 200,
+          "id": "wire-agent",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.381,
+          "http_status": 200,
+          "id": "test-and-tune",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    },
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-822205",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 83.34,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "agent_journey": {
+            "functional_agent": true
+          },
+          "cluster_ref": "flightpath",
+          "contains_sensitive_values": false,
+          "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-822205",
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "MAAS_API_KEY",
+            "MAAS_API_URL",
+            "MAAS_ENDPOINT",
+            "MAAS_MODEL"
+          ],
+          "setup_passed": true,
+          "terminal_scope": [
+            "project=launchpad-flightpath-candida-intel-xeon6-agent-822205",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "82220589-b28f-4219-b5ea-d8047f24fa83",
+      "seat_number": 16,
+      "session_id": "2bba449e-dc27-451a-a461-dbc8568bcaf5",
+      "showroom": [
+        {
+          "duration_seconds": 0.365,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.411,
+          "http_status": 200,
+          "id": "deploy-tools",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.38,
+          "http_status": 200,
+          "id": "wire-agent",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.371,
+          "http_status": 200,
+          "id": "test-and-tune",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    },
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-2459d1",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 82.067,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "agent_journey": {
+            "functional_agent": true
+          },
+          "cluster_ref": "flightpath",
+          "contains_sensitive_values": false,
+          "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-2459d1",
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "MAAS_API_KEY",
+            "MAAS_API_URL",
+            "MAAS_ENDPOINT",
+            "MAAS_MODEL"
+          ],
+          "setup_passed": true,
+          "terminal_scope": [
+            "project=launchpad-flightpath-candida-intel-xeon6-agent-2459d1",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "2459d114-9a33-4910-a304-66145f36d3ac",
+      "seat_number": 17,
+      "session_id": "146c3a08-0955-4fc5-9491-9b14805a7440",
+      "showroom": [
+        {
+          "duration_seconds": 0.385,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.342,
+          "http_status": 200,
+          "id": "deploy-tools",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.345,
+          "http_status": 200,
+          "id": "wire-agent",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.438,
+          "http_status": 200,
+          "id": "test-and-tune",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    },
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-2c6eed",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 82.361,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "agent_journey": {
+            "functional_agent": true
+          },
+          "cluster_ref": "flightpath",
+          "contains_sensitive_values": false,
+          "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-2c6eed",
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "MAAS_API_KEY",
+            "MAAS_API_URL",
+            "MAAS_ENDPOINT",
+            "MAAS_MODEL"
+          ],
+          "setup_passed": true,
+          "terminal_scope": [
+            "project=launchpad-flightpath-candida-intel-xeon6-agent-2c6eed",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "2c6eed61-4b67-4d6d-b7b8-6922107cf6a1",
+      "seat_number": 18,
+      "session_id": "fd7cadad-5572-4af9-89e7-d83962b681fa",
+      "showroom": [
+        {
+          "duration_seconds": 0.36,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.407,
+          "http_status": 200,
+          "id": "deploy-tools",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.338,
+          "http_status": 200,
+          "id": "wire-agent",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.356,
+          "http_status": 200,
+          "id": "test-and-tune",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    },
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-48d720",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 83.914,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "agent_journey": {
+            "functional_agent": true
+          },
+          "cluster_ref": "flightpath",
+          "contains_sensitive_values": false,
+          "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-48d720",
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "MAAS_API_KEY",
+            "MAAS_API_URL",
+            "MAAS_ENDPOINT",
+            "MAAS_MODEL"
+          ],
+          "setup_passed": true,
+          "terminal_scope": [
+            "project=launchpad-flightpath-candida-intel-xeon6-agent-48d720",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "48d7209d-b455-4ea8-9169-1880c21b85a5",
+      "seat_number": 19,
+      "session_id": "106b2bb0-c567-48b0-b271-1d69c46c4772",
+      "showroom": [
+        {
+          "duration_seconds": 0.388,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.366,
+          "http_status": 200,
+          "id": "deploy-tools",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.36,
+          "http_status": 200,
+          "id": "wire-agent",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.361,
+          "http_status": 200,
+          "id": "test-and-tune",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    },
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-7f3c7c",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 81.35,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "agent_journey": {
+            "functional_agent": true
+          },
+          "cluster_ref": "flightpath",
+          "contains_sensitive_values": false,
+          "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-7f3c7c",
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "MAAS_API_KEY",
+            "MAAS_API_URL",
+            "MAAS_ENDPOINT",
+            "MAAS_MODEL"
+          ],
+          "setup_passed": true,
+          "terminal_scope": [
+            "project=launchpad-flightpath-candida-intel-xeon6-agent-7f3c7c",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "7f3c7c82-db4a-48ec-94b4-71439534c593",
+      "seat_number": 20,
+      "session_id": "74a99591-f006-49f4-b1e7-1d01a0ed8fd9",
+      "showroom": [
+        {
+          "duration_seconds": 0.393,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.357,
+          "http_status": 200,
+          "id": "deploy-tools",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.38,
+          "http_status": 200,
+          "id": "wire-agent",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.383,
+          "http_status": 200,
+          "id": "test-and-tune",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    },
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-dbe011",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 82.875,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "agent_journey": {
+            "functional_agent": true
+          },
+          "cluster_ref": "flightpath",
+          "contains_sensitive_values": false,
+          "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-dbe011",
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "MAAS_API_KEY",
+            "MAAS_API_URL",
+            "MAAS_ENDPOINT",
+            "MAAS_MODEL"
+          ],
+          "setup_passed": true,
+          "terminal_scope": [
+            "project=launchpad-flightpath-candida-intel-xeon6-agent-dbe011",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "dbe011b3-c3b0-4f7b-9524-d326e63a3b66",
+      "seat_number": 21,
+      "session_id": "f9a57c4e-abe7-4d2e-add6-7cf1fad7edd3",
+      "showroom": [
+        {
+          "duration_seconds": 0.493,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.48,
+          "http_status": 200,
+          "id": "deploy-tools",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.561,
+          "http_status": 200,
+          "id": "wire-agent",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.461,
+          "http_status": 200,
+          "id": "test-and-tune",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    },
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-154c4e",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 82.618,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "agent_journey": {
+            "functional_agent": true
+          },
+          "cluster_ref": "flightpath",
+          "contains_sensitive_values": false,
+          "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-154c4e",
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "MAAS_API_KEY",
+            "MAAS_API_URL",
+            "MAAS_ENDPOINT",
+            "MAAS_MODEL"
+          ],
+          "setup_passed": true,
+          "terminal_scope": [
+            "project=launchpad-flightpath-candida-intel-xeon6-agent-154c4e",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "154c4e27-d851-4954-b14c-e3025a0735c6",
+      "seat_number": 22,
+      "session_id": "cbefe70a-d41b-4967-b43b-296dca428b61",
+      "showroom": [
+        {
+          "duration_seconds": 0.431,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.322,
+          "http_status": 200,
+          "id": "deploy-tools",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.351,
+          "http_status": 200,
+          "id": "wire-agent",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.338,
+          "http_status": 200,
+          "id": "test-and-tune",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    },
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-6b61ce",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 82.498,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "agent_journey": {
+            "functional_agent": true
+          },
+          "cluster_ref": "flightpath",
+          "contains_sensitive_values": false,
+          "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-6b61ce",
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "MAAS_API_KEY",
+            "MAAS_API_URL",
+            "MAAS_ENDPOINT",
+            "MAAS_MODEL"
+          ],
+          "setup_passed": true,
+          "terminal_scope": [
+            "project=launchpad-flightpath-candida-intel-xeon6-agent-6b61ce",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "6b61ce53-e7e7-44ae-9df8-230ebedc3829",
+      "seat_number": 23,
+      "session_id": "09328383-3251-4b23-87b2-8867db65aa29",
+      "showroom": [
+        {
+          "duration_seconds": 0.367,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.357,
+          "http_status": 200,
+          "id": "deploy-tools",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.352,
+          "http_status": 200,
+          "id": "wire-agent",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.367,
+          "http_status": 200,
+          "id": "test-and-tune",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    },
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-5f6dde",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 81.577,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "agent_journey": {
+            "functional_agent": true
+          },
+          "cluster_ref": "flightpath",
+          "contains_sensitive_values": false,
+          "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-5f6dde",
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "MAAS_API_KEY",
+            "MAAS_API_URL",
+            "MAAS_ENDPOINT",
+            "MAAS_MODEL"
+          ],
+          "setup_passed": true,
+          "terminal_scope": [
+            "project=launchpad-flightpath-candida-intel-xeon6-agent-5f6dde",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "5f6ddebc-c880-434a-aa83-4d70d3b041b7",
+      "seat_number": 24,
+      "session_id": "42eee715-ea98-49c7-b335-4c2edacbc45d",
+      "showroom": [
+        {
+          "duration_seconds": 0.389,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.355,
+          "http_status": 200,
+          "id": "deploy-tools",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.334,
+          "http_status": 200,
+          "id": "wire-agent",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.386,
+          "http_status": 200,
+          "id": "test-and-tune",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    },
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-bc6059",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 85.042,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "agent_journey": {
+            "functional_agent": true
+          },
+          "cluster_ref": "flightpath",
+          "contains_sensitive_values": false,
+          "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-bc6059",
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "MAAS_API_KEY",
+            "MAAS_API_URL",
+            "MAAS_ENDPOINT",
+            "MAAS_MODEL"
+          ],
+          "setup_passed": true,
+          "terminal_scope": [
+            "project=launchpad-flightpath-candida-intel-xeon6-agent-bc6059",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "bc6059bb-7fd2-4245-886a-9f290ac3e30d",
+      "seat_number": 25,
+      "session_id": "80c0bedb-2b85-4a13-920a-7cf18ac1766d",
+      "showroom": [
+        {
+          "duration_seconds": 0.37,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.343,
+          "http_status": 200,
+          "id": "deploy-tools",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.365,
+          "http_status": 200,
+          "id": "wire-agent",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.334,
+          "http_status": 200,
+          "id": "test-and-tune",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    },
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-23ab44",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 82.598,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "agent_journey": {
+            "functional_agent": true
+          },
+          "cluster_ref": "flightpath",
+          "contains_sensitive_values": false,
+          "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-23ab44",
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "MAAS_API_KEY",
+            "MAAS_API_URL",
+            "MAAS_ENDPOINT",
+            "MAAS_MODEL"
+          ],
+          "setup_passed": true,
+          "terminal_scope": [
+            "project=launchpad-flightpath-candida-intel-xeon6-agent-23ab44",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "23ab44fe-823d-4089-a0e4-3cd2fb15c579",
+      "seat_number": 26,
+      "session_id": "ccd81712-75f0-41b4-a2ef-9d6fe29c480d",
+      "showroom": [
+        {
+          "duration_seconds": 0.378,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.347,
+          "http_status": 200,
+          "id": "deploy-tools",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.357,
+          "http_status": 200,
+          "id": "wire-agent",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.418,
+          "http_status": 200,
+          "id": "test-and-tune",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    },
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-3201cd",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 86.498,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "agent_journey": {
+            "functional_agent": true
+          },
+          "cluster_ref": "flightpath",
+          "contains_sensitive_values": false,
+          "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-3201cd",
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "MAAS_API_KEY",
+            "MAAS_API_URL",
+            "MAAS_ENDPOINT",
+            "MAAS_MODEL"
+          ],
+          "setup_passed": true,
+          "terminal_scope": [
+            "project=launchpad-flightpath-candida-intel-xeon6-agent-3201cd",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "3201cd13-51d7-4aa4-b725-134f776b645d",
+      "seat_number": 27,
+      "session_id": "28eeeabc-21c5-47b7-93f7-6a05bbc135f1",
+      "showroom": [
+        {
+          "duration_seconds": 0.399,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.419,
+          "http_status": 200,
+          "id": "deploy-tools",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.375,
+          "http_status": 200,
+          "id": "wire-agent",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.342,
+          "http_status": 200,
+          "id": "test-and-tune",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    },
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-e73900",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 84.806,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "agent_journey": {
+            "functional_agent": true
+          },
+          "cluster_ref": "flightpath",
+          "contains_sensitive_values": false,
+          "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-e73900",
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "MAAS_API_KEY",
+            "MAAS_API_URL",
+            "MAAS_ENDPOINT",
+            "MAAS_MODEL"
+          ],
+          "setup_passed": true,
+          "terminal_scope": [
+            "project=launchpad-flightpath-candida-intel-xeon6-agent-e73900",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "e7390054-0b22-46ec-bf7f-7798e8c8f9ed",
+      "seat_number": 28,
+      "session_id": "4e524cd1-4785-40eb-a41c-778f78c84a32",
+      "showroom": [
+        {
+          "duration_seconds": 0.42,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.384,
+          "http_status": 200,
+          "id": "deploy-tools",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.292,
+          "http_status": 200,
+          "id": "wire-agent",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.415,
+          "http_status": 200,
+          "id": "test-and-tune",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    },
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-b5d356",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 87.127,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "agent_journey": {
+            "functional_agent": true
+          },
+          "cluster_ref": "flightpath",
+          "contains_sensitive_values": false,
+          "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-b5d356",
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "MAAS_API_KEY",
+            "MAAS_API_URL",
+            "MAAS_ENDPOINT",
+            "MAAS_MODEL"
+          ],
+          "setup_passed": true,
+          "terminal_scope": [
+            "project=launchpad-flightpath-candida-intel-xeon6-agent-b5d356",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "b5d356ee-c9a5-48c6-b6cc-dbb8944b3c74",
+      "seat_number": 29,
+      "session_id": "5bbd4217-5809-41d6-9dff-a552b902542a",
+      "showroom": [
+        {
+          "duration_seconds": 0.45,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.391,
+          "http_status": 200,
+          "id": "deploy-tools",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.344,
+          "http_status": 200,
+          "id": "wire-agent",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.415,
+          "http_status": 200,
+          "id": "test-and-tune",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    },
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-ff0392",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 89.112,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "agent_journey": {
+            "functional_agent": true
+          },
+          "cluster_ref": "flightpath",
+          "contains_sensitive_values": false,
+          "namespace": "launchpad-flightpath-candida-intel-xeon6-agent-ff0392",
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "MAAS_API_KEY",
+            "MAAS_API_URL",
+            "MAAS_ENDPOINT",
+            "MAAS_MODEL"
+          ],
+          "setup_passed": true,
+          "terminal_scope": [
+            "project=launchpad-flightpath-candida-intel-xeon6-agent-ff0392",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "ff0392b9-7c7c-44a3-b848-d24f51b470de",
+      "seat_number": 30,
+      "session_id": "01acde95-b1fc-4780-91e9-b726952525e6",
+      "showroom": [
+        {
+          "duration_seconds": 0.361,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.366,
+          "http_status": 200,
+          "id": "deploy-tools",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.366,
+          "http_status": 200,
+          "id": "wire-agent",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.35,
+          "http_status": 200,
+          "id": "test-and-tune",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    }
+  ],
+  "security": {
+    "contains_plaintext_credentials": false,
+    "credential_values_logged": false
+  },
+  "started_at": "2026-09-28T23:31:46.963124Z",
+  "validation_matrix": {
+    "all_seats_ready": "GREEN-live",
+    "capacity_passed": "GREEN-live",
+    "cleanup_completed": "GREEN-live",
+    "contract_valid": "GREEN-live",
+    "evidence_hashed": "GREEN-live",
+    "model_keys_revoked": "GREEN-live",
+    "namespace_isolation_passed": "GREEN-live",
+    "ready_within_limit": "GREEN-live",
+    "seat_probes_passed": "GREEN-live",
+    "sensitive_values_absent": "GREEN-live",
+    "showroom_pages_passed": "GREEN-live",
+    "single_cluster_assignment": "GREEN-live",
+    "zero_residue_cleanup": "GREEN-live"
+  }
+}

@@ -1,0 +1,562 @@
+{
+  "capacity_preview": {
+    "can_provision": true,
+    "catalog_seat_limit": 5,
+    "certification_override": false,
+    "certification_target_seats": null,
+    "estimated_resources": {
+      "cpu_millicores": 3325,
+      "memory_mib": 7440,
+      "pods": 10
+    },
+    "placement_reason": "single-cluster placement",
+    "reason": "Cluster can support 101 seats (CPU: 600, Memory: 539, Pods: 101; Eligible nodes: 3; 20.0% headroom)",
+    "resource_breakdown": {
+      "per_seat": {
+        "cpu_millicores": 665,
+        "memory_mib": 1488,
+        "pods": 2
+      },
+      "shared": {
+        "cpu_millicores": 0,
+        "memory_mib": 0,
+        "pods": 0
+      },
+      "transient": {
+        "concurrent_seats": 5,
+        "cpu_millicores": 0,
+        "memory_mib": 0,
+        "pods": 0
+      }
+    },
+    "seats_requested": 5,
+    "selected_cluster": "flightpath"
+  },
+  "catalog_item_id": "intel-llm-cpu-serving",
+  "cleanup": {
+    "model_keys_revoked": true,
+    "resource_counts": {
+      "applications.argoproj.io": 0,
+      "namespaces": 0,
+      "persistentvolumeclaims": 0,
+      "persistentvolumes": 0,
+      "rolebindings.rbac.authorization.k8s.io": 0,
+      "routes.route.openshift.io": 0,
+      "secrets": 0
+    },
+    "seconds": 69.101,
+    "status": "completed"
+  },
+  "completed_at": "2026-09-29T13:01:49.027204Z",
+  "contract": {
+    "catalog_version": "1.0.12-flightpath.1",
+    "certification_runner_image": "quay.io/rh-ee-jkershaw/launchpad-certification-runner@sha256:201d837d48a68025693e8c6cf89a65a67885a2e2e3d82d0411bb41227e31dea0",
+    "git_commit": "e2d78de667096c7be6e277ec01bf6c29a4a1ffb4",
+    "intake_path": "catalog-onboarding/intel-llm-cpu-serving.yaml",
+    "path": "certification/catalog/intel-llm-cpu-serving.yaml",
+    "platform_manifest_sha256": "c2aaac7b3805bd4adf3edf6f4996e30bddb11d6f16fa7eb37b42fb19477306cb",
+    "sha256": "f031e65b0cfb107afcf10a6913ec3b2e603fda3d222fcca0be3ad9b9255f209e"
+  },
+  "errors": [],
+  "gates": {
+    "all_seats_ready": true,
+    "capacity_passed": true,
+    "cleanup_completed": true,
+    "contract_valid": true,
+    "evidence_hashed": true,
+    "model_keys_revoked": true,
+    "namespace_isolation_passed": true,
+    "ready_within_limit": true,
+    "seat_probes_passed": true,
+    "sensitive_values_absent": true,
+    "showroom_pages_passed": true,
+    "single_cluster_assignment": true,
+    "zero_residue_cleanup": true
+  },
+  "order": {
+    "cluster_ref": "flightpath",
+    "namespaces": [
+      "launchpad-flightpath-candida-intel-llm-cpu-serv-db5ee2",
+      "launchpad-flightpath-candida-intel-llm-cpu-serv-f6bf3e",
+      "launchpad-flightpath-candida-intel-llm-cpu-serv-9d27b2",
+      "launchpad-flightpath-candida-intel-llm-cpu-serv-fdcc03",
+      "launchpad-flightpath-candida-intel-llm-cpu-serv-8fdb46"
+    ],
+    "ready_seconds": 65.375,
+    "seat_count": 5,
+    "session_ids": [
+      "1b3f8f8e-4c69-43db-b805-04cd87874326",
+      "9830a3ad-2834-41f8-9528-f10bcd7a2bb4",
+      "72f5d260-16ab-411a-8695-093a3b931f13",
+      "c539fa46-08cd-4961-a45e-3280dd27bc95",
+      "0390a88a-8644-4f82-9a96-dd322944a403"
+    ],
+    "status_before_reclaim": "ready",
+    "workshop_id": "bff03512-efc4-48cc-8995-1632d23d556e"
+  },
+  "plan": {
+    "all_seats_same_cluster": true,
+    "catalog_item_id": "intel-llm-cpu-serving",
+    "certification_override": false,
+    "cluster_ref": "flightpath",
+    "current_certified_seats": 5,
+    "execution_eligible": true,
+    "exposure_policy": "internal",
+    "kubeconfig_server": "https://api.flightpath.fm2aihpcsed.com:6443",
+    "maximum_cleanup_seconds": 900,
+    "maximum_ready_seconds": 1500,
+    "mutates_cluster": true,
+    "next_promotion_target": null,
+    "probe_concurrency": 5,
+    "provision_concurrency": 5,
+    "required_consecutive_runs": 1,
+    "seat_probe_count": 5,
+    "seats": 5,
+    "showroom_pages_per_seat": 4,
+    "workshop_orders": 1
+  },
+  "promotion": {
+    "consecutive_passing_runs": 2,
+    "eligible": true,
+    "required_consecutive_runs": 1
+  },
+  "proof_strategy": {
+    "BDD": "Given one workshop order, all seats must become ready before concurrent participant journeys run, and reclaim must leave zero residue.",
+    "CBT": "Contract parsing, API lifecycle, Showroom checks, lab-specific probes, isolation, rubric scoring, and cleanup are independently observable components.",
+    "CDD": "The versioned CatalogCertification document defines scale, Showroom, probe, cleanup, and promotion interfaces.",
+    "EDD": "The run writes immutable source identity, lifecycle timing, per-seat results, cleanup counts, rubric decisions, and a SHA-256 manifest.",
+    "TDD": "Contract, planner, assertion, runner, cleanup, and evidence behavior are protected by failing-then-passing tests."
+  },
+  "result": "GREEN-live",
+  "rubric": {
+    "categories": {
+      "authorization": {
+        "awarded": 15,
+        "passed": true,
+        "requires": [
+          "namespace_isolation_passed",
+          "sensitive_values_absent"
+        ],
+        "weight": 15
+      },
+      "cleanup": {
+        "awarded": 15,
+        "passed": true,
+        "requires": [
+          "cleanup_completed",
+          "zero_residue_cleanup",
+          "model_keys_revoked"
+        ],
+        "weight": 15
+      },
+      "contract_integrity": {
+        "awarded": 10,
+        "passed": true,
+        "requires": [
+          "contract_valid",
+          "evidence_hashed"
+        ],
+        "weight": 10
+      },
+      "participant_function": {
+        "awarded": 25,
+        "passed": true,
+        "requires": [
+          "showroom_pages_passed",
+          "seat_probes_passed"
+        ],
+        "weight": 25
+      },
+      "placement_capacity": {
+        "awarded": 15,
+        "passed": true,
+        "requires": [
+          "capacity_passed",
+          "single_cluster_assignment"
+        ],
+        "weight": 15
+      },
+      "provisioning_readiness": {
+        "awarded": 20,
+        "passed": true,
+        "requires": [
+          "all_seats_ready",
+          "ready_within_limit"
+        ],
+        "weight": 20
+      }
+    },
+    "passed": true,
+    "required": 100,
+    "score": 100
+  },
+  "run_id": "flightpath-e2d78de-20260929T124528Z-7fpm8-intel-llm-cpu-serving-five-seat",
+  "schema": "launchpad.redhat.com/catalog-certification-evidence/v1",
+  "seat_results": [
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-intel-llm-cpu-serv-db5ee2",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 26.472,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "cluster_ref": "flightpath",
+          "contains_sensitive_values": false,
+          "namespace": "launchpad-flightpath-candida-intel-llm-cpu-serv-db5ee2",
+          "rag_journey": {
+            "grounded_answer": true
+          },
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "MAAS_API_KEY",
+            "MAAS_API_URL",
+            "MAAS_ENDPOINT",
+            "MAAS_MODEL"
+          ],
+          "setup_passed": true,
+          "terminal_scope": [
+            "project=launchpad-flightpath-candida-intel-llm-cpu-serv-db5ee2",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "db5ee2ce-3b3e-4641-9387-467a8308cf1e",
+      "seat_number": 1,
+      "session_id": "1b3f8f8e-4c69-43db-b805-04cd87874326",
+      "showroom": [
+        {
+          "duration_seconds": 0.034,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.021,
+          "http_status": 200,
+          "id": "wire-rag",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.033,
+          "http_status": 200,
+          "id": "load-documents",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.022,
+          "http_status": 200,
+          "id": "query-rag",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    },
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-intel-llm-cpu-serv-f6bf3e",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 24.51,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "cluster_ref": "flightpath",
+          "contains_sensitive_values": false,
+          "namespace": "launchpad-flightpath-candida-intel-llm-cpu-serv-f6bf3e",
+          "rag_journey": {
+            "grounded_answer": true
+          },
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "MAAS_API_KEY",
+            "MAAS_API_URL",
+            "MAAS_ENDPOINT",
+            "MAAS_MODEL"
+          ],
+          "setup_passed": true,
+          "terminal_scope": [
+            "project=launchpad-flightpath-candida-intel-llm-cpu-serv-f6bf3e",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "f6bf3e36-8e76-43f4-9085-bca5e2b6f1c2",
+      "seat_number": 2,
+      "session_id": "9830a3ad-2834-41f8-9528-f10bcd7a2bb4",
+      "showroom": [
+        {
+          "duration_seconds": 0.03,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.025,
+          "http_status": 200,
+          "id": "wire-rag",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.019,
+          "http_status": 200,
+          "id": "load-documents",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.022,
+          "http_status": 200,
+          "id": "query-rag",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    },
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-intel-llm-cpu-serv-9d27b2",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 23.373,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "cluster_ref": "flightpath",
+          "contains_sensitive_values": false,
+          "namespace": "launchpad-flightpath-candida-intel-llm-cpu-serv-9d27b2",
+          "rag_journey": {
+            "grounded_answer": true
+          },
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "MAAS_API_KEY",
+            "MAAS_API_URL",
+            "MAAS_ENDPOINT",
+            "MAAS_MODEL"
+          ],
+          "setup_passed": true,
+          "terminal_scope": [
+            "project=launchpad-flightpath-candida-intel-llm-cpu-serv-9d27b2",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "9d27b23d-cfb6-4458-baf4-3dbc566ea258",
+      "seat_number": 3,
+      "session_id": "72f5d260-16ab-411a-8695-093a3b931f13",
+      "showroom": [
+        {
+          "duration_seconds": 0.031,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.025,
+          "http_status": 200,
+          "id": "wire-rag",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.035,
+          "http_status": 200,
+          "id": "load-documents",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.023,
+          "http_status": 200,
+          "id": "query-rag",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    },
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-intel-llm-cpu-serv-fdcc03",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 25.878,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "cluster_ref": "flightpath",
+          "contains_sensitive_values": false,
+          "namespace": "launchpad-flightpath-candida-intel-llm-cpu-serv-fdcc03",
+          "rag_journey": {
+            "grounded_answer": true
+          },
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "MAAS_API_KEY",
+            "MAAS_API_URL",
+            "MAAS_ENDPOINT",
+            "MAAS_MODEL"
+          ],
+          "setup_passed": true,
+          "terminal_scope": [
+            "project=launchpad-flightpath-candida-intel-llm-cpu-serv-fdcc03",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "fdcc0308-e1d1-49c3-87c1-a78113aec467",
+      "seat_number": 4,
+      "session_id": "c539fa46-08cd-4961-a45e-3280dd27bc95",
+      "showroom": [
+        {
+          "duration_seconds": 0.022,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.022,
+          "http_status": 200,
+          "id": "wire-rag",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.03,
+          "http_status": 200,
+          "id": "load-documents",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.023,
+          "http_status": 200,
+          "id": "query-rag",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    },
+    {
+      "cluster_ref": "flightpath",
+      "namespace": "launchpad-flightpath-candida-intel-llm-cpu-serv-8fdb46",
+      "probe": {
+        "assertion_failures": [],
+        "duration_seconds": 24.061,
+        "exit_code": 0,
+        "passed": true,
+        "result": {
+          "cluster_ref": "flightpath",
+          "contains_sensitive_values": false,
+          "namespace": "launchpad-flightpath-candida-intel-llm-cpu-serv-8fdb46",
+          "rag_journey": {
+            "grounded_answer": true
+          },
+          "result": "GREEN-live-internal-seat",
+          "runtime_secret_keys": [
+            "MAAS_API_KEY",
+            "MAAS_API_URL",
+            "MAAS_ENDPOINT",
+            "MAAS_MODEL"
+          ],
+          "setup_passed": true,
+          "terminal_scope": [
+            "project=launchpad-flightpath-candida-intel-llm-cpu-serv-8fdb46",
+            "own_edit=yes",
+            "cross_namespace=DENIED",
+            "node_list=DENIED"
+          ]
+        }
+      },
+      "seat_id": "8fdb46f9-a2f1-420f-945a-069b72dd9020",
+      "seat_number": 5,
+      "session_id": "0390a88a-8644-4f82-9a96-dd322944a403",
+      "showroom": [
+        {
+          "duration_seconds": 0.024,
+          "http_status": 200,
+          "id": "welcome",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.034,
+          "http_status": 200,
+          "id": "wire-rag",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.026,
+          "http_status": 200,
+          "id": "load-documents",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        },
+        {
+          "duration_seconds": 0.031,
+          "http_status": 200,
+          "id": "query-rag",
+          "marker_present": true,
+          "passed": true,
+          "track_id": null
+        }
+      ]
+    }
+  ],
+  "security": {
+    "contains_plaintext_credentials": false,
+    "credential_values_logged": false
+  },
+  "started_at": "2026-09-29T12:59:03.442815Z",
+  "validation_matrix": {
+    "all_seats_ready": "GREEN-live",
+    "capacity_passed": "GREEN-live",
+    "cleanup_completed": "GREEN-live",
+    "contract_valid": "GREEN-live",
+    "evidence_hashed": "GREEN-live",
+    "model_keys_revoked": "GREEN-live",
+    "namespace_isolation_passed": "GREEN-live",
+    "ready_within_limit": "GREEN-live",
+    "seat_probes_passed": "GREEN-live",
+    "sensitive_values_absent": "GREEN-live",
+    "showroom_pages_passed": "GREEN-live",
+    "single_cluster_assignment": "GREEN-live",
+    "zero_residue_cleanup": "GREEN-live"
+  }
+}
