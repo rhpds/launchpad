@@ -1,0 +1,60 @@
+{
+  "schema": "launchpad.redhat.com/participant-browser-review/v1",
+  "result": "PARTIAL-LIVE",
+  "certification_promoted": false,
+  "cluster": "flightpath",
+  "catalog_item_id": "virtualization-ai-foundations-101",
+  "date": "2026-10-13",
+  "launchpad_commit": "066d06a3",
+  "deployed_content_revision": "e74393d0def1a7a2749911b3a421c62f3f1c2558",
+  "public_origin": "https://labs.smg-helix.ai",
+  "orders": [
+    "c08b7157-8a5b-4a45-964e-cca743ec5100",
+    "fbd94d62-d02f-4c72-a5e6-3b10122d9cec"
+  ],
+  "observed_checks": {
+    "system_trusted_public_tls": "PASS",
+    "public_health_and_oidc_discovery": "PASS",
+    "one_seat_public_order_on_flightpath": "PASS",
+    "email_and_code_browser_login": "PASS",
+    "participant_landing_and_open_lab": "PASS",
+    "welcome_content_loaded": "PASS",
+    "embedded_story_loaded_without_popup": "PASS",
+    "embedded_terminal_rendered_without_popup": "PASS",
+    "embedded_console_authenticated_without_popup": "PASS",
+    "console_assigned_namespace_and_four_pods_visible": "PASS",
+    "both_test_namespaces_deleted_after_reclaim": "PASS"
+  },
+  "pending_checks": [
+    "Terminal command entry and complete learner workflow",
+    "All nine pages through an authenticated public browser",
+    "Story navigation and live interactions beyond its splash",
+    "Logout, same-seat recovery, and My Lab Access",
+    "Public cross-namespace denial and abuse-limit journeys",
+    "Safe failure, learner evidence export, and learner cleanup",
+    "Access-record, identity, model-key, and all-resource residue inspection"
+  ],
+  "finding": {
+    "id": "VIRT101-PARTICIPANT-SCOPE-001",
+    "stage": "01-verify",
+    "problem": "The required HyperConverged query targets openshift-cnv, outside the participant namespace.",
+    "live_authorization_evidence": {
+      "identity": "system:serviceaccount:launchpad-flightpath-candida-virtualization-ai-26de6a:showroom",
+      "get_hyperconverged_in_openshift_cnv": "no",
+      "get_virtualmachines_in_assigned_namespace": "yes"
+    },
+    "source_fix": "Replace the cluster-management query with a namespace-scoped VMI Ready wait.",
+    "source_repository": "virtualization-ai-foundations",
+    "source_fix_status": "LOCAL-TESTED-NOT-PUBLISHED",
+    "permissions_expanded": false,
+    "live_labs_modified": false
+  },
+  "test_evidence": {
+    "red": {"test": "ShowroomTests.test_runtime_verification_stays_inside_the_seat_namespace", "failed": 1, "passed": 9},
+    "green": {"suite": "virtualization-ai-foundations/tests/test_showroom.py", "passed": 10},
+    "launchpad_regression": {"suites": ["backend/tests/test_virtualization_ai_complete_journeys.py", "backend/tests/test_public_gateway.py"], "passed": 50}
+  },
+  "harness_limitation": "The later browser content and recovery checks were interrupted by an unavailable Node yaml dependency. These checks are pending, not green.",
+  "cleanup_note": "The API reported completed before namespace termination finished. Both namespace deletions were independently confirmed afterward.",
+  "contains_codes_keys_or_participant_emails": false
+}

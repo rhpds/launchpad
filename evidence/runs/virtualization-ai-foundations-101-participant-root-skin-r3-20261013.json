@@ -1,0 +1,324 @@
+{
+  "schema": "launchpad/public-browser-exploration/v1",
+  "catalog": "virtualization-ai-foundations-101",
+  "cluster": "flightpath",
+  "started_at": "2026-10-13T22:49:56.111Z",
+  "checks": [
+    {
+      "id": "order_created",
+      "passed": true,
+      "detail": {
+        "order_id": "4bd83e88-ac0a-4cd6-9a75-0942b3e8bacc",
+        "public_url": "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-4bd83e88"
+      }
+    },
+    {
+      "id": "one_seat_ready",
+      "passed": true,
+      "detail": [
+        {
+          "seat_id": "4d5b271c-3947-4c38-8fef-599186432324",
+          "session_id": "630d0237-d218-4f95-a753-4eb25324d2c2"
+        }
+      ]
+    },
+    {
+      "id": "participant_landing",
+      "passed": true,
+      "detail": {
+        "url": "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-4bd83e88",
+        "text": "×\n|\nPartner AI Launchpad\nPARTICIPANT\nCurrent lab\nMy Lab Access\nLog out of lab\nPARTICIPANT WORKSPACE\nYour lab is ready\n\nSeat 4d5b271c-3947-4c38-8fef-599186432324\n\nOpen Lab\nMy Lab Access\nLog out of lab\nLogging out preserves your seat. Access ends at 2026-10-14T00:49:59.687114."
+      }
+    },
+    {
+      "id": "showroom_shell",
+      "passed": true,
+      "detail": {
+        "url": "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-4bd83e88/showroom/",
+        "frames": [
+          "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-4bd83e88/showroom/",
+          "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-4bd83e88/showroom/www/virtualization-ai-101/main/index.html",
+          "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-4bd83e88/proxy/tool/story/",
+          "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-4bd83e88/showroom/terminal",
+          "https://labs.smg-helix.ai/k8s/ns/launchpad-flightpath-candida-virtualization-ai-4d5b27/core~v1~Pod"
+        ],
+        "text": "Story\nTerminal\nOpenShift Console"
+      }
+    },
+    {
+      "id": "active_tab_story",
+      "passed": true,
+      "detail": {
+        "url": "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-4bd83e88/proxy/tool/story/",
+        "text": "×\nVirtualization + AI 101\n\nTrace a VM-hosted workload to governed Intel Xeon CPU inference\n\nCLICK OR PRESS SPACE TO BEGIN",
+        "canvas": 0,
+        "popups": []
+      }
+    },
+    {
+      "id": "active_tab_terminal",
+      "passed": true,
+      "detail": {
+        "url": "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-4bd83e88/showroom/terminal",
+        "text": "",
+        "canvas": 3,
+        "popups": []
+      }
+    },
+    {
+      "id": "active_tab_openshift_console",
+      "passed": true,
+      "detail": {
+        "url": "https://labs.smg-helix.ai/k8s/ns/launchpad-flightpath-candida-virtualization-ai-4d5b27/core~v1~Pod?page=1&perPage=50",
+        "text": "Skip to content\nCore platform\nHome\nFavorites\nEcosystem\nWorkloads\nVirtualization\nMigration\nServerless\nNetworking\nStorage\nBuilds\nObserve\nUser Management\nAdministration\nProject: launchpad-flightpath-candida-virtualization-ai-4d5b27\nPods\nCreate Pod\n1 - 4 of 4 items\nName\n\t\nStatus\n\t\nReady\n\t\nRestarts\n\t\nOwner\n\t\nMemory\n\t\nCPU\n\t\nCreated\n\t\nActions\n\n\nPod\nP\nai-analysis-adapter-cc6c4db64-2fs7w\n\t\nRunning\n\t1/1\t0\t\nReplicaSet\nRS\nai-analysis-adapter-cc6c4db64\n\t21.6 MiB\t0.000 cores\t\n1 minute ago\n\t\n\n\nPod\nP\nshowroom-7dc9cb85c7-c5h2x\n\t\nRunning\n\t4/4\t0\t\nReplicaSet\nRS\nshowroom-7dc9cb85c7\n\t99.8 MiB\t-\t\n1 minute ago\n\t\n\n\nPod\nP\nvirt-launcher-operations-vm-qgmv6\n\t\nRunning\n\t3/3\t0\t\nVirtualMachineInstance\nVMI\noperations-vm\n\t371.3 MiB\t0.041 cores\t\n1 minute ago\n\t\n\n\nPod\nP\nvirtualization-ai-presentation-5795885fd7-nh9lb\n\t\nRunning\n\t1/1\t0\t\nReplicaSet\nRS\nvirtualization-ai-presentation-5795885fd7\n\t12.2 MiB\t0.000 cores\t\n1 minute ago\n\t\nWelcome to the new OpenShift experience!\n\nIntroducing a fresh modern look to the console! With this update, we made changes to the user interface to enhance usability and streamline your workflow. This includes improved navigation and visual refinement to help manage your applications and infrastructure more easily.\n\nWhat do you want to do next?\nLaunch tour\nSkip tour",
+        "canvas": 0,
+        "popups": []
+      }
+    },
+    {
+      "id": "story_navigation",
+      "passed": true,
+      "detail": {
+        "steps": [
+          {
+            "step": 0,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-4bd83e88/proxy/tool/story/?act=0&scene=0",
+            "text": "×\n←\n→\nP\n⛶\nA VM and an AI service can share a platform—and still prove nothing.\n×\nA VM and an AI service can share a platform—and still prove nothing.\nCOEXISTENCE IS ARCHITECTURE. TRUST REQUIRES EVIDENCE.\n00 · 1/2"
+          },
+          {
+            "step": 1,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-4bd83e88/proxy/tool/story/?act=0&scene=1",
+            "text": "×\n←\n→\nP\n⛶\nTHE REFRAME\nIntegration begins where the evidence chain begins\nThe VM and AI pod are both running\n→\nOne request is attributable across every boundary\n\nOrigin, Service routing, model participation, validation, failure state, and human authority must agree on the same request ID.\n\n00 · 2/2"
+          },
+          {
+            "step": 2,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-4bd83e88/proxy/tool/story/?act=1&scene=0",
+            "text": "×\n←\n→\nP\n⛶\nGUIDED ARCHITECTURE\nEarn each boundary before showing the full path\n\nOne audience question reveals one runtime object, responsibility, protocol, and evidence source.\n\n1\nVirtualMachine / VMI\n2\nOpenShift Service\n3\nAI analysis adapter\n4\nIntel Xeon CPU inference\n5\nHuman operator\nAUDIENCE QUESTION\nHow do we know the request came from the established application?\nReveal technical boundary\nactive request and evidence path\ndeployment or trust boundary\noptional integration\nVIRTUALMACHINE / VMI\nOperations VM\noriginates the versioned request\nguest workload\nOPENSHIFT NAMESPACE\nvirtualization-ai-101 workload boundary\nHTTP JSON\n→\nV1 SERVICE\nai-analysis\nstable namespace-local DNS\n:8080\nselects pod\n→\nAPPS/V1 DEPLOYMENT\nAI analysis adapter\nvalidates input, output, identity, and source state\nPOST /api/v1/analyze\nadvisory inference\n→\nMANAGED INFERENCE\nIntel Xeon CPU model\nbounded interpretation of one synthetic note\nOpenAI-compatible HTTPS\nsame request ID\n→\nEVIDENCE API\nCorrelated evidence\nrequ"
+          },
+          {
+            "step": 3,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-4bd83e88/proxy/tool/story/?act=2&scene=0",
+            "text": "×\n←\n→\nP\n⛶\n1\nHealthy request condition\n2\nUnavailable model condition\nLIVE WORKLOAD\nStart with the workload—not the topology\nRun a concrete input, then inspect the evidence and measurements returned by each condition.\nINPUT · BOUNDED REQUEST\nOne synthetic operations note, one attributable origin\nOrigin\nOperations VM\nContract\nanalysis-request/v1\nConditions\nhealthy → unavailable\n“Intermittent vibration appears after restart and clears when load is reduced; inspect before the next production window.”\nNo customer data, credential, action request, or authored performance claim enters the path.\nInspect technical topology\nRun the VM-origin journey\nHOW IT WORKS\nEvidence accumulates\n\nEach action runs the configured adapter. Results stay attached to their source state, and later conditions do not erase earlier proof.\n\nAny LLM participation must appear beside LIVE output that proves it.\n02 · 1/2"
+          },
+          {
+            "condition_result": "×\n←\n→\nP\n⛶\n1\nHealthy request condition\n2\nUnavailable model condition\nACT 1 OF 2\nHealthy request condition\nLIVE requires model identity and schema-valid advisory output. REHEARSAL exercises only the contract and control path, with no model participation or output claim.\nLIVE\nHealthy request condition\nLIVE\nSOURCE STATE\nLIVE\nAI PARTICIPATED\nyes\nMODEL\ngranite-3.2-8b-tools\nHARDWARE\nIntel Xeon CPU\nADVISORY CATEGORY\ninspect\nBOUNDARY RESULT\nSchema-valid advisory output\nFINAL AUTHORITY\nhuman operator\nInspect technical topology\nNext live act →\nHOW IT WORKS\nEvidence accumulates\n\nEach action runs the configured adapter. Results stay attached to their source state, and later conditions do not erase earlier proof.\n\nAny LLM participation must appear beside LIVE output that proves it.\n02 · 1/2"
+          },
+          {
+            "condition_result": "×\n←\n→\nP\n⛶\n✓\nHealthy request condition\n2\nUnavailable model condition\nACT 2 OF 2\nUnavailable model condition\nThe same adapter path returns no model and no advisory output while preserving the human authority boundary.\nLIVE\nHealthy request condition\nLIVE\nSOURCE STATE\nLIVE\nAI PARTICIPATED\nyes\nMODEL\ngranite-3.2-8b-tools\nHARDWARE\nIntel Xeon CPU\nADVISORY CATEGORY\ninspect\nBOUNDARY RESULT\nSchema-valid advisory output\nFINAL AUTHORITY\nhuman operator\nUnavailable model condition\nLIVE\nSOURCE STATE\nLIVE\nAI PARTICIPATED\nno\nMODEL\nnone\nBOUNDARY RESULT\nFailed closed at model boundary\nADVISORY CATEGORY\nnone\nFINAL AUTHORITY\nhuman operator\nInspect technical topology\nReplay\nHOW IT WORKS\nEvidence accumulates\n\nEach action runs the configured adapter. Results stay attached to their source state, and later conditions do not erase earlier proof.\n\nAny LLM participation must appear beside LIVE output that proves it.\n02 · 1/2"
+          },
+          {
+            "step": 4,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-4bd83e88/proxy/tool/story/?act=2&scene=1",
+            "text": "×\n←\n→\nP\n⛶\nThe boundary is the product of the proof\nHEALTHY CONDITION\nState-bounded evidence\n\nLIVE may carry model identity and validated advisory output; REHEARSAL proves controls only and carries no model claim.\n\nUNAVAILABLE CONDITION\nNo invented answer\n\nThe adapter exposes absence of model participation and returns no advisory result.\n\n02 · 2/2"
+          },
+          {
+            "step": 5,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-4bd83e88/proxy/tool/story/?act=3&scene=0",
+            "text": "×\n←\n→\nP\n⛶\nMECHANISMS\nThree controls make the evidence repeatable\n01\nVersioned contract\nThe VM and adapter agree before the model runs.\nRequest, response, unavailable state, and evidence records are schema-bound.\n02\nCorrelated provenance\nOne request ID joins guest, Service, model, and validation evidence.\nThe evidence record stores a request hash, not the raw note or a credential.\n03\nFail-closed authority\nA result can explain; it cannot act.\nThe model has no tools, action list, or promotion authority. The human operator decides.\n03 · 1/1"
+          },
+          {
+            "step": 6,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-4bd83e88/proxy/tool/story/?act=4&scene=0",
+            "text": "×\n←\n→\nP\n⛶\nWHAT THIS SESSION PROVED\nCoexistence becomes credible when every boundary leaves evidence\nLIVE\n2 proof conditions completed\nLATEST SOURCE STATE\nLIVE\nAI PARTICIPATED\nno\nLATEST BOUNDARY RESULT\nFailed closed at model boundary\nFINAL AUTHORITY\nhuman operator\nThe VM, Service, source state, validation, and human authority stayed attributable; model evidence appears only when LIVE.\nTrace it in 101. Build it in a separate 201.\nClose the presentation, then begin the 60–75 minute Showroom lab →\n04 · 1/1"
+          },
+          {
+            "step": 7,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-4bd83e88/proxy/tool/story/?act=4&scene=0&finale=1",
+            "text": "×\n←\n→\nP\n⛶\nSTORY COMPLETE\nTrace the evidence. Keep the authority human.\nOPTIONAL NEXT STEP · 60–75 MINUTES\nVirtualization + AI 101 hands-on lab\nOpen the separate Showroom lab supplied by the environment. The future 201 lab will require learners to author the contract and configuration.\nClose presentation\nRestart\nRed Hat × Intel"
+          },
+          {
+            "step": 8,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-4bd83e88/proxy/tool/story/?act=4&scene=0&finale=1",
+            "text": "×\n←\n→\nP\n⛶\nSTORY COMPLETE\nTrace the evidence. Keep the authority human.\nOPTIONAL NEXT STEP · 60–75 MINUTES\nVirtualization + AI 101 hands-on lab\nOpen the separate Showroom lab supplied by the environment. The future 201 lab will require learners to author the contract and configuration.\nClose presentation\nRestart\nRed Hat × Intel"
+          },
+          {
+            "step": 9,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-4bd83e88/proxy/tool/story/?act=4&scene=0&finale=1",
+            "text": "×\n←\n→\nP\n⛶\nSTORY COMPLETE\nTrace the evidence. Keep the authority human.\nOPTIONAL NEXT STEP · 60–75 MINUTES\nVirtualization + AI 101 hands-on lab\nOpen the separate Showroom lab supplied by the environment. The future 201 lab will require learners to author the contract and configuration.\nClose presentation\nRestart\nRed Hat × Intel"
+          },
+          {
+            "step": 10,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-4bd83e88/proxy/tool/story/?act=4&scene=0&finale=1",
+            "text": "×\n←\n→\nP\n⛶\nSTORY COMPLETE\nTrace the evidence. Keep the authority human.\nOPTIONAL NEXT STEP · 60–75 MINUTES\nVirtualization + AI 101 hands-on lab\nOpen the separate Showroom lab supplied by the environment. The future 201 lab will require learners to author the contract and configuration.\nClose presentation\nRestart\nRed Hat × Intel"
+          },
+          {
+            "step": 11,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-4bd83e88/proxy/tool/story/?act=4&scene=0&finale=1",
+            "text": "×\n←\n→\nP\n⛶\nSTORY COMPLETE\nTrace the evidence. Keep the authority human.\nOPTIONAL NEXT STEP · 60–75 MINUTES\nVirtualization + AI 101 hands-on lab\nOpen the separate Showroom lab supplied by the environment. The future 201 lab will require learners to author the contract and configuration.\nClose presentation\nRestart\nRed Hat × Intel"
+          }
+        ]
+      }
+    },
+    {
+      "id": "content_welcome",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Trace a VM to Governed AI"
+      }
+    },
+    {
+      "id": "showroom_branding",
+      "passed": true,
+      "detail": {
+        "logos": [
+          {
+            "alt": "Red Hat",
+            "src": "../../_/img/redhat-logo.svg",
+            "loaded": true,
+            "width": 41.703125,
+            "height": 31.671875
+          },
+          {
+            "alt": "Intel",
+            "src": "../../_/img/intel-logo.svg",
+            "loaded": true,
+            "width": 65.765625,
+            "height": 25.515625
+          }
+        ]
+      }
+    },
+    {
+      "id": "content_verify",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Verify the runtime"
+      }
+    },
+    {
+      "id": "code_controls_verify",
+      "passed": true,
+      "detail": {
+        "buttons": [
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "nav-toggle"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          }
+        ],
+        "executable_blocks": 4
+      }
+    },
+    {
+      "id": "reclaim_completed",
+      "passed": true,
+      "detail": {
+        "status": "completed",
+        "remaining_labeled_namespaces": 0
+      }
+    }
+  ],
+  "certified": false,
+  "run": "root-skin-r3",
+  "order_id": "4bd83e88-ac0a-4cd6-9a75-0942b3e8bacc",
+  "public_url": "https://labs.smg-helix.ai/labs/virtualization-ai-foundations-101-4bd83e88",
+  "seats": [
+    {
+      "seat_id": "4d5b271c-3947-4c38-8fef-599186432324",
+      "session_id": "630d0237-d218-4f95-a753-4eb25324d2c2"
+    }
+  ],
+  "error": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.paste-button,button[aria-label=\"Run in terminal\"],button[title*=\"Execute\"]').first()\u001b[22m\n\u001b[2m    - locator resolved to <button class=\"paste-button\" title=\"Run in terminal\" aria-label=\"Run in terminal\">…</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    56 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n",
+  "cleanup_status": "completed",
+  "remaining_labeled_namespaces": 0,
+  "finished_at": "2026-10-13T22:54:20.469Z"
+}

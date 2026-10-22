@@ -1,0 +1,661 @@
+{
+  "schema": "launchpad/public-browser-exploration/v1",
+  "catalog": "virtualization-ai-501",
+  "cluster": "flightpath",
+  "started_at": "2026-10-13T19:51:06.022Z",
+  "checks": [
+    {
+      "id": "order_created",
+      "passed": true,
+      "detail": {
+        "order_id": "7ae24bdd-136c-47a2-b2f4-c5e9ddc3217c",
+        "public_url": "https://labs.smg-helix.ai/labs/virtualization-ai-501-7ae24bdd"
+      }
+    },
+    {
+      "id": "one_seat_ready",
+      "passed": true,
+      "detail": [
+        {
+          "seat_id": "875f2ce3-212e-45f8-a1ff-05255b08774d",
+          "session_id": "8c512595-2694-493a-8e0a-1555469f5d93"
+        }
+      ]
+    },
+    {
+      "id": "participant_landing",
+      "passed": true,
+      "detail": {
+        "url": "https://labs.smg-helix.ai/labs/virtualization-ai-501-7ae24bdd",
+        "text": "×\n|\nPartner AI Launchpad\nPARTICIPANT\nCurrent lab\nMy Lab Access\nLog out of lab\nPARTICIPANT WORKSPACE\nYour lab is ready\n\nSeat 875f2ce3-212e-45f8-a1ff-05255b08774d\n\nOpen Lab\nMy Lab Access\nLog out of lab\nLogging out preserves your seat. Access ends at 2026-10-13T21:51:09.209911."
+      }
+    },
+    {
+      "id": "showroom_shell",
+      "passed": true,
+      "detail": {
+        "url": "https://labs.smg-helix.ai/labs/virtualization-ai-501-7ae24bdd/showroom/",
+        "frames": [
+          "https://labs.smg-helix.ai/labs/virtualization-ai-501-7ae24bdd/showroom/",
+          "https://labs.smg-helix.ai/labs/virtualization-ai-501-7ae24bdd/showroom/www/virtualization-ai-501/index.html",
+          "https://labs.smg-helix.ai/labs/virtualization-ai-501-7ae24bdd/proxy/tool/story/",
+          "https://labs.smg-helix.ai/labs/virtualization-ai-501-7ae24bdd/showroom/terminal",
+          "https://labs.smg-helix.ai/k8s/ns/launchpad-flightpath-candida-v501-875f2c/core~v1~Pod"
+        ],
+        "text": "Story\nTerminal\nOpenShift Console"
+      }
+    },
+    {
+      "id": "active_tab_story",
+      "passed": true,
+      "detail": {
+        "url": "https://labs.smg-helix.ai/labs/virtualization-ai-501-7ae24bdd/proxy/tool/story/",
+        "text": "×\nQualify a Governed VM Inference Fleet\n\nMigration, disruption, placement, capacity, and continuity become one reviewable evidence case\n\nCLICK OR PRESS SPACE TO BEGIN",
+        "canvas": 0,
+        "popups": []
+      }
+    },
+    {
+      "id": "active_tab_terminal",
+      "passed": true,
+      "detail": {
+        "url": "https://labs.smg-helix.ai/labs/virtualization-ai-501-7ae24bdd/showroom/terminal",
+        "text": "",
+        "canvas": 3,
+        "popups": []
+      }
+    },
+    {
+      "id": "active_tab_openshift_console",
+      "passed": true,
+      "detail": {
+        "url": "https://labs.smg-helix.ai/k8s/ns/launchpad-flightpath-candida-v501-875f2c/core~v1~Pod?page=1&perPage=50",
+        "text": "Skip to content\nCore platform\nHome\nFavorites\nEcosystem\nWorkloads\nVirtualization\nMigration\nServerless\nNetworking\nStorage\nBuilds\nObserve\nUser Management\nAdministration\nProject: launchpad-flightpath-candida-v501-875f2c\nPods\nCreate Pod\n1 - 6 of 6 items\nName\n\t\nStatus\n\t\nReady\n\t\nRestarts\n\t\nOwner\n\t\nMemory\n\t\nCPU\n\t\nCreated\n\t\nActions\n\n\nPod\nP\nshowroom-55d469cf65-p4vll\n\t\nRunning\n\t4/4\t0\t\nReplicaSet\nRS\nshowroom-55d469cf65\n\t112.6 MiB\t0.027 cores\t\n1 minute ago\n\t\n\n\nPod\nP\nvirt-launcher-inference-client-a-vxvn6\n\t\nRunning\n\t3/3\t0\t\nVirtualMachineInstance\nVMI\ninference-client-a\n\t681.9 MiB\t0.072 cores\t\n1 minute ago\n\t\n\n\nPod\nP\nvirt-launcher-inference-client-b-7qb5v\n\t\nRunning\n\t3/3\t0\t\nVirtualMachineInstance\nVMI\ninference-client-b\n\t660.4 MiB\t0.067 cores\t\n1 minute ago\n\t\n\n\nPod\nP\nvirt-launcher-inference-client-c-nt9q7\n\t\nRunning\n\t3/3\t0\t\nVirtualMachineInstance\nVMI\ninference-client-c\n\t682.6 MiB\t0.066 cores\t\n1 minute ago\n\t\n\n\nPod\nP\nvirtualization-ai-501-presentation-7854fd964d-7dtx4\n\t\nRunning\n\t1/1\t0\t\nReplicaSet\nRS\nvirtualization-ai-501-presentation-7854fd964d\n\t11.4 MiB\t0.000 cores\t\n1 minute ago\n\t\n\n\nPod\nP\nvirtualization-ai-501-qualification-adapter-6656fd875b-dt7h6\n\t\nRunning\n\t1/1\t0\t\nReplicaSet\nRS\nvirtualization-ai-501-qualification-adapter-6656fd875b\n\t20.5 MiB\t0.000 cores\t\n1 minute ago\n\t\nWelcome to the new OpenShift experience!\n\nIntroducing a fresh modern look to the console! With this update, we made changes to the user interface to enhance usability and streamline your workflow. This includes improved navigation",
+        "canvas": 0,
+        "popups": []
+      }
+    },
+    {
+      "id": "story_navigation",
+      "passed": true,
+      "detail": {
+        "steps": [
+          {
+            "step": 0,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-501-7ae24bdd/proxy/tool/story/?act=0&scene=0",
+            "text": "×\n←\n→\nP\n⛶\nDISCOVER · REHEARSAL\nOne healthy VM does not qualify a fleet\n×\nOne healthy VM does not qualify a fleet\nSCALE INTRODUCES PLACEMENT, CONCURRENCY, MIGRATION, DISRUPTION, CONTINUITY, AND CONTAINMENT DEPENDENCIES.\n01 · 1/1"
+          },
+          {
+            "step": 1,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-501-7ae24bdd/proxy/tool/story/?act=1&scene=0",
+            "text": "×\n←\n→\nP\n⛶\nBASELINE\nEvery claim needs an owner and an evidence path\n\nReveal the causal boundary before showing a result.\n\n1\nFleet identity\n2\nPlacement\n3\nEnvelope\n4\nAuthority\nAUDIENCE QUESTION\nWhat exactly is under qualification?\nReveal technical boundary\nactive request and evidence path\ndeployment or trust boundary\noptional integration\nAUTHORITY\nHuman reviewer\nsets the envelope and owns promotion\nNAMESPACED QUALIFICATION BOUNDARY\nread-only evidence evaluation; no cluster mutation or promotion authority\ngenerate load\n→\nKUBEVIRT\nVM inference fleet\ndistinct VirtualMachine and VMI identities\ninfer\n→\nSERVICE\nInference service\nexecution identity and returned request evidence\ncorrelate\n→\nEVIDENCE\nCorrelated telemetry\nrequest, VM, migration, disruption, CPU, and continuity\nqualify\n→\nPOLICY\nDeterministic policy\nALLOW_REVIEW · REFUSE · ABSTAIN\nPOST /api/v1/qualifications\nchange placement\n→\nEVENT\nMigration trial\nexternally executed and directly observed\nstress boundary\n→\nEVENT\nDisruption trial\nbou"
+          },
+          {
+            "step": 2,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-501-7ae24bdd/proxy/tool/story/?act=2&scene=0",
+            "text": "×\n←\n→\nP\n⛶\nMIGRATE\nA migration event is not a qualification result\nThe VMI moved\n→\nPlacement + inference + state + correlation remained continuous\n\nThe changed condition must survive the same declared envelope.\n\n03 · 1/1"
+          },
+          {
+            "step": 3,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-501-7ae24bdd/proxy/tool/story/?act=3&scene=0",
+            "text": "×\n←\n→\nP\n⛶\n1\nEnvelope satisfied\n2\nCapacity boundary crossed\n3\nEvidence chain breaks\nGOVERNED REHEARSAL\nStart with one declared qualification envelope\nPreserve the exact digest, observed result, source state, and human authority.\nINPUT\nFleet qualification request\nOne typed contract binds fleet identity, trial measurements, placement, continuity, containment, and correlated evidence.\nInspect technical topology\nRun qualification conditions\nAUTHORITY\nPromotion remains human-owned\n\nThe adapter evaluates supplied evidence. It never migrates, disrupts, certifies, or promotes a workload.\n\nALLOW_REVIEW permits inspection; it never authorizes certification or promotion.\n04 · 1/1"
+          },
+          {
+            "step": 4,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-501-7ae24bdd/proxy/tool/story/?act=4&scene=0",
+            "text": "×\n←\n→\nP\n⛶\nCORRELATE\nContinuity is a chain, not a green dashboard\n01\nIdentity\nVM → node → CPU → request\nThe workload and placement records bind to the same request.\n02\nState\nbefore → change → after\nMigration and restart preserve an inspectable ledger.\n03\nContainment\nfailure stays bounded\nA disruption cannot leak across the declared fleet boundary.\n05 · 1/1"
+          },
+          {
+            "step": 5,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-501-7ae24bdd/proxy/tool/story/?act=5&scene=0",
+            "text": "×\n←\n→\nP\n⛶\nQUALIFY\nPolicy turns evidence into a bounded recommendation\nCOMPLETE + INSIDE ENVELOPE\nALLOW_REVIEW\n\nEligible for human promotion review only\n\nKNOWN BOUNDARY BREACH\nREFUSE\n\nSLO, capacity, or containment failed\n\nEVIDENCE INCOMPLETE\nABSTAIN\n\nCorrelation or state continuity is missing\n\n06 · 1/1"
+          },
+          {
+            "step": 6,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-501-7ae24bdd/proxy/tool/story/?act=6&scene=0",
+            "text": "×\n←\n→\nP\n⛶\nHANDOFF\nA candidate is immutable before it becomes certifiable\nNOT RUN\nRun all three REHEARSAL conditions to populate the evidence payoff\nDISCOVER → BASELINE → MIGRATE → DISRUPT → CORRELATE → QUALIFY → HANDOFF remains durable.\nLaunchpad still owns trusted rendering, live seats, capacity graduation, certification, and promotion.\nContinue in the separate 75–90 minute Showroom lab →\n07 · 1/1"
+          },
+          {
+            "step": 7,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-501-7ae24bdd/proxy/tool/story/?act=6&scene=0&finale=1",
+            "text": "×\n←\n→\nP\n⛶\nSTORY COMPLETE\nDecide whether the candidate has earned human promotion review.\nOPTIONAL NEXT STEP · 75–90 MINUTES\nQualify a VM inference fleet lab\nUse the separate Showroom lab and stop at the factory-candidate handoff.\nClose presentation\nRestart\nRed Hat × Intel"
+          },
+          {
+            "step": 8,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-501-7ae24bdd/proxy/tool/story/?act=6&scene=0&finale=1",
+            "text": "×\n←\n→\nP\n⛶\nSTORY COMPLETE\nDecide whether the candidate has earned human promotion review.\nOPTIONAL NEXT STEP · 75–90 MINUTES\nQualify a VM inference fleet lab\nUse the separate Showroom lab and stop at the factory-candidate handoff.\nClose presentation\nRestart\nRed Hat × Intel"
+          },
+          {
+            "step": 9,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-501-7ae24bdd/proxy/tool/story/?act=6&scene=0&finale=1",
+            "text": "×\n←\n→\nP\n⛶\nSTORY COMPLETE\nDecide whether the candidate has earned human promotion review.\nOPTIONAL NEXT STEP · 75–90 MINUTES\nQualify a VM inference fleet lab\nUse the separate Showroom lab and stop at the factory-candidate handoff.\nClose presentation\nRestart\nRed Hat × Intel"
+          },
+          {
+            "step": 10,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-501-7ae24bdd/proxy/tool/story/?act=6&scene=0&finale=1",
+            "text": "×\n←\n→\nP\n⛶\nSTORY COMPLETE\nDecide whether the candidate has earned human promotion review.\nOPTIONAL NEXT STEP · 75–90 MINUTES\nQualify a VM inference fleet lab\nUse the separate Showroom lab and stop at the factory-candidate handoff.\nClose presentation\nRestart\nRed Hat × Intel"
+          },
+          {
+            "step": 11,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-501-7ae24bdd/proxy/tool/story/?act=6&scene=0&finale=1",
+            "text": "×\n←\n→\nP\n⛶\nSTORY COMPLETE\nDecide whether the candidate has earned human promotion review.\nOPTIONAL NEXT STEP · 75–90 MINUTES\nQualify a VM inference fleet lab\nUse the separate Showroom lab and stop at the factory-candidate handoff.\nClose presentation\nRestart\nRed Hat × Intel"
+          }
+        ]
+      }
+    },
+    {
+      "id": "content_welcome",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Qualify a Governed VM Inference Fleet"
+      }
+    },
+    {
+      "id": "showroom_branding",
+      "passed": false,
+      "detail": {
+        "logos": [
+          {
+            "alt": "Red Hat Developer Program",
+            "src": "../_/img/header_logo.png",
+            "loaded": true,
+            "width": 123.40625,
+            "height": 40
+          }
+        ]
+      }
+    },
+    {
+      "id": "code_controls_welcome",
+      "passed": true,
+      "detail": {
+        "buttons": [
+          {
+            "label": null,
+            "title": null,
+            "text": "\n        \n        \n        \n      ",
+            "class": "navbar-burger"
+          },
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "nav-toggle"
+          },
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "copy-button"
+          },
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "copy-button"
+          }
+        ],
+        "executable_blocks": 2
+      }
+    },
+    {
+      "id": "content_discover",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "DISCOVER"
+      }
+    },
+    {
+      "id": "code_controls_discover",
+      "passed": true,
+      "detail": {
+        "buttons": [
+          {
+            "label": null,
+            "title": null,
+            "text": "\n        \n        \n        \n      ",
+            "class": "navbar-burger"
+          },
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "nav-toggle"
+          },
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "copy-button"
+          },
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "copy-button"
+          },
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "copy-button"
+          }
+        ],
+        "executable_blocks": 3
+      }
+    },
+    {
+      "id": "content_baseline",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "BASELINE"
+      }
+    },
+    {
+      "id": "code_controls_baseline",
+      "passed": true,
+      "detail": {
+        "buttons": [
+          {
+            "label": null,
+            "title": null,
+            "text": "\n        \n        \n        \n      ",
+            "class": "navbar-burger"
+          },
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "nav-toggle"
+          },
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "copy-button"
+          },
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "copy-button"
+          }
+        ],
+        "executable_blocks": 2
+      }
+    },
+    {
+      "id": "content_migrate",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "MIGRATE"
+      }
+    },
+    {
+      "id": "code_controls_migrate",
+      "passed": true,
+      "detail": {
+        "buttons": [
+          {
+            "label": null,
+            "title": null,
+            "text": "\n        \n        \n        \n      ",
+            "class": "navbar-burger"
+          },
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "nav-toggle"
+          },
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "copy-button"
+          },
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "copy-button"
+          }
+        ],
+        "executable_blocks": 2
+      }
+    },
+    {
+      "id": "content_disrupt",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "DISRUPT"
+      }
+    },
+    {
+      "id": "code_controls_disrupt",
+      "passed": true,
+      "detail": {
+        "buttons": [
+          {
+            "label": null,
+            "title": null,
+            "text": "\n        \n        \n        \n      ",
+            "class": "navbar-burger"
+          },
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "nav-toggle"
+          },
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "copy-button"
+          },
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "copy-button"
+          }
+        ],
+        "executable_blocks": 2
+      }
+    },
+    {
+      "id": "content_correlate",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "CORRELATE"
+      }
+    },
+    {
+      "id": "code_controls_correlate",
+      "passed": true,
+      "detail": {
+        "buttons": [
+          {
+            "label": null,
+            "title": null,
+            "text": "\n        \n        \n        \n      ",
+            "class": "navbar-burger"
+          },
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "nav-toggle"
+          },
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "copy-button"
+          },
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "copy-button"
+          }
+        ],
+        "executable_blocks": 2
+      }
+    },
+    {
+      "id": "content_qualify",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "QUALIFY"
+      }
+    },
+    {
+      "id": "code_controls_qualify",
+      "passed": true,
+      "detail": {
+        "buttons": [
+          {
+            "label": null,
+            "title": null,
+            "text": "\n        \n        \n        \n      ",
+            "class": "navbar-burger"
+          },
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "nav-toggle"
+          },
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "copy-button"
+          },
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "copy-button"
+          }
+        ],
+        "executable_blocks": 2
+      }
+    },
+    {
+      "id": "content_handoff",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "HANDOFF and participant cleanup"
+      }
+    },
+    {
+      "id": "code_controls_handoff",
+      "passed": true,
+      "detail": {
+        "buttons": [
+          {
+            "label": null,
+            "title": null,
+            "text": "\n        \n        \n        \n      ",
+            "class": "navbar-burger"
+          },
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "nav-toggle"
+          },
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "copy-button"
+          },
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "copy-button"
+          },
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "copy-button"
+          }
+        ],
+        "executable_blocks": 3
+      }
+    },
+    {
+      "id": "content_conclusion",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Conclusion"
+      }
+    },
+    {
+      "id": "execute_button_interaction",
+      "passed": false,
+      "detail": {
+        "reason": "No Run in terminal button found on rendered executable blocks"
+      }
+    },
+    {
+      "id": "rendered_code_inventory",
+      "passed": true,
+      "detail": {
+        "blocks": [
+          {
+            "stage": "welcome",
+            "first_line": "export LAB_NAMESPACE=\"$(oc project -q)\""
+          },
+          {
+            "stage": "welcome",
+            "first_line": "curl -fsS \"$QUAL_URL/healthz\" | jq '{status,mode,authority}'"
+          },
+          {
+            "stage": "discover",
+            "first_line": "oc get virtualmachines,virtualmachineinstances -n \"$LAB_NAMESPACE\" -o wide"
+          },
+          {
+            "stage": "discover",
+            "first_line": "oc get deployment,service,persistentvolumeclaims -n \"$LAB_NAMESPACE\" \\"
+          },
+          {
+            "stage": "discover",
+            "first_line": "test \"$(oc get virtualmachines -n \"$LAB_NAMESPACE\" -o name | wc -l | tr -d ' ')\" -eq 3"
+          },
+          {
+            "stage": "baseline",
+            "first_line": "curl -fsS \"$FIXTURE_ROOT/qualified-fleet-request.json\" -o /tmp/fleet-qualified.json"
+          },
+          {
+            "stage": "baseline",
+            "first_line": "jq -e '.evidence_snapshot | all(.source_state == \"REHEARSAL\")' /tmp/fleet-qualified.json"
+          },
+          {
+            "stage": "migrate",
+            "first_line": "jq '.trials[] | select(.kind == \"MIGRATION\")' /tmp/fleet-qualified.json"
+          },
+          {
+            "stage": "migrate",
+            "first_line": "jq -e '.trials[] | select(.kind == \"MIGRATION\") | .correlation_complete and .state_continuity' /tmp/fleet-qualified.json"
+          },
+          {
+            "stage": "disrupt",
+            "first_line": "curl -fsS \"$FIXTURE_ROOT/capacity-breach-request.json\" -o /tmp/fleet-capacity.json"
+          },
+          {
+            "stage": "disrupt",
+            "first_line": "jq -e '(.trials[] | select(.kind == \"DISRUPTION\") | .p95_ms) > .envelope.max_p95_ms' /tmp/fleet-capacity.json"
+          },
+          {
+            "stage": "correlate",
+            "first_line": "curl -fsS \"$FIXTURE_ROOT/correlation-gap-request.json\" -o /tmp/fleet-gap.json"
+          },
+          {
+            "stage": "correlate",
+            "first_line": "jq -e '.trials | any(.correlation_complete == false)' /tmp/fleet-gap.json"
+          },
+          {
+            "stage": "qualify",
+            "first_line": "for case in qualified capacity gap; do"
+          },
+          {
+            "stage": "qualify",
+            "first_line": "test \"$(jq -r .decision /tmp/fleet-qualified-result.json)\" = ALLOW_REVIEW"
+          },
+          {
+            "stage": "handoff",
+            "first_line": "REQUEST_ID=\"$(jq -r .request_id /tmp/fleet-qualified-result.json)\""
+          },
+          {
+            "stage": "handoff",
+            "first_line": "curl -fsS \"$QUAL_URL/metrics\" | grep '^virtualization_ai_501_'"
+          },
+          {
+            "stage": "handoff",
+            "first_line": "jq -e '.evidence | length > 0' /tmp/fleet-ledger.json"
+          }
+        ]
+      }
+    },
+    {
+      "id": "learner_tool_dependencies",
+      "passed": true,
+      "detail": {
+        "tools": [
+          "/usr/local/bin/oc",
+          "/usr/bin/curl",
+          "/usr/bin/jq",
+          "/usr/local/bin/virtctl",
+          "/usr/bin/ssh",
+          "/usr/bin/uuidgen",
+          "/usr/bin/base64",
+          "/usr/bin/install",
+          "/usr/bin/chmod",
+          "/usr/bin/tee",
+          "/usr/bin/grep"
+        ]
+      }
+    },
+    {
+      "id": "complete_rendered_command_journey",
+      "passed": false,
+      "detail": {
+        "blocks": 18,
+        "completed_blocks": [
+          "JOURNEY_PASS_0_welcome",
+          "JOURNEY_PASS_1_welcome",
+          "JOURNEY_PASS_2_discover",
+          "JOURNEY_PASS_3_discover",
+          "JOURNEY_PASS_4_discover"
+        ],
+        "live_vm_inference": false,
+        "output_tail": "JOURNEY_BLOCK_0_welcome\nnamespace=launchpad-flightpath-candida-v501-875f2c\nadapter=http://virtualization-ai-501-qualification-adapter:8080\nJOURNEY_PASS_0_welcome\nJOURNEY_BLOCK_1_welcome\n{\n  \"status\": \"ok\",\n  \"mode\": \"REHEARSAL\",\n  \"authority\": \"HUMAN_PROMOTION_REQUIRED\"\n}\nJOURNEY_PASS_1_welcome\nJOURNEY_BLOCK_2_discover\nNAME                                            AGE    STATUS    READY\nvirtualmachine.kubevirt.io/inference-client-a   2m8s   Running   True\nvirtualmachine.kubevirt.io/inference-client-b   2m8s   Running   True\nvirtualmachine.kubevirt.io/inference-client-c   2m8s   Running   True\n\nNAME                                                    AGE    PHASE     IP             NODENAME              READY   LIVE-MIGRATABLE   PAUSED\nvirtualmachineinstance.kubevirt.io/inference-client-a   2m8s   Running   10.130.0.141   fp1.fm2aihpcsed.com   True    True              \nvirtualmachineinstance.kubevirt.io/inference-client-b   2m8s   Running   10.130.0.155   fp1.fm2aihpcsed.com   True    True              \nvirtualmachineinstance.kubevirt.io/inference-client-c   2m8s   Running   10.130.0.137   fp1.fm2aihpcsed.com   True    True              \nJOURNEY_PASS_2_discover\nJOURNEY_BLOCK_3_discover\nJOURNEY_PASS_3_discover\nJOURNEY_BLOCK_4_discover\nJOURNEY_PASS_4_discover\nJOURNEY_BLOCK_5_baseline\n",
+        "error_tail": "No resources found in launchpad-flightpath-candida-v501-875f2c namespace.\ncurl: (60) SSL certificate problem: self-signed certificate in certificate chain\nMore details here: https://curl.se/docs/sslcerts.html\n\ncurl failed to verify the legitimacy of the server and therefore could not\nestablish a secure connection to it. To learn more about this situation and\nhow to fix it, please visit the webpage mentioned above.\ncommand terminated with exit code 60\n"
+      }
+    },
+    {
+      "id": "my_labs_contains_seat",
+      "passed": true,
+      "detail": {
+        "text": "×\n|\nPartner AI Launchpad\nPARTICIPANT\nCurrent lab\nMy Lab Access\nLog out of lab\nPARTICIPANT WORKSPACE\nMy Lab Access\n\nResume any active environment associated with your participant identity.\n\nvirtualization-ai-501\n\nAvailable until 2026-10-13T21:51:09.209911\n\nResume lab\nAdd another lab\n\nEnter the instructor code for another active lab.\n\nAdd lab"
+      }
+    },
+    {
+      "id": "reclaim_completed",
+      "passed": true,
+      "detail": {
+        "status": "completed",
+        "remaining_labeled_namespaces": 0
+      }
+    }
+  ],
+  "certified": false,
+  "order_id": "7ae24bdd-136c-47a2-b2f4-c5e9ddc3217c",
+  "public_url": "https://labs.smg-helix.ai/labs/virtualization-ai-501-7ae24bdd",
+  "seats": [
+    {
+      "seat_id": "875f2ce3-212e-45f8-a1ff-05255b08774d",
+      "session_id": "8c512595-2694-493a-8e0a-1555469f5d93"
+    }
+  ],
+  "namespace": "launchpad-flightpath-candida-v501-875f2c",
+  "cleanup_status": "completed",
+  "remaining_labeled_namespaces": 0,
+  "finished_at": "2026-10-13T19:54:53.351Z"
+}

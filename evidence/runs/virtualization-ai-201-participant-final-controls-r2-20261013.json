@@ -1,0 +1,641 @@
+{
+  "schema": "launchpad/public-browser-exploration/v1",
+  "catalog": "virtualization-ai-201",
+  "cluster": "flightpath",
+  "started_at": "2026-10-14T00:24:09.818Z",
+  "checks": [
+    {
+      "id": "order_created",
+      "passed": true,
+      "detail": {
+        "order_id": "05091d7a-2085-4c84-8e42-6b77fedd5af8",
+        "public_url": "https://labs.smg-helix.ai/labs/virtualization-ai-201-05091d7a"
+      }
+    },
+    {
+      "id": "one_seat_ready",
+      "passed": true,
+      "detail": [
+        {
+          "seat_id": "4175295b-c5ae-446e-9437-b39c9162eb1a",
+          "session_id": "90c5ba4f-f79c-40ee-af18-4bab034fa961"
+        }
+      ]
+    },
+    {
+      "id": "participant_landing",
+      "passed": true,
+      "detail": {
+        "url": "https://labs.smg-helix.ai/labs/virtualization-ai-201-05091d7a",
+        "text": "×\n|\nPartner AI Launchpad\nPARTICIPANT\nCurrent lab\nMy Lab Access\nLog out of lab\nPARTICIPANT WORKSPACE\nYour lab is ready\n\nSeat 4175295b-c5ae-446e-9437-b39c9162eb1a\n\nOpen Lab\nMy Lab Access\nLog out of lab\nLogging out preserves your seat. Access ends at 2026-10-14T02:24:13.140854."
+      }
+    },
+    {
+      "id": "showroom_shell",
+      "passed": true,
+      "detail": {
+        "url": "https://labs.smg-helix.ai/labs/virtualization-ai-201-05091d7a/showroom/",
+        "frames": [
+          "https://labs.smg-helix.ai/labs/virtualization-ai-201-05091d7a/showroom/",
+          "https://labs.smg-helix.ai/labs/virtualization-ai-201-05091d7a/showroom/www/virtualization-ai-201/main/index.html",
+          "https://labs.smg-helix.ai/labs/virtualization-ai-201-05091d7a/proxy/tool/story/",
+          "https://labs.smg-helix.ai/labs/virtualization-ai-201-05091d7a/showroom/terminal",
+          "https://labs.smg-helix.ai/k8s/ns/launchpad-flightpath-candida-virtualization-ai-417529/core~v1~Pod"
+        ],
+        "text": "Story\nTerminal\nOpenShift Console"
+      }
+    },
+    {
+      "id": "active_tab_story",
+      "passed": true,
+      "detail": {
+        "url": "https://labs.smg-helix.ai/labs/virtualization-ai-201-05091d7a/proxy/tool/story/",
+        "text": "×\nVirtualization + AI 201\n\nBuild and qualify a VM-to-AI contract\n\nCLICK OR PRESS SPACE TO BEGIN",
+        "canvas": 0,
+        "popups": []
+      }
+    },
+    {
+      "id": "active_tab_terminal",
+      "passed": true,
+      "detail": {
+        "url": "https://labs.smg-helix.ai/labs/virtualization-ai-201-05091d7a/showroom/terminal",
+        "text": "",
+        "canvas": 3,
+        "popups": []
+      }
+    },
+    {
+      "id": "active_tab_openshift_console",
+      "passed": true,
+      "detail": {
+        "url": "https://labs.smg-helix.ai/k8s/ns/launchpad-flightpath-candida-virtualization-ai-417529/core~v1~Pod?page=1&perPage=50",
+        "text": "Skip to content\nCore platform\nHome\nFavorites\nEcosystem\nWorkloads\nVirtualization\nMigration\nServerless\nNetworking\nStorage\nBuilds\nObserve\nUser Management\nAdministration\nProject: launchpad-flightpath-candida-virtualization-ai-417529\nPods\nCreate Pod\n1 - 4 of 4 items\nName\n\t\nStatus\n\t\nReady\n\t\nRestarts\n\t\nOwner\n\t\nMemory\n\t\nCPU\n\t\nCreated\n\t\nActions\n\n\nPod\nP\nshowroom-68c696f78f-zqs98\n\t\nRunning\n\t4/4\t0\t\nReplicaSet\nRS\nshowroom-68c696f78f\n\t104.7 MiB\t0.005 cores\t\n1 minute ago\n\t\n\n\nPod\nP\nvirt-launcher-contract-author-vm-cbf8q\n\t\nRunning\n\t3/3\t0\t\nVirtualMachineInstance\nVMI\ncontract-author-vm\n\t647.8 MiB\t0.042 cores\t\n1 minute ago\n\t\n\n\nPod\nP\nvirtualization-ai-201-adapter-55cc7b6b9d-6tfzx\n\t\nRunning\n\t1/1\t0\t\nReplicaSet\nRS\nvirtualization-ai-201-adapter-55cc7b6b9d\n\t20.8 MiB\t0.000 cores\t\n1 minute ago\n\t\n\n\nPod\nP\nvirtualization-ai-201-presentation-788d5d7885-f4tws\n\t\nRunning\n\t1/1\t0\t\nReplicaSet\nRS\nvirtualization-ai-201-presentation-788d5d7885\n\t12.2 MiB\t0.000 cores\t\n1 minute ago\n\t\nWelcome to the new OpenShift experience!\n\nIntroducing a fresh modern look to the console! With this update, we made changes to the user interface to enhance usability and streamline your workflow. This includes improved navigation and visual refinement to help manage your applications and infrastructure more easily.\n\nWhat do you want to do next?\nLaunch tour\nSkip tour",
+        "canvas": 0,
+        "popups": []
+      }
+    },
+    {
+      "id": "story_navigation",
+      "passed": true,
+      "detail": {
+        "steps": [
+          {
+            "step": 0,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-201-05091d7a/proxy/tool/story/?act=0&scene=0",
+            "text": "×\n←\n→\nP\n⛶\nA model can be reachable while the integration remains unqualified.\n×\nA model can be reachable while the integration remains unqualified.\n201 BEGINS AFTER THE 101 TRACE: THE LEARNER MUST AUTHOR EVERY BOUNDARY.\n00 · 1/2"
+          },
+          {
+            "step": 1,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-201-05091d7a/proxy/tool/story/?act=0&scene=1",
+            "text": "×\n←\n→\nP\n⛶\nTHE REFRAME\nThe deliverable is not a successful prompt\nA VM sends JSON and receives text\n→\nA human can defend the complete contract bundle\n\nSchemas, guest identity, Secret reference, Service, NetworkPolicy, validation, failure, evidence, authority, and cleanup must agree.\n\n00 · 2/2"
+          },
+          {
+            "step": 2,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-201-05091d7a/proxy/tool/story/?act=1&scene=0",
+            "text": "×\n←\n→\nP\n⛶\nLEARNER-AUTHORED BOUNDARIES\nEach artifact answers one qualification question\n\nReveal the contract in the same order the learner must construct and defend it.\n\n1\nRequest schema + VM client\n2\nService + NetworkPolicy\n3\nSecret reference + adapter\n4\nResponse contract + evidence\n5\nHuman reviewer\nAUDIENCE QUESTION\nWhat may leave the guest?\nReveal technical boundary\nactive request and evidence path\ndeployment or trust boundary\noptional integration\nVIRTUALMACHINE CLIENT\nVM contract client\ncreates correlation ID, guest identity, and request hash\nguest Python\nOPENSHIFT PARTICIPANT NAMESPACE\nlearner-authored contract boundary\nHTTP JSON\n→\nV1 SERVICE\nqualification adapter\nstable namespace-local endpoint\n:8080\nselects pod\n→\nAPPS/V1 DEPLOYMENT\nvalidation adapter\nschema, secret boundary, output validation, evidence\nPOST /api/v1/qualify\nconditional egress\n→\nGOVERNED INFERENCE\nIntel Xeon model endpoint\nbounded advisory interpretation only\nOpenAI-compatible HTTPS\nsecretKeyRef\n→\nSECRET REFERENCE\n"
+          },
+          {
+            "step": 3,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-201-05091d7a/proxy/tool/story/?act=2&scene=0",
+            "text": "×\n←\n→\nP\n⛶\n1\nQualify the healthy path\n2\nQualify model unavailability\nLIVE WORKLOAD\nStart with the workload—not the topology\nRun a concrete input, then inspect the evidence and measurements returned by each condition.\nINPUT\nBounded demonstration request\nThe first action should describe what enters the system, why it matters, and what will be measured.\nInspect technical topology\nRun the qualification journey\nHOW IT WORKS\nEvidence accumulates\n\nEach action runs the configured adapter. Results stay attached to their source state, and later conditions do not erase earlier proof.\n\nAgent, workload, and LLM participation belong beside the output that proves them.\n02 · 1/2"
+          },
+          {
+            "condition_result": "×\n←\n→\nP\n⛶\n1\nQualify the healthy path\n2\nQualify model unavailability\nACT 1 OF 2\nQualify the healthy path\nA valid request returns explicit source state, validation, evidence identity, and human authority.\nREHEARSAL\nSOURCE STATE\nREHEARSAL\nOUTCOME\nQUALIFIED\nAI PARTICIPATED\nno\nMODEL\nrehearsal-fixture\nCATEGORY\nconnectivity\nAUTHORITY\nHUMAN_REVIEW_REQUIRED\n\nQualification endpoint returned HTTP 404 Showing clearly labeled fallback evidence.\n\nInspect technical topology\nNext live act →\nHOW IT WORKS\nEvidence accumulates\n\nEach action runs the configured adapter. Results stay attached to their source state, and later conditions do not erase earlier proof.\n\nAgent, workload, and LLM participation belong beside the output that proves them.\n02 · 1/2"
+          },
+          {
+            "condition_result": "×\n←\n→\nP\n⛶\n✓\nQualify the healthy path\n2\nQualify model unavailability\nACT 2 OF 2\nQualify model unavailability\nThe same schema and path preserve correlation while omitting every advisory and model claim.\nREHEARSAL\nQualify the healthy path\nQUALIFIED\nREHEARSAL\nSOURCE STATE\nREHEARSAL\nOUTCOME\nMODEL_UNAVAILABLE\nAI PARTICIPATED\nno\nMODEL\nnone\nCATEGORY\nnone\nAUTHORITY\nHUMAN_REVIEW_REQUIRED\n\nQualification endpoint returned HTTP 404 Showing clearly labeled fallback evidence.\n\nInspect technical topology\nReplay\nHOW IT WORKS\nEvidence accumulates\n\nEach action runs the configured adapter. Results stay attached to their source state, and later conditions do not erase earlier proof.\n\nAgent, workload, and LLM participation belong beside the output that proves them.\n02 · 1/2"
+          },
+          {
+            "step": 4,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-201-05091d7a/proxy/tool/story/?act=2&scene=1",
+            "text": "×\n←\n→\nP\n⛶\nThe unavailable path tests whether the contract tells the truth\nQUALIFIED CONDITION\nBounded advisory\n\nIdentity and validation support human review; they do not grant action authority.\n\nUNAVAILABLE CONDITION\nNo invented answer\n\nFailure remains attributable and contains no advisory, model, or live-AI claim.\n\n02 · 2/2"
+          },
+          {
+            "step": 5,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-201-05091d7a/proxy/tool/story/?act=3&scene=0",
+            "text": "×\n←\n→\nP\n⛶\nCDD → TDD → EDD\nThree disciplines make the learner work reviewable\n01\nContract-driven\nThe acceptance boundary exists before implementation.\nThe retained RED run proves schemas and tests preceded the adapter, client, and manifests.\n02\nTest-driven\nHealthy, rejected, and unavailable paths share executable checks.\nSecret-bearing input, incomplete live identity, and fabricated unavailable output fail closed.\n03\nEvidence-driven\nEvery accepted claim maps to a redacted record.\nCorrelation joins guest, Service, model state, validation, authority, and cleanup without retaining the raw note.\n03 · 1/1"
+          },
+          {
+            "step": 6,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-201-05091d7a/proxy/tool/story/?act=4&scene=0",
+            "text": "×\n←\n→\nP\n⛶\nWHAT THIS SESSION PROVED\nA contract is qualified only when a human can explain its limits\nREHEARSAL\n2 proof conditions completed\nLATEST SOURCE STATE\nREHEARSAL\nLATEST OUTCOME\nMODEL_UNAVAILABLE\nAI PARTICIPATED\nno\nFINAL AUTHORITY\nHUMAN_REVIEW_REQUIRED\nThe learner authored the boundary, not merely the prompt.\nCertification still belongs to Launchpad.\nClose presentation, then begin the 75–90 minute Showroom lab →\n04 · 1/1"
+          },
+          {
+            "step": 7,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-201-05091d7a/proxy/tool/story/?act=4&scene=0&finale=1",
+            "text": "×\n←\n→\nP\n⛶\nSTORY COMPLETE\nAuthor the boundary. Break it safely. Keep approval human.\nOPTIONAL NEXT STEP · 75–90 MINUTES\nVirtualization + AI 201 hands-on lab\nOpen the separate Showroom guide. Begin in lab/starter; 101 receipts are prerequisite context, not completion evidence.\nClose presentation\nRestart\nRed Hat × Intel"
+          },
+          {
+            "step": 8,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-201-05091d7a/proxy/tool/story/?act=4&scene=0&finale=1",
+            "text": "×\n←\n→\nP\n⛶\nSTORY COMPLETE\nAuthor the boundary. Break it safely. Keep approval human.\nOPTIONAL NEXT STEP · 75–90 MINUTES\nVirtualization + AI 201 hands-on lab\nOpen the separate Showroom guide. Begin in lab/starter; 101 receipts are prerequisite context, not completion evidence.\nClose presentation\nRestart\nRed Hat × Intel"
+          },
+          {
+            "step": 9,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-201-05091d7a/proxy/tool/story/?act=4&scene=0&finale=1",
+            "text": "×\n←\n→\nP\n⛶\nSTORY COMPLETE\nAuthor the boundary. Break it safely. Keep approval human.\nOPTIONAL NEXT STEP · 75–90 MINUTES\nVirtualization + AI 201 hands-on lab\nOpen the separate Showroom guide. Begin in lab/starter; 101 receipts are prerequisite context, not completion evidence.\nClose presentation\nRestart\nRed Hat × Intel"
+          },
+          {
+            "step": 10,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-201-05091d7a/proxy/tool/story/?act=4&scene=0&finale=1",
+            "text": "×\n←\n→\nP\n⛶\nSTORY COMPLETE\nAuthor the boundary. Break it safely. Keep approval human.\nOPTIONAL NEXT STEP · 75–90 MINUTES\nVirtualization + AI 201 hands-on lab\nOpen the separate Showroom guide. Begin in lab/starter; 101 receipts are prerequisite context, not completion evidence.\nClose presentation\nRestart\nRed Hat × Intel"
+          },
+          {
+            "step": 11,
+            "url": "https://labs.smg-helix.ai/labs/virtualization-ai-201-05091d7a/proxy/tool/story/?act=4&scene=0&finale=1",
+            "text": "×\n←\n→\nP\n⛶\nSTORY COMPLETE\nAuthor the boundary. Break it safely. Keep approval human.\nOPTIONAL NEXT STEP · 75–90 MINUTES\nVirtualization + AI 201 hands-on lab\nOpen the separate Showroom guide. Begin in lab/starter; 101 receipts are prerequisite context, not completion evidence.\nClose presentation\nRestart\nRed Hat × Intel"
+          }
+        ]
+      }
+    },
+    {
+      "id": "content_welcome",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Build and Qualify a VM-to-AI Contract"
+      }
+    },
+    {
+      "id": "showroom_branding",
+      "passed": true,
+      "detail": {
+        "logos": [
+          {
+            "alt": "Red Hat",
+            "src": "../../_/img/redhat-logo.svg",
+            "loaded": true,
+            "width": 41.703125,
+            "height": 31.671875
+          },
+          {
+            "alt": "Intel",
+            "src": "../../_/img/intel-logo.svg",
+            "loaded": true,
+            "width": 65.765625,
+            "height": 25.515625
+          }
+        ]
+      }
+    },
+    {
+      "id": "content_prerequisite",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Confirm the 101 boundary"
+      }
+    },
+    {
+      "id": "code_controls_prerequisite",
+      "passed": true,
+      "detail": {
+        "buttons": [
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "nav-toggle"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          }
+        ],
+        "executable_blocks": 1
+      }
+    },
+    {
+      "id": "execute_button_interaction",
+      "passed": false,
+      "detail": {
+        "stage": "prerequisite",
+        "button_label": "Run in terminal",
+        "terminal_output_marker": "HEAD is now at",
+        "actual_terminal_output_observed": false
+      }
+    },
+    {
+      "id": "content_frame",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Frame the acceptance contract"
+      }
+    },
+    {
+      "id": "code_controls_frame",
+      "passed": true,
+      "detail": {
+        "buttons": [
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "nav-toggle"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          }
+        ],
+        "executable_blocks": 1
+      }
+    },
+    {
+      "id": "content_author",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Author schemas and the VM client"
+      }
+    },
+    {
+      "id": "code_controls_author",
+      "passed": true,
+      "detail": {
+        "buttons": [
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "nav-toggle"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          }
+        ],
+        "executable_blocks": 1
+      }
+    },
+    {
+      "id": "content_wire",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Wire Secret, Service, and policy"
+      }
+    },
+    {
+      "id": "code_controls_wire",
+      "passed": true,
+      "detail": {
+        "buttons": [
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "nav-toggle"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          }
+        ],
+        "executable_blocks": 1
+      }
+    },
+    {
+      "id": "content_prove",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Prove the healthy path"
+      }
+    },
+    {
+      "id": "code_controls_prove",
+      "passed": true,
+      "detail": {
+        "buttons": [
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "nav-toggle"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          }
+        ],
+        "executable_blocks": 3
+      }
+    },
+    {
+      "id": "content_break",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Break it safely"
+      }
+    },
+    {
+      "id": "code_controls_break",
+      "passed": true,
+      "detail": {
+        "buttons": [
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "nav-toggle"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          }
+        ],
+        "executable_blocks": 2
+      }
+    },
+    {
+      "id": "content_cleanup",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Export evidence and clean learner artifacts"
+      }
+    },
+    {
+      "id": "code_controls_cleanup",
+      "passed": true,
+      "detail": {
+        "buttons": [
+          {
+            "label": null,
+            "title": null,
+            "text": "",
+            "class": "nav-toggle"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          },
+          {
+            "label": "Copy to clipboard",
+            "title": "Copy to clipboard",
+            "text": "Copied!",
+            "class": "copy-button"
+          },
+          {
+            "label": "Run in terminal",
+            "title": "Run in terminal",
+            "text": "Executed!",
+            "class": "paste-button"
+          }
+        ],
+        "executable_blocks": 3
+      }
+    },
+    {
+      "id": "content_conclusion",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "marker": "Conclusion"
+      }
+    },
+    {
+      "id": "rendered_code_inventory",
+      "passed": true,
+      "detail": {
+        "blocks": [
+          {
+            "stage": "prerequisite",
+            "first_line": "export LAB_NAMESPACE=\"$(oc project -q)\""
+          },
+          {
+            "stage": "frame",
+            "first_line": "if python3 lab/qualify_submission.py lab/starter > \"$LAB_DIR/starter-red.txt\"; then"
+          },
+          {
+            "stage": "author",
+            "first_line": "python3 lab/qualify_submission.py lab/starter --stage contract"
+          },
+          {
+            "stage": "wire",
+            "first_line": "python3 lab/qualify_submission.py lab/starter"
+          },
+          {
+            "stage": "prove",
+            "first_line": "export LAB_NAMESPACE=\"${LAB_NAMESPACE:-$(oc project -q)}\""
+          },
+          {
+            "stage": "prove",
+            "first_line": "virtctl ssh --identity-file=/tmp/launchpad-lab/contract-author-key \\"
+          },
+          {
+            "stage": "prove",
+            "first_line": "jq -e --arg correlation \"$CORRELATION_ID\" '"
+          },
+          {
+            "stage": "break",
+            "first_line": "jq --arg namespace \"$LAB_NAMESPACE\" --arg correlation \"$(uuidgen | tr '[:upper:]' '[:lower:]')\" \\"
+          },
+          {
+            "stage": "break",
+            "first_line": "jq -e '"
+          },
+          {
+            "stage": "cleanup",
+            "first_line": "jq -n \\"
+          },
+          {
+            "stage": "cleanup",
+            "first_line": "cp \"$LAB_DIR/learner-evidence-map.json\" /tmp/virtualization-ai-201-evidence.json"
+          },
+          {
+            "stage": "cleanup",
+            "first_line": "test ! -e \"$LAB_DIR\""
+          }
+        ]
+      }
+    },
+    {
+      "id": "learner_tool_dependencies",
+      "passed": true,
+      "detail": {
+        "tools": [
+          "/usr/local/bin/oc",
+          "/usr/bin/curl",
+          "/usr/bin/jq",
+          "/usr/local/bin/virtctl",
+          "/usr/bin/ssh",
+          "/usr/bin/uuidgen",
+          "/usr/bin/base64",
+          "/usr/bin/install",
+          "/usr/bin/chmod",
+          "/usr/bin/tee",
+          "/usr/bin/grep"
+        ]
+      }
+    },
+    {
+      "id": "complete_rendered_command_journey",
+      "passed": false,
+      "detail": {
+        "blocks": 12,
+        "completed_blocks": [],
+        "live_vm_inference": false,
+        "output_tail": "JOURNEY_BLOCK_0_prerequisite\n",
+        "error_tail": "fatal: ambiguous argument 'HEAD': unknown revision or path not in the working tree.\nUse '--' to separate paths from revisions, like this:\n'git <command> [<revision>...] -- [<file>...]'\ncommand terminated with exit code 1\n"
+      }
+    },
+    {
+      "id": "my_labs_contains_seat",
+      "passed": true,
+      "detail": {
+        "text": "×\n|\nPartner AI Launchpad\nPARTICIPANT\nCurrent lab\nMy Lab Access\nLog out of lab\nPARTICIPANT WORKSPACE\nMy Lab Access\n\nResume any active environment associated with your participant identity.\n\nvirtualization-ai-201\n\nAvailable until 2026-10-14T02:24:13.140854\n\nResume lab\nAdd another lab\n\nEnter the instructor code for another active lab.\n\nAdd lab"
+      }
+    }
+  ],
+  "certified": false,
+  "run": "final-controls-r2",
+  "order_id": "05091d7a-2085-4c84-8e42-6b77fedd5af8",
+  "public_url": "https://labs.smg-helix.ai/labs/virtualization-ai-201-05091d7a",
+  "seats": [
+    {
+      "seat_id": "4175295b-c5ae-446e-9437-b39c9162eb1a",
+      "session_id": "90c5ba4f-f79c-40ee-af18-4bab034fa961"
+    }
+  ],
+  "landing_links": [
+    {
+      "text": "Current lab",
+      "href": "/"
+    },
+    {
+      "text": "My Lab Access",
+      "href": "/my-labs"
+    },
+    {
+      "text": "Log out of lab",
+      "href": "/oauth2/sign_out?rd=%2Frealms%2Flaunchpad-public%2Fprotocol%2Fopenid-connect%2Flogout"
+    },
+    {
+      "text": "Open Lab",
+      "href": "/labs/virtualization-ai-201-05091d7a/showroom/"
+    },
+    {
+      "text": "My Lab Access",
+      "href": "/my-labs"
+    },
+    {
+      "text": "Log out of lab",
+      "href": "/oauth2/sign_out?rd=%2Frealms%2Flaunchpad-public%2Fprotocol%2Fopenid-connect%2Flogout"
+    }
+  ],
+  "namespace": "launchpad-flightpath-candida-virtualization-ai-417529",
+  "authoring_method": "Reference-assisted contract/client exercise and chart-derived wiring; the deployed VM uses its preinstalled qualified client. This is not proof that a learner-authored client was deployed.",
+  "cleanup_status": "reclaiming",
+  "remaining_labeled_namespaces": 1,
+  "cleanup_error": "fetch failed",
+  "finished_at": "2026-10-14T00:27:48.867Z"
+}

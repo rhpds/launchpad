@@ -1,0 +1,40 @@
+{
+  "schema": "launchpad.redhat.com/content-release-review/v1",
+  "result": "BLOCKED-SECURITY-GATE",
+  "catalog_item_id": "virtualization-ai-foundations-101",
+  "source_repository": "jkershawrh/virtualization-ai-foundations",
+  "source_revision": "2c14b8adb7e1df9ecd5ff28ecaabff74d35d7148",
+  "workflow_url": "https://github.com/jkershawrh/virtualization-ai-foundations/actions/runs/38441336923",
+  "source_change": "Namespace-scoped runtime verification and its regression test only.",
+  "local_gates": {
+    "python_tests_passed": 34,
+    "ui_tests_passed": 34,
+    "helm_validation": "PASS",
+    "presentation_build": "PASS",
+    "offline_asset_validation": "PASS"
+  },
+  "ci_source_gate": "PASS",
+  "image_gates": {
+    "adapter": {
+      "status": "FAIL-HIGH-CRITICAL",
+      "packages_reported": ["python-3.14", "libcrypto3", "libssl3", "py3-pip-wheel"],
+      "note": "Scanner reports no fixed version for several findings; changing runtime bases requires separate review."
+    },
+    "presentation": {
+      "status": "FAIL-HIGH-CRITICAL",
+      "packages_reported": ["libcrypto3", "libssl3"]
+    },
+    "showroom_content": {
+      "status": "FAIL-HIGH-CRITICAL",
+      "packages_reported": ["stdlib"],
+      "detected_version": "go1.26.6",
+      "scanner_fixed_versions": ["1.26.9", "1.27.2"]
+    }
+  },
+  "catalog_modified": false,
+  "cluster_deployment_modified": false,
+  "active_labs_modified": false,
+  "security_gate_bypassed": false,
+  "fresh_corrected_seat_test": "NOT-RUN",
+  "next_step": "Approve bounded image-base/toolchain remediation, rerun the unchanged strict release gates, then pin the published content digest and test one new Flightpath seat."
+}

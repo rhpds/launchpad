@@ -1,0 +1,9 @@
+{
+  "schema": "launchpad/test-result/v1",
+  "result": "RED-local",
+  "test_id": "backend/tests/test_virtualization_ai_101_experience.py::test_101_records_certification_without_claiming_browser_console_sso",
+  "expected": "active",
+  "observed": "draft",
+  "exit_code": 1,
+  "purpose": "Require one-seat activation only after the exact refreshed candidate earned its live certification gate."
+}
