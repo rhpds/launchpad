@@ -1,0 +1,72 @@
+{
+  "schema": "launchpad.redhat.com/catalog-certification-status/v1",
+  "recorded_at": "2026-09-29T22:57:42Z",
+  "deployment_commit": "a89d7c4",
+  "cluster_ref": "flightpath",
+  "scope": "internal-one-seat",
+  "status": "GREEN-live",
+  "catalogs": [
+    {
+      "catalog_item_id": "virtualization-ai-foundations-101",
+      "journey_mode": "LIVE",
+      "exposure_policy": "internal",
+      "seat_count": 1,
+      "workload_ready": true,
+      "namespace_isolation": true,
+      "model_contract": "granite-3.2-8b-tools on Intel Xeon",
+      "normal_reclaim": true,
+      "namespace_residue": 0,
+      "argocd_application_residue": 0,
+      "public_code_certified": false
+    },
+    {
+      "catalog_item_id": "virtualization-ai-201",
+      "journey_mode": "REHEARSAL_WITH_LIVE_CLUSTER_RESOURCES",
+      "exposure_policy": "internal",
+      "seat_count": 1,
+      "workload_ready": true,
+      "namespace_isolation": true,
+      "normal_reclaim": true,
+      "namespace_residue": 0,
+      "argocd_application_residue": 0,
+      "public_code_certified": false
+    },
+    {
+      "catalog_item_id": "sovereign-ai-201",
+      "journey_mode": "GOVERNED_BOUNDARY",
+      "exposure_policy": "internal",
+      "seat_count": 1,
+      "workload_ready": true,
+      "namespace_isolation": true,
+      "fail_closed_contract": true,
+      "normal_reclaim": true,
+      "namespace_residue": 0,
+      "argocd_application_residue": 0,
+      "public_code_certified": false
+    }
+  ],
+  "evidence_integrity": {
+    "interactive_internal_proof_observed": true,
+    "per_catalog_immutable_manifest_present": false,
+    "status_record_is_not_a_public_certification_receipt": true
+  },
+  "remaining_gate": {
+    "name": "external-public-one-seat",
+    "result": "NOT_RUN",
+    "required_checks": [
+      "catalog-public-code-admission",
+      "trusted-public-dns-and-tls",
+      "one-time-code-disclosure",
+      "email-and-code-seat-claim",
+      "same-seat-recovery",
+      "participant-navigation",
+      "namespace-and-route-isolation",
+      "truthful-live-rehearsal-labeling",
+      "resume-add-lab-logout-and-code-denial",
+      "normal-and-idempotent-reclaim",
+      "zero-access-and-cluster-residue",
+      "hashed-evidence-manifest"
+    ]
+  },
+  "sensitive_values_recorded": false
+}
