@@ -49,6 +49,9 @@ metadata:
   activation_blockers: []
   onboarding_contract: catalog-onboarding/intel-llm-cpu-serving.yaml
   certification_proof_contract: certification/catalog/intel-llm-cpu-serving.yaml
+  allowed_exposure_policies:
+    - internal
+    - public_code
   showroom_journey: intel-llm-cpu-serving
   showroom_title: "Intel AI 101: Serve LLMs on Intel Xeon CPUs"
   workspace_route_name: rag
