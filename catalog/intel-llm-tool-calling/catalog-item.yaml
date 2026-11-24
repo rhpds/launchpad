@@ -48,6 +48,9 @@ metadata:
   activation_blockers: []
   onboarding_contract: catalog-onboarding/intel-llm-tool-calling.yaml
   certification_proof_contract: certification/catalog/intel-llm-tool-calling.yaml
+  allowed_exposure_policies:
+  - internal
+  - public_code
   showroom_journey: intel-llm-tool-calling
   showroom_title: 'Intel AI 201: LLM Tool Calling on Intel'
   showroom_terminal_storage: false

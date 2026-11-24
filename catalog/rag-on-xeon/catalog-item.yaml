@@ -48,6 +48,9 @@ metadata:
   - 5
   onboarding_contract: catalog-onboarding/rag-on-xeon.yaml
   certification_proof_contract: certification/catalog/rag-on-xeon.yaml
+  allowed_exposure_policies:
+  - internal
+  - public_code
   showroom_journey: intel-llm-cpu-serving
   showroom_title: RAG on Intel Xeon
   workspace_route_name: rag
