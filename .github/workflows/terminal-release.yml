@@ -1,0 +1,275 @@
+name: Launchpad Terminal Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      expected_sha:
+        description: Exact 40-character source revision to build
+        required: true
+        type: string
+      publish:
+        description: Publish, sign, and attest the image after all gates pass
+        required: true
+        default: false
+        type: boolean
+      acceptance:
+        description: Repository path to a signed launchpad/risk-acceptance/v1 record, or empty to require a clean scan
+        required: false
+        default: ''
+        type: string
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+  attestations: write
+
+env:
+  IMAGE_REPOSITORY: ghcr.io/${{ github.repository_owner }}/launchpad-showroom-terminal
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the requested revision
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ inputs.expected_sha }}
+
+      - name: Fail closed on revision drift
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "${{ inputs.expected_sha }}"
+          test -z "$(git status --porcelain)"
+          [[ "${{ inputs.expected_sha }}" =~ ^[0-9a-f]{40}$ ]]
+
+      - name: Verify terminal source contracts
+        run: |
+          set -euo pipefail
+          python -m pip install ".[dev]"
+          python -m pytest backend/tests/test_showroom_gitops.py backend/tests/test_terminal_release_workflow.py backend/tests/test_terminal_os_refresh.py backend/tests/test_terminal_cli_refresh.py -q
+          bash -n workshop-images/showroom-terminal/launchpad-runttyd
+          bash -n workshop-images/showroom-terminal/cli-refresh.sh
+
+      - name: Set up emulation
+        uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f
+
+      - name: Build the exact linux/amd64 candidate
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8
+        with:
+          context: workshop-images/showroom-terminal
+          file: workshop-images/showroom-terminal/Containerfile
+          platforms: linux/amd64
+          load: true
+          push: false
+          tags: ${{ env.IMAGE_REPOSITORY }}:git-${{ inputs.expected_sha }}
+          labels: |
+            org.opencontainers.image.revision=${{ inputs.expected_sha }}
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+
+      - name: Verify isolated persistent shell runtime
+        id: runtime_smoke
+        run: |
+          set -euo pipefail
+          docker run --rm --interactive --read-only --network none --user 1001 \
+            --tmpfs /tmp:rw,nosuid,nodev,mode=1777 --env HOME=/tmp \
+            --entrypoint /usr/bin/bash \
+            "${IMAGE_REPOSITORY}:git-${{ inputs.expected_sha }}" -se <<'SCRIPT'
+          test -x /usr/bin/tmux
+          for tool in oc kubectl helm skopeo kn opc roxctl tkn tkn-pac jq curl python3 git tmux; do
+            command -v "$tool"
+          done
+          oc version --client
+          kubectl version --client
+          helm version --short
+          skopeo --version
+          kn version
+          opc version
+          roxctl version
+          tkn version
+          tkn-pac version
+          jq --version
+          curl --version
+          python3 --version
+          git --version
+          bash -n /usr/local/bin/launchpad-runttyd
+          tmux -L certification -f /dev/null new-session -d -s lab
+          trap 'tmux -L certification kill-server' EXIT
+          shell_pid="$(tmux -L certification display-message -p -t lab '#{pane_pid}')"
+          tmux -L certification send-keys -t lab 'export LP_TEST_VALUE=LAUNCHPAD_RECONNECT_OK' Enter
+          tmux -L certification send-keys -t lab 'printf "%s\\n" "$LP_TEST_VALUE"' Enter
+          found=false
+          for attempt in $(seq 1 50); do
+            if tmux -L certification capture-pane -p -t lab | grep -qx LAUNCHPAD_RECONNECT_OK; then
+              found=true
+              break
+            fi
+            sleep .1
+          done
+          test "$found" = true
+          test "$(tmux -L certification display-message -p -t lab '#{pane_pid}')" = "$shell_pid"
+          SCRIPT
+
+      - name: Free runner disk space for the vulnerability scan
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc \
+            /opt/hostedtoolcache/CodeQL /usr/local/.ghcup
+          sudo docker builder prune -f
+          df -h /
+
+      - name: Inventory all candidate vulnerabilities
+        if: ${{ !cancelled() && steps.runtime_smoke.outcome == 'success' }}
+        uses: anchore/scan-action@1638637db639e0ade3258b51db49a9a137574c3e
+        with:
+          image: ${{ env.IMAGE_REPOSITORY }}:git-${{ inputs.expected_sha }}
+          fail-build: false
+          severity-cutoff: high
+          output-format: json
+          output-file: vulnerability-report.json
+
+      - name: Inventory fixable high and critical vulnerabilities
+        if: ${{ !cancelled() && steps.runtime_smoke.outcome == 'success' }}
+        uses: anchore/scan-action@1638637db639e0ade3258b51db49a9a137574c3e
+        with:
+          image: ${{ env.IMAGE_REPOSITORY }}:git-${{ inputs.expected_sha }}
+          # Evidence only: the full-inventory gate below is the single
+          # authoritative publish decision, so a fixable-only result must not
+          # fail the job before that decision is recorded.
+          fail-build: false
+          severity-cutoff: high
+          only-fixed: true
+          output-format: json
+          output-file: vulnerability-report-fixable.json
+
+      - name: Block unresolved full-inventory security findings
+        if: ${{ !cancelled() && steps.runtime_smoke.outcome == 'success' }}
+        shell: bash
+        env:
+          ACCEPTANCE: ${{ inputs.acceptance }}
+          EXPECTED_SHA: ${{ inputs.expected_sha }}
+        run: |
+          set -euo pipefail
+          candidate="${IMAGE_REPOSITORY}:git-${{ inputs.expected_sha }}"
+          candidate_id="$(docker image inspect --format '{{.Id}}' "$candidate")"
+          gate_args=()
+          if [ -n "$ACCEPTANCE" ]; then
+            test -f "$ACCEPTANCE"
+            cp "$ACCEPTANCE" staging-risk-acceptance.yaml
+            gate_args=(--acceptance "$ACCEPTANCE" --source-revision "$EXPECTED_SHA")
+          fi
+          python3 scripts/check_backend_staging_security.py vulnerability-report.json \
+            --component terminal \
+            --expected-image "$candidate" --expected-image-id "$candidate_id" \
+            "${gate_args[@]}" \
+            > staging-security-decision.json
+
+      - name: Generate the SBOM
+        uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610
+        with:
+          image: ${{ env.IMAGE_REPOSITORY }}:git-${{ inputs.expected_sha }}
+          format: spdx-json
+          output-file: sbom.spdx.json
+          upload-artifact: false
+
+      - name: Retain pre-publication evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: terminal-release-evidence-${{ inputs.expected_sha }}
+          path: |
+            vulnerability-report.json
+            vulnerability-report-fixable.json
+            staging-security-decision.json
+            staging-risk-acceptance.yaml
+            sbom.spdx.json
+
+      - name: Log in to GHCR
+        if: ${{ inputs.publish }}
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish immutable candidate and record digest
+        if: ${{ inputs.publish }}
+        id: publish
+        shell: bash
+        run: |
+          set -euo pipefail
+          image="${IMAGE_REPOSITORY}:git-${{ inputs.expected_sha }}"
+          # The gate ran before this push, so a risk acceptance could only bind
+          # by enumeration (digest_pending): a daemon image has no repository
+          # digest to sign. Close that gap here, before anything is signed, by
+          # proving the registry now serves the exact image the gate scanned.
+          scanned_id="$(docker image inspect --format '{{.Id}}' "$image")"
+          docker push "$image"
+          digest_ref="$(docker inspect --format='{{index .RepoDigests 0}}' "$image")"
+          test -n "$digest_ref"
+          digest="${digest_ref##*@}"
+          [[ "$digest" =~ ^sha256:[0-9a-f]{64}$ ]]
+          docker pull -q "$digest_ref" > /dev/null
+          published_id="$(docker image inspect --format '{{.Id}}' "$digest_ref")"
+          test "$published_id" = "$scanned_id"
+          printf 'digest_ref=%s\n' "$digest_ref" >> "$GITHUB_OUTPUT"
+          printf 'digest=%s\n' "$digest" >> "$GITHUB_OUTPUT"
+          printf 'image_id=%s\n' "$published_id" >> "$GITHUB_OUTPUT"
+          jq -n \
+            --arg source_revision "${{ inputs.expected_sha }}" \
+            --arg image "$digest_ref" \
+            --arg image_id "$published_id" \
+            '{schema_version:"launchpad.redhat.com/terminal-release/v1",source_revision:$source_revision,image:$image,image_id:$image_id,platform:"linux/amd64",published:true}' \
+            > terminal-release.json
+
+      - name: Install Cosign
+        if: ${{ inputs.publish }}
+        uses: sigstore/cosign-installer@398d4b0eeef1380460a10c8013a76f728fb906ac
+
+      - name: Sign the published digest with GitHub OIDC
+        if: ${{ inputs.publish }}
+        env:
+          DIGEST_REF: ${{ steps.publish.outputs.digest_ref }}
+        run: cosign sign --yes "$DIGEST_REF"
+
+      - name: Verify published signature
+        if: ${{ inputs.publish }}
+        env:
+          DIGEST_REF: ${{ steps.publish.outputs.digest_ref }}
+        run: |
+          cosign verify --certificate-identity="${{ github.server_url }}/${{ github.workflow_ref }}" \
+            --certificate-oidc-issuer="https://token.actions.githubusercontent.com" "$DIGEST_REF"
+
+      - name: Attest and verify registry-backed build provenance
+        if: ${{ inputs.publish }}
+        env:
+          DIGEST_REF: ${{ steps.publish.outputs.digest_ref }}
+          EXPECTED_SOURCE: ${{ inputs.expected_sha }}
+          WORKFLOW_REVISION: ${{ github.workflow_sha }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SOURCE"
+          identity="${{ github.server_url }}/${{ github.workflow_ref }}"
+          issuer="https://token.actions.githubusercontent.com"
+          jq -n --arg source_revision "$EXPECTED_SOURCE" --arg workflow_revision "$WORKFLOW_REVISION" \
+            --arg repo "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY" --arg builder "$identity" --arg run "$GITHUB_RUN_ID" \
+            '{builder:{id:$builder},buildType:"https://github.com/Attestations/GitHubActionsWorkflow@v1",invocation:{configSource:{uri:("git+"+$repo),digest:{sha1:$source_revision},entryPoint:".github/workflows/terminal-release.yml"},parameters:{source_revision:$source_revision,workflow_revision:$workflow_revision}},metadata:{buildInvocationId:$run},materials:[{uri:("git+"+$repo),digest:{sha1:$source_revision}}]}' > provenance.json
+          cosign attest --yes --type slsaprovenance --predicate provenance.json "$DIGEST_REF"
+          cosign attest --yes --type spdxjson --predicate sbom.spdx.json "$DIGEST_REF"
+          cosign verify --certificate-identity="$identity" --certificate-oidc-issuer="$issuer" "$DIGEST_REF" > signature-verification.json
+          cosign verify-attestation --type slsaprovenance --certificate-identity="$identity" --certificate-oidc-issuer="$issuer" "$DIGEST_REF" > provenance-verification.json
+          cosign verify-attestation --type spdxjson --certificate-identity="$identity" --certificate-oidc-issuer="$issuer" "$DIGEST_REF" > sbom-verification.json
+          jq -se --arg expected "$EXPECTED_SOURCE" '[.[] | (if type == "array" then .[] else . end) | .payload | @base64d | fromjson | .predicate.invocation.configSource.digest.sha1 == $expected] | length > 0 and all' provenance-verification.json
+
+      - name: Retain the immutable release receipt
+        if: ${{ inputs.publish }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: terminal-release-${{ inputs.expected_sha }}
+          path: |
+            terminal-release.json
+            provenance.json
+            *-verification.json
