@@ -1,0 +1,183 @@
+{
+  "schema": "launchpad.redhat.com/terminal-promotion/v1",
+  "evidence_id": "TERMINAL-PROMOTION-20261125",
+  "recorded_at": "2026-11-25T23:55:00Z",
+  "contains_plaintext_credentials": false,
+  "default_kube_context_changed": false,
+  "cluster_id": "flightpath",
+  "namespace": "launchpad-flightpath-candidate",
+  "release": {
+    "workflow": "terminal-release.yml",
+    "run_id": 45721636396,
+    "conclusion": "success",
+    "workflow_revision": "cb7c8839264c9ec0954de923ec8b772bbfb6ec63",
+    "source_revision": "e26a87c39894c2ef8b64ea7ba2b19179300d3290",
+    "published_image": "ghcr.io/rhpds/launchpad-showroom-terminal@sha256:548b0e3c891c31aa6f94ca559643356b37ce9027299aa83a94aae7007654092e",
+    "image_id": "sha256:6a098f277856e503bd8afdcc1ce89a749c242515180db8ad5b7c4e0b9e1ab4cb",
+    "manifest_digest": "sha256:548b0e3c891c31aa6f94ca559643356b37ce9027299aa83a94aae7007654092e",
+    "gate": {
+      "staging_security_gate": "PASS-SCAN-ONLY",
+      "risk_acceptance": "GRANTED",
+      "gate_basis": "SIGNED-ACCEPTANCE",
+      "accepted_high_matches": 179,
+      "accepted_critical_matches": 3,
+      "accepted_unrated_matches": 8,
+      "unaccepted_high_matches": 0,
+      "unaccepted_critical_matches": 0,
+      "unaccepted_unrated_matches": 0,
+      "candidate_identity_verified": true
+    },
+    "acceptance": {
+      "path": "evidence/security/terminal-risk-acceptance-20261125.json",
+      "sha256": "5a9d014c98057ab31afdb8e5423f489483bd552312c8034ba815c3b9239a0f1a",
+      "owner_role": "terminal-image-owner",
+      "owner_signature": "jkershaw (terminal image owner), 2026-11-25",
+      "signed_on": "2026-11-25",
+      "expires_on": "2027-02-23",
+      "entries": 68,
+      "digest_binding": "PENDING-AT-SIGNING",
+      "materialised_copy_byte_identical": true
+    },
+    "inventory_reproduced": {
+      "measured_revision": "66c82756b5b5b76a0b5ce13db230b97634902e48",
+      "measured_triples": 68,
+      "release_triples": 68,
+      "signed_triples": 68,
+      "exact_match": true,
+      "unchanged_from_measurement": true,
+      "note": "The release build reproduced the measured inventory exactly, so no new (advisory, package, severity) triple appeared between the measurement and the release build despite the non-reproducible dnf --refresh upgrade."
+    },
+    "signature": {
+      "verified": true,
+      "tool": "cosign verify",
+      "identity": "https://github.com/rhpds/launchpad/.github/workflows/terminal-release.yml@refs/heads/codex/flightpath-migration-20260922",
+      "oidc_issuer": "https://token.actions.githubusercontent.com",
+      "rekor_log_index": 4113914419,
+      "provenance_attested": true
+    }
+  },
+  "promotion": {
+    "source": "ghcr.io/rhpds/launchpad-showroom-terminal@sha256:548b0e3c891c31aa6f94ca559643356b37ce9027299aa83a94aae7007654092e",
+    "destination": "quay.io/rh-ee-jkershaw/launchpad-showroom-terminal:git-e26a87c3",
+    "command": "skopeo copy --all ... docker://<src> docker://<dst>",
+    "source_digest": "sha256:548b0e3c891c31aa6f94ca559643356b37ce9027299aa83a94aae7007654092e",
+    "quay_digest": "sha256:548b0e3c891c31aa6f94ca559643356b37ce9027299aa83a94aae7007654092e",
+    "digest_preserved": true,
+    "copied_config_digest": "sha256:6a098f277856e503bd8afdcc1ce89a749c242515180db8ad5b7c4e0b9e1ab4cb",
+    "config_digest_matches_scan_image_id": true,
+    "reserialised": false
+  },
+  "repin": {
+    "commit": "ae61cb4d",
+    "files": [
+      "deploy/launchpad/overlays/flightpath-candidate/candidate-clusters.yaml",
+      "deploy/launchpad/overlays/arena/arena-clusters.yaml",
+      "backend/tests/test_multicluster.py",
+      "scripts/tests/test_flightpath_candidate_overlay.py"
+    ],
+    "diffstat": "4 files changed, 4 insertions(+), 4 deletions(-)",
+    "previous_digest": "sha256:324dc5c4201f0da030a572dab389bc8cfdc2f66e800dff3fcee824b7e795daae",
+    "pull_grant_boundary_unchanged": true,
+    "tests": {
+      "command": "PYTHONPATH=. pytest backend/tests/test_multicluster.py scripts/tests/test_flightpath_candidate_overlay.py backend/tests/test_openshift_image_pull_grant.py -q",
+      "passed": 46,
+      "failed": 0
+    }
+  },
+  "live": {
+    "configmap": "launchpad-cluster-targets",
+    "rendered_vs_live_diff": "exactly one line (the showroom_terminal digest)",
+    "applied": true,
+    "generation_before": 382,
+    "generation_after": 383,
+    "rollout_trap_observed": {
+      "apply_then_rollout_status_reported": "deployment \"backend\" successfully rolled out",
+      "pod_still_old": "backend-859c84cd54-v2b24",
+      "pod_age": "22h",
+      "mounted_digest_in_that_pod": "sha256:324dc5c4...",
+      "cause": "The ConfigMap is not part of the pod template, so apply neither bumps generation nor creates a ReplicaSet; the adapter reads cluster targets at startup, so the process must restart.",
+      "remedy": "oc rollout restart deploy/backend"
+    },
+    "verified_in_new_pod": {
+      "pod": "backend-544bc95c5d-k4mfc",
+      "container": "backend",
+      "mounted_path": "/etc/launchpad/clusters.yaml",
+      "mounted_digest": "sha256:548b0e3c891c31aa6f94ca559643356b37ce9027299aa83a94aae7007654092e",
+      "pod_selector": "app.kubernetes.io/name=backend"
+    },
+    "baseline_terminal_pods_cluster_wide": 0
+  },
+  "participant_proof": {
+    "status": "BLOCKED-ON-CAPACITY",
+    "attempted_at": "2026-11-25T23:49:41Z",
+    "endpoint": "POST /api/v1/workshops/orders",
+    "auth": "X-API-Key (admin) via in-cluster port-forward to svc/backend:8000",
+    "order": {
+      "workshop_id": "a104b1d0-1c5f-4218-b618-74c9e28fb2bb",
+      "tenant_id": "flightpath-candidate-cert",
+      "catalog_item_id": "virtualization-ai-201",
+      "num_users": 1,
+      "ttl": "10m",
+      "exposure_policy": "public_code",
+      "target_cluster": "flightpath",
+      "resulting_status": "failed",
+      "seat_status": "pending",
+      "session_created": false,
+      "namespace_created": null,
+      "terminal_pods_created": 0,
+      "one_time_access_code_recorded": false
+    },
+    "capacity_preview": {
+      "can_provision": false,
+      "reason": "Requested 1 seats but cluster supports 0 (CPU: 0, Memory: 265, Pods: 20; Eligible nodes: 3)",
+      "estimated_resources_per_seat": {
+        "cpu_millicores": 625,
+        "memory_mib": 672,
+        "pods": 3
+      }
+    },
+    "capacity_accounting": {
+      "eligible_nodes": [
+        "fp1.fm2aihpcsed.com",
+        "fp2.fm2aihpcsed.com",
+        "fp3.fm2aihpcsed.com"
+      ],
+      "allocatable_cpu_millicores": 758640,
+      "headroom_pct": 20,
+      "cpu_budget_millicores": 606912,
+      "requested_cpu_millicores_on_eligible_nodes": 681784,
+      "available_cpu_millicores": 0,
+      "available_memory_mib": 178154,
+      "available_pods": 62,
+      "cpu_requested_by_namespace": {
+        "ols-eval-models": 301000,
+        "launchpad-model-candidate": 110000,
+        "cpd-instance-1": 101793,
+        "llm-bench": 74100,
+        "cascade-compression": 36000,
+        "openshift-storage": 25143,
+        "folsom-agent-testbed": 8000,
+        "cpd-operators": 4621,
+        "openshift-lightspeed": 2750,
+        "knative-eventing": 2615,
+        "launchpad-flightpath-candidate": 2350,
+        "openshift-gitops": 2125
+      },
+      "cpu_to_free_for_one_seat_millicores": 75497,
+      "note": "CPU requests on the three eligible workers exceed the 80% budget, so the gate admits zero seats even though the requested seat is 625 mCPU. Lowering WORKSHOP_CAPACITY_HEADROOM_PCT or freeing requests of this size would admit the seat; both are owner decisions, not image questions."
+    },
+    "no_capacity_override_path": {
+      "certification_override_scope": "catalog seat certification limit only",
+      "capacity_bypass_available": false
+    },
+    "conclusion": "The order failed closed. No seat pod was created, so no observation of the promoted digest inside a participant terminal exists yet. The image's provenance and the cluster's pin are proven; participant admission is not."
+  },
+  "verification_summary": {
+    "digest_published_and_signed": true,
+    "signature_verified_at_ghcr": true,
+    "digest_preserved_into_quay": true,
+    "repo_pins_updated": true,
+    "live_backend_mounts_promoted_digest": true,
+    "participant_seat_proved": false
+  }
+}

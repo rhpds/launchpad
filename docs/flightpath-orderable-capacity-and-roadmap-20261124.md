@@ -434,6 +434,63 @@ terminal without cluster-admin tooling, which changes what labs can teach; or
 choice to keep shipping 112 Criticals. Option (a) needs an owner signature, and
 Brief 1 is the natural vehicle once a digest exists to sign.
 
+**Option (a) was taken, and it landed.** The owner signed a
+`launchpad/risk-acceptance/v1` record for the terminal — 68 enumerated triples,
+90 days, expiring 2027-02-23 — and the release workflow then ran green at
+`e26a87c3` (run `45721636396`, dispatched from workflow revision `cb7c8839`).
+The result is a signed, attested
+`ghcr.io/rhpds/launchpad-showroom-terminal@sha256:548b0e3c…`. The gate reported
+`PASS-SCAN-ONLY` / `GRANTED` / `SIGNED-ACCEPTANCE` with 68 of 68 accepted entries
+matched and none unused, and the release build reproduced the measured inventory
+*exactly* — the same 68 triples, no new advisory. That last point is what makes
+the record usable: the build is not reproducible, and only the enumeration, not
+a digest comparison, carries the acceptance.
+
+Promotion took the first option above. `skopeo copy --all` into
+`quay.io/rh-ee-jkershaw/launchpad-showroom-terminal:git-e26a87c3` preserved the
+manifest digest (`548b0e3c…`) and the config digest the gate had verified
+(`6a098f27…`), so the Quay tag is the same artifact the signature covers; the
+GHCR package that "does not exist yet" above now does. Cosign verifies at GHCR
+(identity `terminal-release.yml@refs/heads/codex/flightpath-migration-20260922`,
+Rekor `logIndex 4113914419`). The signature does not travel with the copy, which
+is exactly why the runbook makes digest equality the load-bearing step.
+
+Four files were repinned (`ae61cb4d`) and the live `launchpad-cluster-targets`
+differed from the render in exactly one line — the digest. One trap is worth
+recording because it was real: `oc apply` followed by `oc rollout status`
+reported success while the 22-hour-old backend pod kept mounting the old digest.
+A ConfigMap is not part of the pod template, so nothing restarted, and the
+adapter reads cluster targets at startup. `oc rollout restart deploy/backend`
+took generation 382 → 383, and the new pod mounted `548b0e3c…`. Evidence:
+`evidence/runs/terminal-promotion-20261125.json`.
+
+**The image is closed; the participant proof is not.** With the digest live and
+pinned, a real one-seat `public_code` order against `virtualization-ai-201` was
+placed through `POST /api/v1/workshops/orders` and **failed closed on capacity**,
+not on the image:
+
+```
+Requested 1 seats but cluster supports 0 (CPU: 0, Memory: 265, Pods: 20; Eligible nodes: 3)
+```
+
+The three eligible workers (`fp1`–`fp3`) carry 681 784 m of CPU requests against
+a 606 912 m budget — 80 % of 758 640 m allocatable, which is the
+`WORKSHOP_CAPACITY_HEADROOM_PCT` reserve. The seat needs 625 m, so admitting it
+requires freeing at least 75 497 m of requests or lowering the reserve. The
+demand is not Launchpad's: `ols-eval-models` alone requests 301 cores,
+`cpd-instance-1` 102, `llm-bench` 74, `cascade-compression` 36, and Launchpad's
+own model endpoints in `launchpad-model-candidate` account for 110.
+
+Two things follow. First, **the cluster is not orderable for a new seat for
+reasons entirely outside the terminal image**, and no image, catalog, or seat-cap
+change fixes that — it is a shared-worker scheduling decision, so it does not
+belong to Track A or B and should not be answered by weakening the headroom
+policy as a side effect of a proof. Second, the order still behaved correctly: it
+was created `failed` with a `pending` seat, no namespace, no session and no
+terminal pod, so the failure mode is fail-closed rather than half-provisioned.
+What remains unproven is one thing only: that a participant terminal pulls
+`548b0e3c…`.
+
 **Why this outranks every other Track B item.** 16 catalog items declare
 `showroom_terminal_storage`. The terminal is not one blocked experience; it is
 the substrate under nearly all showroom-backed orderability, so no seat-cap or

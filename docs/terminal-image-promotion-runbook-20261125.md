@@ -32,16 +32,30 @@ risk acceptance does not name.
 2. You have push access to `quay.io/rh-ee-jkershaw/launchpad-showroom-terminal`.
 3. `podman` works locally. `skopeo` is not installed on this Mac, so the copy
    runs from the upstream skopeo container image.
+4. The target cluster has capacity to admit one seat under the workshop
+   headroom policy. A correct digest does not imply an admitted order; see
+   step 7.
 
 ## 1. Read the digest the run published
 
 ```bash
-RUN=45713500003            # the publish run, not the measurement run
-SHA=e691b6b2b66108657b825660a83c5796b01b415b
+RUN=45721636396            # the publish run, not a measurement run
+SHA=e26a87c39894c2ef8b64ea7ba2b19179300d3290   # expected_sha, not the branch tip
 
 gh run download "$RUN" --repo rhpds/launchpad -n "terminal-release-$SHA" -D /tmp/terminal-release
 cat /tmp/terminal-release/terminal-release.json
 ```
+
+Take the revision from the run's `expected_sha` input, not from the branch tip:
+the run is dispatched at the branch tip but checks out and releases
+`expected_sha`, and the artifact name carries that SHA. For the 2026-11-25
+release the branch tip was `cb7c8839` (the commit holding the signed record)
+while the released revision was `e26a87c3`.
+
+`RUN=45713500003` and `SHA=e691b6b2…` appear in some notes as the publish run;
+they are a **failed** run that exited `2` (`INVALID`) on the containerd/docker
+identity mismatch. A run that ends `INVALID` produced no digest to promote, so
+never copy `--all` from one.
 
 Expected shape:
 
@@ -118,7 +132,7 @@ PYTHONPATH=. pytest backend/tests/test_multicluster.py scripts/tests/test_flight
 still pass: the image stays under `quay.io/…@sha256:…`, so Flightpath still
 needs no internal pull grant.
 
-## 6. Apply the live config and roll
+## 6. Apply the live config and **restart** the backend
 
 ```bash
 export KUBECONFIG=~/.kube/config-flightpath
@@ -131,26 +145,68 @@ cm=[d for d in docs if d.get('kind')=='ConfigMap' and d['metadata']['name']=='la
 yaml.safe_dump(cm[0], open('/tmp/cluster-targets.yaml','w'))
 print('wrote', cm[0]['metadata']['name'])
 PY
-oc -n launchpad-flightpath-candidate apply -f /tmp/cluster-targets.yaml
-oc -n launchpad-flightpath-candidate rollout status deploy/backend --timeout=300s
 ```
 
-`cluster-targets` is a directory mount (no `subPath`), so the file does update
-in place — but the adapter reads cluster targets at startup, so the rollout is
-what actually changes behaviour.
-
-Verify the mounted file, not the ConfigMap:
+Diff the render against the live ConfigMap before applying, so the change you
+review is the change you ship:
 
 ```bash
-POD=$(oc -n launchpad-flightpath-candidate get pod -l app=backend -o name | head -1)
-oc -n launchpad-flightpath-candidate exec "$POD" -- \
+diff <(oc -n launchpad-flightpath-candidate get cm launchpad-cluster-targets \
+        -o jsonpath='{.data.clusters\.yaml}') \
+     <(python3 -c "import yaml;print(yaml.safe_load(open('/tmp/cluster-targets.yaml'))['data']['clusters.yaml'],end='')")
+```
+
+For the 2026-11-25 promotion this differed in exactly one line: the
+`showroom_terminal` digest. Anything else in the diff is unrelated drift and
+must not ride along.
+
+```bash
+oc -n launchpad-flightpath-candidate apply -f /tmp/cluster-targets.yaml
+oc -n launchpad-flightpath-candidate rollout restart deploy/backend
+oc -n launchpad-flightpath-candidate rollout status deploy/backend --timeout=420s
+```
+
+**`oc rollout status` immediately after an `apply` is a false green.** A
+ConfigMap is not part of the Deployment's pod template, so `apply` does not
+create a new ReplicaSet, `generation` does not change, and `rollout status`
+reports the *old* pod as successfully rolled out. The adapter reads cluster
+targets at startup, so without `rollout restart` the backend keeps serving the
+old digest indefinitely — this actually happened on 2026-11-25 (generation 382
+unchanged, a 22h-old pod still mounting the previous digest). After the restart
+`generation` must increment and the pod age must reset.
+
+Verify the mounted file in the **new** pod, not the ConfigMap. The selector is
+`app.kubernetes.io/name=backend`, not `app=backend`, and the container is named
+`backend` (`oauth-proxy` is the second container):
+
+```bash
+POD=$(oc -n launchpad-flightpath-candidate get pod \
+        -l app.kubernetes.io/name=backend -o name | head -1)
+oc -n launchpad-flightpath-candidate exec "$POD" -c backend -- \
   grep showroom_terminal /etc/launchpad/clusters.yaml
 ```
 
 ## 7. Prove a participant gets that image
 
-Place one public, one-seat order against a catalog item that declares
-`showroom_terminal_storage`, then read the seat pod rather than the order:
+Admission is not guaranteed by a correct pin. A one-seat order only provisions
+if the capacity gate admits it, so check that first:
+
+```bash
+curl -s -X POST http://127.0.0.1:18000/api/v1/workshops/capacity-preview \
+  -H "X-API-Key: $ADMIN_KEY" -H 'Content-Type: application/json' \
+  --data '{"tenant_id":"flightpath-candidate-cert","catalog_item_id":"virtualization-ai-201",
+           "num_users":1,"ttl":"10m","target_cluster":"flightpath","exposure_policy":"public_code"}'
+```
+
+`can_provision: false` means the order will be created `failed` and no seat pod
+will ever exist — which is a capacity answer, not an image answer. On
+2026-11-25 this returned `false` with `CPU: 0`, because the three eligible
+workers carried 681 784 m of requests against a 606 912 m budget (80 % of
+758 640 m allocatable). The order still failed closed, which is the correct
+behaviour but proves nothing about the terminal.
+
+Then place one public, one-seat order against a catalog item that declares
+`showroom_terminal_storage`, and read the seat pod rather than the order:
 
 ```bash
 oc get pods -A -o json | jq -r '.items[]
@@ -159,6 +215,8 @@ oc get pods -A -o json | jq -r '.items[]
 ```
 
 Every terminal pod must show `quay.io/rh-ee-jkershaw/launchpad-showroom-terminal@sha256:<digest>`.
+A cluster with zero terminal pods proves nothing either: capture the post-order
+observation, not the baseline.
 
 ## 8. Record it
 
