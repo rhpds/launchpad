@@ -335,6 +335,33 @@ retained as `evidence/runs/risk-acceptance-mechanism-proof-20261124.json`, which
 states in the file itself that it is a mechanism proof signed with a placeholder
 and authorises nothing.
 
+**Two things that made the publish path unreachable, not just red.** First,
+`terminal-release.yml` has never existed on `main` in either `rhpds/launchpad` or
+the fork, and GitHub only registers `workflow_dispatch` for workflows on the
+default branch — the dispatch API returns `HTTP 404: workflow
+terminal-release.yml not found on the default branch`. So no terminal release
+was ever dispatched, and no run ever failed: the path was undiscoverable. Second,
+the gate runs *before* the push, so at decision time the candidate lives only in
+the runner's docker store. Measured on a single image, three values disagree:
+`podman .Id` `b24e8f7b…`, stored `RepoDigests` `91aae7d5…`, grype
+`manifestDigest` `ef6af63b…`. A `candidate_digest` read from CI would have been a
+phantom, which is why the acceptance path needs `digest_pending` when no real
+digest exists. `18958ee3` closes the resulting gap: the publish step captures the
+scanned image ID, pushes, pulls the digest it just published, and fails before
+cosign signs anything unless the registry serves that same image ID; the receipt
+records `image_id`. `backend-release.yml` has the same ordering and the same gap
+and is deliberately untouched here — it has a working publish history and the
+change cannot be exercised locally.
+
+The two-build path that remains is honest but not free. Because
+`Containerfile:35` runs `dnf -y --refresh upgrade`, the image is not
+reproducible, so the acceptance must be rendered from the report of a build whose
+RPM inventory the release build reproduces. If the release build pulls a newer
+RPM, its extra findings are unlisted, and the gate blocks — correctly. In that
+case the honest move is to render again from the release build's own retained
+report and sign again; there is no mechanism here that lets a stale acceptance
+widen its own scope.
+
 So the decision is now about cost, not feasibility. Three honest options:
 (a) publish with a signed applicability review covering the residual 3 and the
 RPM tail, routed through that mechanism — mechanical, and the only option that
