@@ -154,10 +154,10 @@ new product-owner decision **after** staging acceptance.
 
 **Phase 0** is down to one signature. `docs/phase-0-owner-decisions-20261124.md`
 has both briefs: accept GO-2026-5932 with scope (the two unrated matches are
-`openpgp` code linked into `oc` via `containers_image_openpgp`, unreachable from
-Launchpad's `oc get` / `oc create route` paths, and with no fixed version in any
-release); and a 90-minute Console window that opens with a read-only check
-because the repo contradicts itself on whether the October repair is deployed.
+`openpgp` code linked into `oc` and `helm` via `containers_image_openpgp`, with
+no platform path reaching it in either and no fixed version in any release);
+and a 90-minute Console window that opens with a read-only check because the
+repo contradicts itself on whether the October repair is deployed.
 The reviewer and both decision owners are `jkershaw`; the Flightpath/network
 owner's sign-off on Brief 2 was waived on 2026-11-24 and recorded as an accepted
 risk (§2.11 of the brief), so the Console window is approved but still blocked on
@@ -166,10 +166,11 @@ a powered-on healthy platform and the read-only Step 0.
 Two corrections to the earlier reading, both now in the brief. **Signing does
 not clear the backend gate:** the gate blocks on the full inventory, so the
 disposition removes 2 of 37 blocking findings and leaves 35 High. And the
-advisory is **not backend-only** — the showroom-terminal image builds `skopeo`
-with the same `containers_image_openpgp` tag and carries the same unrated
-finding, where the reachability argument is weaker because `skopeo` is
-participant-invocable. That needs its own disposition or a two-image decision.
+advisory is **not backend-only** — the count of two matches is two *binaries*,
+`oc` and `helm`, and the showroom-terminal image builds `skopeo` with the same
+`containers_image_openpgp` tag and carries the same unrated finding. Brief 1
+covers the two backend binaries only; `skopeo` is participant-invocable, where
+the reachability argument is weakest, and needs its own disposition.
 
 **Phase 1 is closed — the doc previously had it wrong.**
 

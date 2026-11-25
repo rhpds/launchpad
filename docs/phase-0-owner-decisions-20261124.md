@@ -70,11 +70,17 @@ blocking condition. There is no allowlist in the script. So the only honest
 path is a documented, scoped, human-signed disposition, which is what the
 order-of-operations document already says is required.
 
-Current evidence: `evidence/convergence/backend-security-95fec905-20261015.yaml`
-records `unrated: 2`, `suppressed_high_critical_unrated: 0`,
-`risk_acceptance: NOT-GRANTED`, `scanner_ignore_added: false`. The two matches
-are grouped as `golang.org/x/crypto: two unrated matches requiring
-advisory-specific review`.
+Current evidence: `evidence/convergence/image-security-revalidation-20261020.yaml`
+is the present baseline — backend `{Critical 0, High 35, Unknown 2}` at
+`8b8fc909`. The earlier `backend-security-95fec905-20261015.yaml` recorded the
+same `unrated: 2` at `{Critical 0, High 25}`, with `suppressed_high_critical_unrated: 0`,
+`risk_acceptance: NOT-GRANTED`, `scanner_ignore_added: false`.
+
+Both retained scan reports were retrieved and hash-verified against the values
+recorded in the repo, and both report the *same* two matches at
+`golang.org/x/crypto v0.57.0` — one in `/usr/local/bin/oc`, the other in
+`/usr/local/bin/helm`. There is no duplicate counting and no third unrated
+finding: the count of two is two binaries.
 
 ## 1.2 Where the code is in this repo
 
@@ -96,19 +102,33 @@ stack. The pinned build also asserts the compiled module closure explicitly
 `github.com/docker/docker` appears), which is why this dependency was a
 deliberate, reviewed choice rather than an accident.
 
-**A second importer exists, and the brief originally missed it.**
+**A second importer is in the same image, and the brief originally missed it.**
+The two unrated matches are not two records of one binary — they are two
+binaries. CI run 39473152288's `vulnerability-report.json` reports
+`golang.org/x/crypto v0.57.0` at `/usr/local/bin/oc` **and** at
+`/usr/local/bin/helm`. `backend/Containerfile` builds helm v4 from source
+(lines 111–123) and copies it in at line 150. Helm links `x/crypto/openpgp` for
+**chart provenance verification** — `helm verify` and `helm install --verify` —
+which is a documented feature of the binary, not a dead import. Govulncheck
+agrees: the only vulnerability it finds in the helm binary at this commit is
+GO-2026-5932, reported across 15 package records.
+
+**A third importer is in the other image.**
 `workshop-images/showroom-terminal/Containerfile` builds `skopeo` from source
 with the same tag (lines 17 and 19) and installs it at `/usr/bin/skopeo` for
 learners. `evidence/convergence/image-remediation-20261020.yaml` records
 `skopeo_unrated: [GO-2026-5932]` in the terminal image after the grpc fix. So
-the advisory ships in **both** images.
+the advisory ships in **two images and three binaries**.
 
-The reachability argument does not transfer. `oc` is an operator-internal
-helper invoked on two resource paths; `skopeo` is a participant-invocable CLI
-in the terminal image, where signature verification is a supported verb. The
-backend disposition is therefore correct as scoped — it explicitly excludes
-other images — but it leaves a real terminal finding standing, and that one
-cannot borrow the `oc` reachability story.
+The reachability argument covers only one of the three. `oc` is
+operator-internal and is invoked on two resource paths. `helm` is invoked by the
+platform for repository and install operations, but without `--verify`, so the
+platform does not execute the openpgp path — the binary nevertheless exposes
+`helm verify` to anyone with a shell in the backend container. `skopeo` is
+participant-invocable in the terminal image, where `skopeo verify` is a
+supported verb. The backend disposition is right to scope itself, but it must
+say *platform-invoked paths*, not *unreachable*, and it leaves the two
+human-invocable verify paths standing.
 
 ## 1.3 Why this cannot be fixed by upgrading
 
@@ -139,25 +159,38 @@ each:
 
 ## 1.4 Reachability — the basis for scoped acceptance
 
-The code is *linked* but not *reachable* from Launchpad's call paths. The
-backend invokes `oc` for resource operations only — `oc get` and
-`oc create route` — never `oc image`, `oc build`, or image-signature
-verification. No Launchpad code path calls GPG or signature verification.
-This is the same usage boundary recorded for the client advisory review
-(`evidence/convergence/backend-remaining-security-disposition-20261014.yaml`:
+The code is *linked* in three binaries; what matters for the disposition is
+which of them Launchpad itself drives.
+
+| Binary | Image | Who can invoke the openpgp path | Does the platform? |
+|---|---|---|---|
+| `/usr/local/bin/oc` | backend | operator, in-pod | No — only `oc get` and `oc create route`, never `oc image`, `oc build`, or signature verification |
+| `/usr/local/bin/helm` | backend | operator, in-pod | No — `helm repo add/update` and install, never `--verify` |
+| `/usr/bin/skopeo` | showroom-terminal | **participants** | No, but it does not need the platform: `skopeo verify` is a supported verb in a shell they own |
+
+The backend usage boundary is the one already recorded for the client advisory
+review (`evidence/convergence/backend-remaining-security-disposition-20261014.yaml`:
 `observed_backend_operations: [get-resources, create-edge-route,
 apply-manifests, kustomize-apply]`, `absent_direct_calls: ... oc build or oc
-image`).
+image`). Helm's chart-provenance code adds a second surface to that boundary,
+which the review did not name.
 
-The honest caveat: reachability is argued from the call sites reviewed, not
-from a dynamic taint proof. The disposition must say so, and must name the
-condition that would invalidate it.
+The honest caveats, all of which the disposition must carry:
+
+- Reachability is argued from call sites reviewed, not from a dynamic taint
+  proof.
+- Govulncheck reports the advisory at **package** level in both binaries (the
+  advisory lists affected packages, not symbols), so it cannot distinguish
+  "linked" from "called". It is evidence of linkage, not of execution.
+- The claim that survives is narrow: **no Launchpad request path reaches
+  openpgp**. It does not extend to a human with shell access, and it does not
+  extend to the terminal image at all.
 
 ## 1.5 Options and staging-gate consequences
 
 | Option | What it costs | Effect on the staging gate | Verdict |
 |---|---|---|---|
-| **A. Accept with scope** (signed advisory-review disposition) | One record, one reviewer signature, 90-day review | Unblocks the two backend `Unknown` matches *for this scope and expiry*; the terminal `skopeo` finding is out of scope and stays open; the gate still blocks on all other High findings | **Recommended** |
+| **A. Accept with scope** (signed advisory-review disposition) | One record, one reviewer signature, 90-day review | Unblocks the two backend `Unknown` matches *for platform-invoked paths and for this expiry*; the `helm verify` and `skopeo verify` human paths stay open; the gate still blocks on all other High findings | **Recommended** |
 | B. Scanner ignore / suppression | One config change | **Does not work.** The gate blocks suppressed `Unknown` too; would also be a silent waiver, which the repo's own rules forbid | Rejected |
 | C. Bump `x/crypto` | Rebuild, re-pin, re-scan | Moves the finding to `x/crypto/openpgp v0.1.0-deprecated`; still `Unknown`; no fixed version | Rejected as a fix (may be worth doing for other reasons) |
 | D. ProtonMail fork migration | Patch `containers/image`, resolve v3-signature policy | Would remove the finding, but breaks v3 signature fixtures 3/3 and needs a product decision on legacy input | Deferred, not rejected forever |
@@ -165,8 +198,8 @@ condition that would invalidate it.
 | F. Block | Nothing | Gate stays red indefinitely; no upstream fix exists | Rejected |
 
 Option A is the only option that is both honest and finite. It does not claim
-the code is safe; it records that the code is unreachable from Launchpad's
-call paths, that no fix exists, and that the acceptance expires.
+the code is safe; it records that no Launchpad request path reaches the openpgp
+code in either binary, that no fix exists, and that the acceptance expires.
 
 ## 1.6 Exact record to file
 
@@ -185,13 +218,13 @@ Required fields:
 | `advisory` | `GO-2026-5932`, with the `vuln.go.dev` URL |
 | `advisory_status_at_review` | `REVIEWED`; modified date observed |
 | `cve` / `cvss` | `none` / `none` — state explicitly that no severity exists |
-| `affected_modules` | `golang.org/x/crypto` (findings 2) and, if present, `golang.org/x/crypto/openpgp v0.1.0-deprecated` |
-| `scanner_source` | `95fec905f1c2a3b6581de5e290f711af2ede37c1`, run URL, `unrated: 2` |
+| `affected_modules` | `golang.org/x/crypto v0.57.0` — 2 matches, in `/usr/local/bin/oc` and `/usr/local/bin/helm` (both linked via the `containers_image_openpgp` tag) |
+| `scanner_source` | `8b8fc909fe057a8803334ed3d37c1625acd96ea7`, run `39473152288`, `unrated: 2`; prior scan `95fec905…` / run `38758481803` carried the same two |
 | `candidate_digest` | The digest this disposition covers — acceptance is per-image, not global |
-| `build_tag_basis` | `containers_image_openpgp` in `backend/Containerfile`; `oc` at `/usr/local/bin/oc` |
+| `build_tag_basis` | `containers_image_openpgp` in `backend/Containerfile`; selects openpgp in `containers/image/v5/signature`, which both `oc` (built at line 78, copied at 149) and `helm` (built at 119, copied at 150) link |
 | `fixed_version_available` | `false`, with the carve-out explanation |
 | `upgrade_attempts` | Parent bump (relocates), ProtonMail fork (3/3 v3 failures), tag removal (cgo/gpgme) |
-| `reachability` | Reviewed call sites; `oc get` / `oc create route` only; `reachability_proven: false` stated as a limitation |
+| `reachability` | Reviewed call sites, per binary; `reachability_proven: false` stated as a limitation; explicitly limited to *platform-invoked* paths |
 | `scope_statement` | Verbatim block below |
 | `residual_risk` | Verbatim block below |
 | `owner_role` | `launchpad-platform-security-reviewer` |
@@ -217,18 +250,35 @@ severity_basis: >-
   The entry carries no CVE and no CVSS. The staging gate blocks it because the
   scanner reports it as Unknown, not because it scores High or Critical.
 affected_modules:
-  - {module: golang.org/x/crypto, matches: 2}
+  - module: golang.org/x/crypto
+    version: v0.57.0
+    matches: 2
+    binaries: [/usr/local/bin/oc, /usr/local/bin/helm]
 build_tag_basis:
   tag: containers_image_openpgp
   containerfile: backend/Containerfile
-  linked_binary: /usr/local/bin/oc
-  binary_copied_at_containerfile_line: 149
+  linked_binaries:
+    - {path: /usr/local/bin/oc, built_at_line: 78, copied_at_line: 149}
+    - {path: /usr/local/bin/helm, built_at_line: 119, copied_at_line: 150}
+  not_in_scope:
+    - {path: /usr/bin/skopeo, image: showroom-terminal, why: Separate image, participant-invocable, separate disposition required.}
 scanner_source:
+  commit: 8b8fc909fe057a8803334ed3d37c1625acd96ea7
+  run: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/39473152288
+  unrated_matches: 2
+  retained_artifact: backend-vulnerability-scan-8b8fc909fe057a8803334ed3d37c1625acd96ea7
+  report_sha256: 4f85853aa7832af03f4a9b8cf819daeba43e1262ac94b682f3ad1024ae1cd46a
+prior_scan:
   commit: 95fec905f1c2a3b6581de5e290f711af2ede37c1
   run: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/38758481803
+  candidate_digest: sha256:d222ed9ae801475224b1f793e5f758ab9d31f83c0be01aee5978e88b66a83f69
   unrated_matches: 2
-  retained_artifact: backend-vulnerability-scan-95fec905f1c2a3b6581de5e290f711af2ede37c1
-candidate_digest: sha256:d222ed9ae801475224b1f793e5f758ab9d31f83c0be01aee5978e88b66a83f69
+  note: >-
+    Same two binaries at the same module version. Recorded because the earlier
+    draft of this brief cited this scan; the current baseline supersedes it
+    without changing what has to be dispositioned.
+candidate_digest: sha256:49f2ec78b83aa6f963bb6c59a056eeaccde826060b2b15eda74919ce13923b2a
+candidate_published: false
 fixed_version_available: false
 fixed_version_reason: >-
   golang.org/x/crypto v0.59.0 removed the openpgp package. The replacement
@@ -240,28 +290,46 @@ upgrade_attempts:
   protonmail_fork: REJECTED-3-OF-3-V3-SIGNATURE-FIXTURES-FAIL
   remove_build_tag: REQUIRES-CGO-GPGME-OR-RUST-SEQUOIA
 reachability:
-  reviewed_call_sites: [oc get, oc create route]
-  absent_calls: [oc image, oc build, image signature verification]
+  platform_invoked_paths:
+    oc: [oc get, oc create route]
+    helm: [helm repo add, helm repo update, helm install]
+  absent_calls: [oc image, oc build, image signature verification, helm verify]
+  human_invocable_paths_not_covered:
+    - helm verify / helm install --verify, by anyone with a shell in the backend container
+    - skopeo verify, by participants in the showroom-terminal image
   reachability_proven: false
   limitation: Static review of call sites, not a dynamic taint proof.
 scope_statement: |
   This disposition covers the two unrated GO-2026-5932 matches in the
-  containers_image_openpgp build of /usr/local/bin/oc shipped in the backend
-  image at the recorded candidate digest, and nothing else. It does not
-  disposition any other High, Critical, or Unknown finding, any other image,
-  any other build tag, or any future code path that verifies OpenPGP
-  signatures, calls oc image, or calls oc build. In particular it does not
-  cover the GO-2026-5932 finding in /usr/bin/skopeo in the showroom-terminal
-  image, which requires its own disposition and its own reachability
-  argument. It is not a scanner suppression and does not change any scanner
-  configuration.
+  containers_image_openpgp build of the backend image at the recorded candidate
+  digest: one in /usr/local/bin/oc and one in /usr/local/bin/helm. It is scoped
+  to *platform-invoked paths* in both binaries.
+
+  It does not disposition any other High, Critical, or Unknown finding, any
+  other image, any other build tag, or any future code path that verifies
+  OpenPGP signatures, calls oc image, calls oc build, or calls helm verify. It
+  does not cover the openpgp verify paths exposed to a human with shell access
+  in the backend container.
+
+  In particular it does not cover the GO-2026-5932 finding in /usr/bin/skopeo
+  in the showroom-terminal image, where the CLI is participant-invocable and
+  verify is a supported verb; that requires its own disposition and its own
+  reachability argument. It is not a scanner suppression and does not change
+  any scanner configuration.
 residual_risk: |
-  The unmaintained openpgp code remains linked into the shipped oc binary for
-  the life of the acceptance. If a future Launchpad feature routes untrusted
-  image signatures through oc, or enables oc image / oc build, this
-  disposition no longer applies and must be reopened before that feature
-  ships. The scanner will keep reporting the finding on every rebuild; the
-  report is expected, not a regression. There is no upstream fix to wait for.
+  The unmaintained openpgp code remains linked into the shipped oc and helm
+  binaries for the life of the acceptance. If a future Launchpad feature routes
+  untrusted image signatures through oc, enables oc image / oc build, or adds
+  helm verify to a platform path, this disposition no longer applies and must be
+  reopened before that feature ships. The scanner will keep reporting the
+  finding on every rebuild; the report is expected, not a regression. There is
+  no upstream fix to wait for.
+
+  Two human-invocable verify paths remain open for the same period: helm verify
+  inside the backend container, and skopeo verify in the terminal image. The
+  first is bounded by container shell access and is not reached by any platform
+  call site; the second is a separate participant-facing surface and is not
+  covered here.
 owner_role: launchpad-platform-security-reviewer
 owner_signature: null   # name + date at signing
 expires: '2027-02-22'
@@ -288,24 +356,32 @@ staging_qualified_by_this_record: false
 | Expiry passes unnoticed | Medium | Medium | Expiry is a field; the 90-day date is on the decision line |
 
 This acceptance does not make the image safe. It makes the gate's question
-answerable: the finding is known, has no fix, is unreachable today, and lapses
-in 90 days.
+answerable: the finding is known, has no fix, sits behind no platform-invoked
+path in `oc` or `helm`, and lapses in 90 days.
 
-## 1.8 What must be confirmed before signing
+## 1.8 What was confirmed before signing — both answered
 
-Two things are not verifiable from the repo as it stands:
+The two questions this brief opened with are now closed against the retained CI
+artifacts, not against assumptions.
 
-1. **Why there are two matches.** The working assumption is that one advisory
-   is counted twice — once for the parent module and once for the openpgp
-   import path. The retained scan JSON is not in this repository (it lives in
-   the `backend-vulnerability-scan-95fec905...` CI artifact). Confirm the two
-   match IDs in that artifact before signing. If they are *different*
-   advisories, this disposition is incomplete.
-2. **That no other code path pulls in openpgp — answered, and it did.** The
-   `oc` build is one path; the showroom-terminal image's `skopeo` is a second.
-   The reviewer must either accept that the terminal finding remains open or
-   extend this brief into a two-image decision. Do not sign on the assumption
-   that `oc` is the only importer.
+1. **Why there are two matches — answered: two binaries, one advisory.** The
+   working assumption was that one advisory was counted twice for the same
+   binary. It was not. `vulnerability-report.json` from run 39473152288
+   (`8b8fc909`, sha256 `4f85853a…`) reports `GO-2026-5932` at
+   `golang.org/x/crypto v0.57.0` in `/usr/local/bin/oc` **and** in
+   `/usr/local/bin/helm`. The earlier run 38758481803 (`95fec905`, sha256
+   `69a237e7…`) reports the identical pair at the identical version. Both files
+   hash to the values recorded in the repo, so they are the scans the gate used.
+   Both match IDs are the same advisory, so the disposition is complete at the
+   advisory level — but it now covers two binaries, which the earlier draft did
+   not say.
+2. **That no other code path pulls in openpgp — answered, and two did.** Inside
+   the backend image, `helm` is a second importer alongside `oc`, and it links
+   openpgp for chart provenance verification. Outside it, the showroom-terminal
+   image's `skopeo` is a third. The backend disposition may cover `oc` and
+   `helm`; it may **not** cover `skopeo`, and it may not claim the backend
+   binaries are unreachable by a human with shell access. Do not sign on the
+   assumption that `oc` is the only importer.
 
 ## 1.9 Decision line — Brief 1
 
@@ -313,16 +389,22 @@ Two things are not verifiable from the repo as it stands:
 > `evidence/convergence/backend-openpgp-advisory-disposition-20261124.yaml`,
 > schema `launchpad/advisory-disposition/v1`, status `ACCEPTED-WITH-SCOPE`,
 > covering the two unrated matches in the `containers_image_openpgp` build of
-> `oc` at candidate digest
-> `sha256:d222ed9ae801475224b1f793e5f758ab9d31f83c0be01aee5978e88b66a83f69`.
-> This is an advisory-review disposition, not a scanner suppression. It expires
-> 2027-02-22 and reopens on any of the listed triggers.
+> `/usr/local/bin/oc` and `/usr/local/bin/helm` in the backend image at
+> candidate digest
+> `sha256:49f2ec78b83aa6f963bb6c59a056eeaccde826060b2b15eda74919ce13923b2a`
+> (the 2026-10-20 baseline; the 2026-10-15 scan at
+> `sha256:d222ed9ae801475224b1f793e5f758ab9d31f83c0be01aee5978e88b66a83f69`
+> carried the same two matches). Scope is *platform-invoked paths* in both
+> binaries. This is an advisory-review disposition, not a scanner suppression.
+> It expires 2027-02-22 and reopens on any of the listed triggers.
 >
 > Approved by: J Kershaw — `launchpad-platform-security-reviewer`, identity
 > confirmed 2026-11-24
-> Date: __________ **not yet executed** — the match IDs in §1.8 item 1 are still
-> unconfirmed, and this disposition is per-image-digest, so a signature taken
-> before that check would cover a build nobody can identify later.
+> Date: __________ **not yet executed** — the findings are verified and the
+> wording is final, but the acceptance is per-image-digest and the candidate
+> image was never published (`candidate_published: false`), so a signature taken
+> now binds a build that exists only as a retained digest. Sign it against the
+> digest that will be promoted.
 
 ---
 
@@ -578,8 +660,8 @@ accepted for one 90-minute window with a tested rollback.
 
 | Claim | Why it is unverified | What would settle it |
 |---|---|---|
-| The two unrated matches are the same advisory counted twice | Retained scan JSON is a CI artifact, not in the repo | Read `backend-vulnerability-scan-95fec905...` and compare match IDs |
-| `oc` is the only importer of `x/crypto/openpgp` | **Resolved: it is not.** `skopeo` in the showroom-terminal image links the same package under the same tag | Separate terminal disposition, or extend this one to two images |
+| ~~The two unrated matches are the same advisory counted twice~~ | **Resolved: they are not duplicates.** They are `/usr/local/bin/oc` and `/usr/local/bin/helm`, same advisory, same module version, in both retained scans | Settled by `vulnerability-report.json` in runs 39473152288 and 38758481803, hash-verified |
+| `oc` is the only importer of `x/crypto/openpgp` | **Resolved: it is not.** `helm` in the same image links it for chart provenance, and `skopeo` in the showroom-terminal image links it under the same tag | `helm` is covered by Brief 1's scope; `skopeo` needs a separate disposition |
 | The current live Console `spec.route` value | Cluster is scaled to zero; no manifest in repo | Step 0 read-only `oc get` when powered on |
 | Whether the October repair is still deployed | Oct 14 evidence and Oct 16/Nov 24 docs contradict | Same Step 0 read |
 | Current `labs.smg-helix.ai` behaviour | Host returns 530 while scaled to zero | Re-check after power-on |
@@ -594,8 +676,11 @@ accepted for one 90-minute window with a tested rollback.
   open; scale-to-zero note.
 - `docs/flightpath-console-access-separation.md` — Console objects, repair,
   dedicated-hostname alternative, rollback requirements.
-- `evidence/convergence/backend-security-95fec905-20261015.yaml` — 25 High,
-  2 unrated, gate blocked.
+- `evidence/convergence/backend-security-95fec905-20261015.yaml` — earlier scan:
+  25 High, 2 unrated, gate blocked; source of `sha256:d222ed9a…`.
+- `evidence/convergence/image-security-revalidation-20261020.yaml` — current
+  baseline: backend 35 High / 2 unrated at `sha256:49f2ec78…`, terminal 350 High
+  / 10 unrated at its own digest.
 - `evidence/convergence/image-remediation-20261020.yaml` — advisory meaning,
   `not_a_patch_version_fix`, `skopeo_unrated: [GO-2026-5932]`.
 - `evidence/convergence/openpgp-compatibility-experiment-20261020.yaml` —
