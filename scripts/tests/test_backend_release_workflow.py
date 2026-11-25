@@ -35,7 +35,7 @@ def test_backend_release_scans_generates_sbom_signs_and_attests() -> None:
     assert "anchore/scan-action@1638637db639e0ade3258b51db49a9a137574c3e" in text
     assert "severity-cutoff: high" in text
     assert "Inventory all candidate vulnerabilities" in text
-    assert "Block fixable high and critical vulnerabilities" in text
+    assert "Inventory fixable high and critical vulnerabilities" in text
     assert "only-fixed: true" in text
     assert "anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610" in text
     assert "cosign sign --yes" in text
@@ -106,3 +106,28 @@ def test_full_inventory_gate_blocks_publication_and_retains_decision() -> None:
     retained = next(s for s in steps if s.get("name") == "Retain vulnerability evidence even when the gate blocks")
     assert "always()" in retained["if"]
     assert "staging-security-decision.json" in retained["with"]["path"]
+
+
+def test_backend_release_acceptance_input_defaults_to_a_clean_scan() -> None:
+    _, workflow = _workflow()
+    dispatch = workflow[True]["workflow_dispatch"]["inputs"]
+
+    assert dispatch["acceptance"]["default"] == ""
+    assert dispatch["acceptance"]["required"] is False
+
+
+def test_full_inventory_gate_honours_a_signed_acceptance_without_losing_teeth() -> None:
+    _, workflow = _workflow()
+    steps = workflow["jobs"]["release"]["steps"]
+    fixable = next(s for s in steps
+                   if s.get("name") == "Inventory fixable high and critical vulnerabilities")
+    assert fixable["with"]["fail-build"] is False
+    gate = next(s for s in steps
+                if s.get("name") == "Block unresolved full-inventory security findings")
+    assert gate["env"]["ACCEPTANCE"] == "${{ inputs.acceptance }}"
+    assert gate["env"]["EXPECTED_SHA"] == "${{ inputs.expected_sha }}"
+    assert '--acceptance "$ACCEPTANCE" --source-revision "$EXPECTED_SHA"' in gate["run"]
+    assert "continue-on-error" not in gate
+    retained = next(s for s in steps
+                    if s.get("name") == "Retain vulnerability evidence even when the gate blocks")
+    assert "staging-risk-acceptance.yaml" in retained["with"]["path"]

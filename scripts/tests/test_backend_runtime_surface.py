@@ -72,7 +72,7 @@ def test_scans_still_collect_after_symbol_failure_but_publication_stays_gated():
     assert smoke["id"] == "runtime_smoke"
     for name in (
         "Release build cache before security scanning", "Inventory all candidate vulnerabilities",
-        "Block fixable high and critical vulnerabilities",
+        "Inventory fixable high and critical vulnerabilities",
     ):
         step = next(step for step in steps if step.get("name") == name)
         assert "!cancelled()" in step["if"]

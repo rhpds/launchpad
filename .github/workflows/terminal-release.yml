@@ -12,6 +12,11 @@ on:
         required: true
         default: false
         type: boolean
+      acceptance:
+        description: Repository path to a signed launchpad/risk-acceptance/v1 record, or empty to require a clean scan
+        required: false
+        default: ''
+        type: string
 
 permissions:
   contents: read
@@ -126,12 +131,15 @@ jobs:
           output-format: json
           output-file: vulnerability-report.json
 
-      - name: Block fixable high and critical vulnerabilities
+      - name: Inventory fixable high and critical vulnerabilities
         if: ${{ !cancelled() && steps.runtime_smoke.outcome == 'success' }}
         uses: anchore/scan-action@1638637db639e0ade3258b51db49a9a137574c3e
         with:
           image: ${{ env.IMAGE_REPOSITORY }}:git-${{ inputs.expected_sha }}
-          fail-build: true
+          # Evidence only: the full-inventory gate below is the single
+          # authoritative publish decision, so a fixable-only result must not
+          # fail the job before that decision is recorded.
+          fail-build: false
           severity-cutoff: high
           only-fixed: true
           output-format: json
@@ -140,13 +148,23 @@ jobs:
       - name: Block unresolved full-inventory security findings
         if: ${{ !cancelled() && steps.runtime_smoke.outcome == 'success' }}
         shell: bash
+        env:
+          ACCEPTANCE: ${{ inputs.acceptance }}
+          EXPECTED_SHA: ${{ inputs.expected_sha }}
         run: |
           set -euo pipefail
           candidate="${IMAGE_REPOSITORY}:git-${{ inputs.expected_sha }}"
           candidate_id="$(docker image inspect --format '{{.Id}}' "$candidate")"
+          gate_args=()
+          if [ -n "$ACCEPTANCE" ]; then
+            test -f "$ACCEPTANCE"
+            cp "$ACCEPTANCE" staging-risk-acceptance.yaml
+            gate_args=(--acceptance "$ACCEPTANCE" --source-revision "$EXPECTED_SHA")
+          fi
           python3 scripts/check_backend_staging_security.py vulnerability-report.json \
             --component terminal \
             --expected-image "$candidate" --expected-image-id "$candidate_id" \
+            "${gate_args[@]}" \
             > staging-security-decision.json
 
       - name: Generate the SBOM
@@ -166,6 +184,7 @@ jobs:
             vulnerability-report.json
             vulnerability-report-fixable.json
             staging-security-decision.json
+            staging-risk-acceptance.yaml
             sbom.spdx.json
 
       - name: Log in to GHCR
