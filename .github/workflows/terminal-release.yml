@@ -202,17 +202,27 @@ jobs:
         run: |
           set -euo pipefail
           image="${IMAGE_REPOSITORY}:git-${{ inputs.expected_sha }}"
+          # The gate ran before this push, so a risk acceptance could only bind
+          # by enumeration (digest_pending): a daemon image has no repository
+          # digest to sign. Close that gap here, before anything is signed, by
+          # proving the registry now serves the exact image the gate scanned.
+          scanned_id="$(docker image inspect --format '{{.Id}}' "$image")"
           docker push "$image"
           digest_ref="$(docker inspect --format='{{index .RepoDigests 0}}' "$image")"
           test -n "$digest_ref"
           digest="${digest_ref##*@}"
           [[ "$digest" =~ ^sha256:[0-9a-f]{64}$ ]]
+          docker pull -q "$digest_ref" > /dev/null
+          published_id="$(docker image inspect --format '{{.Id}}' "$digest_ref")"
+          test "$published_id" = "$scanned_id"
           printf 'digest_ref=%s\n' "$digest_ref" >> "$GITHUB_OUTPUT"
           printf 'digest=%s\n' "$digest" >> "$GITHUB_OUTPUT"
+          printf 'image_id=%s\n' "$published_id" >> "$GITHUB_OUTPUT"
           jq -n \
             --arg source_revision "${{ inputs.expected_sha }}" \
             --arg image "$digest_ref" \
-            '{schema_version:"launchpad.redhat.com/terminal-release/v1",source_revision:$source_revision,image:$image,platform:"linux/amd64",published:true}' \
+            --arg image_id "$published_id" \
+            '{schema_version:"launchpad.redhat.com/terminal-release/v1",source_revision:$source_revision,image:$image,image_id:$image_id,platform:"linux/amd64",published:true}' \
             > terminal-release.json
 
       - name: Install Cosign

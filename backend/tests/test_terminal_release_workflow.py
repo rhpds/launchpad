@@ -71,3 +71,23 @@ def test_terminal_release_has_one_authoritative_gate_that_honours_a_signed_accep
     assert '--acceptance "$ACCEPTANCE" --source-revision "$EXPECTED_SHA"' in gate['run']
     evidence = next(step for step in steps if step['name'] == 'Retain pre-publication evidence')
     assert 'staging-risk-acceptance.yaml' in evidence['with']['path']
+
+
+def test_published_digest_is_proven_to_be_the_scanned_candidate():
+    """A pre-push scan has no repository digest, so the acceptance binds by
+    enumeration. The publish step must close that gap by proving the registry
+    serves the same image ID the gate verified."""
+    steps = yaml.safe_load(
+        (ROOT / '.github/workflows/terminal-release.yml').read_text())['jobs']['release']['steps']
+    publish = next(step for step in steps
+                   if step['name'] == 'Publish immutable candidate and record digest')
+    run = publish['run']
+    assert "scanned_id=\"$(docker image inspect --format '{{.Id}}' \"$image\")\"" in run
+    assert run.index('scanned_id=') < run.index('docker push')
+    assert 'docker pull -q "$digest_ref"' in run
+    assert 'test "$published_id" = "$scanned_id"' in run
+    assert '--arg image_id "$published_id"' in run
+    assert 'image_id:$image_id' in run
+    assert steps.index(publish) < next(
+        i for i, step in enumerate(steps)
+        if step['name'] == 'Sign the published digest with GitHub OIDC')
