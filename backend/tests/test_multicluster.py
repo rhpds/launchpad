@@ -470,7 +470,7 @@ def test_arena_overlay_enables_brutus_for_supervised_public_pilot():
         ),
         "showroom_terminal": (
             "quay.io/rh-ee-jkershaw/launchpad-showroom-terminal@sha256:"
-            "324dc5c4201f0da030a572dab389bc8cfdc2f66e800dff3fcee824b7e795daae"
+            "548b0e3c891c31aa6f94ca559643356b37ce9027299aa83a94aae7007654092e"
         ),
     }
     assert set(targets["flightpath"]["model_endpoints"]) == {
