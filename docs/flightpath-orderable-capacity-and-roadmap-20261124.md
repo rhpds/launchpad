@@ -330,7 +330,10 @@ record and refuses to write one the gate would reject.
 Verified against the deployed digest: the 1254 blocking matches collapse to
 **376 triples**, the gate reports `PASS-SCAN-ONLY` / `risk_acceptance: GRANTED`
 / `gate_basis: SIGNED-ACCEPTANCE`; one fabricated extra advisory still blocks as
-`APPLIED-INCOMPLETE`; a tampered digest exits 2 as `INVALID`.
+`APPLIED-INCOMPLETE`; a tampered digest exits 2 as `INVALID`. That run is
+retained as `evidence/runs/risk-acceptance-mechanism-proof-20261124.json`, which
+states in the file itself that it is a mechanism proof signed with a placeholder
+and authorises nothing.
 
 So the decision is now about cost, not feasibility. Three honest options:
 (a) publish with a signed applicability review covering the residual 3 and the

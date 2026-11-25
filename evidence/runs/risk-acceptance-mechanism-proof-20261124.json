@@ -1,0 +1,52 @@
+{
+  "schema": "launchpad/risk-acceptance-mechanism-proof/v1",
+  "proof_only": true,
+  "not_a_signed_acceptance": true,
+  "signed_acceptance_exists": false,
+  "recorded_on": "2026-11-25",
+  "purpose": "Demonstrate that the gate honours an exhaustive enumerated acceptance at full inventory scale, and that it still blocks drift and digest tampering. The signed_on/owner_signature fields below are placeholders: this file does not authorise a release.",
+  "component": "terminal",
+  "source_revision": "47f11a11d1c2a6b29ea4e25e603bae618311a530",
+  "image_reference": "quay.io/rh-ee-jkershaw/launchpad-showroom-terminal@sha256:324dc5c4201f0da030a572dab389bc8cfdc2f66e800dff3fcee824b7e795daae",
+  "image_id": "sha256:f640a24eea1bc8ac2873aedd15596390d7ac2b55f5d80706af52b63818439cbf",
+  "grype_report_sha256": "6c377e0b47fbf7bb36a5e3ddd4cee4a5044c92a6ece751774e7516baa5729560",
+  "grype_report": "evidence/runs/terminal-deployed-scan-324dc5c4-20261124.json",
+  "renderer_exit": 0,
+  "acceptance_triples_rendered": 376,
+  "positive_case": {
+    "exit": 0,
+    "staging_security_gate": "PASS-SCAN-ONLY",
+    "risk_acceptance": "GRANTED",
+    "gate_basis": "SIGNED-ACCEPTANCE",
+    "high_matches": 1125,
+    "critical_matches": 112,
+    "unrated_matches": 17,
+    "accepted_high_matches": 1125,
+    "accepted_critical_matches": 112,
+    "accepted_unrated_matches": 17,
+    "unaccepted_high_matches": 0,
+    "unaccepted_critical_matches": 0,
+    "unaccepted_unrated_matches": 0,
+    "platform_staging_qualified": false,
+    "candidate_identity_verified": true,
+    "manifest_digest": "sha256:324dc5c4201f0da030a572dab389bc8cfdc2f66e800dff3fcee824b7e795daae",
+    "acceptance": {
+      "digest_binding": "BOUND",
+      "accepted_entries": 376,
+      "matched_entries": 376
+    }
+  },
+  "negative_case_new_advisory": {
+    "exit": 1,
+    "staging_security_gate": "BLOCKED",
+    "risk_acceptance": "APPLIED-INCOMPLETE",
+    "gate_basis": "BLOCKING-FINDINGS",
+    "accepted_critical_matches": 112,
+    "unaccepted_critical_matches": 1
+  },
+  "negative_case_digest_tamper": {
+    "exit": 2,
+    "staging_security_gate": "INVALID",
+    "error": "Acceptance candidate_digest does not match the scanned image"
+  }
+}
