@@ -194,18 +194,40 @@ explicitly historical, not the present scan.
 version exists somewhere upstream — not that Red Hat shipped a fix for RHEL 9.
 `backend-vendor-states-20261020.json` queried 11 advisories and found every one
 still `Affected`, and an isolated read-only `dnf` dry run refused to remove
-`python3.9` because DNF and Yum require it. The split agreed 2026-11-24 is
-therefore conditional: repair the two only if they sit outside the protected RPM
-set (a Go module, a venv package, a pinned CLI); if they are base-image RPMs the
-only "fix" is a protected-package override, and they belong in the vendor-wait
-group instead.
+`python3.9` because DNF and Yum require it. So "fixable" had to be checked
+item by item before anything could be done with it — the 30 RPM High matches
+behind 11 distinct advisories have no errata to install, and a forced package
+upgrade would be a protected-package override, not a fix.
 
-**That decision is blocked on a missing artifact.** The fixable report body was
-never checked in — `backend-security-revalidation-20261020.json` retains only
-`fixable_report_sha256: cbb1ec5e…`, and no file in the repo hashes to it. The
-two pairs have to come from CI run 39473152288 or from rescanning the recorded
-digest `sha256:49f2ec78…`. Until one of those happens, "2 fixable High" is a
-count with no names attached.
+**The two are named, and they resolve differently.** The fixable report body was
+retrieved from CI run 39473152288; `vulnerability-report-fixable.json` hashes to
+`cbb1ec5e…`, matching the value recorded in the repo, so it is the report the
+gate actually used. Both High findings are
+`github.com/distribution/distribution/v3` at the 2023 pseudo-pin, fixed only in
+`v3.1.0`:
+
+- `GHSA-f2g3-hh2r-cwgc` (GO-2026-4942) affects
+  `registry/storage/cache/redis`. That package is absent from the `oc` symbol
+  table, and govulncheck's only record for it is module-level with no frame. It
+  is not linked.
+- `GHSA-3p65-76g6-3w7r` (GO-2026-5094) carries **no symbol data** in the
+  advisory, so no scanner can prove absence and govulncheck reports it at
+  package level across the linked client. The pull-through cache
+  implementation, `registry/proxy`, is also absent from the binary, and the
+  exploit needs a configured upstream credential store that a client never has.
+  It closes on that applicability argument, not on symbol evidence.
+
+The harness already states both as surfaces rather than prose: the same run's
+`client-symbol-inventory.json` records `distribution-proxy` and
+`distribution-redis-cache` with `named_symbols_present: false` and zero matches
+over 155,403 symbols at `8b8fc909`. (The same file records `archive-extraction`
+as **present**, 66 symbols — so the check discriminates rather than returning
+false for everything.)
+
+Neither closes by upgrading: `v3.1.0` drops registry client packages
+`openshift/library-go` imports — tried in `d3274b41`, reverted in `506e739a`.
+That is the "review the two" half of the 2026-11-24 split; the remaining 33 High
+go to vendor wait.
 
 **Phase 3 — half closed.** The staged pins are committed (`a1d1eb67`,
 `647497bc`, `746e9e71`, all ancestors of HEAD) and the exact-commit regression is
