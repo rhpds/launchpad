@@ -66,9 +66,10 @@ def test_terminal_release_has_one_authoritative_gate_that_honours_a_signed_accep
                 if step['name'] == 'Block unresolved full-inventory security findings')
     assert gate['env']['ACCEPTANCE'] == '${{ inputs.acceptance }}'
     assert gate['env']['EXPECTED_SHA'] == '${{ inputs.expected_sha }}'
-    assert 'test -f "$ACCEPTANCE"' in gate['run']
-    assert 'cp "$ACCEPTANCE" staging-risk-acceptance.yaml' in gate['run']
-    assert '--acceptance "$ACCEPTANCE" --source-revision "$EXPECTED_SHA"' in gate['run']
+    assert 'path="${ACCEPTANCE#./}"' in gate['run']
+    assert 'cp "$path" staging-risk-acceptance.yaml' in gate['run']
+    assert gate['env']['WORKFLOW_SHA'] == '${{ github.workflow_sha }}'
+    assert '--acceptance staging-risk-acceptance.yaml --source-revision "$EXPECTED_SHA"' in gate['run']
     evidence = next(step for step in steps if step['name'] == 'Retain pre-publication evidence')
     assert 'staging-risk-acceptance.yaml' in evidence['with']['path']
 
@@ -85,6 +86,25 @@ def test_terminal_release_rejects_a_short_revision_before_checkout():
     checkout = next(i for i, step in enumerate(steps)
                     if step.get('uses', '').startswith('actions/checkout@'))
     assert steps.index(preflight) < checkout
+
+
+def test_signed_acceptance_is_materialised_from_the_workflow_revision():
+    """The record must name the revision being released, and a commit cannot
+    contain a file that names its own SHA: committing the record changes the
+    SHA it names. So the record lives one commit later, on the workflow
+    revision, and is materialised from there - while the gate still binds it
+    to EXPECTED_SHA and refuses an empty record."""
+    steps = yaml.safe_load(
+        (ROOT / '.github/workflows/terminal-release.yml').read_text())['jobs']['release']['steps']
+    run = next(s for s in steps
+               if s['name'] == 'Block unresolved full-inventory security findings')['run']
+    assert 'git fetch --depth=1 origin "$WORKFLOW_SHA"' in run
+    assert 'git show "$WORKFLOW_SHA:$path" > staging-risk-acceptance.yaml' in run
+    assert run.index('git fetch') < run.index('git show')
+    assert 'test -s staging-risk-acceptance.yaml' in run
+    assert '--source-revision "$EXPECTED_SHA"' in run
+    evidence = next(s for s in steps if s['name'] == 'Retain pre-publication evidence')
+    assert 'staging-risk-acceptance.yaml' in evidence['with']['path']
 
 
 def test_published_digest_is_proven_to_be_the_scanned_candidate():

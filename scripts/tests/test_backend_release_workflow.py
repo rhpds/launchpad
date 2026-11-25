@@ -90,6 +90,18 @@ def test_private_releases_require_registry_attestations_without_publicizing_sour
     assert 'provenance-verification.json' in text
 
 
+def test_backend_acceptance_is_materialised_from_the_workflow_revision() -> None:
+    """A commit cannot contain a record naming its own SHA, so the signed
+    record lives one commit later and is fetched rather than required in the
+    checked-out tree."""
+    _, workflow = _workflow()
+    steps = workflow["jobs"]["release"]["steps"]
+    gate = next(s for s in steps if s.get("name") == "Block unresolved full-inventory security findings")
+    assert gate["env"]["WORKFLOW_SHA"] == "${{ github.workflow_sha }}"
+    assert 'git show "$WORKFLOW_SHA:$path" > staging-risk-acceptance.yaml' in gate["run"]
+    assert 'test -s staging-risk-acceptance.yaml' in gate["run"]
+
+
 def test_backend_release_proves_the_published_digest_is_the_scanned_candidate() -> None:
     """The gate decides before the push, so the acceptance binds by
     enumeration; the publish step must then prove the registry serves the
@@ -143,7 +155,7 @@ def test_full_inventory_gate_honours_a_signed_acceptance_without_losing_teeth() 
                 if s.get("name") == "Block unresolved full-inventory security findings")
     assert gate["env"]["ACCEPTANCE"] == "${{ inputs.acceptance }}"
     assert gate["env"]["EXPECTED_SHA"] == "${{ inputs.expected_sha }}"
-    assert '--acceptance "$ACCEPTANCE" --source-revision "$EXPECTED_SHA"' in gate["run"]
+    assert '--acceptance staging-risk-acceptance.yaml --source-revision "$EXPECTED_SHA"' in gate["run"]
     assert "continue-on-error" not in gate
     retained = next(s for s in steps
                     if s.get("name") == "Retain vulnerability evidence even when the gate blocks")

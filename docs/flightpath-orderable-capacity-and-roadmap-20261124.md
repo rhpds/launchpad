@@ -376,6 +376,18 @@ identical defect and received the identical fix; its "working publish history"
 did not protect it, because a working run under the classic store hides a check
 that is wrong under the containerd store.
 
+**A signed record cannot live in the revision it names.** `validate_acceptance`
+requires `source_revision` to equal the revision being released, and the gate
+read the record from the checked-out tree. A commit cannot contain a file naming
+its own SHA — committing the record changes the SHA it names — so exact equality
+plus in-tree lookup is unsatisfiable, and no dispatch could ever have applied a
+committed record. The record now lives one commit later, on the workflow
+revision, and the gate materialises it with `git show "$WORKFLOW_SHA:$path"`,
+still binding it to `EXPECTED_SHA` and refusing an empty record. The reviewed
+bytes are copied to `staging-risk-acceptance.yaml` and uploaded with the rest of
+the decision evidence, so the exact record is auditable even though it is not in
+the released tree.
+
 The two-build path that remains is honest but not free. Because
 `Containerfile:35` runs `dnf -y --refresh upgrade`, the image is not
 reproducible, so the acceptance must be rendered from the report of a build whose

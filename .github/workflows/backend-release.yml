@@ -219,6 +219,7 @@ jobs:
         env:
           ACCEPTANCE: ${{ inputs.acceptance }}
           EXPECTED_SHA: ${{ inputs.expected_sha }}
+          WORKFLOW_SHA: ${{ github.workflow_sha }}
         run: |
           set -euo pipefail
           # Fixable-only results are insufficient: suppressed, unresolved and
@@ -239,9 +240,18 @@ jobs:
           fi
           gate_args=()
           if [ -n "$ACCEPTANCE" ]; then
-            test -f "$ACCEPTANCE"
-            cp "$ACCEPTANCE" staging-risk-acceptance.yaml
-            gate_args=(--acceptance "$ACCEPTANCE" --source-revision "$EXPECTED_SHA")
+            path="${ACCEPTANCE#./}"
+            if [ -f "$path" ]; then
+              cp "$path" staging-risk-acceptance.yaml
+            else
+              # A commit cannot name its own SHA, so a record bound to the
+              # released revision lives one commit later, on the workflow
+              # revision; materialise it from there.
+              git fetch --depth=1 origin "$WORKFLOW_SHA"
+              git show "$WORKFLOW_SHA:$path" > staging-risk-acceptance.yaml
+            fi
+            test -s staging-risk-acceptance.yaml
+            gate_args=(--acceptance staging-risk-acceptance.yaml --source-revision "$EXPECTED_SHA")
           fi
           python3 scripts/check_backend_staging_security.py vulnerability-report.json \
             --expected-image "$candidate" --expected-image-id "$candidate_id" \
