@@ -31,6 +31,20 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
+      - name: Reject a revision that is not a full commit SHA
+        shell: bash
+        env:
+          EXPECTED_SHA: ${{ inputs.expected_sha }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$EXPECTED_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "expected_sha must be a full 40-character lowercase commit SHA." >&2
+            echo "got: '${EXPECTED_SHA}'" >&2
+            echo "Checkout resolves this as a branch or tag name instead," >&2
+            echo "which fails far less clearly. Run 'git rev-parse <short-sha>'." >&2
+            exit 1
+          fi
+
       - name: Check out the requested revision
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:

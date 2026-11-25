@@ -73,6 +73,20 @@ def test_terminal_release_has_one_authoritative_gate_that_honours_a_signed_accep
     assert 'staging-risk-acceptance.yaml' in evidence['with']['path']
 
 
+def test_terminal_release_rejects_a_short_revision_before_checkout():
+    """Checkout resolves a non-SHA input as a branch name, so an abbreviated
+    SHA fails as 'git fetch refs/heads/<sha>' rather than as bad input."""
+    steps = yaml.safe_load(
+        (ROOT / '.github/workflows/terminal-release.yml').read_text())['jobs']['release']['steps']
+    preflight = steps[0]
+    assert preflight['name'] == 'Reject a revision that is not a full commit SHA'
+    assert '^[0-9a-f]{40}$' in preflight['run']
+    assert preflight['env']['EXPECTED_SHA'] == '${{ inputs.expected_sha }}'
+    checkout = next(i for i, step in enumerate(steps)
+                    if step.get('uses', '').startswith('actions/checkout@'))
+    assert steps.index(preflight) < checkout
+
+
 def test_published_digest_is_proven_to_be_the_scanned_candidate():
     """A pre-push scan has no repository digest, so the acceptance binds by
     enumeration. The publish step must close that gap by proving the registry
