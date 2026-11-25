@@ -6,9 +6,11 @@
 convergence roadmap.
 
 > **Platform is scaled to zero** since 2026-11-16 (all Deployments `0/0`,
-> CronJobs suspended, routes 503, `labs.smg-helix.ai` 530, no Argo CD apps).
-> Data intact. This document describes what the deployed catalog *would*
-> permit once powered back on.
+> CronJobs suspended, no Service endpoints, `labs.smg-helix.ai` 530). Data
+> intact: both PVCs `Bound`. This is an **owner decision, not an incident** —
+> capacity was reallocated to other projects and the platform can be restored
+> on demand (recorded 2026-11-24). Replicas are pinned at `0` in the Deployment
+> specs with no HPA, so a scale-up is not fought by anything.
 
 ## How to read the seat numbers
 
@@ -146,22 +148,21 @@ new product-owner decision **after** staging acceptance.
 
 | Phase | Work | State |
 |---|---|---|
-| **0** | Owner decisions: x/crypto GO-2026-5932 disposition; Console cutover window | **open — 1 signature needed** (Brief 2's network sign-off waived 11-24); briefs written 2026-11-24 |
+| **0** | Owner decisions: x/crypto GO-2026-5932 disposition; Console cutover window | Brief 2 **closed by live check 11-24** — no override exists; Brief 1 **1 signature needed** |
 | **1** | Keycloak 26.8.1 isolated upgrade + DB compatibility proof; virtualization-ai-501 narrow-pane layout | **closed** (2026-10-16) |
 | **2** | Vendor-pending images: terminal, backend | **blocked on vendors**; counts corrected below |
 | **3** | Staged catalog pins; exact-commit regression; current-revision public browser proofs | pins + regression **closed**; public proofs **open and failing** |
-| **4** | Console verify-or-cutover; full acceptance sweep with zero residue | **unverified** — see below |
+| **4** | Console verify-or-cutover; full acceptance sweep with zero residue | Console **verified native 11-24, no mutation needed**; sweep still **unverified** |
 
-**Phase 0** is down to one signature. `docs/phase-0-owner-decisions-20261124.md`
-has both briefs: accept GO-2026-5932 with scope (the two unrated matches are
-`openpgp` code linked into `oc` and `helm` via `containers_image_openpgp`, with
-no platform path reaching it in either and no fixed version in any release);
-and a 90-minute Console window that opens with a read-only check because the
-repo contradicts itself on whether the October repair is deployed.
-The reviewer and both decision owners are `jkershaw`; the Flightpath/network
-owner's sign-off on Brief 2 was waived on 2026-11-24 and recorded as an accepted
-risk (§2.11 of the brief), so the Console window is approved but still blocked on
-a powered-on healthy platform and the read-only Step 0.
+**Phase 0** is down to one signature, and it is Brief 1's. `docs/phase-0-owner-decisions-20261124.md`
+carries both briefs. Brief 1 asks to accept GO-2026-5932 with scope (the two
+unrated matches are `openpgp` code linked into `oc` and `helm` via
+`containers_image_openpgp`, with no platform path reaching it in either and no
+fixed version in any release). Brief 2 was a 90-minute Console window that opened
+with a read-only check — **and the check ran on 2026-11-24: the operator has no
+`spec.route` override and no `console-custom` route exists, so the window is
+void.** No mutation was needed and none was made. The Flightpath/network
+sign-off waived on 2026-11-24 was therefore never exercised.
 
 Two corrections to the earlier reading, both now in the brief. **Signing does
 not clear the backend gate:** the gate blocks on the full inventory, so the
@@ -255,20 +256,31 @@ The reproducible instrument already exists:
 emits named sub-checks and a hash, which is what the 2026-10-02 run was. The
 ad-hoc journey should be retired or given diagnostics and checked in.
 
-**Phase 4 is unverified, not "not started."**
-`flightpath-native-console-repair-20261014.yaml` shows the native-route repair
-deployed and browser-verified on 2026-10-14 — but
-`staging-candidate-freeze-20261016.yaml` still lists a Console hostname cutover
-as a pending owner decision. These are different objects (native route vs a
-dedicated `console-flightpath` hostname), so both can be true; the repository
-cannot say which state the cluster is in, and nothing under `evidence/` postdates
-**2026-10-20 15:24**. The full sweep has no retained artifact.
+**Phase 4 — the Console half is now verified, read-only.** The contradiction was
+between `flightpath-native-console-repair-20261014.yaml` (repair deployed,
+browser-verified) and `staging-candidate-freeze-20261016.yaml` (a hostname
+cutover still listed as pending). Checked live on 2026-11-24:
+
+| Object | Observed |
+|---|---|
+| `console.operator.openshift.io/cluster` → `spec.route` | `{"hostname":"","secret":{"name":""}}` — **no override** |
+| `openshift-console` routes | `console` and `downloads` only; **no `console-custom`** |
+| Both Console routes | `*.apps.flightpath.fm2aihpcsed.com` |
+| Console operator | `Available=True`, `Progressing=False`, `Degraded=False` |
+| Console pods | running, `1/1` |
+
+So the October native-route repair is the live state. The `530` on
+`labs.smg-helix.ai` is the Cloudflare tunnel having no pod, not the Console
+holding the host. The full acceptance sweep is still unverified: nothing under
+`evidence/` postdates **2026-10-20 15:24**, and it has no retained artifact.
 
 **Also Track A — live checks, not repo checks**
 
-- Explain and document, or reverse, the 2026-11-16 scale-to-zero. No Git commit
-  or Argo CD Application records it, and a powered-off cluster cannot host a
-  staging gate. This gates Phase 0 item 2 and the Phase 4 sweep.
+- ~~Explain and document the 2026-11-16 scale-to-zero~~ — **answered
+  2026-11-24** by the Launchpad owner: deliberate, capacity reallocated to other
+  projects, reversible on demand. Recorded as a decision, not an incident. It no
+  longer gates Phase 4; a powered-off platform still cannot host a gate run, so
+  the sweep waits for a power-on rather than a decision.
 - Reconcile the orphan `network-operations-agent-catalog` ConfigMap mounted at
   the same path as the Git-managed v0.2.1 item.
 - Dispose of `network-operations-demo`, a public-route copy of a catalog app

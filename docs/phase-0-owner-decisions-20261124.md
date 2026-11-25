@@ -1,12 +1,14 @@
 # Phase 0 owner decisions — GO-2026-5932 disposition and Console cutover window
 
-Status: OPEN — Brief 1 awaits one reviewer signature; Brief 2's second
-signature was waived 2026-11-24 (§2.11). Neither item is a code change.
+Status: Brief 2 CLOSED 2026-11-24 by a read-only check — no override exists,
+so there was no cutover to perform. Brief 1 OPEN, awaiting one reviewer
+signature. Neither item is a code change.
 Date: 2026-11-24.
 Branch: `codex/flightpath-migration-20260922`.
 Decision owners: Launchpad owner (`jkershaw`, both briefs); Launchpad platform
 security reviewer (`jkershaw`, Brief 1 — identity confirmed 2026-11-24);
-Flightpath/network owner (**sign-off waived for Brief 2, §2.11**).
+Flightpath/network owner (sign-off waived for Brief 2, §2.11 — **the waiver was
+never exercised**, because Brief 2 needed no mutation).
 Source of the gate: `docs/staging-candidate-order-of-operations-20261016.md`,
 Phase 0, items 1 and 2. Restated as "open, blocking" in
 `docs/flightpath-orderable-capacity-and-roadmap-20261124.md`, Track A, Phase 0.
@@ -22,7 +24,7 @@ execution time.
 | # | Item | Recommended decision | Record to file | Blocks |
 |---|---|---|---|---|
 | 1 | `x/crypto` GO-2026-5932 (2 unrated backend matches) | Accept with scope, as a signed advisory-review disposition — **not** a scanner ignore | `evidence/convergence/backend-openpgp-advisory-disposition-20261124.yaml` | Backend security gate, which gates the immutable candidate image |
-| 2 | Console / `labs.smg-helix.ai` collision | Native-route cutover (remove the operator `spec.route` override), not a new DNS hostname | `evidence/convergence/flightpath-console-cutover-<date>.yaml` produced by the window | Track A Phase 4; full participant journey |
+| 2 | Console / `labs.smg-helix.ai` collision | Native-route cutover (remove the operator `spec.route` override), not a new DNS hostname | `evidence/convergence/flightpath-console-cutover-<date>.yaml` produced by the window — **not needed**: closed by read-only check 2026-11-24 | Track A Phase 4 (Console half **closed**; full sweep still open) |
 
 Both are cheap relative to the work they unblock, and both are reversible or
 time-bounded. Neither requires a catalog, seat-ceiling, or image change.
@@ -564,9 +566,10 @@ stored with the window record and hashed; secret *values* are never exported.
 All must be true before Step 1. Any false item postpones, it does not get
 waived.
 
-1. **Platform is powered on and healthy.** The 2026-11-16 scale-to-zero must be
-   separately explained (or reversed) and the Deployments, CronJobs, routes,
-   and tunnel all healthy. A powered-off cluster cannot host this window.
+1. **Platform is powered on and healthy.** The 2026-11-16 scale-to-zero is
+   answered — it was an owner decision to reallocate capacity, reversible on
+   demand (recorded 2026-11-24) — but the platform still has to be up. A
+   powered-off cluster cannot host this window.
 2. **Step 0 read-only check complete**, and the branch in §2.2 chosen and
    written down.
 3. **Zero active lab records**, confirmed read-only, so no participant is
@@ -656,6 +659,11 @@ What is genuinely weaker: there is no second reviewer between the person
 changing shared routing and the change itself. That is the cost, and it is
 accepted for one 90-minute window with a tested rollback.
 
+**The waiver was not exercised.** Step 0 on 2026-11-24 found the repair already
+in place, so no shared object was touched and no second reviewer was ever
+dispensed with. The record stays because the window plan stays valid if the
+override is ever re-introduced.
+
 ## 2.10 Decision line — Brief 2
 
 > **Decision 2:** Approve a single 90-minute native-route cutover window for
@@ -674,6 +682,34 @@ accepted for one 90-minute window with a tested rollback.
 > a satisfied precondition — see §2.11.
 > Date: 2026-11-24 (window itself still blocked on preconditions 1–5)
 
+### Outcome — closed by Step 0 on 2026-11-24, no window required
+
+The pre-mutation read-only check ran against the live cluster. It took the
+first branch: **the October repair is in place, so there is nothing to cut
+over.**
+
+| Check | Observed |
+|---|---|
+| `console.operator.openshift.io/cluster` → `spec.route` | `{"hostname":"","secret":{"name":""}}` — **no override** |
+| `openshift-console/console-custom` Route | **does not exist** |
+| Console Routes present | `console`, `downloads`, both on `*.apps.flightpath.fm2aihpcsed.com` |
+| Console operator conditions | `Available=True`, `Progressing=False`, `Degraded=False` |
+| Console pods | `1/1` running |
+| Canonical host vs. repair record | matches `deployed_result.canonical_console` in `flightpath-native-console-repair-20261014.yaml` |
+| `cm/tunnel-router` `router.py` sha256 | `eb379b51f10a694351c4e56c077eeee176383e295aa5553e8a045dbfddc79f0c` — **matches** the recorded `deployed_router_sha256` |
+
+What this closes: Phase 0 item 2, and the "is the October repair live?" half of
+Phase 4. What it does not close: the full acceptance sweep, which still needs a
+powered-on platform and still has no retained artifact.
+
+The `530` on `labs.smg-helix.ai` is not this collision. It is the Cloudflare
+tunnel Deployment sitting at `0/0` since the platform was scaled down; the
+hostname resolves to the tunnel, not to the Console. Powering the tunnel back on
+restores it without touching routing.
+
+**Nothing was mutated to reach this conclusion, and the waived network signature
+was never used.** The risk in §2.11 was accepted and then not needed.
+
 ---
 
 ## What this brief could not verify
@@ -682,10 +718,10 @@ accepted for one 90-minute window with a tested rollback.
 |---|---|---|
 | ~~The two unrated matches are the same advisory counted twice~~ | **Resolved: they are not duplicates.** They are `/usr/local/bin/oc` and `/usr/local/bin/helm`, same advisory, same module version, in both retained scans | Settled by `vulnerability-report.json` in runs 39473152288 and 38758481803, hash-verified |
 | `oc` is the only importer of `x/crypto/openpgp` | **Resolved: it is not.** `helm` in the same image links it for chart provenance, and `skopeo` in the showroom-terminal image links it under the same tag | `helm` is covered by Brief 1's scope; `skopeo` needs a separate disposition |
-| The current live Console `spec.route` value | Cluster is scaled to zero; no manifest in repo | Step 0 read-only `oc get` when powered on |
-| Whether the October repair is still deployed | Oct 14 evidence and Oct 16/Nov 24 docs contradict | Same Step 0 read |
-| Current `labs.smg-helix.ai` behaviour | Host returns 530 while scaled to zero | Re-check after power-on |
-| Router deployed hash still matches `eb379b51...` | Not readable while scaled to zero | Read at Step 0 |
+| ~~The current live Console `spec.route` value~~ | **Resolved 2026-11-24:** empty — `{"hostname":"","secret":{"name":""}}` | Live read; see the Brief 2 outcome table |
+| ~~Whether the October repair is still deployed~~ | **Resolved 2026-11-24:** yes — no override, no `console-custom`, canonical host matches the repair record | Live read; see the Brief 2 outcome table |
+| ~~Router deployed hash still matches `eb379b51...`~~ | **Resolved 2026-11-24:** `cm/tunnel-router` `router.py` hashes to `eb379b51…` exactly | Live read |
+| `labs.smg-helix.ai` serves participants again after power-on | Host returns `530` while the tunnel is at `0/0` | Re-check after the tunnel returns |
 | Upstream `x/crypto` status after 2026-11-02 | Advisory could change after this brief's date | Re-read `vuln.go.dev` at signing |
 
 ## References
