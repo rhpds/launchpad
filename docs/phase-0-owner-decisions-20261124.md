@@ -220,7 +220,7 @@ Required fields:
 | `cve` / `cvss` | `none` / `none` — state explicitly that no severity exists |
 | `affected_modules` | `golang.org/x/crypto v0.57.0` — 2 matches, in `/usr/local/bin/oc` and `/usr/local/bin/helm` (both linked via the `containers_image_openpgp` tag) |
 | `scanner_source` | `8b8fc909fe057a8803334ed3d37c1625acd96ea7`, run `39473152288`, `unrated: 2`; prior scan `95fec905…` / run `38758481803` carried the same two |
-| `candidate_digest` | The digest this disposition covers — acceptance is per-image, not global |
+| `candidate_digest` | The digest this disposition covers — acceptance is per-image, not global. State whether that digest is published; both scanned digests are not |
 | `build_tag_basis` | `containers_image_openpgp` in `backend/Containerfile`; selects openpgp in `containers/image/v5/signature`, which both `oc` (built at line 78, copied at 149) and `helm` (built at 119, copied at 150) link |
 | `fixed_version_available` | `false`, with the carve-out explanation |
 | `upgrade_attempts` | Parent bump (relocates), ProtonMail fork (3/3 v3 failures), tag removal (cgo/gpgme) |
@@ -279,6 +279,10 @@ prior_scan:
     without changing what has to be dispositioned.
 candidate_digest: sha256:49f2ec78b83aa6f963bb6c59a056eeaccde826060b2b15eda74919ce13923b2a
 candidate_published: false
+candidate_unpushed_note: >-
+  Scanned in CI and never pushed. The registry's newest
+  launchpad-backend-flightpath-candidate version is git-27b6d2b1 (2026-10-14).
+  Any rebuild produces a new digest and reopens this disposition.
 fixed_version_available: false
 fixed_version_reason: >-
   golang.org/x/crypto v0.59.0 removed the openpgp package. The replacement
@@ -382,6 +386,21 @@ artifacts, not against assumptions.
    `helm`; it may **not** cover `skopeo`, and it may not claim the backend
    binaries are unreachable by a human with shell access. Do not sign on the
    assumption that `oc` is the only importer.
+3. **Whether the digest named in the record can be identified later — no, not
+   today.** Checked 2026-11-24: the `launchpad-backend-flightpath-candidate`
+   package has 14 versions, the newest pushed 2026-10-14T18:54Z as
+   `git-27b6d2b1ae96d0f80d97bbb7d405a80c23a52f22`
+   (`sha256:43c9e691…`). Neither `sha256:49f2ec78…` (10-20) nor
+   `sha256:d222ed9a…` (10-15) appears in the registry, and no tag
+   `git-8b8fc909…` or `git-95fec905…` exists. Both scans set
+   `publication_requested: false`, so both builds were scanned and discarded.
+
+   That matters for the signature, not for the findings. A disposition bound to
+   an unpushed digest is still an honest record of a reviewed build, but nobody
+   can pull that image to re-verify it, and the next promoted build is a
+   different digest — which is already a reopen trigger. Signing today therefore
+   documents the decision without clearing anything operationally. The stronger
+   sequence is: promote or publish a build, re-scan it, and sign that digest.
 
 ## 1.9 Decision line — Brief 1
 
@@ -401,10 +420,11 @@ artifacts, not against assumptions.
 > Approved by: J Kershaw — `launchpad-platform-security-reviewer`, identity
 > confirmed 2026-11-24
 > Date: __________ **not yet executed** — the findings are verified and the
-> wording is final, but the acceptance is per-image-digest and the candidate
-> image was never published (`candidate_published: false`), so a signature taken
-> now binds a build that exists only as a retained digest. Sign it against the
-> digest that will be promoted.
+> wording is final. What is not resolved is *which* digest the acceptance binds:
+> neither scanned digest was ever pushed to the registry (§1.8 item 3), so a
+> signature taken now names an image nobody can pull, and the next promoted
+> build reopens it by construction. Sign against the digest that will be
+> promoted, or sign now and accept that the record reopens on the next build.
 
 ---
 
