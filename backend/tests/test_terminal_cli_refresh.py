@@ -10,13 +10,13 @@ ROOT = Path(__file__).resolve().parents[2]
 # helm, tkn, tkn-pac and opc match the vendor-published checksum files.
 PINNED_CLI_TOOLS = {
     'helm': 'v3.22.1',
-    'oc': '4.22.18',
-    'kubectl': '4.22.18',
-    'kn': 'v1.23.0',
-    'tkn': 'v0.46.1',
-    'tkn-pac': 'v0.52.0',
-    'opc': 'v1.24.0',
-    'roxctl': '4.11.5',
+    'oc': '4.22.23',
+    'kubectl': '4.22.23',
+    'kn': 'v1.24.0',
+    'tkn': 'v0.47.0',
+    'tkn-pac': 'v0.54.0',
+    'opc': 'v1.25.0',
+    'roxctl': '5.0.0',
     # skopeo publishes no release binaries; it is built from the immutable
     # v1.24.1 source tag in the Containerfile with a pinned Go toolchain.
     'skopeo': 'v1.24.1',
@@ -105,7 +105,7 @@ def test_cli_refresh_removes_staging_artifacts_before_layer_close():
     assert 'rm -rf /tmp/linux-amd64' in source
     for leftover in (
         '/tmp/kn-linux-amd64',
-        '/tmp/roxctl-4.11.5',
+        '/tmp/roxctl-5.0.0',
         '/tmp/oc',
         '/tmp/kubectl',
         '/tmp/tkn',

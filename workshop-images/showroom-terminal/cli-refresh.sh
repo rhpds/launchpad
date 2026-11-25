@@ -5,9 +5,10 @@
 # Sourcing rules (see evidence/convergence/terminal-os-refresh-20261015.yaml):
 #   - Every downloaded artifact is verified against a pinned SHA256 before it
 #     replaces the inherited base-image binary.
-#   - Checksums for helm, tkn, tkn-pac and opc match the vendor-published
-#     checksum files; kn, oc/kubectl and roxctl pins were computed from the
-#     exact vendor artifacts referenced below.
+#   - Every checksum below is transcribed from a vendor-published checksum
+#     file: helm's .sha256sum, the Tekton and Pipelines-as-Code checksums.txt
+#     assets, knative's checksums.txt, and the OpenShift client and RHACS
+#     mirror sha256sum.txt files.
 #   - skopeo v1.24.1 is built from the immutable upstream source tag inside
 #     the Containerfile (pinned Go toolchain + checksum-pinned source tarball)
 #     because skopeo publishes no release binaries and the vendor container
@@ -30,6 +31,8 @@ verify() {
 }
 
 # helm v3.22.1 (official checksum: helm-v3.22.1-linux-amd64.tar.gz.sha256sum)
+# Deliberately NOT moved to 4.3.2: 3.22.1 already scans 0 Critical / 0 High, so
+# the v4 major-version behaviour change buys no security and risks lab content.
 verify \
   "https://get.helm.sh/helm-v3.22.1-linux-amd64.tar.gz" \
   "896cf63684a42a723d61c980369d6e588330927deb13676ca0d85006dd6da0ea" \
@@ -37,64 +40,68 @@ verify \
 tar -xzf /tmp/helm-v3.22.1-linux-amd64.tar.gz -C /tmp linux-amd64/helm
 install -m 0755 /tmp/linux-amd64/helm /usr/local/bin/helm
 
-# oc + kubectl 4.22.18 from the OpenShift client mirror bundle. The bundle
+# oc + kubectl 4.22.23 from the OpenShift client mirror bundle. The bundle
 # ships the oc binary for both names, matching the inherited base-image
 # layout, so learner commands keep their existing behavior.
+# 4.22.23 is the first client build carrying go1.26.10; 4.22.18/4.22.22 were
+# both go1.25.14 and contributed three Critical stdlib advisories each.
 verify \
-  "https://mirror.openshift.com/pub/openshift-v4/amd64/clients/ocp/4.22.18/openshift-client-linux-4.22.18.tar.gz" \
-  "07751676809553e012448cdb3a755ffa7b11d7e25b8a6cc60a5a62a9f4b18159" \
-  /tmp/openshift-client-linux-4.22.18.tar.gz
-tar -xzf /tmp/openshift-client-linux-4.22.18.tar.gz -C /tmp oc kubectl
+  "https://mirror.openshift.com/pub/openshift-v4/amd64/clients/ocp/4.22.23/openshift-client-linux-4.22.23.tar.gz" \
+  "053507b991867cb04a172a36e4ca7edd935fa2e5909b03a0b8392807991f89ae" \
+  /tmp/openshift-client-linux-4.22.23.tar.gz
+tar -xzf /tmp/openshift-client-linux-4.22.23.tar.gz -C /tmp oc kubectl
 install -m 0755 /tmp/oc /usr/local/bin/oc
 install -m 0755 /tmp/kubectl /usr/local/bin/kubectl
 
-# kn v1.23.0 (knative client)
+# kn v1.24.0 (knative client; checksums.txt asset)
 verify \
-  "https://github.com/knative/client/releases/download/knative-v1.23.0/kn-linux-amd64" \
-  "852a3229e3e36e69a7f006da882f7841138fc39047051589841f24336d8f37b2" \
+  "https://github.com/knative/client/releases/download/knative-v1.24.0/kn-linux-amd64" \
+  "7a69805deda57ff45e3f48aac5d1b0f0b258bc3a85ec2d033770a6e3d38af777" \
   /tmp/kn-linux-amd64
 install -m 0755 /tmp/kn-linux-amd64 /usr/local/bin/kn
 
-# tkn v0.46.1 (official checksums.txt)
+# tkn v0.47.0 (official checksums.txt)
 verify \
-  "https://github.com/tektoncd/cli/releases/download/v0.46.1/tkn_0.46.1_Linux_x86_64.tar.gz" \
-  "bc9fe51595af87cee422ae19a62ab46c8cdcb0a74f7157ffa8b9a9ef39b3d390" \
-  /tmp/tkn-v0.46.1-linux-x86_64.tar.gz
-tar -xzf /tmp/tkn-v0.46.1-linux-x86_64.tar.gz -C /tmp tkn
+  "https://github.com/tektoncd/cli/releases/download/v0.47.0/tkn_0.47.0_Linux_x86_64.tar.gz" \
+  "ea027194967eb010fee9d942cf021512e9a924660ff6b31bb6012926868198f8" \
+  /tmp/tkn-v0.47.0-linux-x86_64.tar.gz
+tar -xzf /tmp/tkn-v0.47.0-linux-x86_64.tar.gz -C /tmp tkn
 install -m 0755 /tmp/tkn /usr/local/bin/tkn
 
-# tkn-pac v0.52.0 (official checksums.txt)
+# tkn-pac v0.54.0 (official checksums.txt)
 verify \
-  "https://github.com/openshift-pipelines/pipelines-as-code/releases/download/v0.52.0/tkn-pac_0.52.0_linux_x86_64.tar.gz" \
-  "943d8da4393d997154a9dd723e754ecc4daa3797df44f7a1c3f4a6b893c32cba" \
-  /tmp/tkn-pac-v0.52.0-linux-x86_64.tar.gz
-tar -xzf /tmp/tkn-pac-v0.52.0-linux-x86_64.tar.gz -C /tmp tkn-pac
+  "https://github.com/openshift-pipelines/pipelines-as-code/releases/download/v0.54.0/tkn-pac_0.54.0_linux_x86_64.tar.gz" \
+  "fcc8ebdf15ded61720d44ec03602be12664754de9aa6fd17868858e43c2752bf" \
+  /tmp/tkn-pac-v0.54.0-linux-x86_64.tar.gz
+tar -xzf /tmp/tkn-pac-v0.54.0-linux-x86_64.tar.gz -C /tmp tkn-pac
 install -m 0755 /tmp/tkn-pac /usr/local/bin/tkn-pac
 
-# opc v1.24.0 (official checksums.txt)
+# opc v1.25.0 (official checksums.txt)
 verify \
-  "https://github.com/openshift-pipelines/opc/releases/download/v1.24.0/opc_1.24.0_linux_x86_64.tar.gz" \
-  "4ad40ad3204dad203e2dadc0f5e79adfb2953f122b2e036e96e4bacd51090930" \
-  /tmp/opc-v1.24.0-linux-x86_64.tar.gz
-tar -xzf /tmp/opc-v1.24.0-linux-x86_64.tar.gz -C /tmp opc
+  "https://github.com/openshift-pipelines/opc/releases/download/v1.25.0/opc_1.25.0_linux_x86_64.tar.gz" \
+  "1e90aba71b440a4a57cb8fff7eeb5ada64057cfb7e5dc86c45e5a0bd5b807e5a" \
+  /tmp/opc-v1.25.0-linux-x86_64.tar.gz
+tar -xzf /tmp/opc-v1.25.0-linux-x86_64.tar.gz -C /tmp opc
 install -m 0755 /tmp/opc /usr/local/bin/opc
 
-# roxctl 4.11.5 (RHACS client mirror)
+# roxctl 5.0.0 (RHACS client mirror; sha256sum.txt). 5.0.0 drops the
+# github.com/containerd/containerd dependency entirely, which removes the two
+# Critical containerd advisories that 4.11.5 could not fix.
 verify \
-  "https://mirror.openshift.com/pub/rhacs/assets/4.11.5/bin/linux/roxctl" \
-  "5c7e604b6672354a79d0a3d3e1cda363618f89a6a38353a2a94445b6eab703bb" \
-  /tmp/roxctl-4.11.5
-install -m 0755 /tmp/roxctl-4.11.5 /usr/local/bin/roxctl
+  "https://mirror.openshift.com/pub/rhacs/assets/5.0.0/bin/linux/roxctl" \
+  "b29c432b7b0e40719969ae3d9e4e202559dce6a746e5b9a62eefcd3bb788fd6b" \
+  /tmp/roxctl-5.0.0
+install -m 0755 /tmp/roxctl-5.0.0 /usr/local/bin/roxctl
 
 # Remove every downloaded and extracted staging artifact so the complete-image
 # scan evaluates exactly one copy of each learner CLI and the published image
 # carries no duplicate binaries.
 rm -f /tmp/helm-v3.22.1-linux-amd64.tar.gz \
-  /tmp/openshift-client-linux-4.22.18.tar.gz \
-  /tmp/tkn-v0.46.1-linux-x86_64.tar.gz \
-  /tmp/tkn-pac-v0.52.0-linux-x86_64.tar.gz \
-  /tmp/opc-v1.24.0-linux-x86_64.tar.gz \
-  /tmp/kn-linux-amd64 /tmp/roxctl-4.11.5 \
+  /tmp/openshift-client-linux-4.22.23.tar.gz \
+  /tmp/tkn-v0.47.0-linux-x86_64.tar.gz \
+  /tmp/tkn-pac-v0.54.0-linux-x86_64.tar.gz \
+  /tmp/opc-v1.25.0-linux-x86_64.tar.gz \
+  /tmp/kn-linux-amd64 /tmp/roxctl-5.0.0 \
   /tmp/oc /tmp/kubectl /tmp/tkn /tmp/tkn-pac /tmp/opc /tmp/helm
 rm -rf /tmp/linux-amd64
 
