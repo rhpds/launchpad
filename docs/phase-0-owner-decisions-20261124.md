@@ -68,9 +68,16 @@ blocked = any(
 
 That detail matters for the decision. A scanner ignore or a suppression entry
 does **not** clear this gate — suppressed `Unknown` matches are part of the
-blocking condition. There is no allowlist in the script. So the only honest
-path is a documented, scoped, human-signed disposition, which is what the
-order-of-operations document already says is required.
+blocking condition, and since `27a1ede0` a risk acceptance cannot cover them
+either. There is still no allowlist: no severity, package or advisory is exempt
+by default. What the script now has is a signed enumeration —
+`launchpad/risk-acceptance/v1`, rendered from a measured report by
+`scripts/render_risk_acceptance.py` — which subtracts exactly the
+`(advisory, package, severity)` triples a reviewer lists, for one component, one
+released revision and one validity window of at most 180 days. Anything unlisted
+still blocks, and `platform_staging_qualified` stays `false`. So the only honest
+path is unchanged, but it is now expressible: a documented, scoped,
+human-signed disposition written in a format the gate itself validates.
 
 Current evidence: `evidence/convergence/image-security-revalidation-20261020.yaml`
 is the present baseline — backend `{Critical 0, High 35, Unknown 2}` at
@@ -209,6 +216,16 @@ Create `evidence/convergence/backend-openpgp-advisory-disposition-20261124.yaml`
 (note: this brief does not create it — the reviewer signs it). Schema
 `launchpad/advisory-disposition/v1`, matching the style already used by
 `evidence/convergence/backend-remaining-security-disposition-20261014.yaml`.
+
+**This document and the gate record are not the same file.** A
+`launchpad/advisory-disposition/v1` is the argument — what the advisory is, why
+it cannot be fixed, what is reachable — and the gate never reads it. What
+subtracts findings from the gate is a `launchpad/risk-acceptance/v1` record,
+rendered from the measured report by `scripts/render_risk_acceptance.py`, which
+enumerates every blocking `(advisory, package, severity)` triple and names the
+revision being released. Sign both: the disposition is the reasoning a reader
+can audit, the acceptance is the scope the pipeline enforces. Neither one grants
+platform staging qualification.
 
 Required fields:
 
@@ -750,7 +767,10 @@ was never used.** The risk in §2.11 was accepted and then not needed.
 - `backend/Containerfile` — `containers_image_openpgp`, `oc`/`helm` build, `oc`
   copied to `/usr/local/bin/oc`.
 - `scripts/check_backend_staging_security.py` — `Unknown` blocks, including
-  suppressed inventory; no allowlist.
+  suppressed inventory; no allowlist, and `launchpad/risk-acceptance/v1`
+  subtracts only enumerated `(advisory, package, severity)` triples.
+- `scripts/render_risk_acceptance.py` — renders that record from a measured
+  Grype report and refuses one the gate would reject.
 - `deploy/console-embed/flightpath-native-route.patch.json` — cutover patch.
 - `deploy/tunnel-oncluster/flightpath-deployment.yaml` — native Console host
   and callback env.

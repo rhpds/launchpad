@@ -306,30 +306,98 @@ High from stdlib advisories fixed only in go1.27.4 and from `x/net` v0.61.0
 fixed only in v0.62.0. Upstream is simply ahead of every artifact we are allowed
 to ship.
 
-**Which means the publication gate cannot pass, by construction.**
-`.github/workflows/terminal-release.yml:129-138` runs `anchore/scan-action` with
-`fail-build: true`, `severity-cutoff: high`, `only-fixed: true` — any *fixable*
-High or Critical fails the job — and the next step runs
+**Which is why a clean scan is unreachable — not why publishing is.**
+`.github/workflows/terminal-release.yml` scans twice: `anchore/scan-action` with
+`severity-cutoff: high` and `only-fixed: true` for the fixable inventory, then
 `scripts/check_backend_staging_security.py` over the **unfiltered** report, which
-blocks on every High/Critical/Unknown regardless of fix state and hardcodes
-`risk_acceptance: NOT-GRANTED`. The projection above carries 121 fixable
-High/Critical. No combination of vendor artifacts changes that; only a signed
-exception path, or dropping the prebuilt CLIs, does.
+blocks on every High/Critical/Unknown regardless of fix state. The projection
+above carries 121 fixable High/Critical, and no combination of vendor artifacts
+reaches zero: even the newest CLIs carry `GO-2026-6612` in `golang.org/x/net`
+because upstream has not shipped a fixed release we are permitted to consume.
 
-That is the live decision, and it is deliberately not taken here. Three honest
-options: (a) publish with a documented applicability review covering the
-residual 3 + the RPM tail and an explicit publish-despite, routed through the
-same `risk_acceptance` mechanism Brief 1 uses; (b) drop `oc`, `kubectl` and
-`roxctl` and accept a terminal without cluster-admin tooling — which changes what
-labs can teach; or (c) leave the terminal unpublished and keep `324dc5c4`
-serving, which is a choice to keep shipping 112 Criticals. Option (a) is the only
-one that reduces participant exposure, and it needs an owner signature — Brief 1
-is the natural vehicle once a digest exists to sign.
+Until `27a1ede0` that made the publish path dead code rather than a red
+pipeline. The gate now accepts a `launchpad/risk-acceptance/v1` record and
+subtracts only what the record enumerates, by exact
+`(advisory, package, severity)` triple, bound to the component, the released
+revision, and either the candidate digest or an explicit `digest_pending`. A
+scanner suppression can never be covered, an unlisted finding still blocks, the
+record expires within 180 days, unknown fields are rejected, and
+`platform_staging_qualified` stays `false`. The fixable-only step is evidence
+now (`fail-build: false`), so the Python gate is the single decision, and
+`scripts/render_risk_acceptance.py` transcribes a measured report into the
+record and refuses to write one the gate would reject.
+
+Verified against the deployed digest: the 1254 blocking matches collapse to
+**376 triples**, the gate reports `PASS-SCAN-ONLY` / `risk_acceptance: GRANTED`
+/ `gate_basis: SIGNED-ACCEPTANCE`; one fabricated extra advisory still blocks as
+`APPLIED-INCOMPLETE`; a tampered digest exits 2 as `INVALID`.
+
+So the decision is now about cost, not feasibility. Three honest options:
+(a) publish with a signed applicability review covering the residual 3 and the
+RPM tail, routed through that mechanism — mechanical, and the only option that
+reduces participant exposure; (b) drop `oc`, `kubectl` and `roxctl` and accept a
+terminal without cluster-admin tooling, which changes what labs can teach; or
+(c) leave the terminal unpublished and keep `324dc5c4` serving, which is a
+choice to keep shipping 112 Criticals. Option (a) needs an owner signature, and
+Brief 1 is the natural vehicle once a digest exists to sign.
 
 **Why this outranks every other Track B item.** 16 catalog items declare
 `showroom_terminal_storage`. The terminal is not one blocked experience; it is
 the substrate under nearly all showroom-backed orderability, so no seat-cap or
 exposure change unblocks external participant orders while this is unresolved.
+
+**The publish target is a second, independent decision.** A green run today
+pushes to `ghcr.io/rhpds/launchpad-showroom-terminal`, which does not exist yet
+(`gh api` returns 404), while both Flightpath overlays pin
+`quay.io/rh-ee-jkershaw/launchpad-showroom-terminal@sha256:324dc5c4…`. Signing a
+digest the cluster never pulls would be theatre, so the promotion path has to be
+chosen before any dispatch. What the live cluster actually does:
+
+| Workload | Image | Pull secret |
+|---|---|---|
+| `backend`, `lifecycle-worker` | `ghcr.io/jkershawrh/…-candidate@sha256:3bedbc0c…` | `launchpad-backend-ghcr-pull`, `launchpad-registry-pull` |
+| `public-access-gateway` | `ghcr.io/rhpds/launchpad-backend-flightpath@sha256:298527ff…` | `launchpad-registry-pull` |
+| `cloudflare-tunnel` | `ghcr.io/rhpds/launchpad-backend@sha256:6af8015c…` | none — package is public |
+| showroom seats | `quay.io/rh-ee-jkershaw/launchpad-showroom-terminal@sha256:324dc5c4…` | none — public Quay |
+
+So "GHCR is not this cluster's registry" is false; GHCR already serves the
+control plane from both `rhpds` and the fork. The objection is narrower and sits
+in the provisioner: `_requires_image_pull_grant`
+(`backend/app/adapters/openshift/provisioning.py:1502`) declines to bind an
+internal pull grant only when every showroom support image matches
+`quay\.io/…@sha256:…` via its local `pinned_quay()` helper. Point the terminal at
+GHCR and the adapter starts creating a `partner-ai-launchpad` RoleBinding for a
+registry the image does not come from, and
+`test_deployed_cluster_images_and_pilot_catalog_preserve_grant_boundary`
+(`backend/tests/test_openshift_image_pull_grant.py:47`, which reads the live
+overlay and expects `flightpath_grant: False`) fails. That test is the invariant,
+not an inconvenience.
+
+`config/artifact-registry-policy.yaml` points a third way: it names
+`quay.io/redhat-gpte` as the authoritative origin, records
+`organization_ownership_approved: false`, and marks every
+`pull_grant_verified: false`. Its gate (`scripts/validate_artifact_registry.py`,
+run from CI) requires each repository to sit under that origin, so it cannot be
+used to bless GHCR either. The deployed `rh-ee-jkershaw` namespace is a personal
+pilot path that satisfies neither the policy nor the grant boundary.
+
+Two coherent choices, with different costs:
+
+* **Keep Quay and promote into it.** Build and sign in GHCR, then copy the
+  digest into the Quay repository the overlays already pin. Preserves
+  `pinned_quay`, the grant boundary, its test, the policy, and every existing
+  reference; because the acceptance binds to the digest, the copy is auditable.
+  Costs a promotion step plus a Quay robot token as a repository secret — CI
+  holds no Quay credential today — and the overlays need only a digest edit.
+* **Move the showroom images to GHCR.** Needs a deliberate widening of the grant
+  boundary (generalize `pinned_quay` into an allowlist of immutable
+  control-plane registries), a pull secret or public package for every seat
+  namespace, an update to the registry policy, and edits to the three tests that
+  pin today's behaviour. Larger, and it changes the code whose job is to decide
+  when to stop granting blanket pull.
+
+The first is recommended: it moves no security invariant, changes no trust path,
+and repins three files. It also matches how `324dc5c4` reached Quay.
 
 **Phase 3 — half closed.** The staged pins are committed (`a1d1eb67`,
 `647497bc`, `746e9e71`, all ancestors of HEAD) and the exact-commit regression is
