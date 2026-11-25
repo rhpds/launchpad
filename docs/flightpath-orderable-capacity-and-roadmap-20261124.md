@@ -150,7 +150,7 @@ new product-owner decision **after** staging acceptance.
 |---|---|---|
 | **0** | Owner decisions: x/crypto GO-2026-5932 disposition; Console cutover window | Brief 2 **closed by live check 11-24** — no override exists; Brief 1 **1 signature needed** |
 | **1** | Keycloak 26.8.1 isolated upgrade + DB compatibility proof; virtualization-ai-501 narrow-pane layout | **closed** (2026-10-16) |
-| **2** | Vendor-pending images: terminal, backend | **blocked on vendors**; counts corrected below |
+| **2** | Vendor-pending images: terminal, backend | backend **vendor-wait**; terminal **blocked on a gate decision, not on vendors** — see below |
 | **3** | Staged catalog pins; exact-commit regression; current-revision public browser proofs | pins + regression **closed**; public proofs **open and failing** |
 | **4** | Console verify-or-cutover; full acceptance sweep with zero residue | Console **verified native 11-24, no mutation needed**; sweep still **unverified** |
 
@@ -189,7 +189,9 @@ the reachability argument is weakest, and needs its own disposition.
 current baseline: backend full inventory `{Critical 0, High 35, Unknown 2}` with
 **2** fixable High; terminal `{Critical 31, High 350, Unknown 10}` with **63**
 fixable (4 Critical, 59 High). The `25 High` figure quoted in older documents is
-explicitly historical, not the present scan.
+explicitly historical, not the present scan. Note that the terminal half of this
+baseline describes an **unpublished** build — the deployed digest and its
+correct counts are below.
 
 **"Fixable" is a scanner claim, not an errata.** The gate reads Grype's
 `fix.state`, so `fixed: 2` means the scanner database knows a newer package
@@ -230,6 +232,104 @@ Neither closes by upgrading: `v3.1.0` drops registry client packages
 `openshift/library-go` imports — tried in `d3274b41`, reverted in `506e739a`.
 That is the "review the two" half of the 2026-11-24 split; the remaining 33 High
 go to vendor wait.
+
+**The terminal was measured wrong, and the error was ours.** Every terminal
+number in this document — the `31 Critical / 350 High / 10 Unknown` above
+included — describes `cefd6a5a`, a build that was **never published**
+(`image_published: false`). The repository `quay.io/rh-ee-jkershaw/launchpad-showroom-terminal`
+has exactly one active tag, `pilot-2026-09-17` → `324dc5c4`, and no retained
+scan named that digest before 2026-11-24. So the gate was correctly blocking a
+build nobody could pull, while the image participants actually ran had never
+been scanned at all.
+
+Scanned on 2026-11-24 with the same grype version as CI (0.97.1) and a current
+database (schema v6.1.10, built that morning), twice — once from a
+`docker-archive`, once from the registry reference — with byte-identical
+findings. The registry scan is the signature-grade one because it records the
+true `manifestDigest`:
+`evidence/runs/terminal-deployed-scan-324dc5c4-20261124.json`
+(`report_sha256 6c377e0b…`).
+
+| | deployed `324dc5c4` | unpublished `cefd6a5a` | rebuilt projection |
+|---|---|---|---|
+| Critical | **112** | 31 | **3** |
+| High | **1125** | 350 | **130** (8 CLIs only) |
+| Unknown | 17 | 10 | 7 (8 CLIs only) |
+| total matches | 2957 | 1219 | 226 (8 CLIs only) |
+| distinct High/Critical ids | 255 | 92 | — |
+| Criticals with a fixed version | **112 of 112** | 29 of 31 | 3 of 3 |
+
+The counts are not directly comparable — the 10-20 scan used a five-week-older
+database — but the direction is not subtle: the deployed image is **3.6× worse
+on Criticals**.
+
+**It is a stale image, not a compromised one.** `324dc5c4` predates the entire
+October refresh, so participants have been running exactly the things that
+refresh removed:
+
+| | deployed | HEAD before this change |
+|---|---|---|
+| `odo` | **still present** — 22 Critical / 130 High by itself | removed 2026-10-16 |
+| `skopeo` | 1.22.2, vendor `/usr/bin` | 1.24.1, source-built |
+| `oc` / `kubectl` | 4.20.32, go1.24.13 | 4.22.18 |
+| `kn` | v1.15.0, **go1.22.11** | v1.23.0 |
+| `tkn` | 0.42.0, go1.24.6 | v0.46.1 |
+| `tkn-pac` | 4.11.2 | v0.52.0 |
+| `roxctl` | 4.11.5 | 4.11.5 |
+
+111 of the 112 Criticals are `go-module` findings inside the nine Go binaries it
+carries; exactly one is an RPM (`ca-certificates`, `CVE-2026-114406`). All 112
+Critical matches carry a fixed version, and the High/Critical fix states are
+`fixed 1187 / not-fixed 43 / unspecified 6 / wont-fix 1`. This is a pinning
+problem, which is why it is worth fixing now rather than waiting.
+
+**The fix is committed, and it lands at 3 Critical.** `097fb62b` moves the
+pinned artifacts to the current vendor releases — `oc`/`kubectl` 4.22.23
+(go1.25.14 → go1.26.10), `kn` v1.24.0, `tkn` v0.47.0, `tkn-pac` v0.54.0, `opc`
+v1.25.0, `roxctl` 5.0.0 — with every checksum transcribed from a
+vendor-published checksum file. Scanning those exact artifacts as a directory
+(`evidence/runs/terminal-rebuild-projection-20261124.json`) gives
+**3 Critical / 130 High** across the eight downloaded CLIs (`oc`, `kubectl`,
+`kn`, `tkn`, `tkn-pac`, `opc`, `roxctl`, `helm`), and removes both containerd
+Criticals outright: **`roxctl` 5.0.0 drops the
+`github.com/containerd/containerd` dependency entirely**, so `GO-2026-5064` and
+`GO-2026-5338` — previously written off as vendor-wait — simply disappear.
+`helm` stays at v3.22.1: it already scans 0 Critical / 0 High and a v4
+major-version change buys no security.
+
+**The residual three are one advisory in three Red Hat binaries.** All three are
+`GO-2026-6612` in `golang.org/x/net`, fixed only in v0.60.0: `oc` and `kubectl`
+ship v0.56.0, `roxctl` v0.58.0. We cannot re-toolchain a Red Hat-built binary,
+and the CLIs that do ship on current Go (`kn`, `tkn`, `tkn-pac`, `opc`) are
+already at the newest upstream releases on go1.27.3 — and *still* carry fixable
+High from stdlib advisories fixed only in go1.27.4 and from `x/net` v0.61.0
+fixed only in v0.62.0. Upstream is simply ahead of every artifact we are allowed
+to ship.
+
+**Which means the publication gate cannot pass, by construction.**
+`.github/workflows/terminal-release.yml:129-138` runs `anchore/scan-action` with
+`fail-build: true`, `severity-cutoff: high`, `only-fixed: true` — any *fixable*
+High or Critical fails the job — and the next step runs
+`scripts/check_backend_staging_security.py` over the **unfiltered** report, which
+blocks on every High/Critical/Unknown regardless of fix state and hardcodes
+`risk_acceptance: NOT-GRANTED`. The projection above carries 121 fixable
+High/Critical. No combination of vendor artifacts changes that; only a signed
+exception path, or dropping the prebuilt CLIs, does.
+
+That is the live decision, and it is deliberately not taken here. Three honest
+options: (a) publish with a documented applicability review covering the
+residual 3 + the RPM tail and an explicit publish-despite, routed through the
+same `risk_acceptance` mechanism Brief 1 uses; (b) drop `oc`, `kubectl` and
+`roxctl` and accept a terminal without cluster-admin tooling — which changes what
+labs can teach; or (c) leave the terminal unpublished and keep `324dc5c4`
+serving, which is a choice to keep shipping 112 Criticals. Option (a) is the only
+one that reduces participant exposure, and it needs an owner signature — Brief 1
+is the natural vehicle once a digest exists to sign.
+
+**Why this outranks every other Track B item.** 16 catalog items declare
+`showroom_terminal_storage`. The terminal is not one blocked experience; it is
+the substrate under nearly all showroom-backed orderability, so no seat-cap or
+exposure change unblocks external participant orders while this is unresolved.
 
 **Phase 3 — half closed.** The staged pins are committed (`a1d1eb67`,
 `647497bc`, `746e9e71`, all ancestors of HEAD) and the exact-commit regression is

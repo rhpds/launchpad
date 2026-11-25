@@ -1,0 +1,117 @@
+{
+  "schema": "launchpad.redhat.com/terminal-cli-refresh-projection/v1",
+  "observed_date": "2026-11-24",
+  "scope": "the eight CLI binaries at the versions pinned by workshop-images/showroom-terminal/cli-refresh.sh at 097fb62b, scanned as a directory rather than as an image",
+  "method": "grype dir: over the exact vendor artifacts; skopeo v1.24.1 is source-built in the Containerfile and is not included here",
+  "scanner": {
+    "name": "grype",
+    "version": "0.97.1",
+    "database_schema": "v6.1.10",
+    "database_built": "2026-11-24T06:22:05Z"
+  },
+  "totals": {
+    "critical": 3,
+    "high": 130,
+    "unrated": 7,
+    "total": 226
+  },
+  "fix_states_of_high_and_critical": {
+    "fixed": 121,
+    "not-fixed": 8,
+    "unspecified": 4
+  },
+  "per_binary": [
+    {
+      "binary": "kubectl",
+      "critical": 1,
+      "high": 37,
+      "unrated": 1
+    },
+    {
+      "binary": "oc",
+      "critical": 1,
+      "high": 37,
+      "unrated": 1
+    },
+    {
+      "binary": "roxctl",
+      "critical": 1,
+      "high": 14,
+      "unrated": 1
+    },
+    {
+      "binary": "opc",
+      "critical": 0,
+      "high": 13,
+      "unrated": 1
+    },
+    {
+      "binary": "tkn",
+      "critical": 0,
+      "high": 12,
+      "unrated": 1
+    },
+    {
+      "binary": "kn",
+      "critical": 0,
+      "high": 9,
+      "unrated": 0
+    },
+    {
+      "binary": "tkn-pac",
+      "critical": 0,
+      "high": 8,
+      "unrated": 1
+    },
+    {
+      "binary": "helm4",
+      "critical": 0,
+      "high": 0,
+      "unrated": 1
+    }
+  ],
+  "residual_criticals": [
+    {
+      "binary": "oc",
+      "package": "golang.org/x/net",
+      "version": "v0.56.0",
+      "advisory": "GO-2026-6612",
+      "fixed_in": [
+        "0.60.0"
+      ]
+    },
+    {
+      "binary": "kubectl",
+      "package": "golang.org/x/net",
+      "version": "v0.56.0",
+      "advisory": "GO-2026-6612",
+      "fixed_in": [
+        "0.60.0"
+      ]
+    },
+    {
+      "binary": "roxctl",
+      "package": "golang.org/x/net",
+      "version": "v0.58.0",
+      "advisory": "GO-2026-6612",
+      "fixed_in": [
+        "0.60.0"
+      ]
+    }
+  ],
+  "residual_note": "All three Criticals are GO-2026-6612 in golang.org/x/net, fixed only in v0.60.0. Red Hat ships oc/kubectl on v0.56.0 and roxctl on v0.58.0, so they cannot be cleared without rebuilding those binaries ourselves.",
+  "contains_containerd": false,
+  "removed_by_this_bump": {
+    "GO-2026-5064": "containerd CRI checkpoint restore, absent on roxctl 5.0.0",
+    "GO-2026-5338": "containerd CRI checkpoint import, absent on roxctl 5.0.0"
+  },
+  "publication_gate": {
+    "step": ".github/workflows/terminal-release.yml:129-138",
+    "configuration": "anchore/scan-action, fail-build: true, severity-cutoff: high, only-fixed: true",
+    "result_on_this_projection": "FAILS - 121 fixable High/Critical across the eight CLIs, 3 of them Critical",
+    "cannot_be_cleared_by_upgrading": "kn 1.24.0, tkn 0.47.0, tkn-pac 0.54.0, opc 1.25.0 and helm 4.3.2 are the current upstream releases and still carry fixable High (stdlib go1.27.3 advisories fixed only in go1.27.4, x/net 0.61.0 fixed only in 0.62.0). oc, kubectl and roxctl are built and shipped by Red Hat on x/net v0.56.0/v0.58.0.",
+    "second_gate": "the step after it runs scripts/check_backend_staging_security.py over the unfiltered report, which blocks on every High/Critical/Unknown regardless of fix state and hardcodes risk_acceptance: NOT-GRANTED",
+    "consequence": "there is no artifact selection that makes this image publishable under the current gate; publication requires a signed exception path or dropping the prebuilt CLIs"
+  },
+  "what_this_does_not_establish": "A directory scan is not an image scan. It says nothing about the pinned RHEL base layer, so it does not project the image's RPM residue. The 2026-10-20 scan of the previous build measured 81 High RPM matches there, but that used a five-week-older database; the rebuilt image's RPM count has to be measured, not assumed."
+}

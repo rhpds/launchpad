@@ -1,0 +1,169 @@
+{
+  "schema": "launchpad.redhat.com/image-security-revalidation-result/v1",
+  "observed_date": "2026-11-24",
+  "component": "terminal",
+  "scope": "deployed participant-facing digest - the only active tag in the repository",
+  "image_reference": "quay.io/rh-ee-jkershaw/launchpad-showroom-terminal@sha256:324dc5c4201f0da030a572dab389bc8cfdc2f66e800dff3fcee824b7e795daae",
+  "manifest_digest": "sha256:324dc5c4201f0da030a572dab389bc8cfdc2f66e800dff3fcee824b7e795daae",
+  "image_id": "sha256:f640a24eea1bc8ac2873aedd15596390d7ac2b55f5d80706af52b63818439cbf",
+  "tag_observed": "pilot-2026-09-17",
+  "tag_last_modified": "2026-09-17T15:58:14Z",
+  "source_revision": "not embedded in the image; built 2026-09-17, predates every October refresh",
+  "scanner": {
+    "name": "grype",
+    "version": "0.97.1",
+    "database_schema": "v6.1.10",
+    "database_built": "2026-11-24T06:22:05Z",
+    "input": "registry:",
+    "platform": "linux/amd64",
+    "scope": "squashed",
+    "note": "a docker-archive scan and a registry scan produced identical finding sets; only the registry scan records the true manifestDigest"
+  },
+  "full_inventory": {
+    "total_matches": 2957,
+    "by_severity": {
+      "Medium": 1366,
+      "High": 1125,
+      "Low": 337,
+      "Critical": 112,
+      "Unknown": 17
+    },
+    "high_matches": 1125,
+    "critical_matches": 112,
+    "unrated_matches": 17,
+    "by_artifact_type": {
+      "go-module": 1755,
+      "rpm": 1202
+    },
+    "distinct_high_critical_ids": 255,
+    "high_critical_fix_states": {
+      "fixed": 1187,
+      "not-fixed": 43,
+      "unspecified": 6,
+      "wont-fix": 1
+    },
+    "critical_with_a_fixed_version": 112,
+    "critical_all_fixable": true,
+    "critical_distinct_advisories": 23,
+    "critical_from_rpm": 1,
+    "critical_from_go_modules": 111
+  },
+  "per_binary": [
+    {
+      "path": "/usr/local/bin/odo",
+      "critical": 22,
+      "high": 130,
+      "unrated": 1,
+      "distinct_high_critical_ids": 145
+    },
+    {
+      "path": "/usr/local/bin/kn",
+      "critical": 17,
+      "high": 123,
+      "unrated": 2,
+      "distinct_high_critical_ids": 133
+    },
+    {
+      "path": "/usr/local/bin/opc",
+      "critical": 16,
+      "high": 123,
+      "unrated": 5,
+      "distinct_high_critical_ids": 130
+    },
+    {
+      "path": "/usr/local/bin/tkn",
+      "critical": 16,
+      "high": 121,
+      "unrated": 5,
+      "distinct_high_critical_ids": 128
+    },
+    {
+      "path": "/usr/local/bin/kubectl",
+      "critical": 12,
+      "high": 106,
+      "unrated": 1,
+      "distinct_high_critical_ids": 110
+    },
+    {
+      "path": "/usr/bin/skopeo",
+      "critical": 11,
+      "high": 86,
+      "unrated": 1,
+      "distinct_high_critical_ids": 89
+    },
+    {
+      "path": "/usr/local/bin/tkn-pac",
+      "critical": 9,
+      "high": 97,
+      "unrated": 0,
+      "distinct_high_critical_ids": 99
+    },
+    {
+      "path": "/usr/local/bin/helm",
+      "critical": 4,
+      "high": 78,
+      "unrated": 1,
+      "distinct_high_critical_ids": 75
+    },
+    {
+      "path": "/usr/local/bin/roxctl",
+      "critical": 4,
+      "high": 66,
+      "unrated": 1,
+      "distinct_high_critical_ids": 64
+    }
+  ],
+  "rpm_inventory": {
+    "critical_matches": 1,
+    "critical_detail": "ca-certificates 2025.2.80_v9.0.305-102.el10_1 / CVE-2026-114406",
+    "high_matches": 195,
+    "high_packages": 40,
+    "high_matches_with_a_fixed_version": 165,
+    "largest": {
+      "skopeo": 17,
+      "krb5-libs": 14,
+      "httpd-tools": 8,
+      "libblkid": 7,
+      "libfdisk": 7,
+      "libmount": 7
+    },
+    "note": "no RHEL 10.2 errata exists for these; the gate counts them regardless of fix state"
+  },
+  "odo_attribution": {
+    "critical": 22,
+    "high": 130,
+    "note": "odo is removed at HEAD but still present in the deployed image"
+  },
+  "gate_decision": {
+    "schema": "launchpad/terminal-staging-security/v1",
+    "staging_security_gate": "BLOCKED",
+    "platform_staging_qualified": false,
+    "high_matches": 1125,
+    "critical_matches": 112,
+    "suppressed_high_matches": 0,
+    "suppressed_critical_matches": 0,
+    "suppressed_unrated_matches": 0,
+    "unrated_matches": 17,
+    "distinct_high_critical_ids": 255,
+    "high_critical_fix_states": {
+      "fixed": 1187,
+      "not-fixed": 43,
+      "unspecified": 6,
+      "wont-fix": 1
+    },
+    "risk_acceptance": "NOT-GRANTED",
+    "candidate_identity_verified": true,
+    "report_sha256": "6c377e0b47fbf7bb36a5e3ddd4cee4a5044c92a6ece751774e7516baa5729560",
+    "fixable_report_sha256": "d1e579dc0afef38730c28b0f4bc345418f916421ec4f3880651ed447ddd4819c"
+  },
+  "previously_scanned": false,
+  "prior_evidence_described_a_different_image": {
+    "source_revision": "8b8fc909fe057a8803334ed3d37c1625acd96ea7",
+    "manifest_digest": "sha256:cefd6a5a5cf861507af4848fc830e411b55130f071b81997027cc39828ccf17e",
+    "image_published": false,
+    "recorded_at": "evidence/runs/terminal-security-revalidation-20261020.json",
+    "comparison": "31 Critical / 350 High / 10 Unknown on 2026-10-20 data; the deployed digest is 3.6x worse on Critical and 3.2x on High. The two scans used different database builds, so the ratio is directional rather than exact."
+  },
+  "finding": "Every terminal security artifact in the repository described a build that was never published. Participants have pulled only this digest since 2026-09-17, and no retained scan named it before this one.",
+  "reproduction": "grype registry:quay.io/rh-ee-jkershaw/launchpad-showroom-terminal@sha256:324dc5c4201f0da030a572dab389bc8cfdc2f66e800dff3fcee824b7e795daae --platform linux/amd64 --scope squashed -o json (grype 0.97.1, DB v6.1.10 built 2026-11-24)"
+}
