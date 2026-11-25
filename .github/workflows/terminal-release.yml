@@ -168,7 +168,22 @@ jobs:
         run: |
           set -euo pipefail
           candidate="${IMAGE_REPOSITORY}:git-${{ inputs.expected_sha }}"
-          candidate_id="$(docker image inspect --format '{{.Id}}' "$candidate")"
+          # Pre-push there is no independent config digest to compare against.
+          # This runner uses the containerd image store, where
+          # `docker image inspect .Id` is the manifest digest, while the
+          # scanner reports the config digest; run 45713500003 compared the two
+          # and rejected a matching candidate as INVALID (exit 2). buildx
+          # reports only the manifest digest, and grype's manifest digest
+          # differs from it because loading re-serialises the manifest. So the
+          # gate binds the report to the tag it scanned, and publication proves
+          # the binding: it requires the registry to serve exactly the config
+          # digest this report recorded.
+          candidate_id="$(jq -r '.source.target.imageID // empty' vulnerability-report.json)"
+          if [[ ! "$candidate_id" =~ ^sha256:[0-9a-f]{64}$ ]]; then
+            echo "vulnerability-report.json records no candidate image ID" >&2
+            echo "got: '${candidate_id}'" >&2
+            exit 1
+          fi
           gate_args=()
           if [ -n "$ACCEPTANCE" ]; then
             test -f "$ACCEPTANCE"
@@ -217,26 +232,37 @@ jobs:
           set -euo pipefail
           image="${IMAGE_REPOSITORY}:git-${{ inputs.expected_sha }}"
           # The gate ran before this push, so a risk acceptance could only bind
-          # by enumeration (digest_pending): a daemon image has no repository
-          # digest to sign. Close that gap here, before anything is signed, by
-          # proving the registry now serves the exact image the gate scanned.
-          scanned_id="$(docker image inspect --format '{{.Id}}' "$image")"
+          # by enumeration (digest_pending): the candidate exists in the
+          # runner's image store and has no repository digest yet. Close that
+          # gap here, before anything is signed. `userInput` already ties the
+          # report to this tag; this proves the tag still resolves to the very
+          # image the report measured, by requiring the registry to serve the
+          # config digest the scan recorded. Config digests are content hashes,
+          # so the comparison holds whichever image store the daemon uses.
+          scanned_config="$(jq -r '.source.target.imageID' vulnerability-report.json)"
+          [[ "$scanned_config" =~ ^sha256:[0-9a-f]{64}$ ]]
           docker push "$image"
           digest_ref="$(docker inspect --format='{{index .RepoDigests 0}}' "$image")"
           test -n "$digest_ref"
           digest="${digest_ref##*@}"
           [[ "$digest" =~ ^sha256:[0-9a-f]{64}$ ]]
-          docker pull -q "$digest_ref" > /dev/null
-          published_id="$(docker image inspect --format '{{.Id}}' "$digest_ref")"
-          test "$published_id" = "$scanned_id"
+          published_manifest="$(docker buildx imagetools inspect --raw "$digest_ref")"
+          published_config="$(printf '%s' "$published_manifest" | jq -r '.config.digest // empty')"
+          if [[ ! "$published_config" =~ ^sha256:[0-9a-f]{64}$ ]]; then
+            echo "Could not read a config digest from $digest_ref" >&2
+            printf '%s\n' "$published_manifest" | head -c 400 >&2
+            exit 1
+          fi
+          test "$published_config" = "$scanned_config"
           printf 'digest_ref=%s\n' "$digest_ref" >> "$GITHUB_OUTPUT"
           printf 'digest=%s\n' "$digest" >> "$GITHUB_OUTPUT"
-          printf 'image_id=%s\n' "$published_id" >> "$GITHUB_OUTPUT"
+          printf 'image_id=%s\n' "$published_config" >> "$GITHUB_OUTPUT"
           jq -n \
             --arg source_revision "${{ inputs.expected_sha }}" \
             --arg image "$digest_ref" \
-            --arg image_id "$published_id" \
-            '{schema_version:"launchpad.redhat.com/terminal-release/v1",source_revision:$source_revision,image:$image,image_id:$image_id,platform:"linux/amd64",published:true}' \
+            --arg image_id "$published_config" \
+            --arg manifest_digest "$digest" \
+            '{schema_version:"launchpad.redhat.com/terminal-release/v1",source_revision:$source_revision,image:$image,image_id:$image_id,manifest_digest:$manifest_digest,platform:"linux/amd64",published:true}' \
             > terminal-release.json
 
       - name: Install Cosign

@@ -346,12 +346,35 @@ the runner's docker store. Measured on a single image, three values disagree:
 `podman .Id` `b24e8f7b…`, stored `RepoDigests` `91aae7d5…`, grype
 `manifestDigest` `ef6af63b…`. A `candidate_digest` read from CI would have been a
 phantom, which is why the acceptance path needs `digest_pending` when no real
-digest exists. `18958ee3` closes the resulting gap: the publish step captures the
-scanned image ID, pushes, pulls the digest it just published, and fails before
-cosign signs anything unless the registry serves that same image ID; the receipt
-records `image_id`. `backend-release.yml` has the same ordering and the same gap
-and is deliberately untouched here — it has a working publish history and the
-change cannot be exercised locally.
+digest exists.
+
+**That gap then failed a real run, which is how the rest of it was found.**
+Dispatch was impossible until the workflow existed on the default branch, so
+registration came first (`14b13d0e`, one additive file on `rhpds/main`). The
+first measurement run then failed at the gate with **exit 2 / `INVALID` —
+"Scan does not match the candidate image"** on a candidate that matched
+perfectly (`45713500003`). The runner uses the containerd image store
+(`driver-type: io.containerd.snapshotter.v1`), where `docker image inspect .Id`
+is the *manifest* digest, while grype reports the *config* digest
+(`sha256:b72689ac…`). The gate compared the two. buildx does not help: its
+`imageid` output is the iidfile, which on that store is the manifest digest
+(`sha256:ceafb199…`), and its metadata output carries only
+`containerimage.digest`. So **no independent config digest exists before the
+push**, and grype's manifest digest cannot substitute because loading
+re-serialises the manifest (`763cfca7…`).
+
+The consequence is a division of proof, now explicit in both workflows and
+tested. The gate binds the report to the tag it scanned (`userInput`) and takes
+the candidate identity from the report's own `source.target.imageID`. The
+*publish* step then proves the binding before cosign signs anything: it reads
+the manifest the registry actually serves with
+`docker buildx imagetools inspect --raw`, and fails unless its `config.digest`
+equals the config digest the scan recorded; the receipt records both `image_id`
+and `manifest_digest`. That pair is sound — a report about any other image
+passes the gate and then fails at publication. `backend-release.yml` had the
+identical defect and received the identical fix; its "working publish history"
+did not protect it, because a working run under the classic store hides a check
+that is wrong under the containerd store.
 
 The two-build path that remains is honest but not free. Because
 `Containerfile:35` runs `dnf -y --refresh upgrade`, the image is not

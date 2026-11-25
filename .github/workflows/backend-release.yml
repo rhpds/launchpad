@@ -226,7 +226,17 @@ jobs:
           # A signed, unexpired risk acceptance may subtract exact findings from
           # the full inventory, and never from a scanner suppression.
           candidate="${IMAGE_REPOSITORY}:git-${{ inputs.expected_sha }}"
-          candidate_id="$(docker image inspect --format '{{.Id}}' "$candidate")"
+          # Identity is bound at publication, not here: on a containerd-store
+          # runner `docker image inspect .Id` is the manifest digest while the
+          # scanner reports the config digest, so the only pre-push identity is
+          # the one the scan itself recorded for this tag. The publish step
+          # requires the registry to serve exactly that config digest.
+          candidate_id="$(jq -r '.source.target.imageID // empty' vulnerability-report.json)"
+          if [[ ! "$candidate_id" =~ ^sha256:[0-9a-f]{64}$ ]]; then
+            echo "vulnerability-report.json records no candidate image ID" >&2
+            echo "got: '${candidate_id}'" >&2
+            exit 1
+          fi
           gate_args=()
           if [ -n "$ACCEPTANCE" ]; then
             test -f "$ACCEPTANCE"
@@ -281,12 +291,29 @@ jobs:
         run: |
           set -euo pipefail
           image="${IMAGE_REPOSITORY}:git-${{ inputs.expected_sha }}"
+          # The gate decided before this push, when the candidate had no
+          # repository digest, so a risk acceptance bound by enumeration
+          # (digest_pending). Prove here, before cosign signs, that the tag
+          # still resolves to the image the report measured: the registry must
+          # serve the config digest the scan recorded.
+          scanned_config="$(jq -r '.source.target.imageID' vulnerability-report.json)"
+          [[ "$scanned_config" =~ ^sha256:[0-9a-f]{64}$ ]]
           docker push "$image"
           digest_ref="$(docker inspect --format='{{index .RepoDigests 0}}' "$image")"
           test -n "$digest_ref"
           digest="${digest_ref##*@}"
+          [[ "$digest" =~ ^sha256:[0-9a-f]{64}$ ]]
+          published_manifest="$(docker buildx imagetools inspect --raw "$digest_ref")"
+          published_config="$(printf '%s' "$published_manifest" | jq -r '.config.digest // empty')"
+          if [[ ! "$published_config" =~ ^sha256:[0-9a-f]{64}$ ]]; then
+            echo "Could not read a config digest from $digest_ref" >&2
+            printf '%s\n' "$published_manifest" | head -c 400 >&2
+            exit 1
+          fi
+          test "$published_config" = "$scanned_config"
           printf 'digest_ref=%s\n' "$digest_ref" >> "$GITHUB_OUTPUT"
           printf 'digest=%s\n' "$digest" >> "$GITHUB_OUTPUT"
+          printf 'image_id=%s\n' "$published_config" >> "$GITHUB_OUTPUT"
           printf '%s\n' "$digest_ref" > image-digest.txt
 
       - name: Install Cosign

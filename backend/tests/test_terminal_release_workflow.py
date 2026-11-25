@@ -35,7 +35,7 @@ def test_terminal_release_blocks_unresolved_inventory_before_publication():
     assert "steps.runtime_smoke.outcome == 'success'" in gate['if']
     assert 'check_backend_staging_security.py vulnerability-report.json' in gate['run']
     assert '--component terminal' in gate['run']
-    assert "docker image inspect --format '{{.Id}}'" in gate['run']
+    assert "candidate_id=\"$(jq -r '.source.target.imageID // empty' vulnerability-report.json)\"" in gate['run']
     assert '--expected-image "$candidate" --expected-image-id "$candidate_id"' in gate['run']
     assert 'continue-on-error' not in gate
     assert '|| true' not in gate['run']
@@ -90,18 +90,33 @@ def test_terminal_release_rejects_a_short_revision_before_checkout():
 def test_published_digest_is_proven_to_be_the_scanned_candidate():
     """A pre-push scan has no repository digest, so the acceptance binds by
     enumeration. The publish step must close that gap by proving the registry
-    serves the same image ID the gate verified."""
+    serves the same config digest the gate verified."""
     steps = yaml.safe_load(
         (ROOT / '.github/workflows/terminal-release.yml').read_text())['jobs']['release']['steps']
     publish = next(step for step in steps
                    if step['name'] == 'Publish immutable candidate and record digest')
     run = publish['run']
-    assert "scanned_id=\"$(docker image inspect --format '{{.Id}}' \"$image\")\"" in run
-    assert run.index('scanned_id=') < run.index('docker push')
-    assert 'docker pull -q "$digest_ref"' in run
-    assert 'test "$published_id" = "$scanned_id"' in run
-    assert '--arg image_id "$published_id"' in run
+    assert 'scanned_config="$(jq -r \'.source.target.imageID\' vulnerability-report.json)"' in run
+    assert run.index('scanned_config=') < run.index('docker push')
+    assert 'docker buildx imagetools inspect --raw "$digest_ref"' in run
+    assert "jq -r '.config.digest // empty'" in run
+    assert 'test "$published_config" = "$scanned_config"' in run
+    assert '--arg image_id "$published_config"' in run
     assert 'image_id:$image_id' in run
     assert steps.index(publish) < next(
         i for i, step in enumerate(steps)
         if step['name'] == 'Sign the published digest with GitHub OIDC')
+
+
+def test_no_release_workflow_trusts_the_daemon_image_id():
+    """On a containerd-store runner `docker image inspect .Id` is the manifest
+    digest, while the scanner reports the config digest. Run 45713500003
+    compared the two and rejected a matching candidate as INVALID (exit 2),
+    and buildx reports only the manifest digest too, so the pre-push identity
+    has to come from the report and be bound at publication."""
+    for path in ('.github/workflows/terminal-release.yml',
+                 '.github/workflows/backend-release.yml'):
+        source = (ROOT / path).read_text()
+        assert "$(docker image inspect" not in source, path
+        assert "steps.build.outputs.imageid" not in source, path
+        assert "source.target.imageID" in source, path

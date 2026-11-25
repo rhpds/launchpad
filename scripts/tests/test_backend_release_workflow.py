@@ -90,6 +90,23 @@ def test_private_releases_require_registry_attestations_without_publicizing_sour
     assert 'provenance-verification.json' in text
 
 
+def test_backend_release_proves_the_published_digest_is_the_scanned_candidate() -> None:
+    """The gate decides before the push, so the acceptance binds by
+    enumeration; the publish step must then prove the registry serves the
+    config digest the gate verified, before cosign signs it."""
+    _, workflow = _workflow()
+    steps = workflow["jobs"]["release"]["steps"]
+    publish = next(s for s in steps if s.get("name") == "Publish immutable candidate and record digest")
+    run = publish["run"]
+    assert 'scanned_config="$(jq -r \'.source.target.imageID\' vulnerability-report.json)"' in run
+    assert run.index("scanned_config=") < run.index("docker push")
+    assert 'docker buildx imagetools inspect --raw "$digest_ref"' in run
+    assert "jq -r '.config.digest // empty'" in run
+    assert 'test "$published_config" = "$scanned_config"' in run
+    names = [s.get("name") for s in steps]
+    assert names.index(publish["name"]) < names.index("Sign the published digest with GitHub OIDC")
+
+
 def test_full_inventory_gate_blocks_publication_and_retains_decision() -> None:
     _, workflow = _workflow()
     steps = workflow["jobs"]["release"]["steps"]
@@ -100,7 +117,7 @@ def test_full_inventory_gate_blocks_publication_and_retains_decision() -> None:
     assert "continue-on-error" not in gate
     assert "python3 scripts/check_backend_staging_security.py vulnerability-report.json" in gate["run"]
     assert "> staging-security-decision.json" in gate["run"]
-    assert "docker image inspect --format '{{.Id}}'" in gate['run']
+    assert 'candidate_id="$(jq -r \'.source.target.imageID // empty\' vulnerability-report.json)"' in gate['run']
     assert '--expected-image "$candidate" --expected-image-id "$candidate_id"' in gate['run']
     assert names.index(gate["name"]) < names.index("Publish immutable candidate and record digest")
     retained = next(s for s in steps if s.get("name") == "Retain vulnerability evidence even when the gate blocks")
