@@ -60,11 +60,11 @@ catalog. Larger caps are post-staging work — see the Roadmap.
 
 **23 active** = 21 participant-visible + 2 internal-only.
 
-> "Declared 11-24" means the declaration is committed at HEAD, including the
-> candidate overlay that ships the item. The live ConfigMaps retired on
-> 2026-11-16 still lack it, so those two items stay fail-open for public
-> exposure until the next apply. Their certified scope is `[internal,
-> public_code]`, so the apply changes the declaration, not the behaviour.
+> "Declared 11-24" means the declaration is committed at HEAD **and applied to
+> the live cluster** on 2026-11-24, including the candidate overlay copy that
+> actually ships the item. Before that apply the three items were fail-open for
+> public exposure; their certified scope is `[internal, public_code]`, so the
+> apply changed the declaration, not the behaviour.
 
 ## Seats available today
 
@@ -296,6 +296,26 @@ A fourth gap was deployment-path only: the candidate overlay ships a full copy
 of the `intel-llm-cpu-serving` item as the `flightpath-candidate-serve-llms-catalog`
 ConfigMap, so fixing the base file alone left the **deployed** item fail-open.
 The overlay now declares it too.
+
+**Applied live 2026-11-24.** Three ConfigMaps (`canonical-intel-llm-tool-calling-catalog`,
+`canonical-rag-on-xeon-catalog`, `flightpath-candidate-serve-llms-catalog`) were
+patched from the rendered overlay and the backend was rolled, because those
+mounts use `subPath` and do not track ConfigMap updates. Verified through the
+backend's own `FileCatalogAdapter` against the live mount:
+
+```
+intel-llm-cpu-serving  -> ['internal', 'public_code']
+intel-llm-tool-calling -> ['internal', 'public_code']
+rag-on-xeon            -> ['internal', 'public_code']
+sovereign-ai-301       -> ['internal']            (withdrawn 10-16, unchanged)
+total: 28 items                                    (unchanged)
+```
+
+Six other ConfigMaps also differ from the rendered overlay, but only in
+`metadata.source_references` (evidence paths) — not exposure, not seat ceilings.
+Those were left alone; applying them is a content change nobody has asked for.
+`network-operations-agent-catalog` still exists live with no Git source, as
+noted above.
 
 The six catalog/certification disagreements are aligned certification ← catalog,
 in the direction the evidence supports rather than by preference:
