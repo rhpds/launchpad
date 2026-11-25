@@ -401,6 +401,30 @@ def test_bootstrap_enqueues_only_interrupted_cluster_bound_workshops() -> None:
     assert {job.aggregate_id for job in jobs} == {"workshop-1", "workshop-2"}
 
 
+def test_bootstrap_logs_clusterless_refusal_only_for_interrupted_workshops(caplog) -> None:
+    """Completed workshops are passed to the bootstrap scan too (main.py sends every
+    persisted workshop). They carry no cluster_ref by design, so logging an error for
+    them claimed an interrupted workshop that did not exist — once per workshop, on
+    every process start. Only genuinely interrupted work may refuse recovery.
+    """
+    store = InMemoryLifecycleJobStore()
+    queue = LifecycleQueueService(store)
+    completed = workshop(status=WorkshopStatus.COMPLETED).model_copy(
+        update={"workshop_id": "workshop-done", "cluster_ref": None}
+    )
+    interrupted_unplaced = workshop(status=WorkshopStatus.PROVISIONING).model_copy(
+        update={"workshop_id": "workshop-stuck", "cluster_ref": None}
+    )
+
+    with caplog.at_level("ERROR", logger="launchpad.lifecycle-worker"):
+        jobs = queue.enqueue_interrupted_workshops([completed, interrupted_unplaced])
+
+    assert jobs == []
+    assert caplog.text.count("has no persisted cluster_ref") == 1
+    assert "workshop-stuck" in caplog.text
+    assert "workshop-done" not in caplog.text
+
+
 def test_bootstrap_enqueues_interrupted_sessions_for_resume_or_reclaim() -> None:
     store = InMemoryLifecycleJobStore()
     queue = LifecycleQueueService(store)

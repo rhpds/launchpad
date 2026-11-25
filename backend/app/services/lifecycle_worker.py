@@ -226,12 +226,18 @@ class LifecycleQueueService:
     ) -> list[LifecycleJob]:
         jobs = []
         for workshop in workshops:
+            interrupted = workshop.status in {
+                WorkshopStatus.QUEUED,
+                WorkshopStatus.PROVISIONING,
+                WorkshopStatus.RECLAIMING,
+            }
             if not workshop.cluster_ref:
-                logger.error(
-                    "Interrupted workshop %s has no persisted cluster_ref; "
-                    "refusing lifecycle recovery",
-                    workshop.workshop_id,
-                )
+                if interrupted:
+                    logger.error(
+                        "Interrupted workshop %s has no persisted cluster_ref; "
+                        "refusing lifecycle recovery",
+                        workshop.workshop_id,
+                    )
                 continue
             if workshop.status in {
                 WorkshopStatus.QUEUED,
