@@ -397,6 +397,34 @@ case the honest move is to render again from the release build's own retained
 report and sign again; there is no mechanism here that lets a stale acceptance
 widen its own scope.
 
+**The record was then signed, and it is deliberately unflattering.** It lives at
+`evidence/security/terminal-risk-acceptance-20261125.json` (with a `.sha256`
+sibling), names revision `e26a87c3`, and enumerates **68
+`(advisory, package, severity)` triples** — 59 advisories across 27 packages,
+covering 179 High, 3 Critical and 8 Unknown matches. The three Criticals are one
+advisory, `GO-2026-6612` in `golang.org/x/net`, inside the shipped `oc`,
+`kubectl` and `roxctl`. 39 advisories are Go modules baked into vendor CLIs and
+20 are UBI RPMs the repository reports `not-fixed` or `wont-fix`.
+
+Two properties of that record are worth stating plainly. First, its scope was
+transcribed mechanically from a measured report
+(`report_sha256 983befb8…`, build of `66c82756`), not by hand, and
+`report_sha256` is audit metadata rather than a binding: the gate's binding is
+the exhaustive enumeration, so a *newer* advisory that the release build picks up
+is simply not on the list and blocks. Second, the measured revision is
+`66c82756`, while the record names `e26a87c3`; between those two commits the
+terminal build context is byte-identical (`git diff 66c82756 e26a87c3 --
+workshop-images/showroom-terminal/` is empty), so the measurement applies to the
+revision being released. That is a claim about the build *inputs*, and it was
+checked rather than assumed.
+
+The record was exercised against the gate before dispatch: with it the gate
+returns `PASS-SCAN-ONLY` / `risk_acceptance: GRANTED` /
+`gate_basis: SIGNED-ACCEPTANCE` and zero unaccepted findings; deleting one
+accepted entry returns `BLOCKED` / `APPLIED-INCOMPLETE`; and naming a different
+revision returns `INVALID` (exit 2). So the signature subtracts exactly the
+enumerated triples and nothing else.
+
 So the decision is now about cost, not feasibility. Three honest options:
 (a) publish with a signed applicability review covering the residual 3 and the
 RPM tail, routed through that mechanism — mechanical, and the only option that

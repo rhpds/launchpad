@@ -1,0 +1,355 @@
+{
+  "schema": "launchpad/risk-acceptance/v1",
+  "component": "terminal",
+  "status": "ACCEPTED-WITH-SCOPE",
+  "owner_role": "terminal-image-owner",
+  "owner_signature": "jkershaw (terminal image owner), 2026-11-25",
+  "signed_on": "2026-11-25",
+  "expires_on": "2027-02-23",
+  "source_revision": "e26a87c39894c2ef8b64ea7ba2b19179300d3290",
+  "rationale": "Every blocking finding is in a pinned vendor binary (oc, kubectl, roxctl, helm, kn, tkn, opc, skopeo) or in a UBI base RPM the repository reports as not-fixed or wont-fix. None is in Launchpad-authored code, and each pin is the newest version available. The image runs a single-tenant workshop terminal with no inbound service, so exploitation requires an attacker already inside the participant's own shell. Re-signed within 90 days.",
+  "report_sha256": "983befb8220bfe11a70810911456b23568c7e89220caac7d9f70919f6fdc6a5a",
+  "accepted": [
+    {
+      "id": "GO-2026-6612",
+      "package": "golang.org/x/net",
+      "severity": "Critical"
+    },
+    {
+      "id": "CVE-2026-76641",
+      "package": "expat",
+      "severity": "High"
+    },
+    {
+      "id": "CVE-2026-105437",
+      "package": "git",
+      "severity": "High"
+    },
+    {
+      "id": "CVE-2026-111760",
+      "package": "git",
+      "severity": "High"
+    },
+    {
+      "id": "CVE-2026-114466",
+      "package": "git",
+      "severity": "High"
+    },
+    {
+      "id": "CVE-2026-105437",
+      "package": "git-core",
+      "severity": "High"
+    },
+    {
+      "id": "CVE-2026-111760",
+      "package": "git-core",
+      "severity": "High"
+    },
+    {
+      "id": "CVE-2026-114466",
+      "package": "git-core",
+      "severity": "High"
+    },
+    {
+      "id": "CVE-2026-105437",
+      "package": "git-core-doc",
+      "severity": "High"
+    },
+    {
+      "id": "CVE-2026-111760",
+      "package": "git-core-doc",
+      "severity": "High"
+    },
+    {
+      "id": "CVE-2026-114466",
+      "package": "git-core-doc",
+      "severity": "High"
+    },
+    {
+      "id": "GHSA-3p65-76g6-3w7r",
+      "package": "github.com/distribution/distribution/v3",
+      "severity": "High"
+    },
+    {
+      "id": "GHSA-f2g3-hh2r-cwgc",
+      "package": "github.com/distribution/distribution/v3",
+      "severity": "High"
+    },
+    {
+      "id": "GHSA-rg2x-37c3-w2rh",
+      "package": "github.com/docker/docker",
+      "severity": "High"
+    },
+    {
+      "id": "GHSA-x86f-5xw2-fm2r",
+      "package": "github.com/docker/docker",
+      "severity": "High"
+    },
+    {
+      "id": "GO-2026-4887",
+      "package": "github.com/docker/docker",
+      "severity": "High"
+    },
+    {
+      "id": "GHSA-qw64-3x98-g7q2",
+      "package": "github.com/go-git/go-billy/v5",
+      "severity": "High"
+    },
+    {
+      "id": "GHSA-389r-gv7p-r3rp",
+      "package": "github.com/go-git/go-git/v5",
+      "severity": "High"
+    },
+    {
+      "id": "GHSA-hc8v-wwc9-vgxm",
+      "package": "github.com/go-git/go-git/v5",
+      "severity": "High"
+    },
+    {
+      "id": "GHSA-78h2-9frx-2jm8",
+      "package": "github.com/go-jose/go-jose/v4",
+      "severity": "High"
+    },
+    {
+      "id": "GHSA-mgcc-cww5-fp2q",
+      "package": "github.com/go-jose/go-jose/v4",
+      "severity": "High"
+    },
+    {
+      "id": "GHSA-259r-337f-4rfw",
+      "package": "github.com/klauspost/compress",
+      "severity": "High"
+    },
+    {
+      "id": "GO-2026-6865",
+      "package": "github.com/klauspost/compress",
+      "severity": "High"
+    },
+    {
+      "id": "GHSA-4c29-8rgm-jvjj",
+      "package": "github.com/moby/buildkit",
+      "severity": "High"
+    },
+    {
+      "id": "GHSA-4vrq-3vrq-g6gg",
+      "package": "github.com/moby/buildkit",
+      "severity": "High"
+    },
+    {
+      "id": "GHSA-hfg8-hc9c-6c3h",
+      "package": "github.com/moby/go-archive",
+      "severity": "High"
+    },
+    {
+      "id": "GHSA-pc3f-x583-g7j2",
+      "package": "github.com/moby/spdystream",
+      "severity": "High"
+    },
+    {
+      "id": "GHSA-f5mr-q85p-6hh6",
+      "package": "github.com/sigstore/fulcio",
+      "severity": "High"
+    },
+    {
+      "id": "GHSA-f83f-xpx7-ffpw",
+      "package": "github.com/sigstore/fulcio",
+      "severity": "High"
+    },
+    {
+      "id": "GHSA-mh2q-q3fh-2475",
+      "package": "go.opentelemetry.io/otel",
+      "severity": "High"
+    },
+    {
+      "id": "GO-2026-6303",
+      "package": "golang.org/x/crypto",
+      "severity": "High"
+    },
+    {
+      "id": "GO-2026-6354",
+      "package": "golang.org/x/crypto",
+      "severity": "High"
+    },
+    {
+      "id": "GO-2026-6355",
+      "package": "golang.org/x/crypto",
+      "severity": "High"
+    },
+    {
+      "id": "GO-2026-5026",
+      "package": "golang.org/x/net",
+      "severity": "High"
+    },
+    {
+      "id": "GO-2026-6603",
+      "package": "golang.org/x/net",
+      "severity": "High"
+    },
+    {
+      "id": "GO-2026-6610",
+      "package": "golang.org/x/net",
+      "severity": "High"
+    },
+    {
+      "id": "GO-2026-6611",
+      "package": "golang.org/x/net",
+      "severity": "High"
+    },
+    {
+      "id": "GO-2026-6617",
+      "package": "golang.org/x/net",
+      "severity": "High"
+    },
+    {
+      "id": "GO-2026-6860",
+      "package": "golang.org/x/net",
+      "severity": "High"
+    },
+    {
+      "id": "GO-2026-6629",
+      "package": "golang.org/x/text",
+      "severity": "High"
+    },
+    {
+      "id": "CVE-2026-129975",
+      "package": "gpgme",
+      "severity": "High"
+    },
+    {
+      "id": "CVE-2026-120194",
+      "package": "json-glib",
+      "severity": "High"
+    },
+    {
+      "id": "CVE-2026-124851",
+      "package": "libzstd",
+      "severity": "High"
+    },
+    {
+      "id": "CVE-2026-107494",
+      "package": "openssl-libs",
+      "severity": "High"
+    },
+    {
+      "id": "CVE-2026-124709",
+      "package": "openssl-libs",
+      "severity": "High"
+    },
+    {
+      "id": "CVE-2026-105437",
+      "package": "perl-Git",
+      "severity": "High"
+    },
+    {
+      "id": "CVE-2026-111760",
+      "package": "perl-Git",
+      "severity": "High"
+    },
+    {
+      "id": "CVE-2026-114466",
+      "package": "perl-Git",
+      "severity": "High"
+    },
+    {
+      "id": "CVE-2026-42784",
+      "package": "podman-sequoia",
+      "severity": "High"
+    },
+    {
+      "id": "CVE-2024-34156",
+      "package": "skopeo",
+      "severity": "High"
+    },
+    {
+      "id": "CVE-2026-116591",
+      "package": "skopeo",
+      "severity": "High"
+    },
+    {
+      "id": "CVE-2026-27137",
+      "package": "skopeo",
+      "severity": "High"
+    },
+    {
+      "id": "CVE-2026-33810",
+      "package": "skopeo",
+      "severity": "High"
+    },
+    {
+      "id": "CVE-2026-34986",
+      "package": "skopeo",
+      "severity": "High"
+    },
+    {
+      "id": "CVE-2026-56859",
+      "package": "skopeo",
+      "severity": "High"
+    },
+    {
+      "id": "CVE-2026-119373",
+      "package": "sqlite-libs",
+      "severity": "High"
+    },
+    {
+      "id": "CVE-2026-119374",
+      "package": "sqlite-libs",
+      "severity": "High"
+    },
+    {
+      "id": "CVE-2026-119379",
+      "package": "sqlite-libs",
+      "severity": "High"
+    },
+    {
+      "id": "CVE-2026-119586",
+      "package": "sqlite-libs",
+      "severity": "High"
+    },
+    {
+      "id": "CVE-2026-97033",
+      "package": "stdlib",
+      "severity": "High"
+    },
+    {
+      "id": "CVE-2026-97034",
+      "package": "stdlib",
+      "severity": "High"
+    },
+    {
+      "id": "CVE-2026-97035",
+      "package": "stdlib",
+      "severity": "High"
+    },
+    {
+      "id": "CVE-2026-97036",
+      "package": "stdlib",
+      "severity": "High"
+    },
+    {
+      "id": "CVE-2026-97037",
+      "package": "stdlib",
+      "severity": "High"
+    },
+    {
+      "id": "CVE-2026-97038",
+      "package": "stdlib",
+      "severity": "High"
+    },
+    {
+      "id": "CVE-2026-97039",
+      "package": "stdlib",
+      "severity": "High"
+    },
+    {
+      "id": "CVE-2026-97043",
+      "package": "stdlib",
+      "severity": "High"
+    },
+    {
+      "id": "GO-2026-5932",
+      "package": "golang.org/x/crypto",
+      "severity": "Unknown"
+    }
+  ],
+  "digest_pending": true
+}
