@@ -186,6 +186,30 @@ oc -n launchpad-flightpath-candidate exec "$POD" -c backend -- \
   grep showroom_terminal /etc/launchpad/clusters.yaml
 ```
 
+Restarting the backend is **not sufficient either**. The `lifecycle-worker`
+Deployment also loads cluster targets at startup, and it is the component that
+renders the showroom Application when a seat is provisioned:
+
+```bash
+oc -n launchpad-flightpath-candidate rollout restart deploy/lifecycle-worker
+oc -n launchpad-flightpath-candidate rollout status deploy/lifecycle-worker --timeout=420s
+```
+
+Confirm no worker pod predates the pin. A rollout can report success while a
+worker carrying the old cache is still `Running` with a `deletionTimestamp`, so
+check creation times rather than trusting the status line:
+
+```bash
+oc -n launchpad-flightpath-candidate get pods -l app.kubernetes.io/name=lifecycle-worker \
+  -o custom-columns=NAME:.metadata.name,CREATED:.metadata.creationTimestamp,PHASE:.status.phase
+```
+
+This is not hypothetical. On 2026-11-26 a correct ConfigMap and a freshly
+restarted backend still produced a seat running the **previous** digest: the
+worker pod had been up since 2026-11-25T00:56Z, its mounted file already read
+`548b0e3c`, and its in-process copy read `324dc5c4`. Restarting only the backend
+leaves that stale copy authoritative for the next order.
+
 ## 7. Prove a participant gets that image
 
 Admission is not guaranteed by a correct pin. A one-seat order only provisions
@@ -210,17 +234,46 @@ Then place one public, one-seat order against a catalog item that declares
 
 ```bash
 oc get pods -A -o json | jq -r '.items[]
-  | select(.spec.containers[0].image|test("launchpad-showroom-terminal"))
-  | "\(.metadata.namespace)  \(.spec.containers[0].image)"'
+  | .metadata.namespace as $ns | .metadata.name as $pod
+  | [(.spec.containers // [])[], ((.spec.initContainers) // [])[]]
+  | select(.image|test("launchpad-showroom-terminal"))
+  | "\($ns)  \($pod)  \(.name)  \(.image)"'
 ```
+
+`containers[0]` is not the terminal container. A showroom pod carries
+`content`, `terminal`, `traefik` and `wetty`, so filtering on the first element
+silently returns nothing and looks like "no seat pods". Match every container by
+image instead.
 
 Every terminal pod must show `quay.io/rh-ee-jkershaw/launchpad-showroom-terminal@sha256:<digest>`.
 A cluster with zero terminal pods proves nothing either: capture the post-order
 observation, not the baseline.
+
+**Observed on 2026-11-26.** The first one-seat order, placed after the pin and
+the backend restart, came up `ready` with its terminal on `324dc5c4` — the
+Argo Application values carried the same old digest. After
+`rollout restart deploy/lifecycle-worker`, a second order came up `ready` with
+the `terminal` container's image **and** `imageID` both `548b0e3c`, and the
+Application values matched. Both seats reclaimed to `completed`, with the
+namespace deleted and no terminal pods remaining.
+
+Compare image *and* `imageID`: the image string proves what was requested,
+`imageID` proves what was actually pulled:
+
+```bash
+oc -n <seat-ns> get pod <showroom-pod> -o json | jq -r '
+  .status.containerStatuses[] | select(.name=="terminal")
+  | "\(.image)\n\(.imageID)"'
+```
+
+Record: `evidence/runs/terminal-participant-seat-20261126.json`.
 
 ## 8. Record it
 
 Write `evidence/runs/terminal-promotion-<date>.json` with the release run id,
 the GHCR digest, the Quay digest, the equality of the two, the repinned files
 and the seat-pod observation. A promotion nobody can audit is indistinguishable
-from an inconsistent one.
+from an inconsistent one. If the seat proof happens in a later session than the
+promotion, write a separate record for it — as
+`terminal-participant-seat-20261126.json` does — instead of editing the earlier
+record's `BLOCKED` status after the fact.

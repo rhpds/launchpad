@@ -481,15 +481,43 @@ demand is not Launchpad's: `ols-eval-models` alone requests 301 cores,
 `cpd-instance-1` 102, `llm-bench` 74, `cascade-compression` 36, and Launchpad's
 own model endpoints in `launchpad-model-candidate` account for 110.
 
-Two things follow. First, **the cluster is not orderable for a new seat for
-reasons entirely outside the terminal image**, and no image, catalog, or seat-cap
-change fixes that — it is a shared-worker scheduling decision, so it does not
-belong to Track A or B and should not be answered by weakening the headroom
-policy as a side effect of a proof. Second, the order still behaved correctly: it
-was created `failed` with a `pending` seat, no namespace, no session and no
-terminal pod, so the failure mode is fail-closed rather than half-provisioned.
-What remains unproven is one thing only: that a participant terminal pulls
-`548b0e3c…`.
+The order still behaved correctly: it was created `failed` with a `pending` seat,
+no namespace, no session and no terminal pod, so the failure mode is fail-closed
+rather than half-provisioned.
+
+**The seat proof now passes, and it took two attempts and one more trap.** The
+capacity block cleared the next day for a reason outside Launchpad:
+`ols-eval-models` released its `granite-v3` (128 cores) and `deepseek-v4-flash`
+(44 cores) pods, dropping requests on `fp1`–`fp3` from 681 784 m to 509 784 m —
+exactly 172 000 m. At the untouched 20 % reserve that admits 20 seats, so the
+temporary 10 % headroom window that had been applied to make room was reverted
+before any order was placed, with the pod-spec env fingerprint byte-identical to
+its pre-change value. No seat in this record was admitted under weakened policy.
+
+The first real order then failed a different test, and this one matters more than
+the capacity numbers. It came up `ready` — and its terminal pulled
+`324dc5c4…`, the **previous** digest. The ConfigMap was correct, the backend's
+mounted `clusters.yaml` was correct, and the `lifecycle-worker`'s own mounted
+file was correct; but the worker process had been up since 2026-11-25T00:56Z and
+held cluster targets in memory from before the pin. The backend rollout never
+touched it, so the showroom Application it rendered carried the old digest. After
+`oc rollout restart deploy/lifecycle-worker` (and confirming no pre-pin worker
+remained — the rollout reported success while the old pod was still `Running`
+with a `deletionTimestamp`), a second order came up `ready` with the `terminal`
+container's image **and** `imageID` both `548b0e3c…`.
+
+Both seats were reclaimed to `completed`, with their namespaces deleted and no
+terminal pods left behind. Evidence:
+`evidence/runs/terminal-participant-seat-20261126.json`, which supersedes the
+`BLOCKED-ON-CAPACITY` status in the 2026-11-25 record without editing it — that
+status was true when it was written.
+
+**What is still not guaranteed is admission.** The cluster can now admit a seat
+because another team stopped requesting 172 cores, not because Launchpad gained
+capacity, and nothing prevents those pods returning. The terminal image, its
+signature, the pin, and the participant pull are all proven; a later order can
+still fail closed on CPU, and that will remain a scheduling answer rather than an
+image answer.
 
 **Why this outranks every other Track B item.** 16 catalog items declare
 `showroom_terminal_storage`. The terminal is not one blocked experience; it is

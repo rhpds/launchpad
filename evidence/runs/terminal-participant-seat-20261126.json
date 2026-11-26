@@ -1,0 +1,194 @@
+{
+  "schema": "launchpad.redhat.com/terminal-participant-seat/v1",
+  "evidence_id": "TERMINAL-PARTICIPANT-SEAT-20261126",
+  "recorded_at": "2026-11-26T21:30:00Z",
+  "observed_date": "2026-11-26",
+  "cluster_id": "flightpath",
+  "namespace": "launchpad-flightpath-candidate",
+  "contains_plaintext_credentials": false,
+  "one_time_access_code_recorded": false,
+  "default_kube_context_changed": false,
+  "supersedes": {
+    "path": "evidence/runs/terminal-promotion-20261125.json",
+    "sha256": "47c70ea4906e0ad1f6366d7d79a62c6b50c12ad5b811cb5938e5dfec44df2970",
+    "note": "That record's participant_proof.status=BLOCKED-ON-CAPACITY and participant_seat_proved=false were true at its recorded_at (2026-11-25T23:55Z). It is not edited; this record is the later observation that closes the gap."
+  },
+  "subject": {
+    "image": "quay.io/rh-ee-jkershaw/launchpad-showroom-terminal@sha256:548b0e3c891c31aa6f94ca559643356b37ce9027299aa83a94aae7007654092e",
+    "manifest_digest": "sha256:548b0e3c891c31aa6f94ca559643356b37ce9027299aa83a94aae7007654092e",
+    "released_at_commit": "e26a87c39894c2ef8b64ea7ba2b19179300d3290",
+    "release_run": 45721636396,
+    "pinned_in_live_configmap": true,
+    "configmap": "launchpad-cluster-targets"
+  },
+  "admission": {
+    "policy_in_force_during_proof": {
+      "env": "WORKSHOP_CAPACITY_HEADROOM_PCT",
+      "value": "unset (code default 20)",
+      "verified_absent_from_pod_spec": true,
+      "deployment_generation": 385
+    },
+    "temporary_headroom_window": {
+      "value_set": 10,
+      "generation_before": 383,
+      "generation_after": 384,
+      "preview_reported": "Cluster can support 46 seats (CPU: 276, Memory: 652, Pods: 46; Eligible nodes: 3; 10.0% headroom)",
+      "reverted": true,
+      "revert_generation": 385,
+      "env_fingerprint_before": "42adc0980afd9932d84c68dd6f15c6d938f02b1d39924a87be7af3f50a496471",
+      "env_fingerprint_after_revert": "42adc0980afd9932d84c68dd6f15c6d938f02b1d39924a87be7af3f50a496471",
+      "orders_placed_while_set": 0,
+      "note": "The window was applied to make room, then found to be unnecessary and reverted before any order was placed. No seat in this record was admitted under 10% headroom."
+    },
+    "why_admission_became_possible": {
+      "cause": "external workload release, not the Launchpad pin",
+      "requests_before_millicores": 681784,
+      "requests_after_millicores": 509784,
+      "freed_millicores": 172000,
+      "released_workloads": [
+        {
+          "namespace": "ols-eval-models",
+          "workload": "granite-v3 (vllm container)",
+          "cpu_millicores": 128000
+        },
+        {
+          "namespace": "ols-eval-models",
+          "workload": "deepseek-v4-flash (serve container)",
+          "cpu_millicores": 44000
+        }
+      ],
+      "qwen35_cpu_still_running": true,
+      "observed_after": "ols-eval-models deployments: gemma4-26b=0, qwen35-122b=0, qwen35-cpu=1; neither granite-v3 nor deepseek-v4 present cluster-wide",
+      "preview_at_20pct_after_release": {
+        "can_provision": true,
+        "reason": "Cluster can support 20 seats (CPU: 155, Memory: 434, Pods: 20; Eligible nodes: 3; 20.0% headroom)"
+      },
+      "note": "These are other teams' workloads. Launchpad neither requested nor caused the release and cannot rely on it persisting."
+    }
+  },
+  "attempt_1_negative": {
+    "outcome": "FAIL-OLD-DIGEST-SERVED",
+    "purpose": "First real one-seat order after the repin. It proved that a correct ConfigMap and a restarted backend are not sufficient.",
+    "order": {
+      "workshop_id": "4347d01b-2800-439d-8d92-3bd7a0695836",
+      "idempotency_key": "terminal-seat-proof-20261126T211115Z",
+      "tenant_id": "flightpath-candidate-cert",
+      "catalog_item_id": "virtualization-ai-201",
+      "num_users": 1,
+      "ttl": "10m",
+      "exposure_policy": "public_code",
+      "target_cluster": "flightpath",
+      "final_status": "ready",
+      "seat_status": "ready",
+      "session_id": "7e55ca9b-d391-4f28-a400-d46a7c6c619b",
+      "public_url_issued": true
+    },
+    "seat_namespace": "launchpad-flightpath-candida-virtualization-ai-4386b8",
+    "seat_namespace_created": "2026-11-26T21:11:25Z",
+    "terminal_pod": {
+      "pod": "showroom-f99d7866f-w5j29",
+      "container": "terminal",
+      "created": "2026-11-26T21:12:06Z",
+      "phase": "Running",
+      "image": "quay.io/rh-ee-jkershaw/launchpad-showroom-terminal@sha256:324dc5c4201f0da030a572dab389bc8cfdc2f66e800dff3fcee824b7e795daae",
+      "digest_matches_subject": false
+    },
+    "argo_application_rendered_image": "quay.io/rh-ee-jkershaw/launchpad-showroom-terminal@sha256:324dc5c4201f0da030a572dab389bc8cfdc2f66e800dff3fcee824b7e795daae",
+    "stale_cache_root_cause": {
+      "pod": "lifecycle-worker-7d796d746c-6rx5d",
+      "deployment": "lifecycle-worker",
+      "pod_created": "2026-11-25T00:56:25Z",
+      "pod_age_at_observation": "44h",
+      "mounted_file_had_new_digest": true,
+      "in_process_target_object_stale": true,
+      "explanation": "The lifecycle worker loads cluster targets at startup and holds them in process. Its ConfigMap volume had already picked up 548b0e3c, but the running process still held 324dc5c4 from 2026-11-25T00:56Z, so it rendered the old digest into the showroom Application. The backend rollout (generation 382 -> 383 -> 384 -> 385) restarts only the backend pod and never touched this worker.",
+      "why_this_is_not_a_pin_problem": "The live ConfigMap and the backend's mounted /etc/launchpad/clusters.yaml both carried 548b0e3c at the time of this observation, and the lifecycle worker's own mount did too. Only the worker's cached object was stale."
+    },
+    "reclaim": {
+      "response_status": "reclaiming",
+      "final_status": "completed",
+      "namespace_gone": true,
+      "terminal_pods_remaining": 0
+    }
+  },
+  "remediation": {
+    "action": "oc -n launchpad-flightpath-candidate rollout restart deploy/lifecycle-worker",
+    "deployment": "lifecycle-worker",
+    "replicas": 2,
+    "generation_before": 377,
+    "generation_after": 378,
+    "old_pod": {
+      "pod": "lifecycle-worker-7d796d746c-6rx5d",
+      "deletion_timestamp": "2026-11-26T21:20:57Z",
+      "disappeared_before_next_order": true
+    },
+    "new_pods": [
+      {
+        "pod": "lifecycle-worker-7f4b564ff9-bpdss",
+        "created": "2026-11-26T21:20:24Z"
+      },
+      {
+        "pod": "lifecycle-worker-7f4b564ff9-g882w",
+        "created": "2026-11-26T21:20:25Z"
+      }
+    ],
+    "all_workers_created_after_pin": true
+  },
+  "attempt_2_positive": {
+    "outcome": "PASS-PINNED-DIGEST-SERVED",
+    "precondition": "no pre-pin lifecycle worker remained (verified before ordering)",
+    "order": {
+      "workshop_id": "edc4726d-221d-4a42-8235-5f08aac96076",
+      "idempotency_key": "terminal-seat-proof-20261126T212109Z-after-worker-restart",
+      "tenant_id": "flightpath-candidate-cert",
+      "catalog_item_id": "virtualization-ai-201",
+      "num_users": 1,
+      "ttl": "10m",
+      "exposure_policy": "public_code",
+      "target_cluster": "flightpath",
+      "capacity_preview_can_provision": true,
+      "final_status": "ready",
+      "seat_status": "ready",
+      "session_id": "8629be3f-8f97-4d48-bea7-04d98902ac56",
+      "public_url_issued": true,
+      "provisioning_seconds_approx": 70
+    },
+    "seat_namespace": "launchpad-flightpath-candida-virtualization-ai-4b7851",
+    "terminal_pod": {
+      "pod": "showroom-6c8fcf9f58-wj95p",
+      "container": "terminal",
+      "created": "2026-11-26T21:21:29Z",
+      "node": "fp2.fm2aihpcsed.com",
+      "phase": "Running",
+      "ready": true,
+      "restart_count": 0,
+      "pod_containers": [
+        "content",
+        "terminal",
+        "traefik",
+        "wetty"
+      ],
+      "image": "quay.io/rh-ee-jkershaw/launchpad-showroom-terminal@sha256:548b0e3c891c31aa6f94ca559643356b37ce9027299aa83a94aae7007654092e",
+      "image_id": "quay.io/rh-ee-jkershaw/launchpad-showroom-terminal@sha256:548b0e3c891c31aa6f94ca559643356b37ce9027299aa83a94aae7007654092e",
+      "pulled_image_matches_pin": true
+    },
+    "argo_application_rendered_image": "quay.io/rh-ee-jkershaw/launchpad-showroom-terminal@sha256:548b0e3c891c31aa6f94ca559643356b37ce9027299aa83a94aae7007654092e",
+    "reclaim": {
+      "response_status": "reclaiming",
+      "final_status": "completed",
+      "namespace_gone": true,
+      "terminal_pods_remaining": 0,
+      "seat_namespaces_remaining": 0
+    }
+  },
+  "verification_summary": {
+    "participant_seat_proved": true,
+    "participant_terminal_pulled_pinned_digest": true,
+    "proved_by": "terminal container imageID equals the manifest digest, not merely the requested image string; the Argo Application values carried the same digest",
+    "stale_worker_cache_observed": true,
+    "backend_restart_insufficient_alone": true,
+    "headroom_policy_weakened_in_final_state": false,
+    "seat_reclaimed_cleanly": true,
+    "open_risk": "Admission depended on capacity that another team freed. A later seat order may fail closed again without any image regression."
+  }
+}
