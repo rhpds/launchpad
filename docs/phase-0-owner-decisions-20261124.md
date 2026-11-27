@@ -1,9 +1,11 @@
 # Phase 0 owner decisions — GO-2026-5932 disposition and Console cutover window
 
-Status: Brief 2 CLOSED 2026-11-24 by a read-only check — no override exists,
-so there was no cutover to perform. Brief 1 OPEN, awaiting one reviewer
-signature. Neither item is a code change.
-Date: 2026-11-24.
+Status: **Both briefs CLOSED.** Brief 2 closed 2026-11-24 by a read-only check —
+no override exists, so there was no cutover to perform. Brief 1 closed
+2026-11-27 by the security reviewer's signature, bound to the reviewed build
+and carrying explicit limits on what that signature does and does not clear.
+Neither item is a code change.
+Date: 2026-11-24 (Brief 1 signed 2026-11-27).
 Branch: `codex/flightpath-migration-20260922`.
 Decision owners: Launchpad owner (`jkershaw`, both briefs); Launchpad platform
 security reviewer (`jkershaw`, Brief 1 — identity confirmed 2026-11-24);
@@ -23,11 +25,13 @@ execution time.
 
 | # | Item | Recommended decision | Record to file | Blocks |
 |---|---|---|---|---|
-| 1 | `x/crypto` GO-2026-5932 (2 unrated backend matches) | Accept with scope, as a signed advisory-review disposition — **not** a scanner ignore | `evidence/convergence/backend-openpgp-advisory-disposition-20261124.yaml` | Backend security gate, which gates the immutable candidate image |
+| 1 | `x/crypto` GO-2026-5932 (2 unrated backend matches) | Accept with scope, as a signed advisory-review disposition — **not** a scanner ignore. **Signed 2026-11-27**; it does not clear the scanner gate | `evidence/convergence/backend-openpgp-advisory-disposition-20261124.yaml` | Backend security gate, which gates the immutable candidate image |
 | 2 | Console / `labs.smg-helix.ai` collision | Native-route cutover (remove the operator `spec.route` override), not a new DNS hostname | `evidence/convergence/flightpath-console-cutover-<date>.yaml` produced by the window — **not needed**: closed by read-only check 2026-11-24 | Track A Phase 4 (Console half **closed**; full sweep still open) |
 
 Both are cheap relative to the work they unblock, and both are reversible or
-time-bounded. Neither requires a catalog, seat-ceiling, or image change.
+time-bounded. Neither requires a catalog, seat-ceiling, or image change. Both are
+now closed: Brief 2 on 2026-11-24 by observation, Brief 1 on 2026-11-27 by
+signature.
 
 ---
 
@@ -213,7 +217,8 @@ code in either binary, that no fix exists, and that the acceptance expires.
 ## 1.6 Exact record to file
 
 Create `evidence/convergence/backend-openpgp-advisory-disposition-20261124.yaml`
-(note: this brief does not create it — the reviewer signs it). Schema
+(note: this brief does not create it — the reviewer signs it; **signed
+2026-11-27**). Schema
 `launchpad/advisory-disposition/v1`, matching the style already used by
 `evidence/convergence/backend-remaining-security-disposition-20261014.yaml`.
 
@@ -225,7 +230,9 @@ rendered from the measured report by `scripts/render_risk_acceptance.py`, which
 enumerates every blocking `(advisory, package, severity)` triple and names the
 revision being released. Sign both: the disposition is the reasoning a reader
 can audit, the acceptance is the scope the pipeline enforces. Neither one grants
-platform staging qualification.
+platform staging qualification. Brief 1 is signed alone: no `risk-acceptance/v1`
+accompanies it, because neither scanned digest was ever published, so there is no
+released artifact whose triples could be enumerated (§1.9).
 
 Required fields:
 
@@ -438,12 +445,19 @@ artifacts, not against assumptions.
 >
 > Approved by: J Kershaw — `launchpad-platform-security-reviewer`, identity
 > confirmed 2026-11-24
-> Date: __________ **not yet executed** — the findings are verified and the
-> wording is final. What is not resolved is *which* digest the acceptance binds:
-> neither scanned digest was ever pushed to the registry (§1.8 item 3), so a
-> signature taken now names an image nobody can pull, and the next promoted
-> build reopens it by construction. Sign against the digest that will be
-> promoted, or sign now and accept that the record reopens on the next build.
+> Signed: 2026-11-27
+>
+> **What the signature binds, and what it does not.** It is bound to the two
+> scanned builds named above, not to a registry artifact. Both digests were
+> checked against the registry at signing time and are **absent**; the newest
+> published `launchpad-backend-flightpath-candidate` remains `git-27b6d2b1`
+> (2026-10-14), which predates both scans. The record therefore documents a
+> reviewed build; it does not clear a registry object, does not clear the
+> scanner gate (the gate reads enumerated `launchpad/risk-acceptance/v1`
+> triples and not this schema), and does not touch the 30 RPM High matches or
+> the 3 non-fixable Go findings that still block a backend publish. The next
+> promoted backend build is a different digest and reopens this disposition by
+> construction. Full statement in the record's `binding_limits` block.
 
 ---
 

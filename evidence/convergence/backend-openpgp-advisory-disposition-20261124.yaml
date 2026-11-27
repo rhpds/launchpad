@@ -1,0 +1,169 @@
+schema: launchpad/advisory-disposition/v1
+record_id: BACKEND-OPENPGP-GO-2026-5932-20261124
+date: '2026-11-24'
+signed_on: '2026-11-27'
+date_note: >-
+  `date` is the date the disposition was drafted and decided (it matches the
+  filename). The signature was applied on `signed_on`.
+brief: docs/phase-0-owner-decisions-20261124.md
+brief_section: '1.6 - 1.9'
+status: ACCEPTED-WITH-SCOPE
+advisory: https://vuln.go.dev/ID/GO-2026-5932.json
+advisory_id: GO-2026-5932
+advisory_status_at_review: REVIEWED
+advisory_modified_at_review: '2026-11-02'
+cve: none
+cvss: none
+severity_basis: >-
+  The entry carries no CVE and no CVSS. The staging gate blocks it because the
+  scanner reports it as Unknown, not because it scores High or Critical.
+affected_modules:
+  - module: golang.org/x/crypto
+    version: v0.57.0
+    matches: 2
+    binaries: [/usr/local/bin/oc, /usr/local/bin/helm]
+build_tag_basis:
+  tag: containers_image_openpgp
+  containerfile: backend/Containerfile
+  linked_binaries:
+    - {path: /usr/local/bin/oc, built_at_line: 78, copied_at_line: 149}
+    - {path: /usr/local/bin/helm, built_at_line: 119, copied_at_line: 150}
+  not_in_scope:
+    - {path: /usr/bin/skopeo, image: showroom-terminal, why: Separate image, participant-invocable, separate disposition required.}
+scanner_source:
+  commit: 8b8fc909fe057a8803334ed3d37c1625acd96ea7
+  run: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/39473152288
+  unrated_matches: 2
+  retained_artifact: backend-vulnerability-scan-8b8fc909fe057a8803334ed3d37c1625acd96ea7
+  report_sha256: 4f85853aa7832af03f4a9b8cf819daeba43e1262ac94b682f3ad1024ae1cd46a
+prior_scan:
+  commit: 95fec905f1c2a3b6581de5e290f711af2ede37c1
+  run: https://github.com/jkershawrh/intel-ai-launchpad/actions/runs/38758481803
+  candidate_digest: sha256:d222ed9ae801475224b1f793e5f758ab9d31f83c0be01aee5978e88b66a83f69
+  unrated_matches: 2
+  report_sha256_prefix_in_brief: '69a237e7'
+  note: >-
+    Same two binaries at the same module version. Recorded because the earlier
+    draft of this brief cited this scan; the current baseline supersedes it
+    without changing what has to be dispositioned. The brief records only the
+    first eight hex characters of this scan's report hash; they are reproduced
+    here rather than reconstructed.
+candidate_digest: sha256:49f2ec78b83aa6f963bb6c59a056eeaccde826060b2b15eda74919ce13923b2a
+candidate_published: false
+candidate_unpushed_note: >-
+  Scanned in CI and never pushed. The registry's newest
+  launchpad-backend-flightpath-candidate version is git-27b6d2b1 (2026-10-14).
+  Any rebuild produces a new digest and reopens this disposition.
+fixed_version_available: false
+fixed_version_reason: >-
+  golang.org/x/crypto v0.59.0 removed the openpgp package. The replacement
+  module golang.org/x/crypto/openpgp v0.1.0-deprecated is deprecated and its
+  advisory range has no fixed version. Upgrading relocates the finding; it does
+  not remove it.
+upgrade_attempts:
+  parent_module_bump: RELOCATES-NOT-REMOVES
+  protonmail_fork: REJECTED-3-OF-3-V3-SIGNATURE-FIXTURES-FAIL
+  remove_build_tag: REQUIRES-CGO-GPGME-OR-RUST-SEQUOIA
+reachability:
+  platform_invoked_paths:
+    oc: [oc get, oc create route]
+    helm: [helm repo add, helm repo update, helm install]
+  absent_calls: [oc image, oc build, image signature verification, helm verify]
+  human_invocable_paths_not_covered:
+    - helm verify / helm install --verify, by anyone with a shell in the backend container
+    - skopeo verify, by participants in the showroom-terminal image
+  reachability_proven: false
+  limitation: Static review of call sites, not a dynamic taint proof.
+scope_statement: |
+  This disposition covers the two unrated GO-2026-5932 matches in the
+  containers_image_openpgp build of the backend image at the recorded candidate
+  digest: one in /usr/local/bin/oc and one in /usr/local/bin/helm. It is scoped
+  to *platform-invoked paths* in both binaries.
+
+  It does not disposition any other High, Critical, or Unknown finding, any
+  other image, any other build tag, or any future code path that verifies
+  OpenPGP signatures, calls oc image, calls oc build, or calls helm verify. It
+  does not cover the openpgp verify paths exposed to a human with shell access
+  in the backend container.
+
+  In particular it does not cover the GO-2026-5932 finding in /usr/bin/skopeo
+  in the showroom-terminal image, where the CLI is participant-invocable and
+  verify is a supported verb; that requires its own disposition and its own
+  reachability argument. It is not a scanner suppression and does not change
+  any scanner configuration.
+residual_risk: |
+  The unmaintained openpgp code remains linked into the shipped oc and helm
+  binaries for the life of the acceptance. If a future Launchpad feature routes
+  untrusted image signatures through oc, enables oc image / oc build, or adds
+  helm verify to a platform path, this disposition no longer applies and must be
+  reopened before that feature ships. The scanner will keep reporting the
+  finding on every rebuild; the report is expected, not a regression. There is
+  no upstream fix to wait for.
+
+  Two human-invocable verify paths remain open for the same period: helm verify
+  inside the backend container, and skopeo verify in the terminal image. The
+  first is bounded by container shell access and is not reached by any platform
+  call site; the second is a separate participant-facing surface and is not
+  covered here.
+owner_role: launchpad-platform-security-reviewer
+owner_signature: 'jkershaw (launchpad-platform-security-reviewer), 2026-11-27'
+expires: '2027-02-22'
+reopen_triggers:
+  - Any Launchpad code path starts verifying OpenPGP signatures.
+  - oc image or oc build becomes reachable from backend request handling.
+  - A CVE is assigned to GO-2026-5932.
+  - Upstream publishes a fixed openpgp module version.
+  - The candidate digest changes without re-review.
+binding_limits:
+  named_digests_published: false
+  registry_check:
+    checked_on: '2026-11-27'
+    method: >-
+      GitHub container registry version inventory for
+      jkershawrh/launchpad-backend-flightpath-candidate, read directly from the
+      package versions API rather than inferred.
+    candidate_digest_present: false
+    prior_digest_present: false
+    newest_published_tag: git-27b6d2b1
+    newest_published_created_at: '2026-10-14T18:54:11Z'
+    note: >-
+      Both digests this disposition names are absent from the registry. The
+      most recent published candidate predates both scans, so no image carrying
+      the reviewed build can be pulled to re-verify this decision.
+  what_this_signature_does: >-
+    It records that a human holding the named role reviewed the advisory, both
+    matches, the build-tag basis, the failed upgrade attempts and the
+    reachability limits for the specific scanned build, and decided that the
+    finding is acceptable within the stated scope until the expiry date.
+  what_this_signature_does_not_do:
+    - It does not publish, promote, push or otherwise make any image pullable.
+    - It does not clear the scanner gate for any build, past or future.
+    - It does not accept any finding other than the two enumerated GO-2026-5932 matches.
+    - It does not assert that the image is safe, only that this finding is scoped and time-bounded.
+    - It does not cover the terminal image, skopeo, helm verify, or human shell access in the backend container.
+  gate_effect: >-
+    None. scripts/check_backend_staging_security.py consumes enumerated
+    launchpad/risk-acceptance/v1 triples and does not read this schema. A build
+    whose report contains this finding still fails the gate until a separate
+    acceptance covering that build's exact triples is materialised for it.
+  next_promoted_backend_build: >-
+    Reopens this disposition by construction. A promoted build is a different
+    digest, therefore a different image, therefore a new scan and a new review;
+    this signature cannot be carried forward to it.
+  known_findings_outside_scope: >-
+    The backend build remains blocked on High findings that this record does not
+    touch: the RPM matches behind their advisories plus the non-fixable Go
+    findings, which are vendor-wait. Recorded as 30 RPM High matches across 11
+    advisories plus 3 non-fixable Go findings in
+    docs/flightpath-orderable-capacity-and-roadmap-20261124.md, which is why a
+    fresh backend publish cannot pass its gate today and why this disposition
+    binds a reviewed build rather than a cleared registry artifact.
+evidence_sources:
+  - docs/phase-0-owner-decisions-20261124.md
+  - evidence/convergence/openpgp-compatibility-experiment-20261020.yaml
+  - evidence/convergence/image-remediation-20261020.yaml
+  - evidence/convergence/staging-candidate-freeze-20261016.yaml
+scanner_ignore_added: false
+suppression_added: false
+live_changes: false
+staging_qualified_by_this_record: false

@@ -148,30 +148,44 @@ new product-owner decision **after** staging acceptance.
 
 | Phase | Work | State |
 |---|---|---|
-| **0** | Owner decisions: x/crypto GO-2026-5932 disposition; Console cutover window | Brief 2 **closed by live check 11-24** — no override exists; Brief 1 **1 signature needed** |
+| **0** | Owner decisions: x/crypto GO-2026-5932 disposition; Console cutover window | **closed** — Brief 2 by live check 11-24 (no override exists); Brief 1 signed 11-27 with its limits recorded. The backend gate itself is still blocked by the vendor-wait findings |
 | **1** | Keycloak 26.8.1 isolated upgrade + DB compatibility proof; virtualization-ai-501 narrow-pane layout | **closed** (2026-10-16) |
 | **2** | Vendor-pending images: terminal, backend | backend **vendor-wait**; terminal **blocked on a gate decision, not on vendors** — see below |
 | **3** | Staged catalog pins; exact-commit regression; current-revision public browser proofs | pins + regression **closed**; public proofs **open and failing** |
 | **4** | Console verify-or-cutover; full acceptance sweep with zero residue | Console **verified native 11-24, no mutation needed**; sweep still **unverified** |
 
-**Phase 0** is down to one signature, and it is Brief 1's. `docs/phase-0-owner-decisions-20261124.md`
-carries both briefs. Brief 1 asks to accept GO-2026-5932 with scope (the two
-unrated matches are `openpgp` code linked into `oc` and `helm` via
-`containers_image_openpgp`, with no platform path reaching it in either and no
-fixed version in any release). Brief 2 was a 90-minute Console window that opened
-with a read-only check — **and the check ran on 2026-11-24: the operator has no
-`spec.route` override and no `console-custom` route exists, so the window is
-void.** No mutation was needed and none was made. The Flightpath/network
-sign-off waived on 2026-11-24 was therefore never exercised.
+**Phase 0 is closed.** `docs/phase-0-owner-decisions-20261124.md` carries both
+briefs, and both are now resolved. Brief 1 accepted GO-2026-5932 with scope on
+2026-11-27: the two unrated matches are `openpgp` code linked into `oc` and
+`helm` via `containers_image_openpgp`, with no platform path reaching it in
+either and no fixed version in any release. The signed record is
+`evidence/convergence/backend-openpgp-advisory-disposition-20261124.yaml`.
+Brief 2 was a 90-minute Console window that opened with a read-only check —
+**and the check ran on 2026-11-24: the operator has no `spec.route` override and
+no `console-custom` route exists, so the window is void.** No mutation was
+needed and none was made. The Flightpath/network sign-off waived on 2026-11-24
+was therefore never exercised.
+
+What Brief 1's signature binds is in the file rather than left to inference. It
+binds the two October scans, and **neither digest was ever published**: a
+registry check at signing time found both absent, with `git-27b6d2b1`
+(2026-10-14) still the newest candidate. The signature therefore documents a
+reviewed build; it does not clear a pullable artifact, does not clear the
+scanner gate — which reads enumerated `risk-acceptance/v1` triples and not this
+schema — and reopens on the next promoted backend build by construction. The
+30 RPM High matches behind 11 advisories and the 3 non-fixable Go findings are
+untouched and remain vendor-wait.
 
 Two corrections to the earlier reading, both now in the brief. **Signing does
 not clear the backend gate:** the gate blocks on the full inventory, so the
-disposition removes 2 of 37 blocking findings and leaves 35 High. And the
-advisory is **not backend-only** — the count of two matches is two *binaries*,
-`oc` and `helm`, and the showroom-terminal image builds `skopeo` with the same
-`containers_image_openpgp` tag and carries the same unrated finding. Brief 1
-covers the two backend binaries only; `skopeo` is participant-invocable, where
-the reachability argument is weakest, and needs its own disposition.
+disposition removes 2 of the 37 blocking findings measured on 2026-11-24 and
+leaves 35 High; 2 of those were fixable and have since been fixed, leaving the
+33 vendor-wait findings. And the advisory is **not backend-only** — the count of
+two matches is two *binaries*, `oc` and `helm`, and the showroom-terminal image
+builds `skopeo` with the same `containers_image_openpgp` tag and carries the
+same unrated finding. Brief 1 covers the two backend binaries only; `skopeo` is
+participant-invocable, where the reachability argument is weakest, and needs its
+own disposition.
 
 **Phase 1 is closed — the doc previously had it wrong.**
 
@@ -431,8 +445,9 @@ RPM tail, routed through that mechanism — mechanical, and the only option that
 reduces participant exposure; (b) drop `oc`, `kubectl` and `roxctl` and accept a
 terminal without cluster-admin tooling, which changes what labs can teach; or
 (c) leave the terminal unpublished and keep `324dc5c4` serving, which is a
-choice to keep shipping 112 Criticals. Option (a) needs an owner signature, and
-Brief 1 is the natural vehicle once a digest exists to sign.
+choice to keep shipping 112 Criticals. Option (a) needs an owner signature, and —
+because Brief 1 is scoped to the two backend binaries and explicitly excludes
+`skopeo` — it needs a terminal-scoped acceptance of its own rather than Brief 1.
 
 **Option (a) was taken, and it landed.** The owner signed a
 `launchpad/risk-acceptance/v1` record for the terminal — 68 enumerated triples,

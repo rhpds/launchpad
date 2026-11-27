@@ -34,6 +34,13 @@ justifies deeper investment.
    capture for the Console/hostname collision fix. Independent of all image
    work; can execute whenever approved.
 
+Both items are now closed. Item 1 was signed on 2026-11-27
+(`evidence/convergence/backend-openpgp-advisory-disposition-20261124.yaml`),
+bound to the October scans with its limits recorded — it does not clear the
+backend gate. Item 2 needed no window: the 2026-11-24 read-only check found no
+operator `spec.route` override to cut over. Details in
+`docs/phase-0-owner-decisions-20261124.md`.
+
 Advice: make these decisions early — they are cheap, and Phase 2's timeline
 does not clear them.
 
