@@ -146,6 +146,23 @@ binding_limits:
     launchpad/risk-acceptance/v1 triples and does not read this schema. A build
     whose report contains this finding still fails the gate until a separate
     acceptance covering that build's exact triples is materialised for it.
+  gate_effect_observed:
+    checked_on: '2026-11-27'
+    method: >-
+      Ran scripts/check_backend_staging_security.py --component backend against
+      a minimal Grype-shaped report carrying one GO-2026-5932 match in
+      golang.org/x/crypto v0.57.0, with this disposition present in the working
+      tree and no acceptance supplied.
+    report_sha256: b2cc52d0abc8710ca0c71fc06520ea1d2de8141a2ba16e8b0fa6b35f494bd1b1
+    result:
+      staging_security_gate: BLOCKED
+      risk_acceptance: NOT-GRANTED
+      gate_basis: BLOCKING-FINDINGS
+      unaccepted_unrated_matches: 1
+      exit_code: 1
+    note: >-
+      The gate has no argument or code path that reads this schema; its only
+      acceptance input is --acceptance with launchpad/risk-acceptance/v1.
   next_promoted_backend_build: >-
     Reopens this disposition by construction. A promoted build is a different
     digest, therefore a different image, therefore a new scan and a new review;
